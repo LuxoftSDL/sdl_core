@@ -491,6 +491,8 @@ bool ApplicationManagerImpl::LoadAppDataToHMI(ApplicationSharedPtr app) {
 }
 
 bool ApplicationManagerImpl::ActivateApplication(ApplicationSharedPtr app) {
+  LOG4CXX_AUTO_TRACE(logger_);
+
   if (!app) {
     LOG4CXX_ERROR(logger_, "Null-pointer application received.");
     NOTREACHED();
@@ -502,59 +504,60 @@ bool ApplicationManagerImpl::ActivateApplication(ApplicationSharedPtr app) {
     return false;
   }
 
-  bool is_new_app_media = app->is_media_application();
-  ApplicationSharedPtr current_active_app = active_application();
+  using namespace mobile_api;
 
-  if (mobile_api::HMILevel::eType::HMI_LIMITED != app->hmi_level()) {
+  if (HMILevel::HMI_LIMITED != app->hmi_level()) {
     if (app->has_been_activated()) {
       MessageHelper::SendAppDataToHMI(app);
     }
   }
 
+  bool is_new_app_media = app->is_media_application();
+  bool is_new_app_voice = app->is_voice_communication_supported();
+  bool is_new_app_navi = app->is_navi();
+
+  ApplicationSharedPtr limited_media_app = get_limited_media_application();
+  ApplicationSharedPtr limited_voice_app = get_limited_voice_application();
+  ApplicationSharedPtr limited_navi_app = get_limited_navi_application();
+
+  ApplicationSharedPtr current_active_app = active_application();
   if (current_active_app.valid()) {
     if (is_new_app_media && current_active_app->is_media_application()) {
-      current_active_app->MakeNotAudible();
-    } else if (!(current_active_app->IsAudioApplication())) {
-      current_active_app->set_hmi_level(mobile_api::HMILevel::HMI_BACKGROUND);
+      MakeAppNotAudible(current_active_app->app_id());
+      MessageHelper::SendHMIStatusNotification(*current_active_app);
     } else {
-      current_active_app->set_hmi_level(mobile_api::HMILevel::HMI_LIMITED);
+      DeactivateApplication(current_active_app);
     }
-
-    MessageHelper::SendHMIStatusNotification(*current_active_app);
   }
 
   app->MakeFullscreen();
 
   if (is_new_app_media) {
-    ApplicationSharedPtr limited_app = get_limited_media_application();
-    if (limited_app.valid()) {
-      limited_app->MakeNotAudible();
-      MessageHelper::SendHMIStatusNotification(*limited_app);
+    if (limited_media_app.valid()) {
+      if (!limited_media_app->is_navi()) {
+        MakeAppNotAudible(limited_media_app->app_id());
+        MessageHelper::SendHMIStatusNotification(*limited_media_app);
+      } else {
+        app->set_audio_streaming_state(AudioStreamingState::ATTENUATED);
+        MessageHelper::SendHMIStatusNotification(*app);
+      }
     }
   }
 
-  if (app->is_voice_communication_supported()) {
-    ApplicationSharedPtr limited_app = get_limited_voice_application();
-    if (limited_app.valid()) {
-      if (limited_app->is_media_application()) {
-        limited_app->set_audio_streaming_state(
-            mobile_api::AudioStreamingState::NOT_AUDIBLE);
-      }
-      limited_app->set_hmi_level(mobile_api::HMILevel::HMI_BACKGROUND);
-      MessageHelper::SendHMIStatusNotification(*limited_app);
+  if (is_new_app_voice && limited_voice_app.valid()) {
+    if (limited_voice_app->is_media_application()) {
+      MakeAppNotAudible(limited_voice_app->app_id());
     }
+    ChangeAppsHMILevel(limited_voice_app->app_id(), HMILevel::HMI_BACKGROUND);
+    MessageHelper::SendHMIStatusNotification(*limited_voice_app);
   }
 
-  if (app->allowed_support_navigation()) {
-    ApplicationSharedPtr limited_app = get_limited_navi_application();
-    if (limited_app.valid()) {
-      if (limited_app->is_media_application()) {
-        limited_app->set_audio_streaming_state(
-            mobile_api::AudioStreamingState::NOT_AUDIBLE);
-      }
-      limited_app->set_hmi_level(mobile_api::HMILevel::HMI_BACKGROUND);
-      MessageHelper::SendHMIStatusNotification(*limited_app);
+  if (is_new_app_navi && limited_navi_app.valid()) {
+    if (limited_navi_app->is_media_application()) {
+      MakeAppNotAudible(limited_navi_app->app_id());
     }
+    ChangeAppsHMILevel(limited_navi_app->app_id(), HMILevel::HMI_BACKGROUND);
+    MessageHelper::SendHMIStatusNotification(*limited_navi_app);
   }
 
   return true;
