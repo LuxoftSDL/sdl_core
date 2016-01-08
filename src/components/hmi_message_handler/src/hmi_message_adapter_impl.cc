@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Ford Motor Company
+ * Copyright (c) 2015, Ford Motor Company
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,37 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SRC_COMPONENTS_HMI_MESSAGE_HANDLER_INCLUDE_HMI_MESSAGE_HANDLER_MQUEUE_ADAPTER_H_
-#define SRC_COMPONENTS_HMI_MESSAGE_HANDLER_INCLUDE_HMI_MESSAGE_HANDLER_MQUEUE_ADAPTER_H_
-
-#include <memory>
-#include <mqueue.h>
-#include "utils/threads/thread.h"
 #include "hmi_message_handler/hmi_message_adapter_impl.h"
 
 namespace hmi_message_handler {
+HMIMessageAdapterImpl::HMIMessageAdapterImpl(HMIMessageHandler* handler)
+    : handler_(handler) {}
 
-class ReceiverThreadDelegate;
-
-/**
- * \brief HMI message adapter for mqueue
- */
-class MqueueAdapter : public HMIMessageAdapterImpl {
- public:
-  MqueueAdapter(HMIMessageHandler* hmi_message_handler);
-  virtual ~MqueueAdapter();
-
- protected:
-  virtual void SendMessageToHMI(MessageSharedPointer message);
-  virtual void SubscribeTo();
-
- private:
-  mqd_t sdl_to_hmi_mqueue_;
-  mqd_t hmi_to_sdl_mqueue_;
-
-  ReceiverThreadDelegate* receiver_thread_delegate_;
-  threads::Thread* receiver_thread_;
-};
+HMIMessageAdapterImpl::~HMIMessageAdapterImpl() { handler_ = 0; }
 
 }  // namespace hmi_message_handler
-#endif  // SRC_COMPONENTS_HMI_MESSAGE_HANDLER_INCLUDE_HMI_MESSAGE_HANDLER_MQUEUE_ADAPTER_H_

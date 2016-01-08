@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Ford Motor Company
+ * Copyright (c) 2015, Ford Motor Company
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,37 +30,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SRC_COMPONENTS_HMI_MESSAGE_HANDLER_INCLUDE_HMI_MESSAGE_HANDLER_MQUEUE_ADAPTER_H_
-#define SRC_COMPONENTS_HMI_MESSAGE_HANDLER_INCLUDE_HMI_MESSAGE_HANDLER_MQUEUE_ADAPTER_H_
+#ifndef SRC_COMPONENTS_HMI_MESSAGE_HANDLER_INCLUDE_HMI_MESSAGE_HANDLER_HMI_MESSAGE_ADAPTER_IMPL_H_
+#define SRC_COMPONENTS_HMI_MESSAGE_HANDLER_INCLUDE_HMI_MESSAGE_HANDLER_HMI_MESSAGE_ADAPTER_IMPL_H_
 
-#include <memory>
-#include <mqueue.h>
-#include "utils/threads/thread.h"
-#include "hmi_message_handler/hmi_message_adapter_impl.h"
+#include "hmi_message_handler/hmi_message_adapter.h"
+#include "hmi_message_handler/hmi_message_handler.h"
 
 namespace hmi_message_handler {
 
-class ReceiverThreadDelegate;
-
-/**
- * \brief HMI message adapter for mqueue
- */
-class MqueueAdapter : public HMIMessageAdapterImpl {
+class HMIMessageAdapterImpl : public HMIMessageAdapter {
  public:
-  MqueueAdapter(HMIMessageHandler* hmi_message_handler);
-  virtual ~MqueueAdapter();
+  /**
+   * \brief Constructor
+   * \param handler Pointer to implementation of HMIMessageHandler abstract
+   * class
+   * to notify it about receiving message or error on sending message.
+   */
+  explicit HMIMessageAdapterImpl(HMIMessageHandler* handler);
+
+  /**
+   * \brief Destructor
+   */
+  virtual ~HMIMessageAdapterImpl();
 
  protected:
-  virtual void SendMessageToHMI(MessageSharedPointer message);
-  virtual void SubscribeTo();
+  virtual HMIMessageHandler* handler() const {
+    return handler_;
+  }
 
  private:
-  mqd_t sdl_to_hmi_mqueue_;
-  mqd_t hmi_to_sdl_mqueue_;
-
-  ReceiverThreadDelegate* receiver_thread_delegate_;
-  threads::Thread* receiver_thread_;
+  /**
+   *\brief Pointer on handler to notify it about receiving message/error.
+   */
+  HMIMessageHandler* handler_;
 };
 
 }  // namespace hmi_message_handler
-#endif  // SRC_COMPONENTS_HMI_MESSAGE_HANDLER_INCLUDE_HMI_MESSAGE_HANDLER_MQUEUE_ADAPTER_H_
+
+#endif  // SRC_COMPONENTS_HMI_MESSAGE_HANDLER_INCLUDE_HMI_MESSAGE_HANDLER_HMI_MESSAGE_ADAPTER_IMPL_H_
