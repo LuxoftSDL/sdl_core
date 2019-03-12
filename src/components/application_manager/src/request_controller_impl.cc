@@ -37,6 +37,7 @@
 #include "application_manager/request_controller_impl.h"
 
 #include "utils/timer_task_impl.h"
+#include "utils/scope_guard.h"
 
 namespace application_manager {
 
@@ -171,8 +172,8 @@ bool RequestControllerImpl::IsRequestTimeoutUpdateRequired(
       return true;
     }
   }
-  return false;
-}
+    return false;
+  }
 
 RequestController::TResult RequestControllerImpl::AddMobileRequest(
     const RequestPtr request, const mobile_apis::HMILevel::eType& hmi_level) {
@@ -283,7 +284,9 @@ void RequestControllerImpl::TerminateRequest(const uint32_t correlation_id,
       return;
     }
   }
-
+  waiting_for_response_.LockInfoSet();
+  utils::ScopeGuard guard = utils::MakeObjGuard(waiting_for_response_,
+                                                &RequestInfoSet::UnlockInfoSet);
   RequestInfoPtr request =
       waiting_for_response_.Find(connection_key, correlation_id);
   if (!request) {
@@ -303,6 +306,8 @@ void RequestControllerImpl::TerminateRequest(const uint32_t correlation_id,
   } else {
     LOG4CXX_WARN(logger_, "Request was not terminated");
   }
+  waiting_for_response_.UnlockInfoSet();
+  guard.Dismiss();
   NotifyTimer();
 }
 
@@ -389,13 +394,17 @@ void RequestControllerImpl::UpdateRequestTimeout(const uint32_t app_id,
   LOG4CXX_DEBUG(logger_,
                 "New_timeout is NULL. RequestCtrl will "
                 "not manage this request any more");
-
+  waiting_for_response_.LockInfoSet();
+  utils::ScopeGuard guard = utils::MakeObjGuard(waiting_for_response_,
+                                                &RequestInfoSet::UnlockInfoSet);
   RequestInfoPtr request_info =
       waiting_for_response_.Find(app_id, correlation_id);
   if (request_info) {
     waiting_for_response_.RemoveRequest(request_info);
     request_info->updateTimeOut(new_timeout);
     waiting_for_response_.Add(request_info);
+    waiting_for_response_.UnlockInfoSet();
+    guard.Dismiss();
     NotifyTimer();
     LOG4CXX_INFO(logger_,
                  "Timeout updated for "
@@ -434,9 +443,14 @@ void RequestControllerImpl::TimeoutThread() {
       "ENTER Waiting fore response count: " << waiting_for_response_.Size());
   sync_primitives::AutoLock auto_lock(timer_lock);
   while (!timer_stop_flag_) {
+    waiting_for_response_.LockInfoSet();
+    utils::ScopeGuard guard = utils::MakeObjGuard(
+        waiting_for_response_, &RequestInfoSet::UnlockInfoSet);
     RequestInfoPtr probably_expired =
         waiting_for_response_.FrontWithNotNullTimeout();
     if (!probably_expired) {
+      waiting_for_response_.UnlockInfoSet();
+      guard.Dismiss();
       timer_condition_.Wait(auto_lock);
       continue;
     }
@@ -456,6 +470,8 @@ void RequestControllerImpl::TimeoutThread() {
         const uint32_t msecs =
             static_cast<uint32_t>(date_time::getmSecs(end_time - current_time));
         LOG4CXX_DEBUG(logger_, "Sleep for " << msecs << " millisecs");
+        waiting_for_response_.UnlockInfoSet();
+        guard.Dismiss();
         timer_condition_.WaitFor(auto_lock, msecs);
       }
       continue;
