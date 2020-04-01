@@ -81,6 +81,8 @@ mobile_apis::AppHMIType::eType StringToAppHMIType(const std::string& str) {
     return mobile_apis::AppHMIType::PROJECTION;
   } else if ("REMOTE_CONTROL" == str) {
     return mobile_apis::AppHMIType::REMOTE_CONTROL;
+  } else if ("WEB_VIEW" == str) {
+    return mobile_apis::AppHMIType::WEB_VIEW;
   } else {
     return mobile_apis::AppHMIType::INVALID_ENUM;
   }
@@ -99,7 +101,8 @@ std::string AppHMITypeToString(mobile_apis::AppHMIType::eType type) {
        {mobile_apis::AppHMIType::BACKGROUND_PROCESS, "BACKGROUND_PROCESS"},
        {mobile_apis::AppHMIType::TESTING, "TESTING"},
        {mobile_apis::AppHMIType::SYSTEM, "SYSTEM"},
-       {mobile_apis::AppHMIType::PROJECTION, "PROJECTION"}};
+       {mobile_apis::AppHMIType::PROJECTION, "PROJECTION"},
+       {mobile_apis::AppHMIType::WEB_VIEW, "WEB_VIEW"}};
 
   std::map<mobile_apis::AppHMIType::eType, std::string>::const_iterator iter =
       app_hmi_type_map.find(type);
@@ -479,6 +482,10 @@ void RegisterAppInterfaceRequest::Run() {
         }
         case mobile_apis::AppHMIType::REMOTE_CONTROL: {
           application->set_remote_control_supported(true);
+          break;
+        }
+        case mobile_apis::AppHMIType::WEB_VIEW: {
+          application->set_webengine_projection_enabled(true);
           break;
         }
         default: {}
