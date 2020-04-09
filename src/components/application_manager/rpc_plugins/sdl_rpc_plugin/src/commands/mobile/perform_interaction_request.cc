@@ -81,7 +81,6 @@ PerformInteractionRequest::PerformInteractionRequest(
     , ui_result_code_(hmi_apis::Common_Result::INVALID_ENUM) {
   response_msg_params =
       smart_objects::SmartObject(smart_objects::SmartType_Map);
-  subscribe_on_event(hmi_apis::FunctionID::UI_OnResetTimeout);
   subscribe_on_event(hmi_apis::FunctionID::VR_OnCommand);
   subscribe_on_event(hmi_apis::FunctionID::Buttons_OnButtonPress);
 }
@@ -238,12 +237,6 @@ void PerformInteractionRequest::on_event(const event_engine::Event& event) {
   const smart_objects::SmartObject& message = event.smart_object();
 
   switch (event.id()) {
-    case hmi_apis::FunctionID::UI_OnResetTimeout: {
-      LOG4CXX_DEBUG(logger_, "Received UI_OnResetTimeout event");
-      application_manager_.updateRequestTimeout(
-          connection_key(), correlation_id(), default_timeout());
-      break;
-    }
     case hmi_apis::FunctionID::UI_PerformInteraction: {
       LOG4CXX_DEBUG(logger_, "Received UI_PerformInteraction event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_UI);
@@ -380,6 +373,13 @@ bool PerformInteractionRequest::ProcessVRResponse(
       return true;
     }
     vr_choice_id_received_ = choice_id;
+  }
+
+  if (mobile_apis::InteractionMode::BOTH == interaction_mode_ ||
+      mobile_apis::InteractionMode::MANUAL_ONLY == interaction_mode_) {
+    LOG4CXX_DEBUG(logger_, "Update timeout for UI");
+    application_manager_.updateRequestTimeout(
+        connection_key(), correlation_id(), default_timeout_);
   }
 
   if (mobile_apis::InteractionMode::BOTH == interaction_mode_ ||

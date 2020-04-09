@@ -29,41 +29,41 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include "sdl_rpc_plugin/commands/hmi/on_tts_reset_timeout_notification.h"
-#include "application_manager/event_engine/event.h"
-#include "interfaces/HMI_API.h"
 
-namespace sdl_rpc_plugin {
-using namespace application_manager;
+#ifndef SRC_COMPONENTS_APPLICATION_MANAGER_INCLUDE_APPLICATION_MANAGER_RESET_TIMEOUT_HANDLER_IMPL_H_
+#define SRC_COMPONENTS_APPLICATION_MANAGER_INCLUDE_APPLICATION_MANAGER_RESET_TIMEOUT_HANDLER_IMPL_H_
 
-namespace commands {
+#include <map>
+#include "application_manager/application_manager.h"
+#include "application_manager/event_engine/event_observer.h"
+#include "application_manager/reset_timeout_handler.h"
 
-namespace hmi {
+namespace application_manager {
 
-OnTTSResetTimeoutNotification::OnTTSResetTimeoutNotification(
-    const application_manager::commands::MessageSharedPtr& message,
-    ApplicationManager& application_manager,
-    rpc_service::RPCService& rpc_service,
-    HMICapabilities& hmi_capabilities,
-    policy::PolicyHandlerInterface& policy_handle)
-    : NotificationFromHMI(message,
-                          application_manager,
-                          rpc_service,
-                          hmi_capabilities,
-                          policy_handle) {}
+namespace request_controller {
 
-OnTTSResetTimeoutNotification::~OnTTSResetTimeoutNotification() {}
+class ResetTimeoutHandlerImpl : public event_engine::EventObserver,
+                                public ResetTimeoutHandler {
+ public:
+  ResetTimeoutHandlerImpl(ApplicationManager& application_manager);
+  void AddRequest(uint32_t hmi_correlation_id,
+                  uint32_t mob_correlation_id,
+                  uint32_t connection_key,
+                  uint32_t hmi_function_id) OVERRIDE;
+  void RemoveRequest(uint32_t hmi_correlation_id) OVERRIDE;
+  void on_event(const event_engine::Event& event) OVERRIDE;
 
-void OnTTSResetTimeoutNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+ private:
+  bool CheckConditionsForUpdate(Request request,
+                                uint32_t timeout,
+                                hmi_apis::FunctionID::eType method_name);
 
-  event_engine::Event event(hmi_apis::FunctionID::TTS_OnResetTimeout);
-  event.set_smart_object(*message_);
-  event.raise(application_manager_.event_dispatcher());
-}
+  std::map<uint32_t, Request> requests_;
+  ApplicationManager& application_manager_;
+  mutable sync_primitives::Lock requests_lock_;
+};
 
-}  // namespace hmi
+}  // namespace request_controller
+}  // namespace application_manager
 
-}  // namespace commands
-
-}  // namespace sdl_rpc_plugin
+#endif  // SRC_COMPONENTS_APPLICATION_MANAGER_INCLUDE_APPLICATION_MANAGER_TIMEOUT_HANDLER_IMPL_H_

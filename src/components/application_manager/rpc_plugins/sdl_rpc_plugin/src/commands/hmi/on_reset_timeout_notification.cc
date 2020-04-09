@@ -29,8 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include "sdl_rpc_plugin/commands/hmi/on_ui_reset_timeout_notification.h"
+#include "sdl_rpc_plugin/commands/hmi/on_reset_timeout_notification.h"
 #include "application_manager/event_engine/event.h"
 #include "interfaces/HMI_API.h"
 
@@ -41,7 +40,7 @@ namespace commands {
 
 namespace hmi {
 
-OnUIResetTimeoutNotification::OnUIResetTimeoutNotification(
+OnResetTimeoutNotification::OnResetTimeoutNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,
     rpc_service::RPCService& rpc_service,
@@ -53,12 +52,13 @@ OnUIResetTimeoutNotification::OnUIResetTimeoutNotification(
                           hmi_capabilities,
                           policy_handle) {}
 
-OnUIResetTimeoutNotification::~OnUIResetTimeoutNotification() {}
+OnResetTimeoutNotification::~OnResetTimeoutNotification() {}
 
-void OnUIResetTimeoutNotification::Run() {
+void OnResetTimeoutNotification::Run() {
   LOG4CXX_AUTO_TRACE(logger_);
 
-  event_engine::Event event(hmi_apis::FunctionID::UI_OnResetTimeout);
+  event_engine::Event event(
+      hmi_apis::FunctionID::BasicCommunication_OnResetTimeout);
   event.set_smart_object(*message_);
   event.raise(application_manager_.event_dispatcher());
 }

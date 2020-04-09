@@ -52,12 +52,12 @@
 #include "application_manager/hmi_interfaces_impl.h"
 #include "application_manager/message.h"
 #include "application_manager/message_helper.h"
-#include "application_manager/request_controller.h"
 #include "application_manager/resumption/resume_ctrl.h"
 #include "application_manager/rpc_handler.h"
 #include "application_manager/rpc_service.h"
 #include "application_manager/state_controller_impl.h"
 
+#include "application_manager/reset_timeout_handler.h"
 #include "application_manager/rpc_handler.h"
 
 #include "application_manager/policies/policy_handler_interface.h"
@@ -976,6 +976,15 @@ class ApplicationManagerImpl
     return *rpc_handler_;
   }
 
+  request_controller::ResetTimeoutHandler& GetResetTimeoutHandler()
+      const OVERRIDE {
+    return *reset_timeout_handler_;
+  }
+
+  request_controller::RequestController& GetRequestController() const OVERRIDE {
+    return *request_ctrl_;
+  }
+
   void SetRPCService(std::unique_ptr<rpc_service::RPCService>& rpc_service) {
     rpc_service_ = std::move(rpc_service);
   }
@@ -1534,8 +1543,10 @@ class ApplicationManagerImpl
   connection_handler::ConnectionHandler* connection_handler_;
   std::unique_ptr<policy::PolicyHandlerInterface> policy_handler_;
   protocol_handler::ProtocolHandler* protocol_handler_;
+  std::unique_ptr<request_controller::ResetTimeoutHandler>
+      reset_timeout_handler_;
+  std::unique_ptr<request_controller::RequestController> request_ctrl_;
   std::unique_ptr<plugin_manager::RPCPluginManager> plugin_manager_;
-  request_controller::RequestController request_ctrl_;
   std::unique_ptr<application_manager::AppServiceManager> app_service_manager_;
 
   /**

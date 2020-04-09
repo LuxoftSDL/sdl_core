@@ -30,54 +30,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SRC_COMPONENTS_APPLICATION_MANAGER_RPC_PLUGINS_SDL_RPC_PLUGIN_INCLUDE_SDL_RPC_PLUGIN_COMMANDS_HMI_ON_TTS_RESET_TIMEOUT_NOTIFICATION_H_
-#define SRC_COMPONENTS_APPLICATION_MANAGER_RPC_PLUGINS_SDL_RPC_PLUGIN_INCLUDE_SDL_RPC_PLUGIN_COMMANDS_HMI_ON_TTS_RESET_TIMEOUT_NOTIFICATION_H_
+#ifndef SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_MOCK_RESET_TIMEOUT_HANDLER_H_
+#define SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_MOCK_RESET_TIMEOUT_HANDLER_H_
 
-#include "application_manager/commands/notification_from_hmi.h"
+#include "application_manager/reset_timeout_handler.h"
+#include "gmock/gmock.h"
 
-namespace sdl_rpc_plugin {
-namespace app_mngr = application_manager;
+namespace test {
+namespace components {
+namespace application_manager_test {
 
-namespace commands {
-
-namespace hmi {
-
-/**
- * @brief OnTTSResetTimeoutNotification command class
- **/
-class OnTTSResetTimeoutNotification
-    : public app_mngr::commands::NotificationFromHMI {
+class MockResetTimeoutHandler
+    : public application_manager::request_controller::ResetTimeoutHandler {
  public:
-  /**
-   * @brief OnTTSResetTimeoutNotification class constructor
-   *
-   * @param message Incoming SmartObject message
-   **/
-  OnTTSResetTimeoutNotification(
-      const app_mngr::commands::MessageSharedPtr& message,
-      app_mngr::ApplicationManager& application_manager,
-      app_mngr::rpc_service::RPCService& rpc_service,
-      app_mngr::HMICapabilities& hmi_capabilities,
-      policy::PolicyHandlerInterface& policy_handle);
-
-  /**
-   * @brief OnTTSResetTimeoutNotification class destructor
-   **/
-  virtual ~OnTTSResetTimeoutNotification();
-
-  /**
-   * @brief Execute command
-   **/
-  virtual void Run();
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(OnTTSResetTimeoutNotification);
+  MOCK_METHOD4(AddRequest,
+               void(uint32_t hmi_correlation_id,
+                    uint32_t mob_correlation_id,
+                    uint32_t connection_key,
+                    uint32_t hmi_function_id));
+  MOCK_METHOD1(RemoveRequest, void(uint32_t hmi_correlation_id));
 };
 
-}  // namespace hmi
+}  //  namespace application_manager_test
+}  //  namespace components
+}  //  namespace test
 
-}  // namespace commands
-
-}  // namespace sdl_rpc_plugin
-
-#endif  // SRC_COMPONENTS_APPLICATION_MANAGER_RPC_PLUGINS_SDL_RPC_PLUGIN_INCLUDE_SDL_RPC_PLUGIN_COMMANDS_HMI_ON_TTS_RESET_TIMEOUT_NOTIFICATION_H_
+#endif  // SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_MOCK_RESET_TIMEOUT_HANDLER_H_

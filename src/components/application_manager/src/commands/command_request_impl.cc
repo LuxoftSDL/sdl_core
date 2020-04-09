@@ -513,6 +513,7 @@ uint32_t CommandRequestImpl::SendHMIRequest(
     const hmi_apis::FunctionID::eType& function_id,
     const smart_objects::SmartObject* msg_params,
     bool use_events) {
+  LOG4CXX_AUTO_TRACE(logger_);
   smart_objects::SmartObjectSPtr result =
       std::make_shared<smart_objects::SmartObject>();
 
@@ -539,7 +540,9 @@ uint32_t CommandRequestImpl::SendHMIRequest(
     subscribe_on_event(function_id, hmi_correlation_id);
   }
   if (ProcessHMIInterfacesAvailability(hmi_correlation_id, function_id)) {
-    if (!rpc_service_.ManageHMICommand(result, SOURCE_SDL_TO_HMI)) {
+    if (rpc_service_.ManageHMICommand(result, SOURCE_SDL_TO_HMI)) {
+      AddRequestToTimeoutHandler(request);
+    } else {
       LOG4CXX_ERROR(logger_, "Unable to send request");
       SendResponse(false, mobile_apis::Result::OUT_OF_MEMORY);
     }
@@ -1078,6 +1081,39 @@ void CommandRequestImpl::AddTimeOutComponentInfoToMessage(
         not_responding_interfaces_string + " component does not respond";
     response[strings::msg_params][strings::info] = component_info;
   }
+}
+
+void CommandRequestImpl::AddRequestToTimeoutHandler(
+    const smart_objects::SmartObject& request_to_hmi) const {
+  auto function_id = static_cast<hmi_apis::FunctionID::eType>(
+      request_to_hmi[strings::params][strings::function_id].asUInt());
+  // SDL must not apply "default timeout for RPCs processing" for
+  // BasicCommunication.DialNumber RPC (that is, SDL must always wait for HMI
+  // response to BC.DialNumber as long as it takes and not return GENERIC_ERROR
+  // to mobile app), so the OnResetTimeout logic is not applicable for
+  // DialNumber RPC
+  if (hmi_apis::FunctionID::BasicCommunication_DialNumber == function_id ||
+      hmi_apis::FunctionID::INVALID_ENUM == function_id) {
+    return;
+  }
+  // If soft buttons are present in Alert RPC, SDL will not use timeout tracking
+  // for response, so the OnResetTimeout logic is not applicable in this case*/
+  if (hmi_apis::FunctionID::UI_Alert == function_id) {
+    if (request_to_hmi.keyExists(strings::msg_params)) {
+      if (request_to_hmi[strings::msg_params].keyExists(
+              strings::soft_buttons)) {
+        LOG4CXX_DEBUG(logger_,
+                      "Soft buttons are present in Alert RPC, OnResetTimeout "
+                      "logic is not applicable in this case");
+        return;
+      }
+    }
+  }
+  application_manager_.GetResetTimeoutHandler().AddRequest(
+      request_to_hmi[strings::params][strings::correlation_id].asUInt(),
+      correlation_id(),
+      connection_key(),
+      function_id);
 }
 
 }  // namespace commands

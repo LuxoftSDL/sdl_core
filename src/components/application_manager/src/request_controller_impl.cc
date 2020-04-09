@@ -34,7 +34,7 @@
 
 #include "application_manager/commands/command_request_impl.h"
 #include "application_manager/commands/request_to_hmi.h"
-#include "application_manager/request_controller.h"
+#include "application_manager/request_controller_impl.h"
 
 #include "utils/timer_task_impl.h"
 
@@ -44,25 +44,28 @@ namespace request_controller {
 
 using namespace sync_primitives;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RequestController")
+CREATE_LOGGERPTR_GLOBAL(logger_, "RequestControllerImpl")
 
-RequestController::RequestController(const RequestControlerSettings& settings)
+RequestControllerImpl::RequestControllerImpl(
+    const RequestControlerSettings& settings,
+    ResetTimeoutHandler& reset_timeout_handler)
     : pool_state_(UNDEFINED)
     , pool_size_(settings.thread_pool_size())
     , request_tracker_(settings)
     , duplicate_message_count_()
     , timer_("AM RequestCtrlTimer",
-             new timer::TimerTaskImpl<RequestController>(
-                 this, &RequestController::TimeoutThread))
+             new timer::TimerTaskImpl<RequestControllerImpl>(
+                 this, &RequestControllerImpl::TimeoutThread))
     , timer_stop_flag_(false)
     , is_low_voltage_(false)
-    , settings_(settings) {
+    , settings_(settings)
+    , reset_timeout_handler_(reset_timeout_handler) {
   LOG4CXX_AUTO_TRACE(logger_);
   InitializeThreadpool();
   timer_.Start(0, timer::kSingleShot);
 }
 
-RequestController::~RequestController() {
+RequestControllerImpl::~RequestControllerImpl() {
   LOG4CXX_AUTO_TRACE(logger_);
   {
     sync_primitives::AutoLock auto_lock(timer_lock);
@@ -75,7 +78,7 @@ RequestController::~RequestController() {
   }
 }
 
-void RequestController::InitializeThreadpool() {
+void RequestControllerImpl::InitializeThreadpool() {
   LOG4CXX_AUTO_TRACE(logger_);
   // TODO(DK): Consider lazy loading threads instead of creating all at once
   pool_state_ = TPoolState::STARTED;
@@ -88,7 +91,7 @@ void RequestController::InitializeThreadpool() {
   }
 }
 
-void RequestController::DestroyThreadpool() {
+void RequestControllerImpl::DestroyThreadpool() {
   LOG4CXX_AUTO_TRACE(logger_);
   {
     AutoLock auto_lock(mobile_request_list_lock_);
@@ -105,7 +108,7 @@ void RequestController::DestroyThreadpool() {
   pool_.clear();
 }
 
-RequestController::TResult RequestController::CheckPosibilitytoAdd(
+RequestControllerImpl::TResult RequestControllerImpl::CheckPosibilitytoAdd(
     const RequestPtr request, const mobile_apis::HMILevel::eType level) {
   LOG4CXX_AUTO_TRACE(logger_);
   if (!CheckPendingRequestsAmount(settings_.pending_requests_amount())) {
@@ -126,16 +129,10 @@ RequestController::TResult RequestController::CheckPosibilitytoAdd(
     return RequestController::TOO_MANY_REQUESTS;
   }
 
-  if (IsLowVoltage()) {
-    LOG4CXX_ERROR(logger_,
-                  "Impossible to add request due to Low Voltage is active");
-    return RequestController::INVALID_DATA;
-  }
-
   return SUCCESS;
 }
 
-bool RequestController::CheckPendingRequestsAmount(
+bool RequestControllerImpl::CheckPendingRequestsAmount(
     const uint32_t& pending_requests_amount) {
   LOG4CXX_AUTO_TRACE(logger_);
   if (pending_requests_amount > 0) {
@@ -154,7 +151,24 @@ bool RequestController::CheckPendingRequestsAmount(
   return true;
 }
 
-RequestController::TResult RequestController::addMobileRequest(
+bool RequestControllerImpl::IsUpdateRequestTimeoutRequired(
+    const uint32_t app_id,
+    const uint32_t correlation_id,
+    const uint32_t new_timeout) const {
+  LOG4CXX_AUTO_TRACE(logger_);
+  auto request_info = waiting_for_response_.Find(app_id, correlation_id);
+  if (request_info) {
+    date_time::TimeDuration current_time = date_time::getCurrentTime();
+    const date_time::TimeDuration end_time = request_info->end_time();
+    date_time::AddMilliseconds(current_time, new_timeout);
+    if (date_time::getmSecs(current_time) > date_time::getmSecs(end_time)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+RequestController::TResult RequestControllerImpl::addMobileRequest(
     const RequestPtr request, const mobile_apis::HMILevel::eType& hmi_level) {
   LOG4CXX_AUTO_TRACE(logger_);
   if (!request) {
@@ -178,7 +192,7 @@ RequestController::TResult RequestController::addMobileRequest(
   return result;
 }
 
-RequestController::TResult RequestController::addHMIRequest(
+RequestController::TResult RequestControllerImpl::addHMIRequest(
     const RequestPtr request) {
   LOG4CXX_AUTO_TRACE(logger_);
 
@@ -198,13 +212,6 @@ RequestController::TResult RequestController::addHMIRequest(
                   "Default timeout was set to 0."
                   "RequestController will not track timeout of this request.");
   }
-
-  if (IsLowVoltage()) {
-    LOG4CXX_ERROR(logger_,
-                  "Impossible to add request due to Low Voltage is active");
-    return RequestController::INVALID_DATA;
-  }
-
   waiting_for_response_.Add(request_info_ptr);
   LOG4CXX_DEBUG(logger_,
                 "Waiting for response count:" << waiting_for_response_.Size());
@@ -213,17 +220,12 @@ RequestController::TResult RequestController::addHMIRequest(
   return RequestController::SUCCESS;
 }
 
-void RequestController::addNotification(const RequestPtr ptr) {
+void RequestControllerImpl::addNotification(const RequestPtr ptr) {
   LOG4CXX_AUTO_TRACE(logger_);
-  if (IsLowVoltage()) {
-    LOG4CXX_ERROR(
-        logger_, "Impossible to add notification due to Low Voltage is active");
-    return;
-  }
   notification_list_.push_back(ptr);
 }
 
-void RequestController::removeNotification(
+void RequestControllerImpl::removeNotification(
     const commands::Command* notification) {
   LOG4CXX_AUTO_TRACE(logger_);
   std::list<RequestPtr>::iterator it = notification_list_.begin();
@@ -239,10 +241,10 @@ void RequestController::removeNotification(
   LOG4CXX_DEBUG(logger_, "Cannot find notification");
 }
 
-void RequestController::TerminateRequest(const uint32_t correlation_id,
-                                         const uint32_t connection_key,
-                                         const int32_t function_id,
-                                         bool force_terminate) {
+void RequestControllerImpl::TerminateRequest(const uint32_t correlation_id,
+                                             const uint32_t connection_key,
+                                             const int32_t function_id,
+                                             bool force_terminate) {
   LOG4CXX_AUTO_TRACE(logger_);
   LOG4CXX_DEBUG(logger_,
                 "correlation_id = "
@@ -276,26 +278,31 @@ void RequestController::TerminateRequest(const uint32_t correlation_id,
   }
   if (force_terminate || request->request()->AllowedToTerminate()) {
     waiting_for_response_.RemoveRequest(request);
+    if (RequestInfo::HMIRequest == request->request_type()) {
+      reset_timeout_handler_.RemoveRequest(request->requestId());
+    }
+
   } else {
     LOG4CXX_WARN(logger_, "Request was not terminated");
   }
   NotifyTimer();
 }
 
-void RequestController::OnMobileResponse(const uint32_t mobile_correlation_id,
-                                         const uint32_t connection_key,
-                                         const int32_t function_id) {
+void RequestControllerImpl::OnMobileResponse(
+    const uint32_t mobile_correlation_id,
+    const uint32_t connection_key,
+    const int32_t function_id) {
   LOG4CXX_AUTO_TRACE(logger_);
   TerminateRequest(mobile_correlation_id, connection_key, function_id);
 }
 
-void RequestController::OnHMIResponse(const uint32_t correlation_id,
-                                      const int32_t function_id) {
+void RequestControllerImpl::OnHMIResponse(const uint32_t correlation_id,
+                                          const int32_t function_id) {
   LOG4CXX_AUTO_TRACE(logger_);
   TerminateRequest(correlation_id, RequestInfo::HmiConnectionKey, function_id);
 }
 
-void RequestController::terminateWaitingForExecutionAppRequests(
+void RequestControllerImpl::terminateWaitingForExecutionAppRequests(
     const uint32_t& app_id) {
   LOG4CXX_AUTO_TRACE(logger_);
   LOG4CXX_DEBUG(logger_,
@@ -315,7 +322,7 @@ void RequestController::terminateWaitingForExecutionAppRequests(
                 "Waiting for execution " << mobile_request_list_.size());
 }
 
-void RequestController::terminateWaitingForResponseAppRequests(
+void RequestControllerImpl::terminateWaitingForResponseAppRequests(
     const uint32_t& app_id) {
   LOG4CXX_AUTO_TRACE(logger_);
   waiting_for_response_.RemoveByConnectionKey(app_id);
@@ -323,7 +330,7 @@ void RequestController::terminateWaitingForResponseAppRequests(
       logger_, "Waiting for response count : " << waiting_for_response_.Size());
 }
 
-void RequestController::terminateAppRequests(const uint32_t& app_id) {
+void RequestControllerImpl::terminateAppRequests(const uint32_t& app_id) {
   LOG4CXX_AUTO_TRACE(logger_);
   LOG4CXX_DEBUG(logger_,
                 "app_id : " << app_id
@@ -337,12 +344,12 @@ void RequestController::terminateAppRequests(const uint32_t& app_id) {
   NotifyTimer();
 }
 
-void RequestController::terminateAllHMIRequests() {
+void RequestControllerImpl::terminateAllHMIRequests() {
   LOG4CXX_AUTO_TRACE(logger_);
   terminateWaitingForResponseAppRequests(RequestInfo::HmiConnectionKey);
 }
 
-void RequestController::terminateAllMobileRequests() {
+void RequestControllerImpl::terminateAllMobileRequests() {
   LOG4CXX_AUTO_TRACE(logger_);
   waiting_for_response_.RemoveMobileRequests();
   LOG4CXX_DEBUG(logger_, "Mobile Requests waiting for response cleared");
@@ -352,9 +359,9 @@ void RequestController::terminateAllMobileRequests() {
   NotifyTimer();
 }
 
-void RequestController::updateRequestTimeout(const uint32_t& app_id,
-                                             const uint32_t& correlation_id,
-                                             const uint32_t& new_timeout) {
+void RequestControllerImpl::updateRequestTimeout(const uint32_t& app_id,
+                                                 const uint32_t& correlation_id,
+                                                 const uint32_t& new_timeout) {
   LOG4CXX_AUTO_TRACE(logger_);
 
   LOG4CXX_DEBUG(logger_,
@@ -384,12 +391,12 @@ void RequestController::updateRequestTimeout(const uint32_t& app_id,
   }
 }
 
-void RequestController::OnLowVoltage() {
+void RequestControllerImpl::OnLowVoltage() {
   LOG4CXX_AUTO_TRACE(logger_);
   is_low_voltage_ = true;
 }
 
-void RequestController::OnWakeUp() {
+void RequestControllerImpl::OnWakeUp() {
   LOG4CXX_AUTO_TRACE(logger_);
   terminateAllHMIRequests();
   terminateAllMobileRequests();
@@ -397,12 +404,12 @@ void RequestController::OnWakeUp() {
   LOG4CXX_DEBUG(logger_, "Terminate old requests done");
 }
 
-bool RequestController::IsLowVoltage() {
+bool RequestControllerImpl::IsLowVoltage() {
   LOG4CXX_TRACE(logger_, "result: " << is_low_voltage_);
   return is_low_voltage_;
 }
 
-void RequestController::TimeoutThread() {
+void RequestControllerImpl::TimeoutThread() {
   LOG4CXX_AUTO_TRACE(logger_);
   LOG4CXX_DEBUG(
       logger_,
@@ -452,6 +459,9 @@ void RequestController::TimeoutThread() {
       LOG4CXX_DEBUG(logger_,
                     "Erase HMI request: " << probably_expired->requestId());
       waiting_for_response_.RemoveRequest(probably_expired);
+      if (RequestInfo::HMIRequest == probably_expired->request_type()) {
+        reset_timeout_handler_.RemoveRequest(experied_request_id);
+      }
     }
     probably_expired = waiting_for_response_.FrontWithNotNullTimeout();
     if (probably_expired) {
@@ -467,12 +477,12 @@ void RequestController::TimeoutThread() {
       "EXIT Waiting for response count : " << waiting_for_response_.Size());
 }
 
-RequestController::Worker::Worker(RequestController* requestController)
+RequestControllerImpl::Worker::Worker(RequestControllerImpl* requestController)
     : request_controller_(requestController), stop_flag_(false) {}
 
-RequestController::Worker::~Worker() {}
+RequestControllerImpl::Worker::~Worker() {}
 
-void RequestController::Worker::threadMain() {
+void RequestControllerImpl::Worker::threadMain() {
   LOG4CXX_AUTO_TRACE(logger_);
   AutoLock auto_lock(thread_lock_);
   while (!stop_flag_) {
@@ -551,13 +561,13 @@ void RequestController::Worker::threadMain() {
   }
 }
 
-void RequestController::Worker::exitThreadMain() {
+void RequestControllerImpl::Worker::exitThreadMain() {
   stop_flag_ = true;
   // setup stop flag and whit while threadMain will be finished correctly
   // FIXME (dchmerev@luxoft.com): There is no waiting
 }
 
-void RequestController::NotifyTimer() {
+void RequestControllerImpl::NotifyTimer() {
   LOG4CXX_AUTO_TRACE(logger_);
   timer_condition_.NotifyOne();
 }
