@@ -1184,6 +1184,12 @@ mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckWithPolicyData() {
       CheckMissedTypes checker(app_hmi_types, log);
       std::for_each(app_types.begin(), app_types.end(), checker);
       if (!log.empty()) {
+        auto it = std::find(app_types.begin(),
+                            app_types.end(),
+                            mobile_apis::AppHMIType::WEB_VIEW);
+        if (app_types.end() != it) {
+          return mobile_apis::Result::REJECTED;
+        }
         response_info_ =
             "Following AppHmiTypes are not present in policy "
             "table:" +
@@ -1200,6 +1206,17 @@ mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckWithPolicyData() {
 
     AppHMITypeInserter inserter(app_hmi_type);
     std::for_each(app_hmi_types.begin(), app_hmi_types.end(), inserter);
+  } else {
+    if (message[strings::msg_params].keyExists(strings::app_hmi_type)) {
+      smart_objects::SmartArray app_types =
+          *(message[strings::msg_params][strings::app_hmi_type].asArray());
+      auto it = std::find(app_types.begin(),
+                          app_types.end(),
+                          mobile_apis::AppHMIType::WEB_VIEW);
+      if (app_types.end() != it) {
+        return mobile_apis::Result::REJECTED;
+      }
+    }
   }
 
   return result;
