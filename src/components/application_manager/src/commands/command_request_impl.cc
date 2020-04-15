@@ -1094,6 +1094,9 @@ void CommandRequestImpl::AddRequestToTimeoutHandler(
   // DialNumber RPC
   if (hmi_apis::FunctionID::BasicCommunication_DialNumber == function_id ||
       hmi_apis::FunctionID::INVALID_ENUM == function_id) {
+    LOG4CXX_DEBUG(logger_,
+                  "Current RPC is DialNumber or Invalid, OnResetTimeout "
+                  "logic is not applicable in this case");
     return;
   }
   // If soft buttons are present in Alert RPC, SDL will not use timeout tracking

@@ -4464,7 +4464,7 @@
     </function>
     <function name="DialNumber" messagetype="response">
     </function>
-    <function name="OnResetTimeout" messagetype="notification" since="5.0">
+    <function name="OnResetTimeout" messagetype="notification" since="6.2">
       <description>
         HMI must send this notification to SDL for method instance for which timeout needs to be reset
       </description>
@@ -5007,7 +5007,7 @@
   </function>
   <function name="SetGlobalProperties" messagetype="response">
   </function>
-  <function name="OnResetTimeout" messagetype="notification" deprecated="true" since="5.0">
+  <function name="OnResetTimeout" messagetype="notification" deprecated="true" since="6.2">
     <description>
       Sender: HMI->SDL. HMI must send this notification every 10 sec. in case the 'methodName'
       results long processing on HMI
@@ -5653,7 +5653,7 @@
   <function name="ClosePopUp" messagetype="response">
     <description>Provides the result of operation.</description>
   </function>
-  <function name="OnResetTimeout" messagetype="notification" deprecated="true" since="5.0">
+  <function name="OnResetTimeout" messagetype="notification" deprecated="true" since="6.2">
     <description>HMI must provide SDL with notifications specific to the current Turn-By-Turn client status on the module</description>
     <param name="appID" type="Integer" mandatory="true">
       <description>Id of application that invoked notifcation.</description>

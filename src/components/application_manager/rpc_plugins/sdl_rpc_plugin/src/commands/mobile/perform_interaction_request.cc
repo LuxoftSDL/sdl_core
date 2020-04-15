@@ -382,13 +382,6 @@ bool PerformInteractionRequest::ProcessVRResponse(
         connection_key(), correlation_id(), default_timeout_);
   }
 
-  if (mobile_apis::InteractionMode::BOTH == interaction_mode_ ||
-      mobile_apis::InteractionMode::MANUAL_ONLY == interaction_mode_) {
-    LOG4CXX_DEBUG(logger_, "Update timeout for UI");
-    application_manager_.updateRequestTimeout(
-        connection_key(), correlation_id(), default_timeout_);
-  }
-
   const bool is_vr_result_success = Compare<Common_Result::eType, EQ, ONE>(
       vr_result_code_, Common_Result::SUCCESS, Common_Result::WARNINGS);
 

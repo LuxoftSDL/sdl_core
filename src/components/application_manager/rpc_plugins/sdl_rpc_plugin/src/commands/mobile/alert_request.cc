@@ -361,8 +361,6 @@ void AlertRequest::SendAlertRequest(int32_t app_id) {
 
   // app_id
   msg_params[strings::app_id] = app_id;
-  msg_params[strings::duration] =
-      (*message_)[strings::msg_params][strings::duration].asUInt();
 
   // NAVI platform progressIndicator
   if ((*message_)[strings::msg_params].keyExists(strings::progress_indicator)) {
