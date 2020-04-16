@@ -236,6 +236,8 @@ TEST_F(RCGetInteriorVehicleDataConsentTest,
        Run_MobileSendButtonPressMessage_HMISendASKDRIVERModeToMobile) {
   // Arrange
   auto mobile_message = CreateBasicMessage();
+  ON_CALL(mock_allocation_manager_, GetAccessMode())
+      .WillByDefault(Return(hmi_apis::Common_RCAccessMode::ASK_DRIVER));
 
   // Expectations
   EXPECT_CALL(mock_allocation_manager_, AcquireResource(_, _, _))
@@ -269,6 +271,10 @@ TEST_F(RCGetInteriorVehicleDataConsentTest,
 
 TEST_F(RCGetInteriorVehicleDataConsentTest,
        Run_MobileSendButtonPressMessage_HMISendINUSEModeToMobile) {
+  // Arrange
+  ON_CALL(mock_allocation_manager_, GetAccessMode())
+      .WillByDefault(Return(hmi_apis::Common_RCAccessMode::AUTO_DENY));
+
   // Expectations
   EXPECT_CALL(mock_allocation_manager_, AcquireResource(_, _, _))
       .WillOnce(Return(rc_rpc_plugin::AcquireResult::IN_USE));

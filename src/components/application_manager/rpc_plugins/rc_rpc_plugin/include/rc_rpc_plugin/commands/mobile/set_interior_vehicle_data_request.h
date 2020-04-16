@@ -46,6 +46,8 @@ class SetInteriorVehicleDataRequest : public RCCommandRequest {
       const application_manager::commands::MessageSharedPtr& message,
       const RCCommandParams& params);
 
+  bool Init() FINAL;
+
   /**
    * @brief Execute command
    */

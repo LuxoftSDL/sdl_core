@@ -110,6 +110,8 @@ class ButtonPressRequestTest
         .WillByDefault(Return(true));
     ON_CALL(mock_rc_capabilities_manager_, CheckIfButtonExistInRCCaps(_))
         .WillByDefault(Return(true));
+    ON_CALL(mock_allocation_manager_, GetAccessMode())
+        .WillByDefault(Return(hmi_apis::Common_RCAccessMode::AUTO_ALLOW));
   }
 
   MessageSharedPtr CreateBasicMessage() {

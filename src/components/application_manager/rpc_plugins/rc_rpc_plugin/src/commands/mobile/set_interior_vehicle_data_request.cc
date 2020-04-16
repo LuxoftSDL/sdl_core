@@ -54,6 +54,21 @@ SetInteriorVehicleDataRequest::SetInteriorVehicleDataRequest(
 
 SetInteriorVehicleDataRequest::~SetInteriorVehicleDataRequest() {}
 
+bool SetInteriorVehicleDataRequest::Init() {
+  LOG4CXX_AUTO_TRACE(logger_);
+  // If driver permission is required, the SDL should increase the default
+  // timeout value by 2 times
+  auto access_mode = resource_allocation_manager_.GetAccessMode();
+
+  if (hmi_apis::Common_RCAccessMode::ASK_DRIVER == access_mode &&
+      resource_allocation_manager_.IsResourceAllocated(ModuleType(), ModuleId(),
+                                                      connection_key())) {
+    const uint32_t increase_value = 2;
+    default_timeout_ *= increase_value;
+  }
+  return true;
+}
+
 /**
  * @brief Clears unrelated module data parameters
  * @param module type in request

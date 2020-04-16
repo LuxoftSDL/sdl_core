@@ -45,6 +45,8 @@ class ButtonPressRequest : public RCCommandRequest {
       const application_manager::commands::MessageSharedPtr& message,
       const RCCommandParams& params);
 
+  bool Init() FINAL;
+
   /**
    * @brief Execute command
    * send HMI request if message contains appropriate

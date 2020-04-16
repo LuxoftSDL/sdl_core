@@ -109,6 +109,8 @@ class SetInteriorVehicleDataRequestTest
         .WillByDefault(Return(true));
     ON_CALL(mock_rc_capabilities_manager_, GetModuleDataCapabilities(_, _))
         .WillByDefault(Return(std::make_pair("", capabilitiesStatus::success)));
+    ON_CALL(mock_allocation_manager_, GetAccessMode())
+        .WillByDefault(Return(hmi_apis::Common_RCAccessMode::AUTO_ALLOW));
   }
 
   MessageSharedPtr CreateBasicMessage() {

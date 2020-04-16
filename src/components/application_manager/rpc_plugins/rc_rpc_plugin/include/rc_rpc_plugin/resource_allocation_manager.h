@@ -129,6 +129,17 @@ class ResourceAllocationManager {
   virtual bool IsResourceFree(const std::string& module_type,
                               const std::string& module_id) const = 0;
 
+    /**
+   * @brief IsResourceAllocated check if module is allocated by certain application
+   * @param module_type module type to be checked
+   * @param module_type module id to be checked
+   * @param app_id app to be checked
+   * @return true if module_type is allocated by application with provided app_id
+   */
+  virtual bool IsResourceAllocated(const std::string& module_type,
+                                  const std::string& module_id,
+                                  const uint32_t app_id) = 0;
+
   /**
    * @brief AcquireResource forces acquiring resource by application
    * @param module_type resource to acquire

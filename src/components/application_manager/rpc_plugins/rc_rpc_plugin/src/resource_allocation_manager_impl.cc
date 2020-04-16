@@ -311,6 +311,25 @@ ResourceAllocationManagerImpl::CreateOnRCStatusNotificationToHmi(
   return msg_to_hmi;
 }
 
+bool ResourceAllocationManagerImpl::IsResourceAllocated(
+    const std::string& module_type, const std::string& module_id, const uint32_t app_id) {
+  ModuleUid module(module_type, module_id);
+  AllocatedResources::const_iterator allocation =
+      allocated_resources_.find(module);
+  if (allocated_resources_.end() == allocation) {
+    LOG4CXX_DEBUG(logger_, "Resource " << module_type << " is not allocated.");
+    return false;
+  }
+  if (app_id != allocation->second) {
+    LOG4CXX_ERROR(logger_,
+                  "Resource " << module_type
+                              << " is allocated by different application "
+                              << allocation->second);
+    return true;
+  }
+  return false;
+}
+
 void ResourceAllocationManagerImpl::SendOnRCStatusNotifications(
     NotificationTrigger::eType event,
     application_manager::ApplicationSharedPtr application) {

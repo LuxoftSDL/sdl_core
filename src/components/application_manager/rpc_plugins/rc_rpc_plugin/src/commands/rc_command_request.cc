@@ -213,62 +213,77 @@ bool RCCommandRequest::AcquireResources() {
 void RCCommandRequest::on_event(const app_mngr::event_engine::Event& event) {
   LOG4CXX_AUTO_TRACE(logger_);
 
-  if (event.id() == hmi_apis::FunctionID::RC_GetInteriorVehicleDataConsent) {
-    ProcessAccessResponse(event);
-  } else {
+  if (event.id() != hmi_apis::FunctionID::RC_GetInteriorVehicleDataConsent) {
     const std::string module_type = ModuleType();
     SetResourceState(module_type, ResourceState::FREE);
+    return;
   }
+
+  ProcessAccessResponse(event);
 }
 
 void RCCommandRequest::ProcessAccessResponse(
     const app_mngr::event_engine::Event& event) {
   LOG4CXX_AUTO_TRACE(logger_);
-  app_mngr::ApplicationSharedPtr app =
-      application_manager_.application(CommandRequestImpl::connection_key());
-  const std::string module_type = ModuleType();
-  const std::string module_id = ModuleId();
-  if (!app) {
-    LOG4CXX_ERROR(logger_, "NULL pointer.");
-    SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED, "");
-    return;
-  }
 
-  const smart_objects::SmartObject& message = event.smart_object();
-
-  mobile_apis::Result::eType result_code =
+  const auto& message = event.smart_object();
+  const auto result_code =
       GetMobileResultCode(static_cast<hmi_apis::Common_Result::eType>(
           message[app_mngr::strings::params][app_mngr::hmi_response::code]
               .asUInt()));
 
-  const bool result =
-      helpers::Compare<mobile_apis::Result::eType, helpers::EQ, helpers::ONE>(
-          result_code,
-          mobile_apis::Result::SUCCESS,
-          mobile_apis::Result::WARNINGS);
-
-  bool is_allowed = false;
-  if (result) {
-    if (message[app_mngr::strings::msg_params].keyExists(
-            message_params::kAllowed)) {
-      is_allowed =
-          message[app_mngr::strings::msg_params][message_params::kAllowed][0]
-              .asBool();
+  enum ConsentResult { ALLOWED, DISALLOWED, CUSTOM_RESULT };
+  auto get_consent_result = [&result_code, &message]() -> ConsentResult {
+    using MobileResult = mobile_apis::Result::eType;
+    const bool result =
+        helpers::Compare<MobileResult, helpers::EQ, helpers::ONE>(
+            result_code,
+            mobile_apis::Result::SUCCESS,
+            mobile_apis::Result::WARNINGS);
+    if (!result) {
+      return CUSTOM_RESULT;
     }
-    std::string policy_app_id = app->policy_app_id();
-    const auto mac_address = app->mac_address();
-    std::vector<std::string> module_ids{module_id};
-    std::vector<bool> module_allowed{is_allowed};
-    auto module_consents =
-        RCHelpers::FillModuleConsents(module_type, module_ids, module_allowed);
-    rc_consent_manager_.SaveModuleConsents(
-        policy_app_id, mac_address, module_consents);
-    ProcessConsentResult(is_allowed, module_type, module_id, app->app_id());
-  } else {
-    std::string response_info;
-    GetInfo(message, response_info);
-    SendResponse(false, result_code, response_info.c_str());
+    auto& msg_params = message[app_mngr::strings::msg_params];
+    const bool is_allowed = msg_params.keyExists(message_params::kAllowed)
+                                ? msg_params[message_params::kAllowed].asBool()
+                                : false;
+    return is_allowed ? ALLOWED : DISALLOWED;
+  };
+
+  auto app = application_manager_.application(connection_key());
+  if (!app) {
+    LOG4CXX_ERROR(logger_, "NULL pointer application ");
+    SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED, "");
+    return;
   }
+
+  const auto consent_result = get_consent_result();
+  if (ALLOWED == consent_result) {
+    resource_allocation_manager_.ForceAcquireResource(ModuleType(), ModuleId(),
+                                                      app->app_id());
+    SetResourceState(ModuleType(), ResourceState::BUSY);
+    const auto default_timeout =
+        application_manager_.get_settings().default_timeout();
+    application_manager_.updateRequestTimeout(
+        connection_key(), correlation_id(), default_timeout);
+    Execute();  // run child's logic
+    return;
+  }
+
+  if (DISALLOWED == consent_result) {
+    resource_allocation_manager_.OnDriverDisallowed(ModuleType(), ModuleId(),
+                                                    app->app_id());
+    SendResponse(false,
+                 mobile_apis::Result::REJECTED,
+                 "The resource is in use and the driver disallows this remote "
+                 "control RPC");
+    return;
+  }
+
+  DCHECK(CUSTOM_RESULT == consent_result);
+  std::string response_info;
+  GetInfo(message, response_info);
+  SendResponse(false, result_code, response_info.c_str());
 }
 
 void RCCommandRequest::ProcessConsentResult(const bool is_allowed,

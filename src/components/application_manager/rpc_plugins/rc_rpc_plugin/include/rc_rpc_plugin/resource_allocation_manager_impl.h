@@ -102,6 +102,9 @@ class ResourceAllocationManagerImpl : public ResourceAllocationManager {
   void OnDriverDisallowed(const std::string& module_type,
                           const std::string& module_id,
                           const uint32_t app_id) FINAL;
+  bool IsResourceAllocated(const std::string& module_type,
+                          const std::string& module_id,
+                          const uint32_t app_id) FINAL;
 
   /**
    * @brief OnApplicationEvent Notifies modules on certain application events
