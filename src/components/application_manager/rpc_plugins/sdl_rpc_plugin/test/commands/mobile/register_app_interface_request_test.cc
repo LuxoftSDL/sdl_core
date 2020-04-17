@@ -324,8 +324,6 @@ class RegisterAppInterfaceRequestTest
   void SetCommonPreconditionsToCheckWithPolicyData(MockAppPtr mock_app) {
     ON_CALL(mock_policy_handler_, AddApplication(kMacAddress1, kAppId1, _))
         .WillByDefault(Return(notify_upd_manager_));
-    ON_CALL(app_mngr_, application(kMacAddress1, kAppId1))
-        .WillByDefault(Return(ApplicationSharedPtr()));
     ON_CALL(app_mngr_, application(kConnectionKey))
         .WillByDefault(Return(mock_app));
     ON_CALL(app_mngr_, RegisterApplication(msg_))
@@ -994,7 +992,7 @@ TEST_F(RegisterAppInterfaceRequestTest,
       .WillByDefault(
           DoAll(SetArgPointee<2>(present_hmi_types_in_policy), Return(true)));
 
-  EXPECT_CALL(*mock_app, set_web_view_hmi_type_enabled(true)).Times(0);
+  EXPECT_CALL(*mock_app, set_webengine_projection_enabled(true)).Times(0);
 
   auto response_to_mobile = CreateMessage();
   EXPECT_CALL(
