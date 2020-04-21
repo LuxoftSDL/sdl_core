@@ -51,7 +51,7 @@ class CommandNotificationImpl : public CommandImpl {
   virtual bool Init();
   virtual bool CleanUp();
   virtual void Run();
-  void SendNotification();
+  void SendNotification(const bool final_message = false);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CommandNotificationImpl);
