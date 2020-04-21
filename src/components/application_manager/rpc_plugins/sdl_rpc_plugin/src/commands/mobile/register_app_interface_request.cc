@@ -1188,6 +1188,8 @@ mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckWithPolicyData() {
                             app_types.end(),
                             mobile_apis::AppHMIType::WEB_VIEW);
         if (app_types.end() != it) {
+          LOG4CXX_DEBUG(
+              logger_, "WEB_VIEW AppHmiType is absent in application policies");
           return mobile_apis::Result::REJECTED;
         }
         response_info_ =
@@ -1214,6 +1216,9 @@ mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckWithPolicyData() {
                           app_types.end(),
                           mobile_apis::AppHMIType::WEB_VIEW);
       if (app_types.end() != it) {
+        LOG4CXX_DEBUG(logger_,
+                      "WEB_VIEW AppHmiType is absent in application policies, "
+                      "because they are empty");
         return mobile_apis::Result::REJECTED;
       }
     }
