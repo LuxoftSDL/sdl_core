@@ -860,7 +860,7 @@ TEST_F(RegisterAppInterfaceRequestTest,
 }
 
 TEST_F(RegisterAppInterfaceRequestTest,
-       RegisterApp_WithoutAppHMITypes_SuccessfulyRegistration) {
+       RegisterApp_WithoutAppHMITypes_SuccessfulRegistration) {
   SetCommonPreconditionsToRegisterApplication();
   InitBasicMessage();
 
@@ -890,7 +890,7 @@ TEST_F(RegisterAppInterfaceRequestTest,
 
 TEST_F(
     RegisterAppInterfaceRequestTest,
-    RegisterAppInterface_AppHMITypesDoesNotExistInPTForSpecifiedApp_SuccessfulyRegistration) {
+    RegisterAppInterface_AppHMITypesDontExistInPTForSpecifiedApp_SuccessfulRegistration) {
   SetCommonPreconditionsToRegisterApplication();
   InitBasicMessage();
   (*msg_)[am::strings::msg_params][am::strings::app_hmi_type][0] =
@@ -929,7 +929,7 @@ TEST_F(
 
 TEST_F(
     RegisterAppInterfaceRequestTest,
-    RegisterApp_AppHMITypeNotCoincidedWithCurrentNonEmptyDataStoredInPT_SuccessfulyRegistrationWithWarning) {
+    RegisterApp_AppHMITypeNotCoincidedWithCurrentNonEmptyDataStoredInPT_SuccessfulRegistrationWithWarning) {
   SetCommonPreconditionsToRegisterApplication();
   InitBasicMessage();
   (*msg_)[am::strings::msg_params][am::strings::app_hmi_type][0] =
@@ -1044,6 +1044,39 @@ TEST_F(RegisterAppInterfaceRequestTest,
   const auto result_code = static_cast<mobile_apis::Result::eType>(
       (*response_to_mobile)[am::strings::msg_params][am::strings::result_code]
           .asUInt());
+  EXPECT_EQ(mobile_apis::Result::REJECTED, result_code);
+}
+
+TEST_F(RegisterAppInterfaceRequestTest,
+       RegisterAppWithWebViewOnly_WebViewNotAllowedInPT_RejectRegistration) {
+  SetCommonPreconditionsToRegisterApplication();
+  InitBasicMessage();
+  (*msg_)[am::strings::msg_params][am::strings::app_hmi_type][0] =
+      mobile_apis::AppHMIType::WEB_VIEW;
+
+  MockAppPtr mock_app = CreateBasicMockedApp();
+  SetCommonPreconditionsToCheckWithPolicyData(mock_app);
+  std::vector<std::string> present_hmi_types_in_policy{"INFORMATION",
+                                                       "COMMUNICATION"};
+  ON_CALL(mock_policy_handler_, GetInitialAppData(kAppId1, _, _))
+      .WillByDefault(
+          DoAll(SetArgPointee<2>(present_hmi_types_in_policy), Return(true)));
+
+  EXPECT_CALL(*mock_app, set_webengine_projection_enabled(true)).Times(0);
+
+  auto response_to_mobile = CreateMessage();
+  EXPECT_CALL(
+      mock_rpc_service_,
+      ManageMobileCommand(_, am::commands::Command::CommandSource::SOURCE_SDL))
+      .WillOnce(DoAll(SaveArg<0>(&response_to_mobile), Return(true)));
+
+  ASSERT_TRUE(command_->Init());
+  command_->Run();
+
+  const auto result_code = static_cast<mobile_apis::Result::eType>(
+      (*response_to_mobile)[am::strings::msg_params][am::strings::result_code]
+          .asUInt());
+
   EXPECT_EQ(mobile_apis::Result::REJECTED, result_code);
 }
 
