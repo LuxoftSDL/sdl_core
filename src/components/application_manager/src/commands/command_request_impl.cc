@@ -1094,9 +1094,9 @@ void CommandRequestImpl::AddRequestToTimeoutHandler(
   // to mobile app), so the OnResetTimeout logic is not applicable for
   // DialNumber RPC
   if (helpers::Compare<hmi_apis::FunctionID::eType, helpers::EQ, helpers::ONE>(
-      function_id,
-      hmi_apis::FunctionID::BasicCommunication_DialNumber,
-      hmi_apis::FunctionID::INVALID_ENUM)) {
+          function_id,
+          hmi_apis::FunctionID::BasicCommunication_DialNumber,
+          hmi_apis::FunctionID::INVALID_ENUM)) {
     LOG4CXX_DEBUG(logger_,
                   "Current RPC is DialNumber or Invalid, OnResetTimeout "
                   "logic is not applicable in this case");
@@ -1115,7 +1115,7 @@ void CommandRequestImpl::AddRequestToTimeoutHandler(
       }
     }
   }
-  application_manager_.get_reset_timeout_handler().AddRequest(
+  application_manager_.get_request_timeout_handler().AddRequest(
       request_to_hmi[strings::params][strings::correlation_id].asUInt(),
       correlation_id(),
       connection_key(),

@@ -427,7 +427,7 @@ class CommandRequestImpl : public CommandImpl,
       smart_objects::SmartObject& response) const;
   /**
    * @brief AddRequestToTimeoutHandler checks the request and adds it to
-   * reset_timeout_handler map for tracking
+   * request_timeout_handler map for tracking
    * @param request request to HMI
    */
   void AddRequestToTimeoutHandler(

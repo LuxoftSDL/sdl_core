@@ -197,8 +197,8 @@ class MockApplicationManager : public application_manager::ApplicationManager {
   MOCK_CONST_METHOD0(GetRPCHandler,
                      application_manager::rpc_handler::RPCHandler&());
   MOCK_CONST_METHOD0(
-      get_reset_timeout_handler,
-      application_manager::request_controller::ResetTimeoutHandler&());
+      get_request_timeout_handler,
+      application_manager::request_controller::RequestTimeoutHandler&());
   MOCK_CONST_METHOD0(
       GetRequestController,
       application_manager::request_controller::RequestController&());

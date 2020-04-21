@@ -30,8 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SRC_COMPONENTS_INCLUDE_APPLICATION_MANAGER_RESET_TIMEOUT_HANDLER_H_
-#define SRC_COMPONENTS_INCLUDE_APPLICATION_MANAGER_RESET_TIMEOUT_HANDLER_H_
+#ifndef SRC_COMPONENTS_INCLUDE_APPLICATION_MANAGER_REQUEST_TIMEOUT_HANDLER_H_
+#define SRC_COMPONENTS_INCLUDE_APPLICATION_MANAGER_REQUEST_TIMEOUT_HANDLER_H_
 
 #include <cstdint>
 
@@ -57,11 +57,11 @@ struct Request {
 };
 
 /**
- * @brief The ResetTimeoutHandler class
+ * @brief The RequestTimeoutHandler class
  * handles OnResetTimeout notification from HMI,
  * reset timeout for mobile request
  */
-class ResetTimeoutHandler {
+class RequestTimeoutHandler {
  public:
   /**
    * @brief AddRequest adds request that waits for response
@@ -80,10 +80,10 @@ class ResetTimeoutHandler {
    */
   virtual void RemoveRequest(const uint32_t hmi_correlation_id) = 0;
 
-  virtual ~ResetTimeoutHandler() {}
+  virtual ~RequestTimeoutHandler() {}
 };
 
 }  // namespace request_controller
 }  // namespace application_manager
 
-#endif  // SRC_COMPONENTS_INCLUDE_APPLICATION_MANAGER_RESET_TIMEOUT_HANDLER_H_
+#endif  // SRC_COMPONENTS_INCLUDE_APPLICATION_MANAGER_REQUEST_TIMEOUT_HANDLER_H_

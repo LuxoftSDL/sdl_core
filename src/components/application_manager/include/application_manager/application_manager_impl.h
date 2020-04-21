@@ -57,7 +57,7 @@
 #include "application_manager/rpc_service.h"
 #include "application_manager/state_controller_impl.h"
 
-#include "application_manager/reset_timeout_handler.h"
+#include "application_manager/request_timeout_handler.h"
 #include "application_manager/rpc_handler.h"
 
 #include "application_manager/policies/policy_handler_interface.h"
@@ -768,7 +768,8 @@ class ApplicationManagerImpl
   /**
    * @ Add notification to collection
    *
-   * @param ptr Reference to shared pointer that point on hmi notification
+   * @param notification Reference to shared pointer that points to hmi
+   * notification
    */
   void removeNotification(const commands::Command* notification);
 
@@ -976,9 +977,9 @@ class ApplicationManagerImpl
     return *rpc_handler_;
   }
 
-  request_controller::ResetTimeoutHandler& get_reset_timeout_handler()
+  request_controller::RequestTimeoutHandler& get_request_timeout_handler()
       const OVERRIDE {
-    return *reset_timeout_handler_;
+    return *request_timeout_handler_;
   }
 
   request_controller::RequestController& GetRequestController() const OVERRIDE {
@@ -1543,8 +1544,8 @@ class ApplicationManagerImpl
   connection_handler::ConnectionHandler* connection_handler_;
   std::unique_ptr<policy::PolicyHandlerInterface> policy_handler_;
   protocol_handler::ProtocolHandler* protocol_handler_;
-  std::unique_ptr<request_controller::ResetTimeoutHandler>
-      reset_timeout_handler_;
+  std::unique_ptr<request_controller::RequestTimeoutHandler>
+      request_timeout_handler_;
   std::unique_ptr<request_controller::RequestController> request_ctrl_;
   std::unique_ptr<plugin_manager::RPCPluginManager> plugin_manager_;
   std::unique_ptr<application_manager::AppServiceManager> app_service_manager_;

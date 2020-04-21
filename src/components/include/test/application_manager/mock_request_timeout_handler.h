@@ -30,18 +30,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_MOCK_RESET_TIMEOUT_HANDLER_H_
-#define SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_MOCK_RESET_TIMEOUT_HANDLER_H_
+#ifndef SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_mock_request_timeout_handler_H_
+#define SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_mock_request_timeout_handler_H_
 
-#include "application_manager/reset_timeout_handler.h"
+#include "application_manager/request_timeout_handler.h"
 #include "gmock/gmock.h"
 
 namespace test {
 namespace components {
 namespace application_manager_test {
 
-class MockResetTimeoutHandler
-    : public application_manager::request_controller::ResetTimeoutHandler {
+class MockRequestTimeoutHandler
+    : public application_manager::request_controller::RequestTimeoutHandler {
  public:
   MOCK_METHOD4(AddRequest,
                void(const uint32_t hmi_correlation_id,
@@ -55,4 +55,4 @@ class MockResetTimeoutHandler
 }  //  namespace components
 }  //  namespace test
 
-#endif  // SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_MOCK_RESET_TIMEOUT_HANDLER_H_
+#endif  // SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_mock_request_timeout_handler_H_

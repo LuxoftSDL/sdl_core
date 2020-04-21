@@ -39,7 +39,7 @@
 #include "application_manager/mock_event_dispatcher.h"
 #include "application_manager/mock_hmi_capabilities.h"
 #include "application_manager/mock_request_controller_settings.h"
-#include "application_manager/mock_reset_timeout_handler.h"
+#include "application_manager/mock_request_timeout_handler.h"
 #include "application_manager/mock_rpc_plugin.h"
 #include "application_manager/mock_rpc_plugin_manager.h"
 #include "application_manager/mock_rpc_protection_manager.h"
@@ -82,7 +82,7 @@ using test::components::application_manager_test::MockApplication;
 using test::components::application_manager_test::MockCommandFactory;
 using test::components::application_manager_test::MockHMICapabilities;
 using test::components::application_manager_test::MockRequestControlerSettings;
-using test::components::application_manager_test::MockResetTimeoutHandler;
+using test::components::application_manager_test::MockRequestTimeoutHandler;
 using test::components::commands_test::CommandRequestTest;
 using test::components::commands_test::CommandsTestMocks;
 using test::components::hmi_message_handler_test::MockHMIMessageHandler;
@@ -111,7 +111,8 @@ class RCGetInteriorVehicleDataConsentTest
       , rc_capabilities_(smart_objects::SmartType::SmartType_Array)
       , rpc_protection_manager_(
             std::make_shared<application_manager::MockRPCProtectionManager>())
-      , request_controller(mock_request_controler, mock_reset_timeout_handler_)
+      , request_controller(mock_request_controler,
+                           mock_request_timeout_handler_)
       , rpc_service_(app_mngr_,
                      request_controller,
                      &mock_protocol_handler,
@@ -216,7 +217,7 @@ class RCGetInteriorVehicleDataConsentTest
   MockCommandFactory mock_command_factory;
   std::shared_ptr<application_manager::MockRPCProtectionManager>
       rpc_protection_manager_;
-  MockResetTimeoutHandler mock_reset_timeout_handler_;
+  MockRequestTimeoutHandler mock_request_timeout_handler_;
   am::request_controller::RequestControllerImpl request_controller;
   am::rpc_service::RPCServiceImpl rpc_service_;
   std::shared_ptr<RCAppExtension> rc_app_extention_;

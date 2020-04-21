@@ -52,7 +52,7 @@
 #include "application_manager/plugin_manager/rpc_plugin_manager_impl.h"
 #include "application_manager/policies/policy_handler.h"
 #include "application_manager/request_controller_impl.h"
-#include "application_manager/reset_timeout_handler_impl.h"
+#include "application_manager/request_timeout_handler_impl.h"
 #include "application_manager/resumption/resume_ctrl_impl.h"
 #include "application_manager/rpc_handler_impl.h"
 #include "application_manager/rpc_protection_manager_impl.h"
@@ -176,10 +176,10 @@ ApplicationManagerImpl::ApplicationManagerImpl(
     , connection_handler_(NULL)
     , policy_handler_(new policy::PolicyHandler(policy_settings, *this))
     , protocol_handler_(NULL)
-    , reset_timeout_handler_(
-          new request_controller::ResetTimeoutHandlerImpl(*this))
+    , request_timeout_handler_(
+          new request_controller::RequestTimeoutHandlerImpl(*this))
     , request_ctrl_(new request_controller::RequestControllerImpl(
-          am_settings, *reset_timeout_handler_))
+          am_settings, *request_timeout_handler_))
     , hmi_so_factory_(NULL)
     , mobile_so_factory_(NULL)
     , hmi_capabilities_(new HMICapabilitiesImpl(*this))

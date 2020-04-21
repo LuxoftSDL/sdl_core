@@ -46,7 +46,7 @@
 #include "application_manager/hmi_interfaces.h"
 #include "application_manager/plugin_manager/rpc_plugin_manager.h"
 #include "application_manager/request_controller.h"
-#include "application_manager/reset_timeout_handler.h"
+#include "application_manager/request_timeout_handler.h"
 #include "application_manager/state_controller.h"
 #include "policy/policy_types.h"
 
@@ -87,7 +87,7 @@ namespace rpc_handler {
 class RPCHandler;
 }
 namespace request_controller {
-class ResetTimeoutHandler;
+class RequestTimeoutHandler;
 class RequestController;
 }  // namespace request_controller
 class Application;
@@ -455,8 +455,8 @@ class ApplicationManager {
 
   virtual rpc_service::RPCService& GetRPCService() const = 0;
   virtual rpc_handler::RPCHandler& GetRPCHandler() const = 0;
-  virtual request_controller::ResetTimeoutHandler& get_reset_timeout_handler()
-      const = 0;
+  virtual request_controller::RequestTimeoutHandler&
+  get_request_timeout_handler() const = 0;
   virtual request_controller::RequestController& GetRequestController()
       const = 0;
   virtual bool is_stopping() const = 0;

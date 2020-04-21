@@ -30,22 +30,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SRC_COMPONENTS_APPLICATION_MANAGER_INCLUDE_APPLICATION_MANAGER_RESET_TIMEOUT_HANDLER_IMPL_H_
-#define SRC_COMPONENTS_APPLICATION_MANAGER_INCLUDE_APPLICATION_MANAGER_RESET_TIMEOUT_HANDLER_IMPL_H_
+#ifndef SRC_COMPONENTS_APPLICATION_MANAGER_INCLUDE_APPLICATION_MANAGER_REQUEST_TIMEOUT_HANDLER_IMPL_H_
+#define SRC_COMPONENTS_APPLICATION_MANAGER_INCLUDE_APPLICATION_MANAGER_REQUEST_TIMEOUT_HANDLER_IMPL_H_
 
 #include <map>
 #include "application_manager/application_manager.h"
 #include "application_manager/event_engine/event_observer.h"
-#include "application_manager/reset_timeout_handler.h"
+#include "application_manager/request_timeout_handler.h"
 
 namespace application_manager {
 
 namespace request_controller {
 
-class ResetTimeoutHandlerImpl : public event_engine::EventObserver,
-                                public ResetTimeoutHandler {
+class RequestTimeoutHandlerImpl : public event_engine::EventObserver,
+                                  public RequestTimeoutHandler {
  public:
-  ResetTimeoutHandlerImpl(ApplicationManager& application_manager);
+  RequestTimeoutHandlerImpl(ApplicationManager& application_manager);
   void AddRequest(const uint32_t hmi_correlation_id,
                   const uint32_t mob_correlation_id,
                   const uint32_t connection_key,
@@ -54,9 +54,9 @@ class ResetTimeoutHandlerImpl : public event_engine::EventObserver,
   void on_event(const event_engine::Event& event) OVERRIDE;
 
  private:
-  bool IsTimeoutUpdateRequired(Request request,
-                                uint32_t timeout,
-                                hmi_apis::FunctionID::eType method_name);
+  bool IsTimeoutUpdateRequired(const Request request,
+                               const uint32_t timeout,
+                               const hmi_apis::FunctionID::eType method_name);
 
   std::map<uint32_t, Request> requests_;
   ApplicationManager& application_manager_;
@@ -66,4 +66,4 @@ class ResetTimeoutHandlerImpl : public event_engine::EventObserver,
 }  // namespace request_controller
 }  // namespace application_manager
 
-#endif  // SRC_COMPONENTS_APPLICATION_MANAGER_INCLUDE_APPLICATION_MANAGER_TIMEOUT_HANDLER_IMPL_H_
+#endif  // SRC_COMPONENTS_APPLICATION_MANAGER_INCLUDE_APPLICATION_MANAGER_REQUEST_TIMEOUT_HANDLER_IMPL_H_

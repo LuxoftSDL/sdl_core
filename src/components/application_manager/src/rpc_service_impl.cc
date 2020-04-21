@@ -251,9 +251,9 @@ bool RPCServiceImpl::ManageMobileCommand(
     const request_controller::RequestController::TResult result =
         request_ctrl_.addMobileRequest(command, app_hmi_level);
 
-    if (result == request_controller::RequestController::SUCCESS) {
+    if (result == request_controller::RequestController::TResult::SUCCESS) {
       LOG4CXX_DEBUG(logger_, "Perform request");
-    } else if (result == request_controller::RequestController::
+    } else if (result == request_controller::RequestController::TResult::
                              TOO_MANY_PENDING_REQUESTS) {
       LOG4CXX_ERROR(logger_,
                     "RET  Unable top perform request: "
@@ -273,8 +273,8 @@ bool RPCServiceImpl::ManageMobileCommand(
 
       SendMessageToMobile(response);
       return false;
-    } else if (result ==
-               request_controller::RequestController::TOO_MANY_REQUESTS) {
+    } else if (result == request_controller::RequestController::TResult::
+                             TOO_MANY_REQUESTS) {
       LOG4CXX_ERROR(logger_,
                     "RET  Unable to perform request: "
                         << "TOO_MANY_REQUESTS");
@@ -294,7 +294,7 @@ bool RPCServiceImpl::ManageMobileCommand(
         app_ptr->usage_report().RecordRemovalsForBadBehavior();
       }
       return false;
-    } else if (result == request_controller::RequestController::
+    } else if (result == request_controller::RequestController::TResult::
                              NONE_HMI_LEVEL_MANY_REQUESTS) {
       LOG4CXX_ERROR(logger_,
                     "RET  Unable to perform request: "

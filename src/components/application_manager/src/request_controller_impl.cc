@@ -48,7 +48,7 @@ CREATE_LOGGERPTR_GLOBAL(logger_, "RequestControllerImpl")
 
 RequestControllerImpl::RequestControllerImpl(
     const RequestControlerSettings& settings,
-    ResetTimeoutHandler& reset_timeout_handler)
+    RequestTimeoutHandler& request_timeout_handler)
     : pool_state_(UNDEFINED)
     , pool_size_(settings.thread_pool_size())
     , request_tracker_(settings)
@@ -59,7 +59,7 @@ RequestControllerImpl::RequestControllerImpl(
     , timer_stop_flag_(false)
     , is_low_voltage_(false)
     , settings_(settings)
-    , reset_timeout_handler_(reset_timeout_handler) {
+    , request_timeout_handler_(request_timeout_handler) {
   LOG4CXX_AUTO_TRACE(logger_);
   InitializeThreadpool();
   timer_.Start(0, timer::kSingleShot);
@@ -113,7 +113,7 @@ RequestControllerImpl::TResult RequestControllerImpl::CheckPosibilitytoAdd(
   LOG4CXX_AUTO_TRACE(logger_);
   if (!CheckPendingRequestsAmount(settings_.pending_requests_amount())) {
     LOG4CXX_ERROR(logger_, "Too many pending request");
-    return RequestController::TOO_MANY_PENDING_REQUESTS;
+    return RequestController::TResult::TOO_MANY_PENDING_REQUESTS;
   }
 
   const TrackResult track_result =
@@ -121,21 +121,21 @@ RequestControllerImpl::TResult RequestControllerImpl::CheckPosibilitytoAdd(
 
   if (TrackResult::kNoneLevelMaxRequestsExceeded == track_result) {
     LOG4CXX_ERROR(logger_, "Too many application requests in hmi level NONE");
-    return RequestController::NONE_HMI_LEVEL_MANY_REQUESTS;
+    return RequestController::TResult::NONE_HMI_LEVEL_MANY_REQUESTS;
   }
 
   if (TrackResult::kMaxRequestsExceeded == track_result) {
     LOG4CXX_ERROR(logger_, "Too many application requests");
-    return RequestController::TOO_MANY_REQUESTS;
+    return RequestController::TResult::TOO_MANY_REQUESTS;
   }
 
   if (IsLowVoltage()) {
     LOG4CXX_ERROR(logger_,
                   "Impossible to add request due to Low Voltage is active");
-    return RequestController::INVALID_DATA;
+    return RequestController::TResult::INVALID_DATA;
   }
 
-  return SUCCESS;
+  return TResult::SUCCESS;
 }
 
 bool RequestControllerImpl::CheckPendingRequestsAmount(
@@ -180,14 +180,14 @@ RequestController::TResult RequestControllerImpl::addMobileRequest(
   if (!request) {
     LOG4CXX_ERROR(logger_, "Null Pointer request");
     cond_var_.NotifyOne();
-    return INVALID_DATA;
+    return TResult::INVALID_DATA;
   }
   LOG4CXX_DEBUG(
       logger_,
       "correlation_id : " << request->correlation_id()
                           << "connection_key : " << request->connection_key());
   RequestController::TResult result = CheckPosibilitytoAdd(request, hmi_level);
-  if (SUCCESS == result) {
+  if (TResult::SUCCESS == result) {
     AutoLock auto_lock_list(mobile_request_list_lock_);
     mobile_request_list_.push_back(request);
     LOG4CXX_DEBUG(logger_,
@@ -204,7 +204,7 @@ RequestController::TResult RequestControllerImpl::addHMIRequest(
 
   if (request.use_count() == 0) {
     LOG4CXX_ERROR(logger_, "HMI request pointer is invalid");
-    return RequestController::INVALID_DATA;
+    return RequestController::TResult::INVALID_DATA;
   }
   LOG4CXX_DEBUG(logger_, " correlation_id : " << request->correlation_id());
 
@@ -222,7 +222,7 @@ RequestController::TResult RequestControllerImpl::addHMIRequest(
   if (IsLowVoltage()) {
     LOG4CXX_ERROR(logger_,
                   "Impossible to add request due to Low Voltage is active");
-    return RequestController::INVALID_DATA;
+    return RequestController::TResult::INVALID_DATA;
   }
 
   waiting_for_response_.Add(request_info_ptr);
@@ -230,7 +230,7 @@ RequestController::TResult RequestControllerImpl::addHMIRequest(
                 "Waiting for response count:" << waiting_for_response_.Size());
 
   NotifyTimer();
-  return RequestController::SUCCESS;
+  return RequestController::TResult::SUCCESS;
 }
 
 void RequestControllerImpl::addNotification(const RequestPtr ptr) {
@@ -297,7 +297,7 @@ void RequestControllerImpl::TerminateRequest(const uint32_t correlation_id,
   if (force_terminate || request->request()->AllowedToTerminate()) {
     waiting_for_response_.RemoveRequest(request);
     if (RequestInfo::HMIRequest == request->request_type()) {
-      reset_timeout_handler_.RemoveRequest(request->requestId());
+      request_timeout_handler_.RemoveRequest(request->requestId());
     }
 
   } else {
@@ -478,7 +478,7 @@ void RequestControllerImpl::TimeoutThread() {
                     "Erase HMI request: " << probably_expired->requestId());
       waiting_for_response_.RemoveRequest(probably_expired);
       if (RequestInfo::HMIRequest == probably_expired->request_type()) {
-        reset_timeout_handler_.RemoveRequest(experied_request_id);
+        request_timeout_handler_.RemoveRequest(experied_request_id);
       }
     }
     probably_expired = waiting_for_response_.FrontWithNotNullTimeout();

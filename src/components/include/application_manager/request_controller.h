@@ -50,7 +50,7 @@ class RequestController {
   /**
    * @brief Result code for addRequest
    */
-  enum TResult {
+  enum class TResult {
     SUCCESS = 0,
     TOO_MANY_REQUESTS,
     TOO_MANY_PENDING_REQUESTS,
@@ -121,6 +121,8 @@ class RequestController {
   /**
    * @brief Removes request from queue
    * @param mobile_correlation_id Active mobile request correlation ID
+   * @param connection_key Active request connection key (0 for HMI requests)
+   * @param function_id Active request function ID
    */
   virtual void OnMobileResponse(const uint32_t mobile_correlation_id,
                                 const uint32_t connection_key,
@@ -129,13 +131,15 @@ class RequestController {
   /**
    * @brief Removes request from queue
    * @param mobile_correlation_id Active mobile request correlation ID
+   * @param function_id Active request function ID
    */
   virtual void OnHMIResponse(const uint32_t correlation_id,
                              const int32_t function_id) = 0;
 
   /**
    * @ Add notification to collection
-   * @param ptr Reference to shared pointer that point on hmi notification
+   * @param notification Reference to shared pointer that points to hmi
+   * notification
    */
   virtual void removeNotification(const commands::Command* notification) = 0;
 
@@ -169,7 +173,8 @@ class RequestController {
    * @brief IsUpdateRequestTimeoutRequired check is update timeout required.
    * @param app_id Connection key of application
    * @param correlation_id Correlation ID of the mobile request
-   * @param new_timeout New timeout to be set in milliseconds
+   * @param new_timeout New timeout value of which will be check with current
+   * timeout
    * @return true if the new timeout value is greater than the time remaining
    * from the current timeout, otherwise - false
    */
@@ -183,10 +188,13 @@ class RequestController {
   virtual void OnLowVoltage() = 0;
 
   /**
-   * @brief Function Should be called when Low Voltage is occured
+   * @brief Function Should be called when WakeUp occures after Low Voltage
    */
   virtual void OnWakeUp() = 0;
 
+  /**
+   * @return true if low voltage state is active
+   */
   virtual bool IsLowVoltage() = 0;
 };
 
