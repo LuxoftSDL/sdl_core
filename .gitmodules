@@ -3,4 +3,4 @@
 	url = https://github.com/smartdevicelink/jsoncpp.git
 [submodule "tools/rpc_spec"]
 	path = tools/rpc_spec
-	url = https://github.ford.com/SmartDeviceLinkMirror/rpc_spec.git
+	url = git@github.ford.com:SmartDeviceLinkMirror/rpc_spec.git
