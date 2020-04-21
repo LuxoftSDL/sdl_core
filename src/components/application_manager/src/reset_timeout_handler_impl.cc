@@ -29,6 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "application_manager/reset_timeout_handler_impl.h"
 #include "application_manager/message_helper.h"
 #include "utils/logger.h"
@@ -36,7 +37,6 @@
 CREATE_LOGGERPTR_GLOBAL(logger_, "RequestTimeoutHandler")
 
 namespace application_manager {
-
 namespace request_controller {
 
 ResetTimeoutHandlerImpl::ResetTimeoutHandlerImpl(
@@ -46,15 +46,15 @@ ResetTimeoutHandlerImpl::ResetTimeoutHandlerImpl(
   subscribe_on_event(hmi_apis::FunctionID::BasicCommunication_OnResetTimeout);
 }
 
-void ResetTimeoutHandlerImpl::AddRequest(uint32_t hmi_correlation_id,
-                                         uint32_t mob_correlation_id,
-                                         uint32_t connection_key,
-                                         uint32_t hmi_function_id) {
+void ResetTimeoutHandlerImpl::AddRequest(const uint32_t hmi_correlation_id,
+                                         const uint32_t mob_correlation_id,
+                                         const uint32_t connection_key,
+                                         const uint32_t hmi_function_id) {
   Request request(mob_correlation_id, connection_key, hmi_function_id);
   requests_.insert(std::make_pair(hmi_correlation_id, request));
 }
 
-void ResetTimeoutHandlerImpl::RemoveRequest(uint32_t hmi_correlation_id) {
+void ResetTimeoutHandlerImpl::RemoveRequest(const uint32_t hmi_correlation_id) {
   LOG4CXX_AUTO_TRACE(logger_);
   sync_primitives::AutoLock lock(requests_lock_);
   auto it = requests_.find(hmi_correlation_id);
@@ -63,7 +63,7 @@ void ResetTimeoutHandlerImpl::RemoveRequest(uint32_t hmi_correlation_id) {
   };
 }
 
-bool ResetTimeoutHandlerImpl::CheckConditionsForUpdate(
+bool ResetTimeoutHandlerImpl::IsTimeoutUpdateRequired(
     Request request,
     uint32_t timeout,
     hmi_apis::FunctionID::eType method_name) {
@@ -74,16 +74,16 @@ bool ResetTimeoutHandlerImpl::CheckConditionsForUpdate(
                                             request.mob_correlation_id_,
                                             timeout)) {
       return true;
-    } else {
-      LOG4CXX_WARN(logger_,
+    }
+
+    LOG4CXX_WARN(logger_,
                    "New timeout value is less than the time remaining from "
                    "the current timeout. OnResetTimeout will be ignored");
-      return false;
-    }
-  } else {
-    LOG4CXX_WARN(logger_, "Method name does not match the hmi function id");
     return false;
   }
+
+  LOG4CXX_WARN(logger_, "Method name does not match the hmi function id");
+  return false;
 }
 
 void ResetTimeoutHandlerImpl::on_event(const event_engine::Event& event) {
@@ -102,15 +102,15 @@ void ResetTimeoutHandlerImpl::on_event(const event_engine::Event& event) {
       return;
     }
     uint32_t timeout = application_manager_.get_settings().default_timeout();
-    if (message[strings::msg_params].keyExists(strings::reset_period)) {
-      timeout = message[strings::msg_params][strings::reset_period].asUInt();
+    if (message[strings::msg_params].keyExists(strings::timeout_period_for_reset)) {
+      timeout = message[strings::msg_params][strings::timeout_period_for_reset].asUInt();
     }
     auto hmi_corr_id =
         message[strings::msg_params][strings::request_id].asUInt();
     auto it = requests_.find(hmi_corr_id);
     if (it != requests_.end()) {
       auto request = it->second;
-      if (CheckConditionsForUpdate(request, timeout, method_name)) {
+      if (IsTimeoutUpdateRequired(request, timeout, method_name)) {
         application_manager_.updateRequestTimeout(
             request.connection_key_, request.mob_correlation_id_, timeout);
       }

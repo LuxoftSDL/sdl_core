@@ -46,15 +46,15 @@ class ResetTimeoutHandlerImpl : public event_engine::EventObserver,
                                 public ResetTimeoutHandler {
  public:
   ResetTimeoutHandlerImpl(ApplicationManager& application_manager);
-  void AddRequest(uint32_t hmi_correlation_id,
-                  uint32_t mob_correlation_id,
-                  uint32_t connection_key,
-                  uint32_t hmi_function_id) OVERRIDE;
-  void RemoveRequest(uint32_t hmi_correlation_id) OVERRIDE;
+  void AddRequest(const uint32_t hmi_correlation_id,
+                  const uint32_t mob_correlation_id,
+                  const uint32_t connection_key,
+                  const uint32_t hmi_function_id) OVERRIDE;
+  void RemoveRequest(const uint32_t hmi_correlation_id) OVERRIDE;
   void on_event(const event_engine::Event& event) OVERRIDE;
 
  private:
-  bool CheckConditionsForUpdate(Request request,
+  bool IsTimeoutUpdateRequired(Request request,
                                 uint32_t timeout,
                                 hmi_apis::FunctionID::eType method_name);
 

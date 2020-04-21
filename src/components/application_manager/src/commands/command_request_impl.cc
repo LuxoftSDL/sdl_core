@@ -44,6 +44,7 @@
 #include "smart_objects/smart_object.h"
 
 #include "smart_objects/enum_schema_item.h"
+#include "utils/helpers.h"
 
 namespace application_manager {
 
@@ -1092,8 +1093,10 @@ void CommandRequestImpl::AddRequestToTimeoutHandler(
   // response to BC.DialNumber as long as it takes and not return GENERIC_ERROR
   // to mobile app), so the OnResetTimeout logic is not applicable for
   // DialNumber RPC
-  if (hmi_apis::FunctionID::BasicCommunication_DialNumber == function_id ||
-      hmi_apis::FunctionID::INVALID_ENUM == function_id) {
+  if (helpers::Compare<hmi_apis::FunctionID::eType, helpers::EQ, helpers::ONE>(
+      function_id,
+      hmi_apis::FunctionID::BasicCommunication_DialNumber,
+      hmi_apis::FunctionID::INVALID_ENUM)) {
     LOG4CXX_DEBUG(logger_,
                   "Current RPC is DialNumber or Invalid, OnResetTimeout "
                   "logic is not applicable in this case");
@@ -1112,7 +1115,7 @@ void CommandRequestImpl::AddRequestToTimeoutHandler(
       }
     }
   }
-  application_manager_.GetResetTimeoutHandler().AddRequest(
+  application_manager_.get_reset_timeout_handler().AddRequest(
       request_to_hmi[strings::params][strings::correlation_id].asUInt(),
       correlation_id(),
       connection_key(),

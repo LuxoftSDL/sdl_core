@@ -59,6 +59,7 @@ namespace components {
 namespace request_controller_test {
 
 using ::application_manager::request_controller::RequestControllerImpl;
+using ::application_manager::request_controller::RequestController;
 using ::application_manager::request_controller::RequestInfo;
 using test::components::application_manager_test::MockResetTimeoutHandler;
 
@@ -108,7 +109,7 @@ class RequestControllerTestClass : public ::testing::Test {
     ON_CALL(mock_request_controller_settings_, thread_pool_size())
         .WillByDefault(Return(kThreadPoolSize));
     request_ctrl_ = std::make_shared<RequestControllerImpl>(
-        mock_request_controller_settings_, mock_reset_timeout_);
+        mock_request_controller_settings_, mock_reset_timeout_handler_);
   }
 
   RequestPtr GetMockRequest(
@@ -122,7 +123,7 @@ class RequestControllerTestClass : public ::testing::Test {
     return output;
   }
 
-  RequestControllerImpl::TResult AddRequest(
+  RequestController::TResult AddRequest(
       const TestSettings& settings,
       RequestPtr request,
       const RequestInfo::RequestType request_type =
@@ -158,7 +159,7 @@ class RequestControllerTestClass : public ::testing::Test {
 
   NiceMock<application_manager_test::MockRequestControlerSettings>
       mock_request_controller_settings_;
-  MockResetTimeoutHandler mock_reset_timeout_;
+  MockResetTimeoutHandler mock_reset_timeout_handler_;
   RequestControllerSPtr request_ctrl_;
   RequestPtr empty_mock_request_;
   const TestSettings default_settings_;
@@ -174,7 +175,7 @@ TEST_F(RequestControllerTestClass,
       .Times(1)
       .WillRepeatedly(NotifyTestAsyncWaiter(&waiter_valid));
 
-  EXPECT_EQ(RequestControllerImpl::SUCCESS,
+  EXPECT_EQ(RequestController::TResult::SUCCESS,
             AddRequest(default_settings_,
                        request_valid,
                        RequestInfo::RequestType::MobileRequest,
@@ -190,7 +191,7 @@ TEST_F(RequestControllerTestClass,
   ON_CALL(*request_dup_corr_id, Run())
       .WillByDefault(NotifyTestAsyncWaiter(&waiter_dup));
 
-  EXPECT_EQ(RequestControllerImpl::SUCCESS,
+  EXPECT_EQ(RequestController::TResult::SUCCESS,
             AddRequest(default_settings_,
                        request_dup_corr_id,
                        RequestInfo::RequestType::MobileRequest,
@@ -205,7 +206,7 @@ TEST_F(RequestControllerTestClass,
   // app_hmi_level_none_time_scale_max_requests_ equals 0
   // (in the default settings they setted to 0)
   for (size_t i = 0; i < kMaxRequestAmount; ++i) {
-    EXPECT_EQ(RequestControllerImpl::SUCCESS,
+    EXPECT_EQ(RequestController::TResult::SUCCESS,
               AddRequest(default_settings_,
                          GetMockRequest(i),
                          RequestInfo::RequestType::MobileRequest,
@@ -223,7 +224,7 @@ TEST_F(
 
   // Adding requests to fit in pending_requests_amount_
   for (size_t i = 0; i < kNumberOfRequests; ++i) {
-    EXPECT_EQ(RequestControllerImpl::TResult::SUCCESS,
+    EXPECT_EQ(RequestController::TResult::SUCCESS,
               AddRequest(settings,
                          GetMockRequest(),
                          RequestInfo::RequestType::MobileRequest,
@@ -232,7 +233,7 @@ TEST_F(
 
   // Trying to add one more extra request
   // Expect overflow and TOO_MANY_PENDING_REQUESTS result
-  EXPECT_EQ(RequestControllerImpl::TResult::TOO_MANY_PENDING_REQUESTS,
+  EXPECT_EQ(RequestController::TResult::TOO_MANY_PENDING_REQUESTS,
             AddRequest(settings,
                        GetMockRequest(),
                        RequestInfo::RequestType::MobileRequest,
@@ -252,7 +253,7 @@ TEST_F(RequestControllerTestClass, IsLowVoltage_SetOnWakeUp_FALSE) {
 }
 
 TEST_F(RequestControllerTestClass, AddMobileRequest_SetValidData_SUCCESS) {
-  EXPECT_EQ(RequestControllerImpl::SUCCESS,
+  EXPECT_EQ(RequestController::TResult::SUCCESS,
             AddRequest(default_settings_,
                        GetMockRequest(),
                        RequestInfo::RequestType::MobileRequest,
@@ -261,7 +262,7 @@ TEST_F(RequestControllerTestClass, AddMobileRequest_SetValidData_SUCCESS) {
 
 TEST_F(RequestControllerTestClass,
        AddMobileRequest_SetInvalidData_INVALID_DATA) {
-  EXPECT_EQ(RequestControllerImpl::INVALID_DATA,
+  EXPECT_EQ(RequestController::TResult::INVALID_DATA,
             AddRequest(default_settings_,
                        empty_mock_request_,
                        RequestInfo::RequestType::MobileRequest,
@@ -269,14 +270,14 @@ TEST_F(RequestControllerTestClass,
 }
 
 TEST_F(RequestControllerTestClass, AddHMIRequest_AddRequest_SUCCESS) {
-  EXPECT_EQ(RequestControllerImpl::SUCCESS,
+  EXPECT_EQ(RequestController::TResult::SUCCESS,
             AddRequest(default_settings_,
                        GetMockRequest(),
                        RequestInfo::RequestType::HMIRequest));
 }
 
 TEST_F(RequestControllerTestClass, AddHMIRequest_AddInvalidData_INVALID_DATA) {
-  EXPECT_EQ(RequestControllerImpl::INVALID_DATA,
+  EXPECT_EQ(RequestController::TResult::INVALID_DATA,
             AddRequest(default_settings_,
                        empty_mock_request_,
                        RequestInfo::RequestType::HMIRequest));
@@ -288,7 +289,7 @@ TEST_F(RequestControllerTestClass, OnTimer_SUCCESS) {
       kDefaultCorrelationID, kDefaultConnectionKey, request_timeout);
 
   TestAsyncWaiter waiter;
-  EXPECT_EQ(RequestControllerImpl::SUCCESS,
+  EXPECT_EQ(RequestController::TResult::SUCCESS,
             AddRequest(default_settings_,
                        mock_request,
                        RequestInfo::RequestType::MobileRequest));

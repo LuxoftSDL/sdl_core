@@ -33,7 +33,7 @@
 #ifndef SRC_COMPONENTS_INCLUDE_APPLICATION_MANAGER_RESET_TIMEOUT_HANDLER_H_
 #define SRC_COMPONENTS_INCLUDE_APPLICATION_MANAGER_RESET_TIMEOUT_HANDLER_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace application_manager {
 namespace request_controller {
@@ -41,12 +41,12 @@ namespace request_controller {
 /*
  * @brief Structure for active mobile request
  * that is waiting for a response from the HMI.
- * Use for OnResetTimeout logic.
+ * Used for OnResetTimeout logic.
  */
 struct Request {
-  Request(uint32_t mob_correlation_id,
-          uint32_t connection_key,
-          uint32_t hmi_function_id)
+  Request(const uint32_t mob_correlation_id,
+          const uint32_t connection_key,
+          const uint32_t hmi_function_id)
       : mob_correlation_id_(mob_correlation_id)
       , connection_key_(connection_key)
       , hmi_function_id_(hmi_function_id) {}
@@ -58,7 +58,7 @@ struct Request {
 
 /**
  * @brief The ResetTimeoutHandler class
- * handle OnResetTimeout notification from HMI,
+ * handles OnResetTimeout notification from HMI,
  * reset timeout for mobile request
  */
 class ResetTimeoutHandler {
@@ -70,15 +70,15 @@ class ResetTimeoutHandler {
    * @param connection_key connection key
    * @param hmi_function_id function id
    */
-  virtual void AddRequest(uint32_t hmi_correlation_id,
-                          uint32_t mob_correlation_id,
-                          uint32_t connection_key,
-                          uint32_t hmi_function_id) = 0;
+  virtual void AddRequest(const uint32_t hmi_correlation_id,
+                          const uint32_t mob_correlation_id,
+                          const uint32_t connection_key,
+                          const uint32_t hmi_function_id) = 0;
   /**
    * @brief RemoveRequest removes processed request
    * @param hmi_correlation_id hmi correlation id
    */
-  virtual void RemoveRequest(uint32_t hmi_correlation_id) = 0;
+  virtual void RemoveRequest(const uint32_t hmi_correlation_id) = 0;
 
   virtual ~ResetTimeoutHandler() {}
 };

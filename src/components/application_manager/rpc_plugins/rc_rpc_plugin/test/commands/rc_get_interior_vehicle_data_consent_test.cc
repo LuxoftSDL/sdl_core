@@ -111,7 +111,7 @@ class RCGetInteriorVehicleDataConsentTest
       , rc_capabilities_(smart_objects::SmartType::SmartType_Array)
       , rpc_protection_manager_(
             std::make_shared<application_manager::MockRPCProtectionManager>())
-      , request_controller(mock_request_controler, mock_reset_timeout_)
+      , request_controller(mock_request_controler, mock_reset_timeout_handler_)
       , rpc_service_(app_mngr_,
                      request_controller,
                      &mock_protocol_handler,
@@ -216,7 +216,7 @@ class RCGetInteriorVehicleDataConsentTest
   MockCommandFactory mock_command_factory;
   std::shared_ptr<application_manager::MockRPCProtectionManager>
       rpc_protection_manager_;
-  MockResetTimeoutHandler mock_reset_timeout_;
+  MockResetTimeoutHandler mock_reset_timeout_handler_;
   am::request_controller::RequestControllerImpl request_controller;
   am::rpc_service::RPCServiceImpl rpc_service_;
   std::shared_ptr<RCAppExtension> rc_app_extention_;

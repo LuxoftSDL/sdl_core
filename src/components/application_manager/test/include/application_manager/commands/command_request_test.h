@@ -123,7 +123,7 @@ class CommandRequestTest : public CommandsTest<kIsNice> {
     CommandsTest<kIsNice>::InitCommand(default_timeout);
     ON_CALL(CommandsTest<kIsNice>::app_mngr_, event_dispatcher())
         .WillByDefault(ReturnRef(event_dispatcher_));
-    ON_CALL(CommandsTest<kIsNice>::app_mngr_, GetResetTimeoutHandler())
+    ON_CALL(CommandsTest<kIsNice>::app_mngr_, get_reset_timeout_handler())
         .WillByDefault(ReturnRef(mock_reset_timeout_handler_));
   }
 };

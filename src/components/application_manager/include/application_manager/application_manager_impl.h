@@ -976,7 +976,7 @@ class ApplicationManagerImpl
     return *rpc_handler_;
   }
 
-  request_controller::ResetTimeoutHandler& GetResetTimeoutHandler()
+  request_controller::ResetTimeoutHandler& get_reset_timeout_handler()
       const OVERRIDE {
     return *reset_timeout_handler_;
   }

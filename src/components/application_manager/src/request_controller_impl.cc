@@ -129,6 +129,12 @@ RequestControllerImpl::TResult RequestControllerImpl::CheckPosibilitytoAdd(
     return RequestController::TOO_MANY_REQUESTS;
   }
 
+  if (IsLowVoltage()) {
+    LOG4CXX_ERROR(logger_,
+                  "Impossible to add request due to Low Voltage is active");
+    return RequestController::INVALID_DATA;
+  }
+
   return SUCCESS;
 }
 
@@ -212,6 +218,13 @@ RequestController::TResult RequestControllerImpl::addHMIRequest(
                   "Default timeout was set to 0."
                   "RequestController will not track timeout of this request.");
   }
+
+  if (IsLowVoltage()) {
+    LOG4CXX_ERROR(logger_,
+                  "Impossible to add request due to Low Voltage is active");
+    return RequestController::INVALID_DATA;
+  }
+
   waiting_for_response_.Add(request_info_ptr);
   LOG4CXX_DEBUG(logger_,
                 "Waiting for response count:" << waiting_for_response_.Size());
@@ -222,6 +235,11 @@ RequestController::TResult RequestControllerImpl::addHMIRequest(
 
 void RequestControllerImpl::addNotification(const RequestPtr ptr) {
   LOG4CXX_AUTO_TRACE(logger_);
+  if (IsLowVoltage()) {
+    LOG4CXX_ERROR(
+        logger_, "Impossible to add notification due to Low Voltage is active");
+    return;
+  }
   notification_list_.push_back(ptr);
 }
 
@@ -244,7 +262,7 @@ void RequestControllerImpl::removeNotification(
 void RequestControllerImpl::TerminateRequest(const uint32_t correlation_id,
                                              const uint32_t connection_key,
                                              const int32_t function_id,
-                                             bool force_terminate) {
+                                             const bool force_terminate) {
   LOG4CXX_AUTO_TRACE(logger_);
   LOG4CXX_DEBUG(logger_,
                 "correlation_id = "
@@ -477,8 +495,8 @@ void RequestControllerImpl::TimeoutThread() {
       "EXIT Waiting for response count : " << waiting_for_response_.Size());
 }
 
-RequestControllerImpl::Worker::Worker(RequestControllerImpl* requestController)
-    : request_controller_(requestController), stop_flag_(false) {}
+RequestControllerImpl::Worker::Worker(RequestControllerImpl* request_controller)
+    : request_controller_(request_controller), stop_flag_(false) {}
 
 RequestControllerImpl::Worker::~Worker() {}
 

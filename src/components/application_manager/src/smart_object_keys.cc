@@ -439,7 +439,7 @@ const char* const y = "y";
 
 // OnResetTimeout
 const char* const request_id = "requestID";
-const char* const reset_period = "resetPeriod";
+const char* const timeout_period_for_reset = "resetPeriod";
 }  // namespace strings
 
 namespace json {

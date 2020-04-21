@@ -455,7 +455,7 @@ class ApplicationManager {
 
   virtual rpc_service::RPCService& GetRPCService() const = 0;
   virtual rpc_handler::RPCHandler& GetRPCHandler() const = 0;
-  virtual request_controller::ResetTimeoutHandler& GetResetTimeoutHandler()
+  virtual request_controller::ResetTimeoutHandler& get_reset_timeout_handler()
       const = 0;
   virtual request_controller::RequestController& GetRequestController()
       const = 0;

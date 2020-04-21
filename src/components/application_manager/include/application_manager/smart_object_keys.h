@@ -480,7 +480,7 @@ extern const char* const y;
 
 // OnResetTimeout
 extern const char* const request_id;
-extern const char* const reset_period;
+extern const char* const timeout_period_for_reset;
 }  // namespace strings
 
 namespace json {

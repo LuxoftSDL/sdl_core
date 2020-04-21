@@ -83,7 +83,7 @@ class RequestControllerImpl : public RequestController {
   void TerminateRequest(const uint32_t correlation_id,
                         const uint32_t connection_key,
                         const int32_t function_id,
-                        bool force_terminate = false) OVERRIDE;
+                        const bool force_terminate = false) OVERRIDE;
 
   void OnMobileResponse(const uint32_t mobile_correlation_id,
                         const uint32_t connection_key,
@@ -151,7 +151,7 @@ class RequestControllerImpl : public RequestController {
  private:
   class Worker : public threads::ThreadDelegate {
    public:
-    explicit Worker(RequestControllerImpl* requestController);
+    explicit Worker(RequestControllerImpl* request_controller);
     virtual ~Worker();
     virtual void threadMain();
     virtual void exitThreadMain();

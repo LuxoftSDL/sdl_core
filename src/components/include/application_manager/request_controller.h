@@ -35,6 +35,8 @@
 
 #include "application_manager/commands/command.h"
 
+#include <memory>
+
 namespace application_manager {
 namespace request_controller {
 
@@ -106,15 +108,15 @@ class RequestController {
   /**
    * @brief Removes request from queue
    * @param correlation_id Active request correlation ID,
-   * @param connection_key Active request connection key (0 for HMI requersts)
-   * @param function_id Active request  function id
+   * @param connection_key Active request connection key (0 for HMI requests)
+   * @param function_id Active request function id
    * @param force_terminate if true, request controller will terminate
    * even if not allowed by request
    */
   virtual void TerminateRequest(const uint32_t correlation_id,
                                 const uint32_t connection_key,
                                 const int32_t function_id,
-                                bool force_terminate = false) = 0;
+                                const bool force_terminate = false) = 0;
 
   /**
    * @brief Removes request from queue
@@ -187,8 +189,8 @@ class RequestController {
 
   virtual bool IsLowVoltage() = 0;
 };
-}  // namespace request_controller
 
+}  // namespace request_controller
 }  // namespace application_manager
 
 #endif  // SRC_COMPONENTS_INCLUDE_APPLICATION_MANAGER_REQUEST_CONTROLLER_H_
