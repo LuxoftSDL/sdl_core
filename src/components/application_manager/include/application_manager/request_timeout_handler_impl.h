@@ -54,7 +54,7 @@ class RequestTimeoutHandlerImpl : public event_engine::EventObserver,
   void on_event(const event_engine::Event& event) OVERRIDE;
 
  private:
-  bool IsTimeoutUpdateRequired(const Request request,
+  bool IsTimeoutUpdateRequired(const Request& request,
                                const uint32_t timeout,
                                const hmi_apis::FunctionID::eType method_name);
 

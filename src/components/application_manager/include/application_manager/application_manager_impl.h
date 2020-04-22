@@ -763,15 +763,14 @@ class ApplicationManagerImpl
    *
    * @param ptr Reference to shared pointer that point on hmi notification
    */
-  void addNotification(const CommandSharedPtr ptr);
+  void AddNotification(const CommandSharedPtr ptr);
 
   /**
    * @ Add notification to collection
    *
-   * @param notification Reference to shared pointer that points to hmi
-   * notification
+   * @param notification Pointer that points to hmi notification
    */
-  void removeNotification(const commands::Command* notification);
+  void RemoveNotification(const commands::Command* notification);
 
   /**
    * @ Updates request timeout
@@ -780,7 +779,7 @@ class ApplicationManagerImpl
    * @param mobile_correlation_id Correlation ID of the mobile request
    * @param new_timeout_value New timeout in milliseconds to be set
    */
-  void updateRequestTimeout(uint32_t connection_key,
+  void UpdateRequestTimeout(uint32_t connection_key,
                             uint32_t mobile_correlation_id,
                             uint32_t new_timeout_value) OVERRIDE;
 
@@ -982,7 +981,8 @@ class ApplicationManagerImpl
     return *request_timeout_handler_;
   }
 
-  request_controller::RequestController& GetRequestController() const OVERRIDE {
+  request_controller::RequestController& get_request_controller()
+      const OVERRIDE {
     return *request_ctrl_;
   }
 

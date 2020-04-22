@@ -131,10 +131,10 @@ class RequestControllerTestClass : public ::testing::Test {
       const mobile_apis::HMILevel::eType& hmi_level =
           mobile_apis::HMILevel::INVALID_ENUM) {
     if (RequestInfo::RequestType::HMIRequest == request_type) {
-      return request_ctrl_->addHMIRequest(request);
+      return request_ctrl_->AddHMIRequest(request);
     }
     CallSettings(settings);
-    return request_ctrl_->addMobileRequest(request, hmi_level);
+    return request_ctrl_->AddMobileRequest(request, hmi_level);
   }
 
   void CallSettings(const TestSettings& settings) const {

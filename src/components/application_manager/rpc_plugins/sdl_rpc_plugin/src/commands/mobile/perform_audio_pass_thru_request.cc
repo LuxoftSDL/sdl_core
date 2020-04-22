@@ -180,7 +180,7 @@ void PerformAudioPassThruRequest::on_event(const event_engine::Event& event) {
         StartMicrophoneRecording();
 
         // update request timeout to get time for perform audio recording
-        application_manager_.updateRequestTimeout(
+        application_manager_.UpdateRequestTimeout(
             connection_key(), correlation_id(), default_timeout());
       }
       break;

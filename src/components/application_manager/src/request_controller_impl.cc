@@ -49,7 +49,7 @@ CREATE_LOGGERPTR_GLOBAL(logger_, "RequestControllerImpl")
 RequestControllerImpl::RequestControllerImpl(
     const RequestControlerSettings& settings,
     RequestTimeoutHandler& request_timeout_handler)
-    : pool_state_(UNDEFINED)
+    : pool_state_(TPoolState::UNDEFINED)
     , pool_size_(settings.thread_pool_size())
     , request_tracker_(settings)
     , duplicate_message_count_()
@@ -139,7 +139,7 @@ RequestControllerImpl::TResult RequestControllerImpl::CheckPosibilitytoAdd(
 }
 
 bool RequestControllerImpl::CheckPendingRequestsAmount(
-    const uint32_t& pending_requests_amount) {
+    const uint32_t pending_requests_amount) {
   LOG4CXX_AUTO_TRACE(logger_);
   if (pending_requests_amount > 0) {
     const size_t pending_requests_size = mobile_request_list_.size();
@@ -157,7 +157,7 @@ bool RequestControllerImpl::CheckPendingRequestsAmount(
   return true;
 }
 
-bool RequestControllerImpl::IsUpdateRequestTimeoutRequired(
+bool RequestControllerImpl::IsRequestTimeoutUpdateRequired(
     const uint32_t app_id,
     const uint32_t correlation_id,
     const uint32_t new_timeout) const {
@@ -174,7 +174,7 @@ bool RequestControllerImpl::IsUpdateRequestTimeoutRequired(
   return false;
 }
 
-RequestController::TResult RequestControllerImpl::addMobileRequest(
+RequestController::TResult RequestControllerImpl::AddMobileRequest(
     const RequestPtr request, const mobile_apis::HMILevel::eType& hmi_level) {
   LOG4CXX_AUTO_TRACE(logger_);
   if (!request) {
@@ -198,7 +198,7 @@ RequestController::TResult RequestControllerImpl::addMobileRequest(
   return result;
 }
 
-RequestController::TResult RequestControllerImpl::addHMIRequest(
+RequestController::TResult RequestControllerImpl::AddHMIRequest(
     const RequestPtr request) {
   LOG4CXX_AUTO_TRACE(logger_);
 
@@ -233,7 +233,7 @@ RequestController::TResult RequestControllerImpl::addHMIRequest(
   return RequestController::TResult::SUCCESS;
 }
 
-void RequestControllerImpl::addNotification(const RequestPtr ptr) {
+void RequestControllerImpl::AddNotification(const RequestPtr ptr) {
   LOG4CXX_AUTO_TRACE(logger_);
   if (IsLowVoltage()) {
     LOG4CXX_ERROR(
@@ -243,7 +243,7 @@ void RequestControllerImpl::addNotification(const RequestPtr ptr) {
   notification_list_.push_back(ptr);
 }
 
-void RequestControllerImpl::removeNotification(
+void RequestControllerImpl::RemoveNotification(
     const commands::Command* notification) {
   LOG4CXX_AUTO_TRACE(logger_);
   std::list<RequestPtr>::iterator it = notification_list_.begin();
@@ -320,8 +320,8 @@ void RequestControllerImpl::OnHMIResponse(const uint32_t correlation_id,
   TerminateRequest(correlation_id, RequestInfo::HmiConnectionKey, function_id);
 }
 
-void RequestControllerImpl::terminateWaitingForExecutionAppRequests(
-    const uint32_t& app_id) {
+void RequestControllerImpl::TerminateWaitingForExecutionAppRequests(
+    const uint32_t app_id) {
   LOG4CXX_AUTO_TRACE(logger_);
   LOG4CXX_DEBUG(logger_,
                 "app_id: " << app_id << "Waiting for execution"
@@ -340,15 +340,15 @@ void RequestControllerImpl::terminateWaitingForExecutionAppRequests(
                 "Waiting for execution " << mobile_request_list_.size());
 }
 
-void RequestControllerImpl::terminateWaitingForResponseAppRequests(
-    const uint32_t& app_id) {
+void RequestControllerImpl::TerminateWaitingForResponseAppRequests(
+    const uint32_t app_id) {
   LOG4CXX_AUTO_TRACE(logger_);
   waiting_for_response_.RemoveByConnectionKey(app_id);
   LOG4CXX_DEBUG(
       logger_, "Waiting for response count : " << waiting_for_response_.Size());
 }
 
-void RequestControllerImpl::terminateAppRequests(const uint32_t& app_id) {
+void RequestControllerImpl::TerminateAppRequests(const uint32_t app_id) {
   LOG4CXX_AUTO_TRACE(logger_);
   LOG4CXX_DEBUG(logger_,
                 "app_id : " << app_id
@@ -357,17 +357,17 @@ void RequestControllerImpl::terminateAppRequests(const uint32_t& app_id) {
                             << "Requests waiting for response count : "
                             << waiting_for_response_.Size());
 
-  terminateWaitingForExecutionAppRequests(app_id);
-  terminateWaitingForResponseAppRequests(app_id);
+  TerminateWaitingForExecutionAppRequests(app_id);
+  TerminateWaitingForResponseAppRequests(app_id);
   NotifyTimer();
 }
 
-void RequestControllerImpl::terminateAllHMIRequests() {
+void RequestControllerImpl::TerminateAllHMIRequests() {
   LOG4CXX_AUTO_TRACE(logger_);
-  terminateWaitingForResponseAppRequests(RequestInfo::HmiConnectionKey);
+  TerminateWaitingForResponseAppRequests(RequestInfo::HmiConnectionKey);
 }
 
-void RequestControllerImpl::terminateAllMobileRequests() {
+void RequestControllerImpl::TerminateAllMobileRequests() {
   LOG4CXX_AUTO_TRACE(logger_);
   waiting_for_response_.RemoveMobileRequests();
   LOG4CXX_DEBUG(logger_, "Mobile Requests waiting for response cleared");
@@ -377,9 +377,9 @@ void RequestControllerImpl::terminateAllMobileRequests() {
   NotifyTimer();
 }
 
-void RequestControllerImpl::updateRequestTimeout(const uint32_t& app_id,
-                                                 const uint32_t& correlation_id,
-                                                 const uint32_t& new_timeout) {
+void RequestControllerImpl::UpdateRequestTimeout(const uint32_t app_id,
+                                                 const uint32_t correlation_id,
+                                                 const uint32_t new_timeout) {
   LOG4CXX_AUTO_TRACE(logger_);
 
   LOG4CXX_DEBUG(logger_,
@@ -416,8 +416,8 @@ void RequestControllerImpl::OnLowVoltage() {
 
 void RequestControllerImpl::OnWakeUp() {
   LOG4CXX_AUTO_TRACE(logger_);
-  terminateAllHMIRequests();
-  terminateAllMobileRequests();
+  TerminateAllHMIRequests();
+  TerminateAllMobileRequests();
   is_low_voltage_ = false;
   LOG4CXX_DEBUG(logger_, "Terminate old requests done");
 }

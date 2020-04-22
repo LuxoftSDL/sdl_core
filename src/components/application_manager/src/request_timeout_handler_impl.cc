@@ -65,13 +65,13 @@ void RequestTimeoutHandlerImpl::RemoveRequest(
 }
 
 bool RequestTimeoutHandlerImpl::IsTimeoutUpdateRequired(
-    const Request request,
+    const Request& request,
     const uint32_t timeout,
     const hmi_apis::FunctionID::eType method_name) {
   if (static_cast<hmi_apis::FunctionID::eType>(request.hmi_function_id_) ==
       method_name) {
-    if (application_manager_.GetRequestController()
-            .IsUpdateRequestTimeoutRequired(request.connection_key_,
+    if (application_manager_.get_request_controller()
+            .IsRequestTimeoutUpdateRequired(request.connection_key_,
                                             request.mob_correlation_id_,
                                             timeout)) {
       return true;
@@ -112,9 +112,9 @@ void RequestTimeoutHandlerImpl::on_event(const event_engine::Event& event) {
         message[strings::msg_params][strings::request_id].asUInt();
     auto it = requests_.find(hmi_corr_id);
     if (it != requests_.end()) {
-      auto request = it->second;
+      const auto& request = it->second;
       if (IsTimeoutUpdateRequired(request, timeout, method_name)) {
-        application_manager_.updateRequestTimeout(
+        application_manager_.UpdateRequestTimeout(
             request.connection_key_, request.mob_correlation_id_, timeout);
       }
     } else {

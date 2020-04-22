@@ -1688,7 +1688,7 @@ void ApplicationManagerImpl::OnDeviceSwitchingStart(
   }
 
   for (const auto& app : wait_list) {
-    request_ctrl_->terminateAppRequests(app->app_id());
+    request_ctrl_->TerminateAppRequests(app->app_id());
     resume_ctrl_->SaveApplication(app);
   }
 
@@ -2921,21 +2921,21 @@ void ApplicationManagerImpl::SetTelemetryObserver(
 }
 #endif  // TELEMETRY_MONITOR
 
-void ApplicationManagerImpl::addNotification(const CommandSharedPtr ptr) {
-  request_ctrl_->addNotification(ptr);
+void ApplicationManagerImpl::AddNotification(const CommandSharedPtr ptr) {
+  request_ctrl_->AddNotification(ptr);
 }
 
-void ApplicationManagerImpl::removeNotification(
+void ApplicationManagerImpl::RemoveNotification(
     const commands::Command* notification) {
-  request_ctrl_->removeNotification(notification);
+  request_ctrl_->RemoveNotification(notification);
 }
 
-void ApplicationManagerImpl::updateRequestTimeout(
+void ApplicationManagerImpl::UpdateRequestTimeout(
     uint32_t connection_key,
     uint32_t mobile_correlation_id,
     uint32_t new_timeout_value) {
   LOG4CXX_AUTO_TRACE(logger_);
-  request_ctrl_->updateRequestTimeout(
+  request_ctrl_->UpdateRequestTimeout(
       connection_key, mobile_correlation_id, new_timeout_value);
 }
 
@@ -2946,7 +2946,7 @@ void ApplicationManagerImpl::IncreaseForwardedRequestTimeout(
                     << get_settings().rpc_pass_through_timeout());
   uint32_t new_timeout_value = get_settings().default_timeout() +
                                get_settings().rpc_pass_through_timeout();
-  request_ctrl_->updateRequestTimeout(
+  request_ctrl_->UpdateRequestTimeout(
       connection_key, mobile_correlation_id, new_timeout_value);
 }
 
@@ -3167,7 +3167,7 @@ void ApplicationManagerImpl::UnregisterAllApplications() {
   if (is_ignition_off) {
     resume_controller().OnIgnitionOff();
   }
-  request_ctrl_->terminateAllHMIRequests();
+  request_ctrl_->TerminateAllHMIRequests();
 }
 
 void ApplicationManagerImpl::RemoveAppsWaitingForRegistration(
@@ -3284,7 +3284,7 @@ void ApplicationManagerImpl::UnregisterApplication(
       // Just to terminate RAI in case of connection is dropped (rare case)
       // App won't be unregistered since RAI has not been started yet
       LOG4CXX_DEBUG(logger_, "Trying to terminate possible RAI request.");
-      request_ctrl_->terminateAppRequests(app_id);
+      request_ctrl_->TerminateAppRequests(app_id);
 
       return;
     }
@@ -3338,7 +3338,7 @@ void ApplicationManagerImpl::UnregisterApplication(
 
   MessageHelper::SendOnAppUnregNotificationToHMI(
       app_to_remove, is_unexpected_disconnect, *this);
-  request_ctrl_->terminateAppRequests(app_id);
+  request_ctrl_->TerminateAppRequests(app_id);
   if (applications_.empty()) {
     policy_handler_->StopRetrySequence();
   }

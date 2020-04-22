@@ -30,8 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_mock_request_timeout_handler_H_
-#define SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_mock_request_timeout_handler_H_
+#ifndef SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_MOCK_REQUEST_TIMEOUT_HANDLER_H_
+#define SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_MOCK_REQUEST_TIMEOUT_HANDLER_H_
 
 #include "application_manager/request_timeout_handler.h"
 #include "gmock/gmock.h"
@@ -55,4 +55,4 @@ class MockRequestTimeoutHandler
 }  //  namespace components
 }  //  namespace test
 
-#endif  // SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_mock_request_timeout_handler_H_
+#endif  // SRC_COMPONENTS_INCLUDE_TEST_APPLICATION_MANAGER_MOCK_REQUEST_TIMEOUT_HANDLER_H_

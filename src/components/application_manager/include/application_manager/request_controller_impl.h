@@ -72,13 +72,13 @@ class RequestControllerImpl : public RequestController {
 
   void DestroyThreadpool() OVERRIDE;
 
-  TResult addMobileRequest(
+  TResult AddMobileRequest(
       const RequestPtr request,
       const mobile_apis::HMILevel::eType& hmi_level) OVERRIDE;
 
-  TResult addHMIRequest(const RequestPtr request) OVERRIDE;
+  TResult AddHMIRequest(const RequestPtr request) OVERRIDE;
 
-  void addNotification(const RequestPtr ptr) OVERRIDE;
+  void AddNotification(const RequestPtr ptr) OVERRIDE;
 
   void TerminateRequest(const uint32_t correlation_id,
                         const uint32_t connection_key,
@@ -92,19 +92,19 @@ class RequestControllerImpl : public RequestController {
   void OnHMIResponse(const uint32_t correlation_id,
                      const int32_t function_id) OVERRIDE;
 
-  void removeNotification(const commands::Command* notification) OVERRIDE;
+  void RemoveNotification(const commands::Command* notification) OVERRIDE;
 
-  void terminateAppRequests(const uint32_t& app_id) OVERRIDE;
+  void TerminateAppRequests(const uint32_t app_id) OVERRIDE;
 
-  void terminateAllHMIRequests() OVERRIDE;
+  void TerminateAllHMIRequests() OVERRIDE;
 
-  void terminateAllMobileRequests() OVERRIDE;
+  void TerminateAllMobileRequests() OVERRIDE;
 
-  void updateRequestTimeout(const uint32_t& app_id,
-                            const uint32_t& mobile_correlation_id,
-                            const uint32_t& new_timeout) OVERRIDE;
+  void UpdateRequestTimeout(const uint32_t app_id,
+                            const uint32_t mobile_correlation_id,
+                            const uint32_t new_timeout) OVERRIDE;
 
-  bool IsUpdateRequestTimeoutRequired(
+  bool IsRequestTimeoutUpdateRequired(
       const uint32_t app_id,
       const uint32_t correlation_id,
       const uint32_t new_timeout) const OVERRIDE;
@@ -126,8 +126,8 @@ class RequestControllerImpl : public RequestController {
    */
   void NotifyTimer();
 
-  void terminateWaitingForExecutionAppRequests(const uint32_t& app_id);
-  void terminateWaitingForResponseAppRequests(const uint32_t& app_id);
+  void TerminateWaitingForExecutionAppRequests(const uint32_t app_id);
+  void TerminateWaitingForResponseAppRequests(const uint32_t app_id);
 
   /**
    * @brief Checks whether all constraints are met before adding of request into
@@ -146,7 +146,7 @@ class RequestControllerImpl : public RequestController {
    * allowed for all applications
    * @return True if new request could be added, false otherwise
    */
-  bool CheckPendingRequestsAmount(const uint32_t& pending_requests_amount);
+  bool CheckPendingRequestsAmount(const uint32_t pending_requests_amount);
 
  private:
   class Worker : public threads::ThreadDelegate {

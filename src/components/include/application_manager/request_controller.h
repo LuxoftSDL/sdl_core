@@ -61,7 +61,7 @@ class RequestController {
   /**
    * @brief Thread pool state
    */
-  enum TPoolState {
+  enum class TPoolState {
     UNDEFINED = 0,
     STARTED,
     STOPPED,
@@ -84,26 +84,26 @@ class RequestController {
 
   /**
    * @brief Check if max request amount wasn't exceed and adds request to queue.
-   * @param request     Active mobile request
-   * @param hmi_level   Current application hmi_level
+   * @param request Active request to mobile
+   * @param hmi_level Current application hmi_level
    * @return Result code
    */
-  virtual TResult addMobileRequest(
+  virtual TResult AddMobileRequest(
       const RequestPtr request,
       const mobile_apis::HMILevel::eType& hmi_level) = 0;
 
   /**
    * @brief Store HMI request until response or timeout won't remove it
-   * @param request Active hmi request
+   * @param request Active request to hmi
    * @return Result code
    */
-  virtual TResult addHMIRequest(const RequestPtr request) = 0;
+  virtual TResult AddHMIRequest(const RequestPtr request) = 0;
 
   /**
    * @brief Add notification to collection
    * @param ptr Reference to shared pointer that point on hmi notification
    */
-  virtual void addNotification(const RequestPtr ptr) = 0;
+  virtual void AddNotification(const RequestPtr ptr) = 0;
 
   /**
    * @brief Removes request from queue
@@ -138,26 +138,25 @@ class RequestController {
 
   /**
    * @ Add notification to collection
-   * @param notification Reference to shared pointer that points to hmi
-   * notification
+   * @param notification Pointer that points to hmi notification
    */
-  virtual void removeNotification(const commands::Command* notification) = 0;
+  virtual void RemoveNotification(const commands::Command* notification) = 0;
 
   /**
    * @brief Removes all requests from queue for specified application
    * @param app_id Mobile application ID (app_id)
    */
-  virtual void terminateAppRequests(const uint32_t& app_id) = 0;
+  virtual void TerminateAppRequests(const uint32_t app_id) = 0;
 
   /**
    * @brief Terminates all requests from HMI
    */
-  virtual void terminateAllHMIRequests() = 0;
+  virtual void TerminateAllHMIRequests() = 0;
 
   /**
    * @brief Terminates all requests from Mobile
    */
-  virtual void terminateAllMobileRequests() = 0;
+  virtual void TerminateAllMobileRequests() = 0;
 
   /**
    * @brief Updates request timeout
@@ -165,20 +164,20 @@ class RequestController {
    * @param mobile_correlation_id Correlation ID of the mobile request
    * @param new_timeout_value New timeout to be set in milliseconds
    */
-  virtual void updateRequestTimeout(const uint32_t& app_id,
-                                    const uint32_t& mobile_correlation_id,
-                                    const uint32_t& new_timeout) = 0;
+  virtual void UpdateRequestTimeout(const uint32_t app_id,
+                                    const uint32_t mobile_correlation_id,
+                                    const uint32_t new_timeout) = 0;
 
   /**
-   * @brief IsUpdateRequestTimeoutRequired check is update timeout required.
+   * @brief IsRequestTimeoutUpdateRequired check is update timeout required.
    * @param app_id Connection key of application
    * @param correlation_id Correlation ID of the mobile request
    * @param new_timeout New timeout value of which will be check with current
-   * timeout
+   * timeout, it means that timeout need be updated
    * @return true if the new timeout value is greater than the time remaining
    * from the current timeout, otherwise - false
    */
-  virtual bool IsUpdateRequestTimeoutRequired(
+  virtual bool IsRequestTimeoutUpdateRequired(
       const uint32_t app_id,
       const uint32_t correlation_id,
       const uint32_t new_timeout) const = 0;

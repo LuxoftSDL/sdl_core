@@ -45,14 +45,14 @@ class MockRequestController
   MOCK_METHOD0(InitializeThreadpool, void());
   MOCK_METHOD0(DestroyThreadpool, void());
   MOCK_METHOD2(
-      addMobileRequest,
+      AddMobileRequest,
       TResult(const application_manager::request_controller::RequestPtr request,
               const mobile_apis::HMILevel::eType& hmi_level));
-  MOCK_METHOD1(addHMIRequest,
+  MOCK_METHOD1(AddHMIRequest,
                TResult(const application_manager::request_controller::RequestPtr
                            request));
   MOCK_METHOD1(
-      addNotification,
+      AddNotification,
       void(const application_manager::request_controller::RequestPtr request));
   MOCK_METHOD4(TerminateRequest,
                void(const uint32_t correlation_id,
@@ -66,16 +66,16 @@ class MockRequestController
   MOCK_METHOD2(OnHMIResponse,
                void(const uint32_t correlation_id, const int32_t function_id));
   MOCK_METHOD1(
-      removeNotification,
+      RemoveNotification,
       void(const application_manager::commands::Command* notification));
-  MOCK_METHOD1(terminateAppRequests, void(const uint32_t& app_id));
-  MOCK_METHOD0(terminateAllHMIRequests, void());
-  MOCK_METHOD0(terminateAllMobileRequests, void());
-  MOCK_METHOD3(updateRequestTimeout,
-               void(const uint32_t& app_id,
-                    const uint32_t& mobile_correlation_id,
-                    const uint32_t& new_timeout));
-  MOCK_CONST_METHOD3(IsUpdateRequestTimeoutRequired,
+  MOCK_METHOD1(TerminateAppRequests, void(const uint32_t app_id));
+  MOCK_METHOD0(TerminateAllHMIRequests, void());
+  MOCK_METHOD0(TerminateAllMobileRequests, void());
+  MOCK_METHOD3(UpdateRequestTimeout,
+               void(const uint32_t app_id,
+                    const uint32_t mobile_correlation_id,
+                    const uint32_t new_timeout));
+  MOCK_CONST_METHOD3(IsRequestTimeoutUpdateRequired,
                      bool(const uint32_t app_id,
                           const uint32_t correlation_id,
                           const uint32_t new_timeout));
