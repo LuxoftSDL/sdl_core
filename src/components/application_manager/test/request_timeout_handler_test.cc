@@ -40,8 +40,10 @@
 #include "application_manager/commands/command_request_test.h"
 #include "application_manager/mock_application_manager.h"
 #include "application_manager/mock_event_dispatcher.h"
+#include "application_manager/mock_hmi_capabilities.h"
 #include "application_manager/mock_message_helper.h"
 #include "application_manager/mock_request_controller.h"
+#include "application_manager/policies/mock_policy_handler_interface.h"
 #include "sdl_rpc_plugin/commands/hmi/on_reset_timeout_notification.h"
 #include "sdl_rpc_plugin/commands/mobile/subscribe_way_points_request.h"
 
@@ -89,14 +91,35 @@ class ResetTimeoutHandlerTest : public commands_test::CommandRequestTest<
     Mock::VerifyAndClearExpectations(&mock_message_helper_);
   }
 
+  std::unique_ptr<SubscribeWayPointsRequest> CreateCommand() {
+    ON_CALL(app_mngr_, get_settings())
+        .WillByDefault(ReturnRef(app_mngr_settings_));
+    ON_CALL(app_mngr_settings_, default_timeout())
+        .WillByDefault(ReturnRef(kDefaultTimeout));
+
+    std::shared_ptr<smart_objects::SmartObject> msg =
+        std::make_shared<smart_objects::SmartObject>(
+            smart_objects::SmartType_Null);
+
+    std::unique_ptr<SubscribeWayPointsRequest> command(
+        new SubscribeWayPointsRequest(msg,
+                                      app_mngr_,
+                                      mock_rpc_service_,
+                                      mock_hmi_capabilities_,
+                                      mock_policy_handler_));
+    return command;
+  }
+
   application_manager::MockMessageHelper* mock_message_helper_;
   MockRequestController mock_request_controller_;
   std::shared_ptr<RequestTimeoutHandlerImpl> request_timeout_handler_;
+  testing::NiceMock<application_manager_test::MockHMICapabilities>
+      mock_hmi_capabilities_;
+  policy_test::MockPolicyHandlerInterface mock_policy_handler_;
 };
 
 TEST_F(ResetTimeoutHandlerTest, onEvent_OnResetTimeout_success) {
-  std::shared_ptr<SubscribeWayPointsRequest> command =
-      CreateCommand<SubscribeWayPointsRequest>();
+  std::unique_ptr<SubscribeWayPointsRequest> command = CreateCommand();
   MockAppPtr mock_app = CreateMockApp();
   ON_CALL(app_mngr_, application(_)).WillByDefault(Return(mock_app));
   ON_CALL(app_mngr_, IsAppSubscribedForWayPoints(_))
@@ -138,8 +161,7 @@ TEST_F(ResetTimeoutHandlerTest, onEvent_OnResetTimeout_success) {
 }
 
 TEST_F(ResetTimeoutHandlerTest, onEvent_OnResetTimeout_missedResetPeriod) {
-  std::shared_ptr<SubscribeWayPointsRequest> command =
-      CreateCommand<SubscribeWayPointsRequest>();
+  std::unique_ptr<SubscribeWayPointsRequest> command = CreateCommand();
   MockAppPtr mock_app = CreateMockApp();
   ON_CALL(app_mngr_, application(_)).WillByDefault(Return(mock_app));
   ON_CALL(app_mngr_, IsAppSubscribedForWayPoints(_))
@@ -181,8 +203,7 @@ TEST_F(ResetTimeoutHandlerTest, onEvent_OnResetTimeout_missedResetPeriod) {
 }
 
 TEST_F(ResetTimeoutHandlerTest, onEvent_OnResetTimeout_invalidRequestId) {
-  std::shared_ptr<SubscribeWayPointsRequest> command =
-      CreateCommand<SubscribeWayPointsRequest>();
+  std::unique_ptr<SubscribeWayPointsRequest> command = CreateCommand();
   MockAppPtr mock_app = CreateMockApp();
   ON_CALL(app_mngr_, application(_)).WillByDefault(Return(mock_app));
   ON_CALL(app_mngr_, IsAppSubscribedForWayPoints(_))
@@ -219,8 +240,7 @@ TEST_F(ResetTimeoutHandlerTest, onEvent_OnResetTimeout_invalidRequestId) {
 }
 
 TEST_F(ResetTimeoutHandlerTest, onEvent_OnResetTimeout_invalidMethodName) {
-  std::shared_ptr<SubscribeWayPointsRequest> command =
-      CreateCommand<SubscribeWayPointsRequest>();
+  std::unique_ptr<SubscribeWayPointsRequest> command = CreateCommand();
   MockAppPtr mock_app = CreateMockApp();
   ON_CALL(app_mngr_, application(_)).WillByDefault(Return(mock_app));
   ON_CALL(app_mngr_, IsAppSubscribedForWayPoints(_))
