@@ -46,7 +46,7 @@ class MockRequestTimeoutHandler
   MOCK_METHOD2(
       AddRequest,
       void(const uint32_t hmi_correlation_id,
-           const application_manager::request_controller::Request request));
+           const application_manager::request_controller::Request& request));
   MOCK_METHOD1(RemoveRequest, void(const uint32_t hmi_correlation_id));
 };
 

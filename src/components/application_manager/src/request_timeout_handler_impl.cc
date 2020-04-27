@@ -47,7 +47,7 @@ RequestTimeoutHandlerImpl::RequestTimeoutHandlerImpl(
 }
 
 void RequestTimeoutHandlerImpl::AddRequest(const uint32_t hmi_correlation_id,
-                                           const Request request) {
+                                           const Request& request) {
   requests_.insert(std::make_pair(hmi_correlation_id, request));
 }
 

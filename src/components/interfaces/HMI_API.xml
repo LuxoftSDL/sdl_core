@@ -4475,15 +4475,15 @@
       </param>
       <param name="methodName" type="String" mandatory="true">
         <description>
-         Name of the function for which timeout needs to be reset
-         </description>
-       </param>
-       <param name="resetPeriod" type="Integer" minvalue="0" maxvalue="1000000" mandatory="false">
-         <description>
-           Timeout period in milliseconds, for the method for which timeout needs to be reset.
-           If omitted, timeout would be reset by defaultTimeout specified in smartDeviceLink.ini
-          </description>
-        </param>
+          Name of the function for which timeout needs to be reset
+        </description>
+      </param>
+      <param name="resetPeriod" type="Integer" minvalue="0" maxvalue="1000000" mandatory="false">
+        <description>
+          Timeout period in milliseconds, for the method for which timeout needs to be reset.
+          If omitted, timeout would be reset by defaultTimeout specified in smartDeviceLink.ini
+        </description>
+      </param>
     </function>
     <!-- Policies -->
 

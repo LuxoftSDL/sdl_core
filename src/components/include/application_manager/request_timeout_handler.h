@@ -69,7 +69,7 @@ class RequestTimeoutHandler {
    * @param request active mobile request
    */
   virtual void AddRequest(const uint32_t hmi_correlation_id,
-                          const Request request) = 0;
+                          const Request& request) = 0;
   /**
    * @brief RemoveRequest removes processed request
    * @param hmi_correlation_id hmi correlation id

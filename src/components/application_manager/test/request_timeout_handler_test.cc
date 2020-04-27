@@ -51,6 +51,7 @@
 namespace test {
 namespace components {
 namespace request_timeout_handler_test {
+
 using application_manager::event_engine::Event;
 using ::testing::_;
 using ::testing::Mock;
