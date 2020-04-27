@@ -296,7 +296,7 @@ void RegisterAppInterfaceRequest::Run() {
           policy_result,
           mobile_apis::Result::SUCCESS,
           mobile_apis::Result::WARNINGS)) {
-    SendResponse(false, policy_result);
+    SendResponse(false, policy_result, response_info_.c_str());
     return;
   }
 
@@ -1188,8 +1188,9 @@ mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckWithPolicyData() {
                             app_types.end(),
                             mobile_apis::AppHMIType::WEB_VIEW);
         if (app_types.end() != it) {
-          LOG4CXX_DEBUG(
-              logger_, "WEB_VIEW AppHmiType is absent in application policies");
+          response_info_ =
+              "WEB_VIEW AppHmiType is absent in application policies";
+          LOG4CXX_DEBUG(logger_, response_info_);
           return mobile_apis::Result::REJECTED;
         }
         response_info_ =
