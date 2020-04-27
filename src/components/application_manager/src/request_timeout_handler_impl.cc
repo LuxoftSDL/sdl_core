@@ -47,10 +47,7 @@ RequestTimeoutHandlerImpl::RequestTimeoutHandlerImpl(
 }
 
 void RequestTimeoutHandlerImpl::AddRequest(const uint32_t hmi_correlation_id,
-                                           const uint32_t mob_correlation_id,
-                                           const uint32_t connection_key,
-                                           const uint32_t hmi_function_id) {
-  Request request(mob_correlation_id, connection_key, hmi_function_id);
+                                           const Request request) {
   requests_.insert(std::make_pair(hmi_correlation_id, request));
 }
 
@@ -92,7 +89,7 @@ void RequestTimeoutHandlerImpl::on_event(const event_engine::Event& event) {
   const auto event_id = event.id();
   if (hmi_apis::FunctionID::BasicCommunication_OnResetTimeout == event_id) {
     const smart_objects::SmartObject& message = event.smart_object();
-    auto method_name = MessageHelper::HMIFunctionIDFromString(
+    const auto method_name = MessageHelper::HMIFunctionIDFromString(
         message[strings::msg_params][strings::method_name].asString());
 
     if (hmi_apis::FunctionID::INVALID_ENUM == method_name) {
@@ -108,7 +105,7 @@ void RequestTimeoutHandlerImpl::on_event(const event_engine::Event& event) {
       timeout = message[strings::msg_params][strings::timeout_period_for_reset]
                     .asUInt();
     }
-    auto hmi_corr_id =
+    const auto hmi_corr_id =
         message[strings::msg_params][strings::request_id].asUInt();
     auto it = requests_.find(hmi_corr_id);
     if (it != requests_.end()) {

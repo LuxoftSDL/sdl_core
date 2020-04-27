@@ -47,9 +47,7 @@ class RequestTimeoutHandlerImpl : public event_engine::EventObserver,
  public:
   RequestTimeoutHandlerImpl(ApplicationManager& application_manager);
   void AddRequest(const uint32_t hmi_correlation_id,
-                  const uint32_t mob_correlation_id,
-                  const uint32_t connection_key,
-                  const uint32_t hmi_function_id) OVERRIDE;
+                  const Request request) OVERRIDE;
   void RemoveRequest(const uint32_t hmi_correlation_id) OVERRIDE;
   void on_event(const event_engine::Event& event) OVERRIDE;
 

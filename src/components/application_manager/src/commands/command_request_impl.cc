@@ -1115,11 +1115,11 @@ void CommandRequestImpl::AddRequestToTimeoutHandler(
       }
     }
   }
+  const application_manager::request_controller::Request request(
+      correlation_id(), connection_key(), function_id);
   application_manager_.get_request_timeout_handler().AddRequest(
       request_to_hmi[strings::params][strings::correlation_id].asUInt(),
-      correlation_id(),
-      connection_key(),
-      function_id);
+      request);
 }
 
 }  // namespace commands

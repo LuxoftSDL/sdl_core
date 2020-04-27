@@ -43,11 +43,10 @@ namespace application_manager_test {
 class MockRequestTimeoutHandler
     : public application_manager::request_controller::RequestTimeoutHandler {
  public:
-  MOCK_METHOD4(AddRequest,
-               void(const uint32_t hmi_correlation_id,
-                    const uint32_t mob_correlation_id,
-                    const uint32_t connection_key,
-                    const uint32_t hmi_function_id));
+  MOCK_METHOD2(
+      AddRequest,
+      void(const uint32_t hmi_correlation_id,
+           const application_manager::request_controller::Request request));
   MOCK_METHOD1(RemoveRequest, void(const uint32_t hmi_correlation_id));
 };
 
