@@ -1219,11 +1219,14 @@ TEST_F(HMICapabilitiesTest, PrepareJsonValueForSaving_Success) {
 
   Json::Value root_node;
   utils::JsonReader reader;
-  EXPECT_TRUE(reader.parse(content_after_update, &root_node));
+  ASSERT_TRUE(reader.parse(content_after_update, &root_node));
 
   for (size_t i = 0; i < interfaces_name.size(); ++i) {
     EXPECT_TRUE(static_cast<bool>(root_node[interfaces_name[i]]));
   }
+  EXPECT_TRUE(
+      root_node[hmi_interface::ui][strings::audio_pass_thru_capabilities]
+          .isArray());
 }
 
 TEST_F(HMICapabilitiesTest,
