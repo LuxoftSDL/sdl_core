@@ -477,11 +477,9 @@ void SQLPTRepresentation::GatherModuleMeta(
   utils::dbms::SQLQuery query(db());
   if (query.Prepare(sql_pt::kSelectModuleMeta) && query.Next()) {
     *meta->ccpu_version = query.GetString(0);
-    *meta->language = query.GetString(1);
-    *meta->wers_country_code = query.GetString(2);
-    *meta->pt_exchanged_at_odometer_x = query.GetInteger(3);
-    *meta->pt_exchanged_x_days_after_epoch = query.GetInteger(4);
-    *meta->ignition_cycles_since_last_exchange = query.GetInteger(5);
+    *meta->pt_exchanged_at_odometer_x = query.GetInteger(1);
+    *meta->pt_exchanged_x_days_after_epoch = query.GetInteger(2);
+    *meta->ignition_cycles_since_last_exchange = query.GetInteger(3);
   }
 }
 
@@ -696,9 +694,7 @@ bool SQLPTRepresentation::GatherConsumerFriendlyMessages(
   return true;
 }
 
-bool SQLPTRepresentation::SetMetaInfo(const std::string& ccpu_version,
-                                      const std::string& wers_country_code,
-                                      const std::string& language) {
+bool SQLPTRepresentation::SetMetaInfo(const std::string& ccpu_version) {
   LOG4CXX_AUTO_TRACE(logger_);
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kUpdateMetaParams)) {
@@ -707,8 +703,6 @@ bool SQLPTRepresentation::SetMetaInfo(const std::string& ccpu_version,
   }
 
   query.Bind(0, ccpu_version);
-  query.Bind(1, wers_country_code);
-  query.Bind(2, language);
 
   if (!query.Exec() || !query.Reset()) {
     LOG4CXX_WARN(logger_, "Incorrect insert to module meta.");
@@ -1421,11 +1415,9 @@ bool SQLPTRepresentation::SaveModuleMeta(const policy_table::ModuleMeta& meta) {
   const int64_t odometer = *(meta.pt_exchanged_at_odometer_x);
 
   query.Bind(0, *(meta.ccpu_version));
-  query.Bind(1, *(meta.language));
-  query.Bind(2, *(meta.wers_country_code));
-  query.Bind(3, odometer);
-  query.Bind(4, *(meta.pt_exchanged_x_days_after_epoch));
-  query.Bind(5, *(meta.ignition_cycles_since_last_exchange));
+  query.Bind(1, odometer);
+  query.Bind(2, *(meta.pt_exchanged_x_days_after_epoch));
+  query.Bind(3, *(meta.ignition_cycles_since_last_exchange));
 
   if (!query.Exec()) {
     LOG4CXX_WARN(logger_, "Incorrect update for module_meta.");
