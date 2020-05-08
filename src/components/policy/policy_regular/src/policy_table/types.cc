@@ -1269,17 +1269,16 @@ ModuleMeta::~ModuleMeta() {}
 
 ModuleMeta::ModuleMeta(const Json::Value* value__)
     : CompositeType(InitHelper(value__, &Json::Value::isObject))
-    , ccpu_version(impl::ValueMember(value__, "ccpu_version"))
     , pt_exchanged_at_odometer_x(
           impl::ValueMember(value__, "pt_exchanged_at_odometer_x"))
     , pt_exchanged_x_days_after_epoch(
           impl::ValueMember(value__, "pt_exchanged_x_days_after_epoch"))
     , ignition_cycles_since_last_exchange(
-          impl::ValueMember(value__, "ignition_cycles_since_last_exchange")) {}
+          impl::ValueMember(value__, "ignition_cycles_since_last_exchange"))
+    , ccpu_version(impl::ValueMember(value__, "ccpu_version")) {}
 
 Json::Value ModuleMeta::ToJsonValue() const {
   Json::Value result__(Json::objectValue);
-  impl::WriteJsonField("ccpu_version", ccpu_version, &result__);
   impl::WriteJsonField(
       "pt_exchanged_at_odometer_x", pt_exchanged_at_odometer_x, &result__);
   impl::WriteJsonField("pt_exchanged_x_days_after_epoch",
@@ -1288,6 +1287,7 @@ Json::Value ModuleMeta::ToJsonValue() const {
   impl::WriteJsonField("ignition_cycles_since_last_exchange",
                        ignition_cycles_since_last_exchange,
                        &result__);
+  impl::WriteJsonField("ccpu_version", ccpu_version, &result__);
   return result__;
 }
 
@@ -1354,7 +1354,6 @@ void ModuleMeta::ReportErrors(rpc::ValidationReport* report__) const {
 
 void ModuleMeta::SetPolicyTableType(PolicyTableType pt_type) {
   CompositeType::SetPolicyTableType(pt_type);
-  ccpu_version.SetPolicyTableType(pt_type);
   pt_exchanged_at_odometer_x.SetPolicyTableType(pt_type);
   pt_exchanged_x_days_after_epoch.SetPolicyTableType(pt_type);
   ignition_cycles_since_last_exchange.SetPolicyTableType(pt_type);
