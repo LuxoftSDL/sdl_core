@@ -479,6 +479,7 @@ void SQLPTRepresentation::GatherModuleMeta(
     *meta->pt_exchanged_at_odometer_x = query.GetInteger(0);
     *meta->pt_exchanged_x_days_after_epoch = query.GetInteger(1);
     *meta->ignition_cycles_since_last_exchange = query.GetInteger(2);
+    *meta->ccpu_version = query.GetString(4);
   }
 }
 
