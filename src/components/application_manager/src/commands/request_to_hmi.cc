@@ -32,6 +32,7 @@
 
 #include "application_manager/commands/request_to_hmi.h"
 #include "application_manager/rpc_service.h"
+#include "utils/helpers.h"
 
 namespace application_manager {
 
@@ -50,13 +51,40 @@ bool ChangeInterfaceState(ApplicationManager& application_manager,
   if (response_from_hmi[strings::msg_params].keyExists(strings::available)) {
     const bool is_available =
         response_from_hmi[strings::msg_params][strings::available].asBool();
-    const HmiInterfaces::InterfaceState interface_state =
-        is_available ? HmiInterfaces::STATE_AVAILABLE
-                     : HmiInterfaces::STATE_NOT_AVAILABLE;
-    application_manager.hmi_interfaces().SetInterfaceState(interface,
-                                                           interface_state);
+
+    if (!is_available) {
+      application_manager.hmi_interfaces().SetInterfaceState(
+          interface, HmiInterfaces::STATE_NOT_AVAILABLE);
+      return false;
+    }
+
+    if (response_from_hmi[strings::params].keyExists(hmi_response::code)) {
+      hmi_apis::Common_Result::eType response_code =
+          static_cast<hmi_apis::Common_Result::eType>(
+              response_from_hmi[strings::params][hmi_response::code].asInt());
+
+      using helpers::Compare;
+      using helpers::EQ;
+      using helpers::ONE;
+
+      const bool result_success =
+          Compare<hmi_apis::Common_Result::eType, EQ, ONE>(
+              response_code,
+              hmi_apis::Common_Result::SUCCESS,
+              hmi_apis::Common_Result::WARNINGS);
+
+      if (!result_success) {
+        application_manager.hmi_interfaces().SetInterfaceState(
+            interface, HmiInterfaces::STATE_NOT_AVAILABLE);
+        return false;
+      }
+    }
+
+    application_manager.hmi_interfaces().SetInterfaceState(
+        interface, HmiInterfaces::STATE_AVAILABLE);
     return is_available;
   }
+
   return false;
 }
 
