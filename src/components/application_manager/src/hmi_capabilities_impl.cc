@@ -1676,7 +1676,7 @@ void HMICapabilitiesImpl::OnSoftwareVersionReceived(
 
   if (MatchesCCPUVersion(ccpu_version)) {
     LOG4CXX_DEBUG(logger_, "Software version not changed");
-    app_mngr_.SetHMICooperating(true);
+    CheckPendingRequestsRequiredForCapabilities();
     app_mngr_.RequestForInterfacesAvailability();
     return;
   }
