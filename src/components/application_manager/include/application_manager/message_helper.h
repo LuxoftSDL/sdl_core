@@ -985,6 +985,12 @@ class MessageHelper {
   static smart_objects::SmartObjectSPtr CreateDisplayCapabilityUpdateToMobile(
       const smart_objects::SmartObject& system_capabilities, Application& app);
 
+  /**
+   * @brief Recursively removes empty parameters of composite type from message
+   * @param msg_params smart object containing message params
+   */
+  static void RemoveEmptyMessageParams(smart_objects::SmartObject& msg_params);
+
  private:
   /**
    * @brief Allows to fill SO according to the  current permissions.

@@ -3296,4 +3296,36 @@ WindowID MessageHelper::ExtractWindowIdFromSmartObject(
   return mobile_apis::PredefinedWindows::DEFAULT_WINDOW;
 }
 
+void MessageHelper::RemoveEmptyMessageParams(
+    smart_objects::SmartObject& msg_params) {
+  for (const auto& item : msg_params.enumerate()) {
+    auto& param = msg_params[item];
+    if (smart_objects::SmartType_Array == param.getType()) {
+      auto& array = *param.asArray();
+
+      if (array.empty() ||
+          (smart_objects::SmartType_Array != array.begin()->getType() &&
+           smart_objects::SmartType_Map != array.begin()->getType())) {
+        break;
+      }
+
+      array.erase(std::remove_if(array.begin(),
+                                 array.end(),
+                                 [](smart_objects::SmartObject item) {
+                                   RemoveEmptyMessageParams(item);
+                                   return item.empty();
+                                 }),
+                  array.end());
+    } else if (smart_objects::SmartType_Map == param.getType()) {
+      RemoveEmptyMessageParams(param);
+      if (param.empty()) {
+        LOG4CXX_WARN(logger_,
+                     item << " parameter is empty and will be "
+                             "removed from response message.");
+        msg_params.erase(item);
+      }
+    }
+  }
+}
+
 }  //  namespace application_manager

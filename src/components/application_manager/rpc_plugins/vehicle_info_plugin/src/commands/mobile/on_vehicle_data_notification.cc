@@ -68,6 +68,8 @@ void OnVehicleDataNotification::Run() {
   custom_vehicle_data_manager_.CreateMobileMessageParams(
       (*message_)[strings::msg_params]);
 
+  MessageHelper::RemoveEmptyMessageParams((*message_)[strings::msg_params]);
+
   const auto& param_names = (*message_)[strings::msg_params].enumerate();
   for (const auto& name : param_names) {
     LOG4CXX_DEBUG(logger_, "vehicle_data name: " << name);
