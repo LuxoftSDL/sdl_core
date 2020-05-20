@@ -91,6 +91,12 @@ class MockApplicationManager : public application_manager::ApplicationManager {
   MOCK_METHOD1(RemovePendingApplication,
                void(const std::string& policy_app_id));
   MOCK_CONST_METHOD1(
+      StringToScreenPredefinedLayout,
+      mobile_apis::PredefinedLayout::eType(const std::string& str));
+  MOCK_CONST_METHOD1(
+      ScreenPredefinedLayoutToString,
+      std::string(const mobile_apis::PredefinedLayout::eType& type));
+  MOCK_CONST_METHOD1(
       application, application_manager::ApplicationSharedPtr(uint32_t app_id));
   MOCK_CONST_METHOD0(active_application,
                      application_manager::ApplicationSharedPtr());
