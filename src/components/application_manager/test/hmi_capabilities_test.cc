@@ -1205,6 +1205,34 @@ TEST_F(HMICapabilitiesTest,
   EXPECT_NE(content_to_save, content_after_update);
 }
 
+TEST_F(
+    HMICapabilitiesTest,
+    SaveCachedCapabilitiesToFile_LanguageIsNotTheSameAsPersisted_SaveNewLanguageToCache) {
+  SetUpLanguageAndLightCapabilitiesExpectation();
+  std::string new_language = "RU_RU";
+  ON_CALL(*(MockMessageHelper::message_helper_mock()),
+          CommonLanguageToString(_))
+      .WillByDefault(Return(new_language));
+
+  hmi_capabilities_->Init(last_state_wrapper_);
+  hmi_capabilities_->set_active_tts_language(hmi_apis::Common_Language::RU_RU);
+  const std::vector<std::string> sections_to_update{hmi_response::language};
+  const std::string content_to_save = "{\"TTS\": {\"language\":\"RU_RU\"}}";
+
+  CreateFile(kHmiCapabilitiesCacheFile);
+  const std::vector<uint8_t> binary_data_to_save(content_to_save.begin(),
+                                                 content_to_save.end());
+  file_system::Write(kHmiCapabilitiesCacheFile, binary_data_to_save);
+
+  EXPECT_TRUE(hmi_capabilities_->SaveCachedCapabilitiesToFile(
+      hmi_interface::tts, sections_to_update, schema_));
+
+  std::string content_after_update;
+  ASSERT_TRUE(
+      file_system::ReadFile(kHmiCapabilitiesCacheFile, content_after_update));
+  EXPECT_TRUE(content_after_update.find(new_language) != std::string::npos);
+}
+
 TEST_F(HMICapabilitiesTest, PrepareJsonValueForSaving_Success) {
   const std::vector<std::string> sections_to_update{
       hmi_response::display_capabilities,
