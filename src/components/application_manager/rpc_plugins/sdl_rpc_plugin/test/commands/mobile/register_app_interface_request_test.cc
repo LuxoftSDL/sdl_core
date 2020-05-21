@@ -854,6 +854,14 @@ TEST_F(RegisterAppInterfaceRequestTest,
               ManageMobileCommand(_, am::commands::Command::SOURCE_SDL))
       .Times(2);
   EXPECT_CALL(app_mngr_, SendDriverDistractionState(app));
+  const std::string default_webview_layout{"WEB_VIEW"};
+  EXPECT_CALL(
+      app_mngr_,
+      ScreenPredefinedLayoutToString(mobile_apis::PredefinedLayout::WEB_VIEW))
+      .WillOnce(Return(default_webview_layout));
+  EXPECT_CALL(*mock_app,
+              set_window_layout(mobile_apis::PredefinedWindows::DEFAULT_WINDOW,
+                                default_webview_layout));
 
   ASSERT_TRUE(command_->Init());
   command_->Run();
@@ -878,6 +886,14 @@ TEST_F(RegisterAppInterfaceRequestTest,
       .WillOnce(DoAll(SaveArg<0>(&response_to_mobile), Return(true)))
       .WillOnce(Return(true));
 
+  EXPECT_CALL(
+      app_mngr_,
+      ScreenPredefinedLayoutToString(mobile_apis::PredefinedLayout::WEB_VIEW))
+      .Times(0);
+  EXPECT_CALL(
+      *mock_app,
+      set_window_layout(mobile_apis::PredefinedWindows::DEFAULT_WINDOW, _))
+      .Times(0);
   ASSERT_TRUE(command_->Init());
   command_->Run();
 
