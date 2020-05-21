@@ -171,7 +171,7 @@ void CreateWindowRequest::Run() {
         mobile_apis::PredefinedWindows::DEFAULT_WINDOW;
 
     if (default_window_id == duplicate_updates_from_window_id) {
-      const std::string current_stringified_layout =
+      const auto current_stringified_layout =
           application->window_layout(default_window_id);
       const auto current_app_layout =
           application_manager_.StringToScreenPredefinedLayout(
