@@ -274,8 +274,7 @@ class ApplicationManagerImplTest
     smart_objects::SmartObject sm_object(smart_objects::SmartType_Map);
     sm_object[strings::params][strings::function_id] =
         static_cast<int>(function_id);
-    smart_objects::SmartObjectSPtr sptr =
-        std::make_shared<smart_objects::SmartObject>(sm_object);
+    auto sptr = std::make_shared<smart_objects::SmartObject>(sm_object);
 
     ON_CALL(*mock_message_helper_, CreateModuleInfoSO(function_id, _))
         .WillByDefault(Return(sptr));
