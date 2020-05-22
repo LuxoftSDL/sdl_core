@@ -270,7 +270,7 @@ class ApplicationManagerImplTest
   }
 
   void SetUpRequestForInterfacesAvailabilityExpectation(
-      hmi_apis::FunctionID::eType function_id) {
+      const hmi_apis::FunctionID::eType function_id) {
     smart_objects::SmartObject sm_object(smart_objects::SmartType_Map);
     sm_object[strings::params][strings::function_id] =
         static_cast<int>(function_id);

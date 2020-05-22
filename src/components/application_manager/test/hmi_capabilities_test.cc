@@ -1217,7 +1217,7 @@ TEST_F(
   hmi_capabilities_->Init(last_state_wrapper_);
   hmi_capabilities_->set_active_tts_language(hmi_apis::Common_Language::RU_RU);
   const std::vector<std::string> sections_to_update{hmi_response::language};
-  const std::string content_to_save = "{\"TTS\": {\"language\":\"RU_RU\"}}";
+  const std::string content_to_save = "{\"TTS\": {\"language\":\"EN_US\"}}";
 
   CreateFile(kHmiCapabilitiesCacheFile);
   const std::vector<uint8_t> binary_data_to_save(content_to_save.begin(),

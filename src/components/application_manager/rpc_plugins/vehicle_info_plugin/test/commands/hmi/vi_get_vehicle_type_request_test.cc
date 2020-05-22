@@ -87,7 +87,9 @@ TEST_F(VIGetVehicleTypeRequestTest, RUN_SendRequest_SUCCESS) {
             (*command_msg)[strings::params][strings::protocol_version].asInt());
 }
 
-TEST_F(VIGetVehicleTypeRequestTest, onTimeOut_VIGetVehicleTypeUpdated) {
+TEST_F(
+    VIGetVehicleTypeRequestTest,
+    onTimeOut_VIGetVehicleTypeRequestTimeoutExpired_UpdateRequestsRequiredForVIGetVehicleType) {
   MessageSharedPtr command_msg = CreateCommandMsg();
   auto command(CreateCommandVI<VIGetVehicleTypeRequest>(command_msg));
 
