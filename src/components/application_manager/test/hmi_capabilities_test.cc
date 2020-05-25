@@ -1209,7 +1209,7 @@ TEST_F(
     HMICapabilitiesTest,
     SaveCachedCapabilitiesToFile_LanguageIsNotTheSameAsPersisted_SaveNewLanguageToCache) {
   SetUpLanguageAndLightCapabilitiesExpectation();
-  std::string new_language = "RU_RU";
+  const std::string new_language = "RU_RU";
   ON_CALL(*(MockMessageHelper::message_helper_mock()),
           CommonLanguageToString(_))
       .WillByDefault(Return(new_language));

@@ -269,7 +269,7 @@ class ApplicationManagerImplTest
     ASSERT_TRUE(mock_app_ptr_.get());
   }
 
-  void SetUpCreateModuleInfoSOExpectation(
+  void SetExpectationForCreateModuleInfoSO(
       const hmi_apis::FunctionID::eType function_id) {
     smart_objects::SmartObject sm_object(smart_objects::SmartType_Map);
     sm_object[strings::params][strings::function_id] =
@@ -2057,9 +2057,10 @@ TEST_F(
       hmi_apis::FunctionID::RC_IsReady};
 
   for (auto request : expected_requests) {
-    SetUpCreateModuleInfoSOExpectation(request);
+    SetExpectationForCreateModuleInfoSO(request);
     EXPECT_CALL(*mock_rpc_service_,
-                ManageHMICommand(HMIResultCodeIs(request), _));
+                ManageHMICommand(HMIResultCodeIs(request),
+                                 commands::Command::SOURCE_HMI));
   }
 
   app_manager_impl_->RequestForInterfacesAvailability();
