@@ -100,6 +100,12 @@ WebSocketConnection<Session>::~WebSocketConnection() {
 template <typename Session>
 void WebSocketConnection<Session>::OnError() {
   LOG4CXX_AUTO_TRACE(wsc_logger_);
+
+  if (IsShuttingDown()) {
+    LOG4CXX_DEBUG(wsc_logger_, "Session is shutting down...");
+    return;
+  }
+
   Message message_ptr;
   while (message_queue_.pop(message_ptr)) {
     DataSendFailed(message_ptr);
