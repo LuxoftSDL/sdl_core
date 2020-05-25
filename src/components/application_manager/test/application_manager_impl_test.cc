@@ -269,7 +269,7 @@ class ApplicationManagerImplTest
     ASSERT_TRUE(mock_app_ptr_.get());
   }
 
-  void SetUpRequestForInterfacesAvailabilityExpectation(
+  void SetUpCreateModuleInfoSOExpectation(
       const hmi_apis::FunctionID::eType function_id) {
     smart_objects::SmartObject sm_object(smart_objects::SmartType_Map);
     sm_object[strings::params][strings::function_id] =
@@ -2057,25 +2057,10 @@ TEST_F(
       hmi_apis::FunctionID::RC_IsReady};
 
   for (auto request : expected_requests) {
-    SetUpRequestForInterfacesAvailabilityExpectation(request);
+    SetUpCreateModuleInfoSOExpectation(request);
+    EXPECT_CALL(*mock_rpc_service_,
+                ManageHMICommand(HMIResultCodeIs(request), _));
   }
-
-  EXPECT_CALL(
-      *mock_rpc_service_,
-      ManageHMICommand(
-          HMIResultCodeIs(hmi_apis::FunctionID::VehicleInfo_IsReady), _));
-  EXPECT_CALL(
-      *mock_rpc_service_,
-      ManageHMICommand(HMIResultCodeIs(hmi_apis::FunctionID::VR_IsReady), _));
-  EXPECT_CALL(
-      *mock_rpc_service_,
-      ManageHMICommand(HMIResultCodeIs(hmi_apis::FunctionID::TTS_IsReady), _));
-  EXPECT_CALL(
-      *mock_rpc_service_,
-      ManageHMICommand(HMIResultCodeIs(hmi_apis::FunctionID::UI_IsReady), _));
-  EXPECT_CALL(
-      *mock_rpc_service_,
-      ManageHMICommand(HMIResultCodeIs(hmi_apis::FunctionID::RC_IsReady), _));
 
   app_manager_impl_->RequestForInterfacesAvailability();
 }
