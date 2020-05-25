@@ -1023,7 +1023,7 @@ TEST_F(RegisterAppInterfaceRequestTest,
       (*response_to_mobile)[am::strings::msg_params][am::strings::result_code]
           .asUInt());
 
-  EXPECT_EQ(mobile_apis::Result::REJECTED, result_code);
+  EXPECT_EQ(mobile_apis::Result::DISALLOWED, result_code);
 }
 
 TEST_F(RegisterAppInterfaceRequestTest,
@@ -1060,7 +1060,7 @@ TEST_F(RegisterAppInterfaceRequestTest,
   const auto result_code = static_cast<mobile_apis::Result::eType>(
       (*response_to_mobile)[am::strings::msg_params][am::strings::result_code]
           .asUInt());
-  EXPECT_EQ(mobile_apis::Result::REJECTED, result_code);
+  EXPECT_EQ(mobile_apis::Result::DISALLOWED, result_code);
 }
 
 TEST_F(RegisterAppInterfaceRequestTest,
@@ -1093,7 +1093,7 @@ TEST_F(RegisterAppInterfaceRequestTest,
       (*response_to_mobile)[am::strings::msg_params][am::strings::result_code]
           .asUInt());
 
-  EXPECT_EQ(mobile_apis::Result::REJECTED, result_code);
+  EXPECT_EQ(mobile_apis::Result::DISALLOWED, result_code);
 }
 
 }  // namespace register_app_interface_request
