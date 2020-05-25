@@ -166,6 +166,25 @@ void CreateWindowRequest::Run() {
         (*message_)[strings::msg_params]
                    [strings::duplicate_updates_from_window_id]
                        .asInt();
+
+    const auto default_window_id =
+        mobile_apis::PredefinedWindows::DEFAULT_WINDOW;
+
+    if (default_window_id == duplicate_updates_from_window_id) {
+      const auto current_stringified_layout =
+          application->window_layout(default_window_id);
+      const auto current_app_layout =
+          application_manager_.StringToScreenPredefinedLayout(
+              current_stringified_layout);
+      if (mobile_apis::PredefinedLayout::WEB_VIEW == current_app_layout) {
+        LOG4CXX_ERROR(logger_,
+                      "MAIN window has active template WEB_VIEW. Option: "
+                      "duplicate from main window is not allowed");
+        SendResponse(false, mobile_apis::Result::REJECTED);
+        return;
+      }
+    }
+
     if (!application->WindowIdExists(duplicate_updates_from_window_id)) {
       LOG4CXX_ERROR(logger_,
                     "Window with id #" << duplicate_updates_from_window_id
