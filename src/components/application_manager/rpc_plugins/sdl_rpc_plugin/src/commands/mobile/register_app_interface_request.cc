@@ -1145,12 +1145,12 @@ mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckWithPolicyData() {
 
   smart_objects::SmartObject& message = *message_;
   policy::StringArray app_nicknames;
-  policy::StringArray app_hmi_types;
+  policy::StringArray app_hmi_types_in_policy;
 
   const std::string mobile_app_id =
       application_manager_.GetCorrectMobileIDFromMessage(message_);
   const bool init_result = GetPolicyHandler().GetInitialAppData(
-      mobile_app_id, &app_nicknames, &app_hmi_types);
+      mobile_app_id, &app_nicknames, &app_hmi_types_in_policy);
 
   if (!init_result) {
     LOG4CXX_ERROR(logger_, "Error during initial application data check.");
@@ -1179,25 +1179,26 @@ mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckWithPolicyData() {
   mobile_apis::Result::eType result = mobile_apis::Result::SUCCESS;
 
   // If AppHMIType is not included in policy - allow any type
-  if (!app_hmi_types.empty()) {
+  if (!app_hmi_types_in_policy.empty()) {
     if (message[strings::msg_params].keyExists(strings::app_hmi_type)) {
       // If AppHmiTypes are partially same, the system should allow those listed
       // in the policy table and send warning info on missed values
-      smart_objects::SmartArray app_types =
+      smart_objects::SmartArray app_types_in_message =
           *(message[strings::msg_params][strings::app_hmi_type].asArray());
 
       std::string log;
-      CheckMissedTypes checker(app_hmi_types, log);
-      std::for_each(app_types.begin(), app_types.end(), checker);
+      CheckMissedTypes checker(app_hmi_types_in_policy, log);
+      std::for_each(
+          app_types_in_message.begin(), app_types_in_message.end(), checker);
       if (!log.empty()) {
-        auto it = std::find(app_types.begin(),
-                            app_types.end(),
+        auto it = std::find(app_types_in_message.begin(),
+                            app_types_in_message.end(),
                             mobile_apis::AppHMIType::WEB_VIEW);
-        if (app_types.end() != it) {
+        if (app_types_in_message.end() != it) {
           response_info_ =
               "WEB_VIEW AppHmiType is absent in application policies";
           LOG4CXX_DEBUG(logger_, response_info_);
-          return mobile_apis::Result::REJECTED;
+          return mobile_apis::Result::DISALLOWED;
         }
         response_info_ =
             "Following AppHmiTypes are not present in policy "
@@ -1214,19 +1215,21 @@ mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckWithPolicyData() {
         message[strings::msg_params][strings::app_hmi_type];
 
     AppHMITypeInserter inserter(app_hmi_type);
-    std::for_each(app_hmi_types.begin(), app_hmi_types.end(), inserter);
+    std::for_each(app_hmi_types_in_policy.begin(),
+                  app_hmi_types_in_policy.end(),
+                  inserter);
   } else {
     if (message[strings::msg_params].keyExists(strings::app_hmi_type)) {
-      smart_objects::SmartArray app_types =
+      smart_objects::SmartArray app_types_in_message =
           *(message[strings::msg_params][strings::app_hmi_type].asArray());
-      auto it = std::find(app_types.begin(),
-                          app_types.end(),
+      auto it = std::find(app_types_in_message.begin(),
+                          app_types_in_message.end(),
                           mobile_apis::AppHMIType::WEB_VIEW);
-      if (app_types.end() != it) {
+      if (app_types_in_message.end() != it) {
         LOG4CXX_DEBUG(logger_,
                       "WEB_VIEW AppHmiType is absent in application policies, "
                       "because they are empty");
-        return mobile_apis::Result::REJECTED;
+        return mobile_apis::Result::DISALLOWED;
       }
     }
   }
