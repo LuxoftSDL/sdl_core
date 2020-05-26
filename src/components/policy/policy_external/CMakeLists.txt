@@ -139,13 +139,6 @@ add_custom_target(copy_library_Policy ALL
     DEPENDS Policy
     COMMENT "Copying library ${library_name}")
 
-install(TARGETS Policy
-  DESTINATION ${install_destination}
-  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-    GROUP_READ GROUP_EXECUTE
-    WORLD_READ WORLD_EXECUTE
-)
-
 # --- Table struct
 set(struct_target policy_struct)
 

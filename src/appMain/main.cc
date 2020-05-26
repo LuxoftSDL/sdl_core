@@ -112,7 +112,7 @@ int32_t main(int32_t argc, char** argv) {
   if ((argc > 1) && (0 != argv)) {
     profile_instance.set_config_file_name(argv[1]);
   } else {
-    profile_instance.set_config_file_name("smartDeviceLink.ini");
+    profile_instance.set_config_file_name("/usr/local/bin/smartDeviceLink.ini");
   }
 
   // Reading profile offsets for real-time signals dedicated
@@ -133,7 +133,7 @@ int32_t main(int32_t argc, char** argv) {
 
   // --------------------------------------------------------------------------
   // Logger initialization
-  INIT_LOGGER("log4cxx.properties", profile_instance.logs_enabled());
+  INIT_LOGGER("/usr/local/bin/log4cxx.properties", profile_instance.logs_enabled());
 
   threads::Thread::SetNameForId(threads::Thread::CurrentId(), "MainThread");
 

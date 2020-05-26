@@ -13,6 +13,3 @@ else()
 endif()
 
 set_target_properties(pugixml PROPERTIES VERSION 1.2 SOVERSION 1.2)
-
-install(TARGETS pugixml LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
-install(FILES ${HEADERS} DESTINATION include)

@@ -242,11 +242,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 # Please do not change compiler/linker flags if You do not know how particular
 # flag is handled by CMake
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR})
-set(ARCHIVE_OUTPUT_DIRECTORY ./bin)
+#set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR})
+set(INSTALL_LIB_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+set(INSTALL_BIN_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 set(EXCLUDE_ERROR_FLAGS "-Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations")
-set(CMAKE_CXX_FLAGS "-fPIC -std=gnu++0x -Wall -fvisibility=hidden -Werror ${EXCLUDE_ERROR_FLAGS} -Wuninitialized -Wvla")
+set(CMAKE_CXX_FLAGS "-fPIC -std=gnu++0x -fvisibility=hidden -Wvla")
 
 if (USE_GOLD_LD)
   execute_process(COMMAND ld -v OUTPUT_VARIABLE result)
@@ -451,6 +452,7 @@ SET(RPATH_DIRECTORIES
   /usr/local/lib
   /usr/local
   ${CMAKE_INSTALL_PREFIX}/bin
+  ${CMAKE_INSTALL_PREFIX}/lib
 )
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
@@ -468,6 +470,7 @@ if(BUILD_TESTS)
   message(STATUS "Tests enabled")
 endif()
 
+
 # --- 3rd party libs (static)
 add_subdirectory(./src/3rd_party-static)
 
@@ -484,7 +487,6 @@ add_subdirectory(./src/appMain)
 add_subdirectory(./src/plugins)
 
 add_dependencies(${PROJECT} Policy)
-add_dependencies(${PROJECT} copy_policy_library)
 
 # Building documentation
 

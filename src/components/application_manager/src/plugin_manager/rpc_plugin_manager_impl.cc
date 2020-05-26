@@ -37,7 +37,7 @@ T GetFuncFromLib(void* dl_handle, const std::string& function_name) {
       reinterpret_cast<T>(dlsym(dl_handle, function_name.c_str()));
   char* error_string = dlerror();
   if (nullptr != error_string) {
-    LOG4CXX_ERROR(logger_, "Failed to export symbols : " << error_string);
+    LOG4CXX_DEBUG(logger_, "Failed to export symbols : " << error_string);
     return nullptr;
   }
   return exported_func;
@@ -61,7 +61,7 @@ RPCPluginManagerImpl::RPCPluginPtr RPCPluginManagerImpl::LoadPlugin(
   typedef RPCPlugin* (*Create)();
   Create create_plugin = GetFuncFromLib<Create>(plugin_dll, "Create");
   if (!create_plugin) {
-    LOG4CXX_ERROR(logger_, "No Create function in " << full_plugin_path);
+    LOG4CXX_DEBUG(logger_, "No Create function in " << full_plugin_path);
     dlclose(plugin_dll);
     return RPCPluginPtr(nullptr, [](RPCPlugin*) {});
   }

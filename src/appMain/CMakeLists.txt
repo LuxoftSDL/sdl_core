@@ -195,66 +195,67 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
   endif(GIT_FOUND)
 endif()
 
-if (${QT_HMI})
-  set(main_qml "hmi/MainWindow.qml")
-  set(plugins_dir "hmi/plugins")
-
-  if (CMAKE_SYSTEM_NAME STREQUAL "QNX")
-    set(start_command "./start-qml.sh")
-    set(command_arguments "${main_qml} ${plugins_dir}")
-  else ()
-    execute_process(
-      COMMAND ${CMAKE_SOURCE_DIR}/FindQt.sh -v ${qt_version} -b qmlscene
-      OUTPUT_VARIABLE start_command
-    )
-    set(command_arguments "${main_qml} -I ${plugins_dir}")
-  endif ()
-
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/start_hmi.sh
-    "#!/bin/sh\n${start_command} ${command_arguments}\n")
-endif ()
 
 # Install rules
-install(TARGETS ${PROJECT} DESTINATION bin)
+install(TARGETS ${PROJECT}
+        RUNTIME
+        DESTINATION ${INSTALL_BIN_DESTINATION}
+        COMPONENT SDL)
+
+
+
 install(
   FILES build_config.txt log4cxx.properties audio.8bit.wav test.txt
     ${CMAKE_CURRENT_BINARY_DIR}/smartDeviceLink.ini
     hmi_capabilities.json sdl_preloaded_pt.json sample_policy_manager.py
     ${CMAKE_SOURCE_DIR}/mycert.pem ${CMAKE_SOURCE_DIR}/mykey.pem
-  DESTINATION bin
+    DESTINATION ${INSTALL_BIN_DESTINATION}
+  COMPONENT SDL
 )
-
-install(
-    FILES sdl_preloaded_pt.json
-    DESTINATION bin
-)
-
-if (${QT_HMI})
-  if (CMAKE_SYSTEM_NAME STREQUAL "QNX")
-    install(FILES start-qml.sh DESTINATION bin
-      PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-        GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-  endif ()
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/start_hmi.sh DESTINATION bin
-    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-endif ()
-if (CMAKE_SYSTEM_NAME STREQUAL "QNX")
-  install(FILES init_policy.sh DESTINATION bin
-    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-endif ()
 
 if (${EXTENDED_POLICY} STREQUAL "EXTERNAL_PROPRIETARY")
-  install(FILES start_external_proprietary.sh DESTINATION bin
+  install(FILES start_external_proprietary.sh
+      DESTINATION ${INSTALL_BIN_DESTINATION}
       PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE RENAME start.sh)
+      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE RENAME start.sh
+      COMPONENT SDL
+      )
 else()
-  install(FILES start.sh DESTINATION bin
+  install(FILES start.sh
+      DESTINATION ${INSTALL_BIN_DESTINATION}
       PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+      COMPONENT SDL
+      )
 endif()
 
 if(BUILD_TESTS)
   add_subdirectory(test)
 endif()
+
+install(
+  DIRECTORY $ENV{THIRD_PARTY_INSTALL_PREFIX}/lib/
+  DESTINATION ${INSTALL_LIB_DESTINATION}
+  USE_SOURCE_PERMISSIONS
+  COMPONENT SDL
+  FILES_MATCHING PATTERN lib*.so*
+)
+
+install(
+  DIRECTORY $ENV{THIRD_PARTY_INSTALL_PREFIX_ARCH}/lib/
+  DESTINATION ${INSTALL_LIB_DESTINATION}
+  USE_SOURCE_PERMISSIONS
+  COMPONENT SDL
+  FILES_MATCHING PATTERN lib*.so*
+)
+
+
+SET(CPACK_GENERATOR "DEB")
+set(CPACK_DEB_COMPONENT_INSTALL ON)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libbluetooth3,libusb-1.0-0,libssl-dev,libsqlite3-0,libexpat1-dev,libicu63")
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_ALL SDL)
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Alexander Kutsan <akutsan@luxoft.com>") #required
+
+
+INCLUDE(CPack)
