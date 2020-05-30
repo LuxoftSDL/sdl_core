@@ -55,6 +55,10 @@ bool SQLDatabase::Open() {
     return true;
   error_ = sqlite3_open(get_path().c_str(), &conn_);
   if (error_ != SQLITE_OK) {
+    // Whether or not an error occurs when it is opened, resources associated
+    // with the database connection handle should be released by passing it to
+    // sqlite3_close() when it is no longer required.
+    sqlite3_close(conn_);
     conn_ = NULL;
   }
   return error_ == SQLITE_OK;

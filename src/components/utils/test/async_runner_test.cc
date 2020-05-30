@@ -122,14 +122,14 @@ TEST_F(AsyncRunnerTest, ASyncRunManyDelegates_ExpectSuccessfulAllDelegatesRun) {
 
 TEST_F(AsyncRunnerTest, StopThenRun_ExpectDelegateNotStarted) {
   // Create Delegate mock
-  MockThreadDelegate mock_thread_delegate;
+  MockThreadDelegate* mock_thread_delegate = new MockThreadDelegate();
   // Check that delegate was not started due to Stop() called before AsyncRun()
-  EXPECT_CALL(mock_thread_delegate, threadMain()).Times(0);
+  EXPECT_CALL(*mock_thread_delegate, threadMain()).Times(0);
   {
     std::shared_ptr<AsyncRunner> async_runner =
         std::make_shared<AsyncRunner>("test");
     async_runner->Stop();
-    async_runner->AsyncRun(&mock_thread_delegate);
+    async_runner->AsyncRun(mock_thread_delegate);
   }
 }
 

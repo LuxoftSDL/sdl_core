@@ -66,6 +66,10 @@ AsyncRunner::~AsyncRunner() {
 
 AsyncRunner::AsyncRunnerDelegate::AsyncRunnerDelegate() : stop_flag_(false) {}
 
+AsyncRunner::AsyncRunnerDelegate::~AsyncRunnerDelegate() {
+  clearDelegateQueue();
+}
+
 void AsyncRunner::AsyncRunnerDelegate::processDelegate() {
   if (!delegates_queue_.empty()) {
     delegates_queue_lock_.Acquire();
@@ -85,6 +89,22 @@ void AsyncRunner::AsyncRunnerDelegate::waitForDelegate() {
   sync_primitives::AutoLock lock(delegates_queue_lock_);
   if (!stop_flag_ && delegates_queue_.empty()) {
     delegate_notifier_.Wait(lock);
+  }
+}
+
+void AsyncRunner::AsyncRunnerDelegate::clearDelegateQueue() {
+  if (!delegates_queue_.empty()) {
+    std::queue<threads::ThreadDelegate*> empty_queue;
+    delegates_queue_lock_.Acquire();
+    std::swap(delegates_queue_, empty_queue);
+    delegates_queue_lock_.Release();
+    do {
+      auto delegate = empty_queue.front();
+      empty_queue.pop();
+      if (delegate) {
+        delete delegate;
+      }
+    } while (!empty_queue.empty());
   }
 }
 

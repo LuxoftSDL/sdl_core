@@ -471,6 +471,7 @@ HMICapabilitiesImpl::~HMICapabilitiesImpl() {
   delete phone_capability_;
   delete video_streaming_capability_;
   delete rc_capability_;
+  delete seat_location_capability_;
 }
 
 bool HMICapabilitiesImpl::VerifyImageType(const int32_t image_type) const {

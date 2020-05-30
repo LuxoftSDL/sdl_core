@@ -52,6 +52,52 @@ using ::testing::Return;
 using ::testing::ReturnPointee;
 using ::testing::ReturnRef;
 
+ResumptionDataTest::~ResumptionDataTest() {
+  for (auto& submenu : test_submenu_map) {
+    delete submenu.second;
+  }
+
+  for (auto& command : test_commands_map) {
+    delete command.second;
+  }
+
+  for (auto& choiceset : test_choiceset_map) {
+    delete choiceset.second;
+  }
+
+  if (help_prompt_) {
+    delete help_prompt_;
+  }
+
+  if (timeout_prompt_) {
+    delete timeout_prompt_;
+  }
+
+  if (vr_help_) {
+    delete vr_help_;
+  }
+
+  if (vr_help_title_) {
+    delete vr_help_title_;
+  }
+
+  if (vr_synonyms_) {
+    delete vr_synonyms_;
+  }
+
+  if (keyboard_props_) {
+    delete keyboard_props_;
+  }
+
+  if (menu_title_) {
+    delete menu_title_;
+  }
+
+  if (menu_icon_) {
+    delete menu_icon_;
+  }
+}
+
 void ResumptionDataTest::CheckSavedApp(sm::SmartObject& resume_app_list) {
   EXPECT_EQ(policy_app_id_, resume_app_list[am::strings::app_id].asString());
   EXPECT_EQ(grammar_id_, resume_app_list[am::strings::grammar_id].asUInt());
@@ -442,7 +488,17 @@ void ResumptionDataTest::SetMenuTitleAndIcon() {
 
   sm::SmartObject sm_title;
   sm_title = "test title";
+
+  if (menu_title_) {
+    delete menu_title_;
+  }
+
   menu_title_ = new sm::SmartObject(sm_title);
+
+  if (menu_icon_) {
+    delete menu_icon_;
+  }
+
   menu_icon_ = new sm::SmartObject(sm_icon);
 }
 
@@ -456,12 +512,22 @@ void ResumptionDataTest::SetHelpAndTimeoutPrompt() {
     help_prompt[i][am::strings::text] = "help prompt name" + std::string(numb);
     help_prompt[i][am::strings::type] = SpeechCapabilities::PRE_RECORDED;
   }
+
+  if (help_prompt_) {
+    delete help_prompt_;
+  }
+
   help_prompt_ = new sm::SmartObject(help_prompt);
+
   for (uint i = 0; i < tts_chunks_count; ++i) {
     char numb[12];
     std::snprintf(numb, 12, "%d", i);
     timeout_prompt[i][am::strings::text] = "timeout test" + std::string(numb);
     timeout_prompt[i][am::strings::type] = SpeechCapabilities::SC_TEXT;
+  }
+
+  if (timeout_prompt_) {
+    delete timeout_prompt_;
   }
 
   timeout_prompt_ = new sm::SmartObject(timeout_prompt);
@@ -479,7 +545,16 @@ void ResumptionDataTest::SetVRHelpTitle() {
     vr_help[i][am::strings::position] = i;
   }
 
+  if (vr_help_) {
+    delete vr_help_;
+  }
+
   vr_help_ = new sm::SmartObject(vr_help);
+
+  if (vr_help_title_) {
+    delete vr_help_title_;
+  }
+
   vr_help_title_ = new sm::SmartObject(vr_help_title);
 }
 
@@ -591,6 +666,11 @@ void ResumptionDataTest::SetKeyboardProperties() {
   keyboard[am::strings::auto_complete_text] = "complete";
   keyboard[am::strings::limited_character_list][0] = "y";
   keyboard[am::strings::limited_character_list][1] = "n";
+
+  if (keyboard_props_) {
+    delete keyboard_props_;
+  }
+
   keyboard_props_ = new sm::SmartObject(keyboard);
 }
 

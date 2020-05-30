@@ -82,6 +82,8 @@ class AsyncRunner {
    public:
     AsyncRunnerDelegate();
 
+    ~AsyncRunnerDelegate();
+
     /**
      * @brief threadMain runs delegates queue handling.
      */
@@ -110,6 +112,11 @@ class AsyncRunner {
      * @brief waitForDelegate wait while delegates queue is empty.
      */
     void waitForDelegate();
+
+    /**
+     * @bref clearDelegateQueue delete leftover delegates in the queue
+     */
+    void clearDelegateQueue();
 
     std::queue<threads::ThreadDelegate*> delegates_queue_;
     sync_primitives::ConditionalVariable delegate_notifier_;

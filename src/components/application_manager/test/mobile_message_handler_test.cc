@@ -128,8 +128,8 @@ class MobileMessageHandlerTest : public testing::Test {
 
     // Act
     size_t payload_size = data.size();
-    Message* message = HandleIncomingMessage(
-        protocol_version, json_plus_binary_data, payload_size);
+    const auto message = std::shared_ptr<Message>(HandleIncomingMessage(
+        protocol_version, json_plus_binary_data, payload_size));
 
     // Checks
     EXPECT_EQ(data, message->json_message());
@@ -148,8 +148,8 @@ class MobileMessageHandlerTest : public testing::Test {
     // Arrange
     size_t payload_size = data.size();
     size_t full_data_size = data.size() + PROTOCOL_HEADER_V2_SIZE;
-    Message* message =
-        HandleIncomingMessage(protocol_version, data, payload_size);
+    const auto message = std::shared_ptr<Message>(
+        HandleIncomingMessage(protocol_version, data, payload_size));
 
     // Checks
     EXPECT_EQ(data, message->json_message());
@@ -197,8 +197,8 @@ class MobileMessageHandlerTest : public testing::Test {
     MobileMessage message_to_send = CreateMessageForSending(
         protocol_version, function_id, correlation_id, connection_key, data);
     // Act
-    RawMessage* result_message =
-        MobileMessageHandler::HandleOutgoingMessageProtocol(message_to_send);
+    std::shared_ptr<RawMessage> result_message(
+        MobileMessageHandler::HandleOutgoingMessageProtocol(message_to_send));
 
     std::vector<uint8_t> full_data = joiner<std::vector<uint8_t> >(
         binary_header, binary_header + PROTOCOL_HEADER_V2_SIZE, data);
@@ -233,12 +233,14 @@ class MobileMessageHandlerTest : public testing::Test {
                                                             data,
                                                             bin_dat);
     // Act
-    RawMessage* result_message =
-        MobileMessageHandler::HandleOutgoingMessageProtocol(message_to_send);
+    std::shared_ptr<RawMessage> result_message(
+        MobileMessageHandler::HandleOutgoingMessageProtocol(message_to_send));
     std::vector<uint8_t> full_data = joiner<std::vector<uint8_t> >(
         binary_header, binary_header + PROTOCOL_HEADER_V2_SIZE, data);
     size_t full_size =
         sizeof(uint8_t) * full_data.size() + bin_dat->size() * sizeof(uint8_t);
+
+    delete bin_dat;
 
     // Checks
     EXPECT_EQ(protocol_version, result_message->protocol_version());

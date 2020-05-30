@@ -63,7 +63,15 @@ using namespace mobile_apis;
 class ResumptionDataTest : public ::testing::Test {
  protected:
   ResumptionDataTest()
-      : kCountOfCommands_(5u)
+      : help_prompt_(nullptr)
+      , timeout_prompt_(nullptr)
+      , vr_help_(nullptr)
+      , vr_help_title_(nullptr)
+      , vr_synonyms_(nullptr)
+      , keyboard_props_(nullptr)
+      , menu_title_(nullptr)
+      , menu_icon_(nullptr)
+      , kCountOfCommands_(5u)
       , kCountOfChoice_(2u)
       , kCountOfChoiceSets_(4u)
       , kCountOfSubmenues_(3u)
@@ -77,6 +85,8 @@ class ResumptionDataTest : public ::testing::Test {
       , ivilock_ptr_(std::make_shared<sync_primitives::Lock>())
       , window_params_map_lock_ptr_(std::make_shared<sync_primitives::Lock>()) {
   }
+
+  ~ResumptionDataTest();
   // Check structure in saved application
   void CheckSavedApp(sm::SmartObject& saved_data);
   // Set data for resumption

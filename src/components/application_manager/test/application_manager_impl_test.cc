@@ -713,6 +713,8 @@ TEST_F(ApplicationManagerImplTest,
   app_manager_impl_->OnServiceStartedCallback(
       device_handle, session_key, service_type, &input_params);
 
+  bson_object_deinitialize(&input_params);
+
   // check: return value is true and list is empty
   EXPECT_TRUE(result);
   EXPECT_TRUE(rejected_params.empty());
@@ -806,6 +808,8 @@ TEST_F(ApplicationManagerImplTest,
   app_manager_impl_->OnServiceStartedCallback(
       device_handle, session_key, service_type, &input_params);
 
+  bson_object_deinitialize(&input_params);
+
   // check: return value is false
   EXPECT_FALSE(result);
 
@@ -853,6 +857,8 @@ TEST_F(ApplicationManagerImplTest,
 
   app_manager_impl_->OnServiceStartedCallback(
       device_handle, session_key, service_type, &input_params);
+
+  bson_object_deinitialize(&input_params);
 
   // check: return value is true and list is empty
   EXPECT_TRUE(result);
@@ -938,6 +944,8 @@ TEST_F(ApplicationManagerImplTest,
 
   app_manager_impl_->OnServiceStartedCallback(
       device_handle, session_key, service_type, &input_params);
+
+  bson_object_deinitialize(&input_params);
 
   // check: return value is true and list is empty
   EXPECT_TRUE(result);

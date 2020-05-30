@@ -90,7 +90,7 @@ TEST(ScopeGuardTest, CallObjectFunctionWithParam) {
 TEST(ScopeGuardTest, DismissCallFreeFunctionWithParam) {
   {
     call_with_param_count = 0;
-    char* ptr = new char;
+    char* ptr = const_cast<char*>("dealloc is not called");
     ScopeGuard guard = MakeGuard(dealloc, ptr);
     guard.Dismiss();
   }

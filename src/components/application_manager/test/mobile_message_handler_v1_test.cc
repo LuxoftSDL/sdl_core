@@ -75,10 +75,10 @@ TEST(MobileMessageHandlerTestV1Test,
                                                        data_json.length(),
                                                        false);
 
-  application_manager::Message* ptr =
-      MobileMessageHandler::HandleIncomingMessageProtocol(message);
+  std::shared_ptr<application_manager::Message> ptr(
+      MobileMessageHandler::HandleIncomingMessageProtocol(message));
 
-  ASSERT_TRUE(ptr);
+  ASSERT_TRUE(ptr.get());
 
   EXPECT_EQ(connection_key_p1, ptr->connection_key());
   EXPECT_EQ(protocol_version_1, ptr->protocol_version());
@@ -98,10 +98,10 @@ TEST(MobileMessageHandlerTestV1Test,
                                                        full_data.length(),
                                                        false);
 
-  application_manager::Message* ptr =
-      MobileMessageHandler::HandleIncomingMessageProtocol(message);
+  const auto ptr = std::shared_ptr<application_manager::Message>(
+      MobileMessageHandler::HandleIncomingMessageProtocol(message));
 
-  ASSERT_TRUE(ptr);
+  ASSERT_TRUE(ptr.get());
 
   EXPECT_EQ(connection_key_p1, ptr->connection_key());
   EXPECT_EQ(protocol_version_1, ptr->protocol_version());
@@ -121,10 +121,10 @@ TEST(MobileMessageHandlerTestV1Test,
   message->set_json_message(data_json);
   message->set_connection_key(connection_key_p1);
 
-  RawMessage* ptr =
-      MobileMessageHandler::HandleOutgoingMessageProtocol(message);
+  std::shared_ptr<RawMessage> ptr(
+      MobileMessageHandler::HandleOutgoingMessageProtocol(message));
 
-  ASSERT_TRUE(ptr);
+  ASSERT_TRUE(ptr.get());
 
   EXPECT_EQ(connection_key, ptr->connection_key());
   EXPECT_EQ(static_cast<uint32_t>(
