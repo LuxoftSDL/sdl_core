@@ -1229,12 +1229,6 @@ class ApplicationManagerImpl
   const std::string AppHMITypeToString(
       mobile_apis::AppHMIType::eType type) const;
 
-  mobile_apis::PredefinedLayout::eType StringToScreenPredefinedLayout(
-      const std::string& str) const OVERRIDE;
-
-  std::string ScreenPredefinedLayoutToString(
-      const mobile_apis::PredefinedLayout::eType& type) const OVERRIDE;
-
   /**
    * @brief Method compares arrays of app HMI type
    * @param from_policy contains app HMI type from policy

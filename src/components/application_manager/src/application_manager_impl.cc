@@ -4198,8 +4198,6 @@ mobile_apis::AppHMIType::eType ApplicationManagerImpl::StringToAppHMIType(
     return mobile_apis::AppHMIType::TESTING;
   } else if ("SYSTEM" == str) {
     return mobile_apis::AppHMIType::SYSTEM;
-  } else if ("WEB_VIEW" == str) {
-    return mobile_apis::AppHMIType::WEB_VIEW;
   } else {
     return mobile_apis::AppHMIType::INVALID_ENUM;
   }
@@ -4233,112 +4231,6 @@ const std::string ApplicationManagerImpl::AppHMITypeToString(
       return "PROJECTION";
     case mobile_apis::AppHMIType::REMOTE_CONTROL:
       return "REMOTE_CONTROL";
-    case mobile_apis::AppHMIType::WEB_VIEW:
-      return "WEB_VIEW";
-    default:
-      return "INVALID_ENUM";
-  }
-}
-
-mobile_apis::PredefinedLayout::eType
-ApplicationManagerImpl::StringToScreenPredefinedLayout(
-    const std::string& str) const {
-  LOG4CXX_AUTO_TRACE(logger_);
-  using ScreenLayout = mobile_apis::PredefinedLayout::eType;
-  if ("DEFAULT" == str) {
-    return ScreenLayout::DEFAULT;
-  } else if ("MEDIA" == str) {
-    return ScreenLayout::MEDIA;
-  } else if ("NON_MEDIA" == str) {
-    return ScreenLayout::NON_MEDIA;
-  } else if ("ONSCREEN_PRESETS" == str) {
-    return ScreenLayout::ONSCREEN_PRESETS;
-  } else if ("NAV_FULLSCREEN_MAP" == str) {
-    return ScreenLayout::NAV_FULLSCREEN_MAP;
-  } else if ("NAV_LIST" == str) {
-    return ScreenLayout::NAV_LIST;
-  } else if ("NAV_KEYBOARD" == str) {
-    return ScreenLayout::NAV_KEYBOARD;
-  } else if ("GRAPHIC_WITH_TEXT" == str) {
-    return ScreenLayout::GRAPHIC_WITH_TEXT;
-  } else if ("TEXT_WITH_GRAPHIC" == str) {
-    return ScreenLayout::TEXT_WITH_GRAPHIC;
-  } else if ("TILES_ONLY" == str) {
-    return ScreenLayout::TILES_ONLY;
-  } else if ("TEXTBUTTONS_ONLY" == str) {
-    return ScreenLayout::TEXTBUTTONS_ONLY;
-  } else if ("GRAPHIC_WITH_TILES" == str) {
-    return ScreenLayout::GRAPHIC_WITH_TILES;
-  } else if ("TILES_WITH_GRAPHIC" == str) {
-    return ScreenLayout::TILES_WITH_GRAPHIC;
-  } else if ("GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS" == str) {
-    return ScreenLayout::GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS;
-  } else if ("TEXT_AND_SOFTBUTTONS_WITH_GRAPHIC" == str) {
-    return ScreenLayout::TEXT_AND_SOFTBUTTONS_WITH_GRAPHIC;
-  } else if ("GRAPHIC_WITH_TEXTBUTTONS" == str) {
-    return ScreenLayout::GRAPHIC_WITH_TEXTBUTTONS;
-  } else if ("TEXTBUTTONS_WITH_GRAPHIC" == str) {
-    return ScreenLayout::TEXTBUTTONS_WITH_GRAPHIC;
-  } else if ("LARGE_GRAPHIC_WITH_SOFTBUTTONS" == str) {
-    return ScreenLayout::LARGE_GRAPHIC_WITH_SOFTBUTTONS;
-  } else if ("DOUBLE_GRAPHIC_WITH_SOFTBUTTONS" == str) {
-    return ScreenLayout::DOUBLE_GRAPHIC_WITH_SOFTBUTTONS;
-  } else if ("LARGE_GRAPHIC_ONLY" == str) {
-    return ScreenLayout::LARGE_GRAPHIC_ONLY;
-  } else if ("WEB_VIEW" == str) {
-    return ScreenLayout::WEB_VIEW;
-  } else {
-    return ScreenLayout::INVALID_ENUM;
-  }
-}
-
-std::string ApplicationManagerImpl::ScreenPredefinedLayoutToString(
-    const mobile_apis::PredefinedLayout::eType& type) const {
-  LOG4CXX_AUTO_TRACE(logger_);
-  using ScreenLayout = mobile_apis::PredefinedLayout::eType;
-  switch (type) {
-    case ScreenLayout::DEFAULT:
-      return "DEFAULT";
-    case ScreenLayout::MEDIA:
-      return "MEDIA";
-    case ScreenLayout::NON_MEDIA:
-      return "NON_MEDIA";
-    case ScreenLayout::ONSCREEN_PRESETS:
-      return "ONSCREEN_PRESETS";
-    case ScreenLayout::NAV_FULLSCREEN_MAP:
-      return "NAV_FULLSCREEN_MAP";
-    case ScreenLayout::NAV_LIST:
-      return "NAV_LIST";
-    case ScreenLayout::NAV_KEYBOARD:
-      return "NAV_KEYBOARD";
-    case ScreenLayout::GRAPHIC_WITH_TEXT:
-      return "GRAPHIC_WITH_TEXT";
-    case ScreenLayout::TEXT_WITH_GRAPHIC:
-      return "TEXT_WITH_GRAPHIC";
-    case ScreenLayout::TILES_ONLY:
-      return "TILES_ONLY";
-    case ScreenLayout::TEXTBUTTONS_ONLY:
-      return "TEXTBUTTONS_ONLY";
-    case ScreenLayout::GRAPHIC_WITH_TILES:
-      return "GRAPHIC_WITH_TILES";
-    case ScreenLayout::TILES_WITH_GRAPHIC:
-      return "TILES_WITH_GRAPHIC";
-    case ScreenLayout::GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS:
-      return "GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS";
-    case ScreenLayout::TEXT_AND_SOFTBUTTONS_WITH_GRAPHIC:
-      return "TEXT_AND_SOFTBUTTONS_WITH_GRAPHIC";
-    case ScreenLayout::GRAPHIC_WITH_TEXTBUTTONS:
-      return "GRAPHIC_WITH_TEXTBUTTONS";
-    case ScreenLayout::TEXTBUTTONS_WITH_GRAPHIC:
-      return "TEXTBUTTONS_WITH_GRAPHIC";
-    case ScreenLayout::LARGE_GRAPHIC_WITH_SOFTBUTTONS:
-      return "LARGE_GRAPHIC_WITH_SOFTBUTTONS";
-    case ScreenLayout::DOUBLE_GRAPHIC_WITH_SOFTBUTTONS:
-      return "DOUBLE_GRAPHIC_WITH_SOFTBUTTONS";
-    case ScreenLayout::LARGE_GRAPHIC_ONLY:
-      return "LARGE_GRAPHIC_ONLY";
-    case ScreenLayout::WEB_VIEW:
-      return "WEB_VIEW";
     default:
       return "INVALID_ENUM";
   }

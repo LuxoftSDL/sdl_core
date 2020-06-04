@@ -186,22 +186,6 @@ class ApplicationManager {
    */
   virtual void RemovePendingApplication(const std::string& policy_app_id) = 0;
 
-  /**
-   * @brief Method transforms string to screen PredefinedLayout enum
-   * @param str contains string with screen PredefinedLayout
-   * @return enum PredefinedLayout
-   */
-  virtual mobile_apis::PredefinedLayout::eType StringToScreenPredefinedLayout(
-      const std::string& str) const = 0;
-
-  /**
-   * @brief Returns a string representation of screen PredefinedLayout enum
-   * @param type an enum value of screen PredefinedLayout
-   * @return string representation of the enum value
-   */
-  virtual std::string ScreenPredefinedLayoutToString(
-      const mobile_apis::PredefinedLayout::eType& type) const = 0;
-
   virtual DataAccessor<ReregisterWaitList> reregister_applications() const = 0;
 
   virtual ApplicationSharedPtr application(uint32_t app_id) const = 0;

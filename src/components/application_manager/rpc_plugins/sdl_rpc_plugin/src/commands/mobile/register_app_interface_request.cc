@@ -486,12 +486,6 @@ void RegisterAppInterfaceRequest::Run() {
         }
         case mobile_apis::AppHMIType::WEB_VIEW: {
           application->set_webengine_projection_enabled(true);
-          const auto default_webview_layout =
-              application_manager_.ScreenPredefinedLayoutToString(
-                  mobile_apis::PredefinedLayout::WEB_VIEW);
-          application->set_window_layout(
-              mobile_apis::PredefinedWindows::DEFAULT_WINDOW,
-              default_webview_layout);
           break;
         }
         default: {}
