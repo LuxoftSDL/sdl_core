@@ -36,6 +36,7 @@
 #include "application_manager/request_info.h"
 
 #include <algorithm>
+
 namespace application_manager {
 
 namespace request_controller {
@@ -124,6 +125,8 @@ RequestInfoSet::~RequestInfoSet() {
     it = time_sorted_pending_requests_.begin();
   }
 }
+
+RequestInfoSet::RequestInfoSet() : pending_requests_lock_() {}
 
 bool RequestInfoSet::Add(RequestInfoPtr request_info) {
   DCHECK_OR_RETURN(request_info, false);
@@ -266,6 +269,14 @@ const size_t RequestInfoSet::Size() {
   sync_primitives::AutoLock lock(pending_requests_lock_);
   CheckSetSizes();
   return time_sorted_pending_requests_.size();
+}
+
+void RequestInfoSet::LockInfoSet() {
+  pending_requests_lock_.Acquire();
+}
+
+void RequestInfoSet::UnlockInfoSet() {
+  pending_requests_lock_.Release();
 }
 
 void RequestInfoSet::CheckSetSizes() {

@@ -48,7 +48,7 @@ namespace application_manager {
 
 namespace request_controller {
 
-/*
+/**
  * @brief Typedef for active mobile request
  *
  */
@@ -174,7 +174,7 @@ typedef std::set<RequestInfoPtr, RequestInfoTimeComparator>
 typedef std::set<RequestInfoPtr, RequestInfoHashComparator>
     HashSortedRequestInfoSet;
 
-/*
+/**
  * @brief RequestInfoSet provides uniue requests bu corralation_id and app_id
  *
  */
@@ -185,14 +185,19 @@ class RequestInfoSet {
    */
   ~RequestInfoSet();
 
-  /*
+  /**
+   * @brief Default constructor
+   */
+  RequestInfoSet();
+
+  /**
    * @brief Add requests into colletion by log(n) time
    * @param request_info - request to add
    * @return false is request with the same app_id and correlation_id exist
    */
   bool Add(RequestInfoPtr request_info);
 
-  /*
+  /**
    * @brief Find requests int colletion by log(n) time
    * @param connection_key - connection_key of request
    * @param correlation_id - correlation_id of request
@@ -201,45 +206,55 @@ class RequestInfoSet {
   RequestInfoPtr Find(const uint32_t connection_key,
                       const uint32_t correlation_id) const;
 
-  /*
+  /**
    * @brief Get request with smalest end_time_
    * @return founded request or shared_ptr with NULL
    */
   RequestInfoPtr Front();
 
-  /*
+  /**
    * @brief Get request with smalest end_time_ != 0
    * @return founded request or shared_ptr with NULL
    */
   RequestInfoPtr FrontWithNotNullTimeout();
 
-  /*
+  /**
    * @brief Erase request from colletion by log(n) time
    * @param request_info - request to erase
    * @return true if Erase succes, otherwise return false
    */
   bool RemoveRequest(const RequestInfoPtr request_info);
 
-  /*
+  /**
    * @brief Erase request from colletion by connection_key
    * @param connection_key - connection_key of requests to erase
    * @return count of erased requests
    */
   uint32_t RemoveByConnectionKey(uint32_t connection_key);
 
-  /*
+  /**
    * @brief Erase all mobile requests from controller
    * @return count of erased requests
    */
   uint32_t RemoveMobileRequests();
 
-  /*
+  /**
    * @return count of requestd in collections
    */
   const size_t Size();
 
+  /**
+   * @brief Locks info sets using internal lock
+   */
+  void LockInfoSet();
+
+  /**
+   * @brief Unlocks info sets using internal lock
+   */
+  void UnlockInfoSet();
+
  private:
-  /*
+  /**
    * @brief Comparator of connection key for std::find_if function
    */
   struct AppIdCompararator {
@@ -255,21 +270,21 @@ class RequestInfoSet {
 
   bool Erase(const RequestInfoPtr request_info);
 
-  /*
+  /**
    * @brief Erase requests from collection if filter allows
    * @param filter - filtering predicate
    * @return count of erased requests
    */
   uint32_t RemoveRequests(const RequestInfoSet::AppIdCompararator& filter);
 
-  /*
+  /**
    * @brief Debug function, will raise assert if set sizes are noit equal
    */
   inline void CheckSetSizes();
   TimeSortedRequestInfoSet time_sorted_pending_requests_;
   HashSortedRequestInfoSet hash_sorted_pending_requests_;
 
-  mutable sync_primitives::Lock pending_requests_lock_;
+  mutable sync_primitives::RecursiveLock pending_requests_lock_;
 };
 
 /**
@@ -305,6 +320,5 @@ struct TimeScale {
 };
 
 }  //  namespace request_controller
-
 }  //  namespace application_manager
 #endif  // SRC_COMPONENTS_APPLICATION_MANAGER_INCLUDE_APPLICATION_MANAGER_REQUEST_INFO_H_
