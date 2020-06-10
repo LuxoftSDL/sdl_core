@@ -85,6 +85,12 @@ bool ChangeInterfaceState(ApplicationManager& application_manager,
     return is_available;
   }
 
+  if (response_from_hmi[strings::params].keyExists(strings::error_msg)) {
+    application_manager.hmi_interfaces().SetInterfaceState(
+        interface, HmiInterfaces::STATE_NOT_AVAILABLE);
+    return false;
+  }
+
   return false;
 }
 
