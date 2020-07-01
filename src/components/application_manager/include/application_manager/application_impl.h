@@ -146,8 +146,7 @@ class ApplicationImpl : public virtual Application,
                        uint32_t timer_len = 0);
 
   virtual bool is_voice_communication_supported() const;
-  virtual void set_voice_communication_supported(
-      bool is_voice_communication_supported);
+  virtual void set_voice_communication_supported(bool option);
   inline bool app_allowed() const;
   bool has_been_activated() const;
   bool set_activated(bool is_active);
