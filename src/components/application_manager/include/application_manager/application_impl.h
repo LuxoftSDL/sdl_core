@@ -113,7 +113,7 @@ class ApplicationImpl : public virtual Application,
   inline bool is_navi() const {
     return is_navi_;
   }
-  void set_is_navi(bool allow);
+  void set_is_navi(bool option);
 
   virtual bool is_remote_control_supported() const;
 
@@ -186,7 +186,7 @@ class ApplicationImpl : public virtual Application,
   bool keep_context();
   void set_version(const Version& ver);
   void set_name(const custom_str::CustomString& name);
-  void set_is_media_application(bool is_media);
+  void set_is_media_application(bool option);
   void increment_put_file_in_none_count();
   void increment_delete_file_in_none_count();
   void increment_list_files_in_none_count();

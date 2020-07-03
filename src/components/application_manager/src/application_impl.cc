@@ -200,9 +200,9 @@ bool ApplicationImpl::is_audio() const {
 }
 
 void ApplicationImpl::ChangeSupportingAppHMIType() {
-  is_navi_ = false;
-  is_voice_communication_application_ = false;
-  mobile_projection_enabled_ = false;
+  set_is_navi(false);
+  set_voice_communication_supported(false);
+  set_mobile_projection_enabled(false);
   set_webengine_projection_enabled(false);
   const smart_objects::SmartObject& array_app_types = *app_types_;
   uint32_t lenght_app_types = array_app_types.length();
@@ -231,7 +231,7 @@ void ApplicationImpl::ChangeSupportingAppHMIType() {
 }
 
 void ApplicationImpl::set_is_navi(bool option) {
-  LOG4CXX_TRACE(logger_, "option " << option);
+  LOG4CXX_TRACE(logger_, "option " << std::boolalpha << option);
   is_navi_ = option;
 }
 
@@ -248,7 +248,7 @@ bool ApplicationImpl::is_voice_communication_supported() const {
 }
 
 void ApplicationImpl::set_voice_communication_supported(bool option) {
-  LOG4CXX_TRACE(logger_, "option " << option);
+  LOG4CXX_TRACE(logger_, "option " << std::boolalpha << option);
   is_voice_communication_application_ = option;
 }
 
@@ -293,7 +293,7 @@ void ApplicationImpl::SetPostponedState(const WindowID window_id,
 }
 
 void ApplicationImpl::set_mobile_projection_enabled(bool option) {
-  LOG4CXX_TRACE(logger_, "option " << option);
+  LOG4CXX_TRACE(logger_, "option " << std::boolalpha << option);
   mobile_projection_enabled_ = option;
 }
 
@@ -302,7 +302,7 @@ bool ApplicationImpl::mobile_projection_enabled() const {
 }
 
 void ApplicationImpl::set_webengine_projection_enabled(const bool option) {
-  LOG4CXX_TRACE(logger_, "option " << option);
+  LOG4CXX_TRACE(logger_, "option " << std::boolalpha << option);
   webengine_projection_enabled_ = option;
 }
 
@@ -473,8 +473,9 @@ void ApplicationImpl::set_name(const custom_str::CustomString& name) {
   app_name_ = name;
 }
 
-void ApplicationImpl::set_is_media_application(bool is_media) {
-  is_media_ = is_media;
+void ApplicationImpl::set_is_media_application(bool option) {
+  LOG4CXX_TRACE(logger_, "option " << std::boolalpha << option);
+  is_media_ = option;
 }
 
 bool IsTTSState(const HmiStatePtr state) {
