@@ -66,6 +66,23 @@ MATCHER(CheckMessageToMobile, "") {
     is_connection_key_correct =
         (*arg)[strings::params][strings::connection_key] == kAppId;
   }
+
+  return is_function_id_matched && app_id_exist && is_connection_key_correct;
+}
+
+MATCHER(CheckMessageToMobileWithoutAppId, "") {
+  const auto function_id = mobile_apis::FunctionID::OnSystemCapabilityUpdatedID;
+
+  const bool is_function_id_matched =
+      function_id == static_cast<am::mobile_api::FunctionID::eType>(
+                         (*arg)[strings::params][strings::function_id].asInt());
+  const bool app_id_exist =
+      (*arg)[strings::msg_params].keyExists(strings::app_id);
+  bool is_connection_key_correct = true;
+  if ((*arg)[strings::msg_params].keyExists(strings::connection_key)) {
+    is_connection_key_correct =
+        (*arg)[strings::params][strings::connection_key] == kAppId;
+  }
   return is_function_id_matched && !app_id_exist && is_connection_key_correct;
 }
 
@@ -105,7 +122,7 @@ TEST_F(
   EXPECT_CALL(
       mock_rpc_service_,
       ManageMobileCommand(
-          CheckMessageToMobile(),
+          CheckMessageToMobileWithoutAppId(),
           ::application_manager::commands::Command::CommandSource::SOURCE_SDL))
       .WillOnce(Return(true));
 
@@ -130,7 +147,7 @@ TEST_F(OnBCSystemCapabilityUpdatedNotificationFromHMITest,
 
 TEST_F(
     OnBCSystemCapabilityUpdatedNotificationFromHMITest,
-    Run_AppRegisteredWithPresentedAppIdInMessage_SetDisplayCapabilitiesToApp_SendMessageToMobile) {
+    Run_AppRegisteredWithPresentedAppIdInMessage_SetDisplayCapabilitiesToAppAndAppIdIsErasedFromMessage_SendMessageToMobile) {
   (*message_)[am::strings::msg_params][strings::system_capability]
              [am::strings::system_capability_type] =
                  mobile_apis::SystemCapabilityType::DISPLAYS;
@@ -144,11 +161,26 @@ TEST_F(
   EXPECT_CALL(
       mock_rpc_service_,
       ManageMobileCommand(
-          CheckMessageToMobile(),
+          CheckMessageToMobileWithoutAppId(),
           ::application_manager::commands::Command::CommandSource::SOURCE_SDL))
       .WillOnce(Return(true));
 
   ASSERT_TRUE(command_->Init());
+  command_->Run();
+}
+
+TEST_F(
+    OnBCSystemCapabilityUpdatedNotificationFromHMITest,
+    Run_SysCapTypeVideoStreaming_CapabilityIsAbsent_DoesntSetInHMICapabilities) {
+  smart_objects::SmartObject system_capability =
+      smart_objects::SmartObject(smart_objects::SmartType_Map);
+
+  system_capability[strings::system_capability_type] =
+      mobile_apis::SystemCapabilityType::VIDEO_STREAMING;
+
+  ASSERT_TRUE(command_->Init());
+  EXPECT_CALL(mock_hmi_capabilities_, set_video_streaming_capability(_))
+      .Times(0);
   command_->Run();
 }
 
