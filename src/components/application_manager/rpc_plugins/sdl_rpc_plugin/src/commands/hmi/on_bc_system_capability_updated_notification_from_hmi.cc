@@ -36,6 +36,7 @@
 #include "application_manager/message_helper.h"
 #include "interfaces/HMI_API.h"
 #include "interfaces/MOBILE_API.h"
+#include "sdl_rpc_plugin/extensions/system_capability_app_extension.h"
 
 namespace sdl_rpc_plugin {
 using namespace application_manager;
@@ -104,10 +105,21 @@ void OnBCSystemCapabilityUpdatedNotificationFromHMI::Run() {
   (*message_)[strings::params][strings::function_id] = static_cast<int32_t>(
       mobile_apis::FunctionID::OnSystemCapabilityUpdatedID);
 
+  if (!(*message_)[strings::msg_params].keyExists(strings::system_capability)) {
+    LOG4CXX_ERROR(logger_,
+                  "SystemCapability is absent in the notification."
+                  "Notification will be ignored");
+    return;
+  }
+
   const auto& system_capability =
       (*message_)[strings::msg_params][strings::system_capability];
 
-  switch (system_capability[strings::system_capability_type].asInt()) {
+  const auto system_capbility_type =
+      static_cast<mobile_apis::SystemCapabilityType::eType>(
+          system_capability[strings::system_capability_type].asInt());
+
+  switch (system_capbility_type) {
     case mobile_apis::SystemCapabilityType::DISPLAYS: {
       if (system_capability.keyExists(strings::display_capabilities)) {
         const auto result = ProcessSystemDisplayCapabilities(
@@ -135,6 +147,46 @@ void OnBCSystemCapabilityUpdatedNotificationFromHMI::Run() {
       }
       break;
     }
+    case mobile_apis::SystemCapabilityType::VIDEO_STREAMING: {
+      if (!system_capability.keyExists(strings::video_streaming_capability)) {
+        LOG4CXX_WARN(logger_,
+                     "VideoStreamingCapability is absent in the notification. "
+                     "Notification Will be ignored");
+        return;
+      }
+      if (!(*message_)[strings::msg_params].keyExists(strings::app_id)) {
+        LOG4CXX_WARN(logger_,
+                     "Notification doesn't contain an application id. Will "
+                     "be ignored");
+        return;
+      }
+
+      const auto app_id =
+          (*message_)[strings::msg_params][strings::app_id].asUInt();
+
+      auto app = application_manager_.application(app_id);
+      if (!app) {
+        LOG4CXX_WARN(logger_,
+                     "Application with app_id: "
+                         << app_id
+                         << " isn't registered. Notification will be ignored");
+        return;
+      }
+
+      auto& system_capability_extension =
+          SystemCapabilityAppExtension::ExtractExtension(*app);
+
+      if (!system_capability_extension.IsSubscribedTo(system_capbility_type)) {
+        LOG4CXX_WARN(logger_,
+                     "The Application with app_id: "
+                         << app_id
+                         << " isn't subscribed to the VIDEO_STREAMING system "
+                            "capability type. Notification will be ignored");
+        return;
+      }
+      break;
+    }
+    default: {}
   }
 
   SendNotificationToMobile(message_);
