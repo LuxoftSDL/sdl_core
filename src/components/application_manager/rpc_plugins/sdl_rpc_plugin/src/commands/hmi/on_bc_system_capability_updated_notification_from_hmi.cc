@@ -85,9 +85,7 @@ OnBCSystemCapabilityUpdatedNotificationFromHMI::
   app->set_display_capabilities(display_capabilities);
 
   // Remove app_id from notification to mobile
-  (*message_)[strings::params][strings::connection_key] =
-      (*message_)[strings::msg_params][strings::app_id];
-  (*message_)[strings::msg_params].erase(strings::app_id);
+  RemoveAppIdFromNotification();
   if (app->is_resuming() && app->is_app_data_resumption_allowed()) {
     LOG4CXX_DEBUG(logger_, "Application is resuming");
     app->display_capabilities_builder().UpdateDisplayCapabilities(
@@ -98,6 +96,13 @@ OnBCSystemCapabilityUpdatedNotificationFromHMI::
   return ProcessSystemDisplayCapabilitiesResult::SUCCESS;
 }
 
+void OnBCSystemCapabilityUpdatedNotificationFromHMI::
+    RemoveAppIdFromNotification() {
+  (*message_)[strings::params][strings::connection_key] =
+      (*message_)[strings::msg_params][strings::app_id];
+  (*message_)[strings::msg_params].erase(strings::app_id);
+}
+
 void OnBCSystemCapabilityUpdatedNotificationFromHMI::Run() {
   LOG4CXX_AUTO_TRACE(logger_);
 
@@ -105,21 +110,14 @@ void OnBCSystemCapabilityUpdatedNotificationFromHMI::Run() {
   (*message_)[strings::params][strings::function_id] = static_cast<int32_t>(
       mobile_apis::FunctionID::OnSystemCapabilityUpdatedID);
 
-  if (!(*message_)[strings::msg_params].keyExists(strings::system_capability)) {
-    LOG4CXX_ERROR(logger_,
-                  "SystemCapability is absent in the notification."
-                  "Notification will be ignored");
-    return;
-  }
-
   const auto& system_capability =
       (*message_)[strings::msg_params][strings::system_capability];
 
-  const auto system_capbility_type =
+  const auto system_capability_type =
       static_cast<mobile_apis::SystemCapabilityType::eType>(
           system_capability[strings::system_capability_type].asInt());
 
-  switch (system_capbility_type) {
+  switch (system_capability_type) {
     case mobile_apis::SystemCapabilityType::DISPLAYS: {
       if (system_capability.keyExists(strings::display_capabilities)) {
         const auto result = ProcessSystemDisplayCapabilities(
@@ -176,7 +174,7 @@ void OnBCSystemCapabilityUpdatedNotificationFromHMI::Run() {
       auto& system_capability_extension =
           SystemCapabilityAppExtension::ExtractExtension(*app);
 
-      if (!system_capability_extension.IsSubscribedTo(system_capbility_type)) {
+      if (!system_capability_extension.IsSubscribedTo(system_capability_type)) {
         LOG4CXX_WARN(logger_,
                      "The Application with app_id: "
                          << app_id
@@ -184,6 +182,8 @@ void OnBCSystemCapabilityUpdatedNotificationFromHMI::Run() {
                             "capability type. Notification will be ignored");
         return;
       }
+
+      RemoveAppIdFromNotification();
       break;
     }
     default: {}
