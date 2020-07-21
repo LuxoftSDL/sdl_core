@@ -81,9 +81,6 @@ void OnSystemCapabilityUpdatedNotification::Run() {
     }
     case mobile_apis::SystemCapabilityType::VIDEO_STREAMING:
       if ((*message_)[strings::msg_params].keyExists(strings::app_id)) {
-        (*message_)[strings::params][strings::connection_key] =
-            (*message_)[strings::msg_params][strings::app_id];
-        (*message_)[strings::msg_params].erase(strings::app_id);
         SendNotification();
       }
       return;
@@ -249,7 +246,7 @@ void OnSystemCapabilityUpdatedNotification::Run() {
     (*message_)[strings::params][strings::connection_key] = app->app_id();
     SendNotification();
   }
-}  // namespace mobile
+}
 
 }  // namespace mobile
 }  // namespace commands
