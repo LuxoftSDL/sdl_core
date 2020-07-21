@@ -246,12 +246,11 @@ TEST_F(OnBCSystemCapabilityUpdatedNotificationFromHMITest,
 
   sdl_rpc_plugin::SDLRPCPlugin sdl_rpc_plugin;
 
-  // By default system capability extensiob is not subsribed to the
+  // By default system capability extension is not subsribed to the
   // VIDEO_STREAMING
-  std::shared_ptr<sdl_rpc_plugin::SystemCapabilityAppExtension>
-      system_capability_app_extension(
-          std::make_shared<sdl_rpc_plugin::SystemCapabilityAppExtension>(
-              sdl_rpc_plugin, *mock_app_));
+  auto system_capability_app_extension =
+      std::make_shared<sdl_rpc_plugin::SystemCapabilityAppExtension>(
+          sdl_rpc_plugin, *mock_app_);
 
   ON_CALL(*mock_app_,
           QueryInterface(sdl_rpc_plugin::SystemCapabilityAppExtension::
