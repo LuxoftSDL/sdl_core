@@ -40,7 +40,7 @@
 
 namespace transport_manager {
 namespace transport_adapter {
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 WebsocketClientConnection::WebsocketClientConnection(
     const DeviceUID& device_uid,
@@ -80,7 +80,7 @@ void WebsocketClientConnection::AddCertificateAuthority(
 #endif  // ENABLE_SECURITY
 
 TransportAdapter::Error WebsocketClientConnection::Start() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DeviceSptr device = controller_->FindDevice(device_uid_);
   CloudDevice* cloud_device = static_cast<CloudDevice*>(device.get());
   CloudWebsocketTransportAdapter* cloud_ta =
@@ -271,14 +271,14 @@ void WebsocketClientConnection::OnRead(boost::system::error_code ec,
 
 TransportAdapter::Error WebsocketClientConnection::SendData(
     ::protocol_handler::RawMessagePtr message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock auto_lock(frames_to_send_mutex_);
   message_queue_.push(message);
   return TransportAdapter::OK;
 }
 
 TransportAdapter::Error WebsocketClientConnection::Disconnect() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   Shutdown();
   return TransportAdapter::OK;
 }

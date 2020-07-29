@@ -46,7 +46,7 @@
 
 namespace transport_manager {
 namespace transport_adapter {
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 ThreadedSocketConnection::ThreadedSocketConnection(
     const DeviceUID& device_id,
@@ -69,7 +69,7 @@ ThreadedSocketConnection::ThreadedSocketConnection(
 }
 
 ThreadedSocketConnection::~ThreadedSocketConnection() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(nullptr == thread_);
 
   if (-1 != read_fd_) {
@@ -91,13 +91,13 @@ void ThreadedSocketConnection::StopAndJoinThread() {
 }
 
 void ThreadedSocketConnection::Abort() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   unexpected_disconnect_ = true;
   terminate_flag_ = true;
 }
 
 TransportAdapter::Error ThreadedSocketConnection::Start() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   int fds[2];
   const int pipe_ret = pipe(fds);
   if (0 == pipe_ret) {
@@ -124,7 +124,7 @@ TransportAdapter::Error ThreadedSocketConnection::Start() {
 }
 
 void ThreadedSocketConnection::Finalize() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (unexpected_disconnect_) {
     LOG4CXX_DEBUG(logger_, "unexpected_disconnect");
     controller_->ConnectionAborted(
@@ -138,7 +138,7 @@ void ThreadedSocketConnection::Finalize() {
 }
 
 TransportAdapter::Error ThreadedSocketConnection::Notify() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (-1 == write_fd_) {
     LOG4CXX_ERROR_WITH_ERRNO(
         logger_, "Failed to wake up connection thread for connection " << this);
@@ -156,26 +156,26 @@ TransportAdapter::Error ThreadedSocketConnection::Notify() const {
 
 TransportAdapter::Error ThreadedSocketConnection::SendData(
     ::protocol_handler::RawMessagePtr message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock auto_lock(frames_to_send_mutex_);
   frames_to_send_.push(message);
   return Notify();
 }
 
 TransportAdapter::Error ThreadedSocketConnection::Disconnect() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   terminate_flag_ = true;
   ShutdownAndCloseSocket();
   return Notify();
 }
 
 void ThreadedSocketConnection::Terminate() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   StopAndJoinThread();
 }
 
 void ThreadedSocketConnection::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ConnectError* connect_error = nullptr;
   if (!Establish(&connect_error)) {
     LOG4CXX_ERROR(logger_, "Connection Establish failed");
@@ -208,7 +208,7 @@ bool ThreadedSocketConnection::IsFramesToSendQueueEmpty() const {
 }
 
 void ThreadedSocketConnection::ShutdownAndCloseSocket() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const int socket = socket_;
   socket_ = -1;
   if (socket != -1) {
@@ -224,7 +224,7 @@ void ThreadedSocketConnection::ShutdownAndCloseSocket() {
 }
 
 void ThreadedSocketConnection::Transmit() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const nfds_t kPollFdsSize = 2;
   pollfd poll_fds[kPollFdsSize];
@@ -301,7 +301,7 @@ void ThreadedSocketConnection::Transmit() {
 }
 
 bool ThreadedSocketConnection::Receive() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint8_t buffer[4096];
   ssize_t bytes_read = -1;
 
@@ -332,7 +332,7 @@ bool ThreadedSocketConnection::Receive() {
 }
 
 bool ThreadedSocketConnection::Send() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   FrameQueue frames_to_send_local;
 
   {
@@ -373,13 +373,13 @@ ThreadedSocketConnection::SocketConnectionDelegate::SocketConnectionDelegate(
     : connection_(connection) {}
 
 void ThreadedSocketConnection::SocketConnectionDelegate::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(connection_);
   connection_->threadMain();
 }
 
 void ThreadedSocketConnection::SocketConnectionDelegate::exitThreadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 }  // namespace transport_adapter

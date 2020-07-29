@@ -41,7 +41,7 @@
 
 namespace rc_rpc_plugin {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule");
+SDL_CREATE_LOGGERPTR( "RemoteControlModule");
 
 InteriorDataCacheImpl::InteriorDataCacheImpl() {}
 
@@ -63,7 +63,7 @@ void InteriorDataCacheImpl::Add(const ModuleUid& module,
 
 smart_objects::SmartObject InteriorDataCacheImpl::Retrieve(
     const ModuleUid& module) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(cached_data_lock_);
   auto it = cached_data_.find(module);
   if (it == cached_data_.end()) {
@@ -92,7 +92,7 @@ std::vector<ModuleUid> InteriorDataCacheImpl::GetCachedModulesByType(
 }
 
 bool InteriorDataCacheImpl::Contains(const ModuleUid& module) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(cached_data_lock_);
   auto it = cached_data_.find(module);
   const bool contains = it != cached_data_.end();
@@ -119,7 +119,7 @@ void InteriorDataCacheImpl::Remove(const ModuleUid& module) {
 }
 
 void InteriorDataCacheImpl::Clear() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(cached_data_lock_);
   cached_data_.clear();
 }

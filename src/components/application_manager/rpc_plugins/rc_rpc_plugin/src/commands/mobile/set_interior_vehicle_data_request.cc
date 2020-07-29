@@ -45,7 +45,7 @@ namespace commands {
 
 using namespace json_keys;
 using namespace message_params;
-CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule")
+SDL_CREATE_LOGGERPTR( "RemoteControlModule")
 
 SetInteriorVehicleDataRequest::SetInteriorVehicleDataRequest(
     const app_mngr::commands::MessageSharedPtr& message,
@@ -62,7 +62,7 @@ SetInteriorVehicleDataRequest::~SetInteriorVehicleDataRequest() {}
  */
 bool ClearUnrelatedModuleData(const std::string& module_type,
                               smart_objects::SmartObject& module_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto& all_module_types = RCHelpers::GetModuleTypesList();
   const auto& data_mapping = RCHelpers::GetModuleTypeToDataMapping();
   bool module_type_and_data_match = false;
@@ -110,7 +110,7 @@ mobile_apis::Result::eType PrepareResultCodeAndInfo(
 }
 
 void SetInteriorVehicleDataRequest::Execute() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject& module_data =
       (*message_)[app_mngr::strings::msg_params][message_params::kModuleData];
@@ -220,7 +220,7 @@ void SetInteriorVehicleDataRequest::Execute() {
 
 void SetInteriorVehicleDataRequest::on_event(
     const app_mngr::event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   RCCommandRequest::on_event(event);
 
   if (hmi_apis::FunctionID::RC_SetInteriorVehicleData != event.id()) {
@@ -298,7 +298,7 @@ void SetInteriorVehicleDataRequest::on_event(
 
 void SetInteriorVehicleDataRequest::CheckAudioSource(
     const smart_objects::SmartObject& audio_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (audio_data.keyExists(message_params::kSource)) {
     application_manager_.set_current_audio_source(
         audio_data[message_params::kSource].asUInt());
@@ -307,7 +307,7 @@ void SetInteriorVehicleDataRequest::CheckAudioSource(
 
 void SetInteriorVehicleDataRequest::CutOffReadOnlyParams(
     smart_objects::SmartObject& module_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string module_type = ModuleType();
   const auto& module_type_params =
       rc_capabilities_manager_.ControlDataForType(module_data, module_type);
@@ -338,7 +338,7 @@ void SetInteriorVehicleDataRequest::CutOffReadOnlyParams(
 }
 
 std::string SetInteriorVehicleDataRequest::ModuleType() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   mobile_apis::ModuleType::eType module_type =
       static_cast<mobile_apis::ModuleType::eType>(
           (*message_)[app_mngr::strings::msg_params]
@@ -351,7 +351,7 @@ std::string SetInteriorVehicleDataRequest::ModuleType() const {
 }
 
 std::string SetInteriorVehicleDataRequest::ModuleId() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto msg_params = (*message_)[app_mngr::strings::msg_params];
   if (msg_params[message_params::kModuleData].keyExists(
           message_params::kModuleId)) {
@@ -372,7 +372,7 @@ std::string SetInteriorVehicleDataRequest::ModuleId() const {
 
 AcquireResult::eType SetInteriorVehicleDataRequest::AcquireResource(
     const app_mngr::commands::MessageSharedPtr& message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string module_type = ModuleType();
   app_mngr::ApplicationSharedPtr app =
       application_manager_.application(CommandRequestImpl::connection_key());
@@ -388,7 +388,7 @@ bool SetInteriorVehicleDataRequest::IsResourceFree(
 
 void SetInteriorVehicleDataRequest::SetResourceState(
     const std::string& module_type, const ResourceState::eType state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   app_mngr::ApplicationSharedPtr app =
       application_manager_.application(CommandRequestImpl::connection_key());
   resource_allocation_manager_.SetResourceState(

@@ -53,7 +53,7 @@ OnWayPointChangeNotification::OnWayPointChangeNotification(
 OnWayPointChangeNotification::~OnWayPointChangeNotification() {}
 
 void OnWayPointChangeNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::set<uint32_t> subscribed_for_way_points =
       application_manager_.GetAppsSubscribedForWayPoints();

@@ -56,7 +56,7 @@ SetDisplayLayoutRequest::SetDisplayLayoutRequest(
 SetDisplayLayoutRequest::~SetDisplayLayoutRequest() {}
 
 void SetDisplayLayoutRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
@@ -123,7 +123,7 @@ void SetDisplayLayoutRequest::Run() {
 }
 
 void SetDisplayLayoutRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 

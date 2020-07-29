@@ -55,7 +55,7 @@ PerformAppServiceInteractionResponseFromMobile::
     ~PerformAppServiceInteractionResponseFromMobile() {}
 
 void PerformAppServiceInteractionResponseFromMobile::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   event_engine::MobileEvent event(
       mobile_apis::FunctionID::PerformAppServiceInteractionID);
   event.set_smart_object(*message_);

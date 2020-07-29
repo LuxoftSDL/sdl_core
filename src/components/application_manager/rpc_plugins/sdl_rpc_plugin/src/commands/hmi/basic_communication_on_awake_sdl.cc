@@ -54,7 +54,7 @@ OnAwakeSDLNotification::OnAwakeSDLNotification(
 OnAwakeSDLNotification::~OnAwakeSDLNotification() {}
 
 void OnAwakeSDLNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!application_manager_.resume_controller().is_suspended()) {
     return;

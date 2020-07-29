@@ -37,7 +37,7 @@
 
 namespace threads {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Utils")
+SDL_CREATE_LOGGERPTR( "Utils")
 
 PulseThreadDelegate::PulseThreadDelegate() : run_(false) {
   LOG4CXX_TRACE(logger_, "Creating QNX channel");

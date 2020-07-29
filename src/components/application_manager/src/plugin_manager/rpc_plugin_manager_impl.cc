@@ -6,7 +6,7 @@
 namespace application_manager {
 namespace plugin_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "PluginManager")
+SDL_CREATE_LOGGERPTR( "PluginManager")
 
 RPCPluginManagerImpl::RPCPluginManagerImpl(
     ApplicationManager& app_manager,

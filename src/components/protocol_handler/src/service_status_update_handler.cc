@@ -3,7 +3,7 @@
 
 namespace protocol_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ServiceStatusUpdateHandler")
+SDL_CREATE_LOGGERPTR( "ServiceStatusUpdateHandler")
 
 hmi_apis::Common_ServiceType::eType GetHMIServiceType(
     protocol_handler::ServiceType service_type) {
@@ -30,7 +30,7 @@ void ServiceStatusUpdateHandler::OnServiceUpdate(
   using namespace hmi_apis;
   typedef utils::Optional<Common_ServiceStatusUpdateReason::eType>
       UpdateReasonOptional;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto hmi_service_type = GetHMIServiceType(service_type);
 
   switch (service_status) {

@@ -50,7 +50,7 @@
 #include "app_service_rpc_plugin/commands/mobile/unpublish_app_service_request.h"
 #include "app_service_rpc_plugin/commands/mobile/unpublish_app_service_response.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "AppServiceRpcPlugin")
+SDL_CREATE_LOGGERPTR( "AppServiceRpcPlugin")
 
 namespace app_service_rpc_plugin {
 namespace strings = app_mngr::strings;
@@ -64,7 +64,7 @@ AppServiceMobileCommandFactory::AppServiceMobileCommandFactory(
     , rpc_service_(rpc_service)
     , hmi_capabilities_(hmi_capabilities)
     , policy_handler_(policy_handler) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 app_mngr::CommandSharedPtr AppServiceMobileCommandFactory::CreateCommand(

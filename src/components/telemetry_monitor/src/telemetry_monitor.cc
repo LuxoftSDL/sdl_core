@@ -47,7 +47,7 @@
 
 namespace telemetry_monitor {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TelemetryMonitor")
+SDL_CREATE_LOGGERPTR( "TelemetryMonitor")
 
 TelemetryMonitor::TelemetryMonitor(const std::string& server_address,
                                    uint16_t port)
@@ -64,7 +64,7 @@ void TelemetryMonitor::Start() {
 }
 
 void TelemetryMonitor::set_streamer(std::shared_ptr<Streamer> streamer) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (thread_ && !thread_->is_running()) {
     streamer_ = streamer;
     thread_->set_delegate(streamer_.get());
@@ -91,7 +91,7 @@ void TelemetryMonitor::Init(
     TelemetryObservable<application_manager::AMTelemetryObserver>* app_manager,
     TelemetryObservable<transport_manager::TMTelemetryObserver>*
         transport_manager) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(streamer_);
 
   app_manager->SetTelemetryObserver(&app_observer);
@@ -103,7 +103,7 @@ void TelemetryMonitor::Init(
 }
 
 void TelemetryMonitor::Stop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (thread_) {
     thread_->stop();
     thread_->join();
@@ -133,7 +133,7 @@ Streamer::~Streamer() {
 }
 
 void Streamer::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   Start();
   while (!stop_flag_) {
@@ -167,14 +167,14 @@ void Streamer::threadMain() {
 }
 
 void Streamer::exitThreadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   Stop();
   messages_.Shutdown();
   ThreadDelegate::exitThreadMain();
 }
 
 void Streamer::Start() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   server_socket_fd_ = socket(AF_INET, SOCK_STREAM, 0);
 
   if (0 >= server_socket_fd_) {
@@ -214,7 +214,7 @@ void Streamer::Start() {
 }
 
 void Streamer::ShutDownAndCloseSocket(int32_t socket_fd) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (0 < socket_fd) {
     LOG4CXX_INFO(logger_, "Shutdown socket");
     if (-1 == ::shutdown(socket_fd, SHUT_RDWR)) {
@@ -229,7 +229,7 @@ void Streamer::ShutDownAndCloseSocket(int32_t socket_fd) {
 }
 
 void Streamer::Stop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (stop_flag_) {
     LOG4CXX_WARN(logger_, "Already Stopped");
     return;
@@ -270,7 +270,7 @@ bool Streamer::IsReady() const {
 }
 
 bool Streamer::Send(const std::string& msg) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!IsReady()) {
     LOG4CXX_ERROR(logger_, " Socket is not ready");
     return false;

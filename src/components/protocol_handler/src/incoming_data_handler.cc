@@ -35,7 +35,7 @@
 
 namespace protocol_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ProtocolHandler")
+SDL_CREATE_LOGGERPTR( "ProtocolHandler")
 
 IncomingDataHandler::IncomingDataHandler()
     : header_(), validator_(NULL), last_portion_of_data_was_malformed_(false) {}
@@ -52,7 +52,7 @@ ProtocolFramePtrList IncomingDataHandler::ProcessData(
     const RawMessage& tm_message,
     RESULT_CODE& out_result,
     size_t* malformed_occurrence) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(malformed_occurrence);
   const transport_manager::ConnectionUID connection_id =
       tm_message.connection_key();
@@ -106,14 +106,14 @@ ProtocolFramePtrList IncomingDataHandler::ProcessData(
 
 void IncomingDataHandler::AddConnection(
     const transport_manager::ConnectionUID connection_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   // Add empty list of session to new connection
   connections_data_[connection_id] = ConnectionsDataMap::mapped_type();
 }
 
 void IncomingDataHandler::RemoveConnection(
     const transport_manager::ConnectionUID connection_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   connections_data_.erase(connection_id);
 }
 
@@ -140,7 +140,7 @@ RESULT_CODE IncomingDataHandler::CreateFrame(
     ProtocolFramePtrList& out_frames,
     size_t& malformed_occurrence,
     const transport_manager::ConnectionUID connection_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::vector<uint8_t>::iterator data_it = incoming_data.begin();
   size_t data_size = incoming_data.size();
 

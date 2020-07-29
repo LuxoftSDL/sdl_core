@@ -41,7 +41,7 @@ namespace connection_handler {
 
 using namespace sync_primitives;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "HeartBeatMonitor")
+SDL_CREATE_LOGGERPTR( "HeartBeatMonitor")
 
 HeartBeatMonitor::HeartBeatMonitor(uint32_t heartbeat_timeout_mseconds,
                                    Connection* connection)
@@ -106,7 +106,7 @@ void HeartBeatMonitor::AddSession(uint8_t session_id) {
 }
 
 void HeartBeatMonitor::RemoveSession(uint8_t session_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   AutoLock auto_lock(sessions_list_lock_);
 
   LOG4CXX_DEBUG(logger_,
@@ -120,7 +120,7 @@ void HeartBeatMonitor::RemoveSession(uint8_t session_id) {
 }
 
 void HeartBeatMonitor::KeepAlive(uint8_t session_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   AutoLock auto_lock(sessions_list_lock_);
 
   if (sessions_.end() != sessions_.find(session_id)) {
@@ -136,7 +136,7 @@ void HeartBeatMonitor::exitThreadMain() {
   // FIXME (dchmerev@luxoft.com): thread requested to stop should stop as soon
   // as possible,
   // not running one more iteration before actual stop
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   AutoLock main_lock(main_thread_lock_);
   run_ = false;
   heartbeat_monitor_.NotifyOne();
@@ -158,7 +158,7 @@ HeartBeatMonitor::SessionState::SessionState(
     uint32_t heartbeat_timeout_mseconds)
     : heartbeat_timeout_mseconds_(heartbeat_timeout_mseconds)
     , is_heartbeat_sent_(false) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   RefreshExpiration();
 }
 
@@ -189,7 +189,7 @@ bool HeartBeatMonitor::SessionState::IsReadyToClose() const {
 }
 
 void HeartBeatMonitor::SessionState::KeepAlive() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   is_heartbeat_sent_ = false;
   RefreshExpiration();
 }

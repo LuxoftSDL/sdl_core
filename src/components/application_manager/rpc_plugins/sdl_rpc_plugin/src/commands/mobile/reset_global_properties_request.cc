@@ -61,7 +61,7 @@ ResetGlobalPropertiesRequest::ResetGlobalPropertiesRequest(
 ResetGlobalPropertiesRequest::~ResetGlobalPropertiesRequest() {}
 
 void ResetGlobalPropertiesRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint32_t app_id =
       (*message_)[strings::params][strings::connection_key].asUInt();
@@ -266,7 +266,7 @@ bool ResetGlobalPropertiesRequest::ResetVrHelpTitleItems(
 }
 
 void ResetGlobalPropertiesRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
 
   switch (event.id()) {
@@ -315,7 +315,7 @@ bool ResetGlobalPropertiesRequest::Init() {
 bool ResetGlobalPropertiesRequest::PrepareResponseParameters(
     mobile_apis::Result::eType& out_result_code,
     std::string& out_response_info) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   bool result = false;

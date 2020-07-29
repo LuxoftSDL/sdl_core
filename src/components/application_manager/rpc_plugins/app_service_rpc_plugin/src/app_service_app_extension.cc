@@ -33,7 +33,7 @@
 #include "app_service_rpc_plugin/app_service_app_extension.h"
 #include "app_service_rpc_plugin/app_service_rpc_plugin.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "AppServiceRpcPlugin")
+SDL_CREATE_LOGGERPTR( "AppServiceRpcPlugin")
 
 namespace app_service_rpc_plugin {
 
@@ -44,11 +44,11 @@ AppServiceAppExtension::AppServiceAppExtension(
     : app_mngr::AppExtension(AppServiceAppExtensionUID)
     , plugin_(plugin)
     , app_(app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 AppServiceAppExtension::~AppServiceAppExtension() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 bool AppServiceAppExtension::SubscribeToAppService(
@@ -69,7 +69,7 @@ bool AppServiceAppExtension::UnsubscribeFromAppService(
 }
 
 void AppServiceAppExtension::UnsubscribeFromAppService() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   subscribed_data_.clear();
 }
 

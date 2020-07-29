@@ -44,7 +44,7 @@ static const std::string UIKey = "UI";
 static const std::string VRKey = "VR";
 static const std::string TTSKey = "TTS";
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ApplicationManager")
+SDL_CREATE_LOGGERPTR( "ApplicationManager")
 namespace application_manager {
 
 HMILanguageHandler::HMILanguageHandler(ApplicationManager& application_manager)
@@ -62,7 +62,7 @@ HMILanguageHandler::HMILanguageHandler(ApplicationManager& application_manager)
 void HMILanguageHandler::set_language_for(
     HMILanguageHandler::Interface interface,
     hmi_apis::Common_Language::eType language) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::string key = "UNKNOWN";
   switch (interface) {
     case INTERFACE_UI:
@@ -89,7 +89,7 @@ void HMILanguageHandler::set_language_for(
 
 hmi_apis::Common_Language::eType HMILanguageHandler::get_language_for(
     HMILanguageHandler::Interface interface) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace resumption;
   using namespace hmi_apis;
   std::string key = "UNKNOWN";
@@ -121,7 +121,7 @@ hmi_apis::Common_Language::eType HMILanguageHandler::get_language_for(
 }
 
 void HMILanguageHandler::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject msg = event.smart_object();
   switch (event.id()) {
     case hmi_apis::FunctionID::UI_GetLanguage:
@@ -157,7 +157,7 @@ void HMILanguageHandler::on_event(const event_engine::Event& event) {
 
 void HMILanguageHandler::set_handle_response_for(
     const smart_objects::SmartObject& request) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
   if (!request.keyExists(strings::params)) {
     LOG4CXX_ERROR(logger_,
@@ -223,7 +223,7 @@ void HMILanguageHandler::set_default_capabilities_languages(
 
 void HMILanguageHandler::SendOnLanguageChangeToMobile(
     const uint32_t connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObjectSPtr notification =
       std::make_shared<smart_objects::SmartObject>();
@@ -249,7 +249,7 @@ void HMILanguageHandler::SendOnLanguageChangeToMobile(
 }
 
 void HMILanguageHandler::VerifyWithPersistedLanguages() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
   const HMICapabilities& hmi_capabilities =
       application_manager_.hmi_capabilities();
@@ -292,7 +292,7 @@ void HMILanguageHandler::VerifyWithPersistedLanguages() {
 }
 
 void HMILanguageHandler::HandleWrongLanguageApp(const Apps::value_type& app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     sync_primitives::AutoLock lock(apps_lock_);
     Apps::iterator it = apps_.find(app.first);
@@ -324,7 +324,7 @@ void HMILanguageHandler::HandleWrongLanguageApp(const Apps::value_type& app) {
 }
 
 void HMILanguageHandler::CheckApplication(const Apps::value_type app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool is_need_handle_wrong_language = false;
   {
     sync_primitives::AutoLock lock(apps_lock_);
@@ -352,7 +352,7 @@ void HMILanguageHandler::Init(resumption::LastStateWrapperPtr value) {
 }
 
 void HMILanguageHandler::OnUnregisterApplication(uint32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(apps_lock_);
   apps_.erase(app_id);
 }

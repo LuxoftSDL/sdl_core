@@ -39,7 +39,7 @@
 
 namespace media_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "MediaManager")
+SDL_CREATE_LOGGERPTR( "MediaManager")
 
 GMainLoop* FromMicToFileRecorderThread::loop = NULL;
 
@@ -61,13 +61,13 @@ FromMicToFileRecorderThread::FromMicToFileRecorderThread(
     , outputFileName_(output_file)
     , samplingRate_(sampling_rate)
     , bitsPerSample_(bits_per_sample) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   set_record_duration(duration);
   // audio_type is not used as we always employ LPCM
 }
 
 FromMicToFileRecorderThread::~FromMicToFileRecorderThread() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (sleepThread_) {
     sleepThread_->join();
     delete sleepThread_->delegate();
@@ -77,12 +77,12 @@ FromMicToFileRecorderThread::~FromMicToFileRecorderThread() {
 
 void FromMicToFileRecorderThread::set_output_file(
     const std::string& output_file) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   outputFileName_ = output_file;
 }
 
 void FromMicToFileRecorderThread::set_record_duration(int32_t duration) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::stringstream stringStream;
   stringStream << duration / 1000;
@@ -90,7 +90,7 @@ void FromMicToFileRecorderThread::set_record_duration(int32_t duration) {
 }
 
 void FromMicToFileRecorderThread::initArgs() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   argv_ = new gchar*[argc_];
 
@@ -108,7 +108,7 @@ void FromMicToFileRecorderThread::initArgs() {
 }
 
 void FromMicToFileRecorderThread::deinitArgs() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (argv_) {
     for (int32_t i = 0; i < argc_; i++) {
@@ -120,7 +120,7 @@ void FromMicToFileRecorderThread::deinitArgs() {
 }
 
 void FromMicToFileRecorderThread::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   {
     sync_primitives::AutoLock auto_lock(stopFlagLock_);
@@ -296,7 +296,7 @@ void FromMicToFileRecorderThread::threadMain() {
 }
 
 std::string FromMicToFileRecorderThread::create_caps_string() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::stringstream ss;
   ss << "audio/x-raw";
@@ -355,7 +355,7 @@ void FromMicToFileRecorderThread::SleepThreadDelegate::threadMain() {
 }
 
 void FromMicToFileRecorderThread::exitThreadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (NULL != loop) {
     if (g_main_loop_is_running(loop)) {

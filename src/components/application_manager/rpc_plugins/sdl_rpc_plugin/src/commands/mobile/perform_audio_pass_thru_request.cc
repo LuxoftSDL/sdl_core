@@ -64,7 +64,7 @@ PerformAudioPassThruRequest::PerformAudioPassThruRequest(
 PerformAudioPassThruRequest::~PerformAudioPassThruRequest() {}
 
 void PerformAudioPassThruRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   FinishTTSSpeak();
   CommandRequestImpl::onTimeOut();
@@ -77,7 +77,7 @@ bool PerformAudioPassThruRequest::Init() {
 }
 
 void PerformAudioPassThruRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -135,7 +135,7 @@ void PerformAudioPassThruRequest::Run() {
 }
 
 void PerformAudioPassThruRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   const smart_objects::SmartObject& message = event.smart_object();
@@ -214,7 +214,7 @@ void PerformAudioPassThruRequest::on_event(const event_engine::Event& event) {
 
 const PerformAudioPassThruRequest::ResponseParams&
 PerformAudioPassThruRequest::PrepareResponseParameters() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   app_mngr::commands::ResponseInfo ui_perform_info(
       result_ui_, HmiInterfaces::HMI_INTERFACE_UI, application_manager_);
@@ -252,7 +252,7 @@ PerformAudioPassThruRequest::PrepareResponseParameters() {
 }
 
 void PerformAudioPassThruRequest::SendSpeakRequest() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   using namespace hmi_apis;
   using namespace smart_objects;
@@ -274,7 +274,7 @@ void PerformAudioPassThruRequest::SendSpeakRequest() {
 }
 
 void PerformAudioPassThruRequest::SendPerformAudioPassThruRequest() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject msg_params =
       smart_objects::SmartObject(smart_objects::SmartType_Map);
@@ -321,7 +321,7 @@ void PerformAudioPassThruRequest::SendPerformAudioPassThruRequest() {
 }
 
 void PerformAudioPassThruRequest::SendRecordStartNotification() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject msg_params =
       smart_objects::SmartObject(smart_objects::SmartType_Map);
@@ -331,7 +331,7 @@ void PerformAudioPassThruRequest::SendRecordStartNotification() {
 }
 
 void PerformAudioPassThruRequest::StartMicrophoneRecording() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint32_t app_id = connection_key();
   application_manager_.BeginAudioPassThru(app_id);
@@ -346,7 +346,7 @@ void PerformAudioPassThruRequest::StartMicrophoneRecording() {
 }
 
 bool PerformAudioPassThruRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   if ((*message_)[strings::msg_params].keyExists(strings::initial_prompt)) {
@@ -392,7 +392,7 @@ bool PerformAudioPassThruRequest::IsWhiteSpaceExist() {
 }
 
 void PerformAudioPassThruRequest::FinishTTSSpeak() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint32_t app_id = connection_key();
   if (application_manager_.EndAudioPassThru(app_id)) {
     LOG4CXX_DEBUG(logger_, "Stop AudioPassThru.");
@@ -446,7 +446,7 @@ PerformAudioPassThruRequest::PrepareAudioPassThruResultCodeForResponse(
 }
 
 bool PerformAudioPassThruRequest::IsWaitingHMIResponse() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return IsInterfaceAwaited(HmiInterfaces::HMI_INTERFACE_TTS) ||
          IsInterfaceAwaited(HmiInterfaces::HMI_INTERFACE_UI);
 }

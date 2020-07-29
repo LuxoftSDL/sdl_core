@@ -37,7 +37,7 @@
 
 namespace resumption {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Resumption")
+SDL_CREATE_LOGGERPTR( "Resumption")
 
 ResumptionData::ResumptionData(
     const application_manager::ApplicationManager& application_manager)
@@ -46,7 +46,7 @@ ResumptionData::ResumptionData(
 smart_objects::SmartObject ResumptionData::GetApplicationCommands(
     app_mngr::ApplicationConstSharedPtr application) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject commands_array(smart_objects::SmartType_Array);
   DCHECK_OR_RETURN(application, commands_array);
   if (!application) {
@@ -65,7 +65,7 @@ smart_objects::SmartObject ResumptionData::GetApplicationCommands(
 smart_objects::SmartObject ResumptionData::GetApplicationSubMenus(
     app_mngr::ApplicationConstSharedPtr application) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   DCHECK(application.get());
   smart_objects::SmartObject submenues_array =
@@ -87,7 +87,7 @@ smart_objects::SmartObject ResumptionData::GetApplicationSubMenus(
 smart_objects::SmartObject ResumptionData::GetApplicationInteractionChoiseSets(
     app_mngr::ApplicationConstSharedPtr application) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   DCHECK(application.get());
   smart_objects::SmartObject interaction_choice_set_array =
@@ -108,7 +108,7 @@ smart_objects::SmartObject ResumptionData::GetApplicationInteractionChoiseSets(
 smart_objects::SmartObject ResumptionData::GetApplicationGlobalProperties(
     app_mngr::ApplicationConstSharedPtr application) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   DCHECK(application.get());
   smart_objects::SmartObject global_properties =
@@ -138,7 +138,7 @@ smart_objects::SmartObject ResumptionData::GetApplicationGlobalProperties(
 smart_objects::SmartObject ResumptionData::GetApplicationSubscriptions(
     app_mngr::ApplicationConstSharedPtr application) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(application.get());
   smart_objects::SmartObject subscriptions =
       smart_objects::SmartObject(smart_objects::SmartType_Map);
@@ -168,7 +168,7 @@ smart_objects::SmartObject ResumptionData::GetApplicationSubscriptions(
 smart_objects::SmartObject ResumptionData::GetApplicationFiles(
     app_mngr::ApplicationConstSharedPtr application) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(application.get());
   LOG4CXX_TRACE(logger_, "ENTER app_id:" << application->app_id());
 
@@ -201,7 +201,7 @@ smart_objects::SmartObject ResumptionData::GetApplicationFiles(
 smart_objects::SmartObject ResumptionData::GetApplicationWidgetsInfo(
     app_mngr::ApplicationConstSharedPtr application) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject windows_info =
       smart_objects::SmartObject(smart_objects::SmartType_Array);
   DCHECK_OR_RETURN(application, windows_info);
@@ -226,7 +226,7 @@ smart_objects::SmartObject ResumptionData::CreateWindowInfoSO(
     const mobile_apis::WindowType::eType window_type,
     const app_mngr::WindowParamsMap& window_optional_params_map) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto window_info = smart_objects::SmartObject(smart_objects::SmartType_Map);
 
   window_info[strings::window_id] = window_id;
@@ -246,7 +246,7 @@ smart_objects::SmartObject ResumptionData::CreateWindowInfoSO(
 
 smart_objects::SmartObject ResumptionData::PointerToSmartObj(
     const smart_objects::SmartObject* ptr) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject temp;
   if (ptr != NULL) {
     temp = *ptr;

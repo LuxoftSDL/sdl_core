@@ -54,7 +54,7 @@ OnASAppServiceDataNotificationFromHMI::
     ~OnASAppServiceDataNotificationFromHMI() {}
 
 void OnASAppServiceDataNotificationFromHMI::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Received an OnAppServiceData from HMI");
 
   std::string service_id =

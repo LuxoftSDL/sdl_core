@@ -14,7 +14,7 @@ bool IsPredefinedApplication(const std::string& app_id) {
 namespace rpc {
 namespace policy_table_interface_base {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Policy")
+SDL_CREATE_LOGGERPTR( "Policy")
 
 bool VerifyPredefinedApp(ApplicationPolicies::value_type& app_policies) {
   const std::string& app_id = app_policies.first;

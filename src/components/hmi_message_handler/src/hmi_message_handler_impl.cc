@@ -35,7 +35,7 @@
 
 namespace hmi_message_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "HMIMessageHandler")
+SDL_CREATE_LOGGERPTR( "HMIMessageHandler")
 
 HMIMessageHandlerImpl::HMIMessageHandlerImpl(
     const HMIMessageHandlerSettings& settings)
@@ -51,14 +51,14 @@ HMIMessageHandlerImpl::HMIMessageHandlerImpl(
           threads::ThreadOptions(get_settings().thread_min_stack_size())) {}
 
 HMIMessageHandlerImpl::~HMIMessageHandlerImpl() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   messages_to_hmi_.Shutdown();
   messages_from_hmi_.Shutdown();
   set_message_observer(NULL);
 }
 
 void HMIMessageHandlerImpl::OnMessageReceived(MessageSharedPointer message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(observer_locker_);
   if (!observer_) {
     LOG4CXX_WARN(logger_, "No HMI message observer set!");
@@ -73,13 +73,13 @@ void HMIMessageHandlerImpl::SendMessageToHMI(MessageSharedPointer message) {
 }
 
 void HMIMessageHandlerImpl::set_message_observer(HMIMessageObserver* observer) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(observer_locker_);
   observer_ = observer;
 }
 
 void HMIMessageHandlerImpl::OnErrorSending(MessageSharedPointer message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(observer_locker_);
   if (!observer_) {
     LOG4CXX_WARN(logger_, "No HMI message observer set!");
@@ -89,7 +89,7 @@ void HMIMessageHandlerImpl::OnErrorSending(MessageSharedPointer message) {
 }
 
 void HMIMessageHandlerImpl::AddHMIMessageAdapter(HMIMessageAdapter* adapter) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!adapter) {
     LOG4CXX_WARN(logger_, "HMIMessageAdapter is not valid!");
     return;
@@ -100,7 +100,7 @@ void HMIMessageHandlerImpl::AddHMIMessageAdapter(HMIMessageAdapter* adapter) {
 
 void HMIMessageHandlerImpl::RemoveHMIMessageAdapter(
     HMIMessageAdapter* adapter) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!adapter) {
     LOG4CXX_WARN(logger_, "HMIMessageAdapter is not valid!");
     return;

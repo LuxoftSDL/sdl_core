@@ -58,7 +58,7 @@ DeleteInteractionChoiceSetRequest::DeleteInteractionChoiceSetRequest(
 DeleteInteractionChoiceSetRequest::~DeleteInteractionChoiceSetRequest() {}
 
 void DeleteInteractionChoiceSetRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -108,7 +108,7 @@ bool DeleteInteractionChoiceSetRequest::Init() {
 
 bool DeleteInteractionChoiceSetRequest::ChoiceSetInUse(
     ApplicationConstSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!app->is_perform_interaction_active()) {
     return false;
   }
@@ -137,7 +137,7 @@ bool DeleteInteractionChoiceSetRequest::ChoiceSetInUse(
 
 void DeleteInteractionChoiceSetRequest::SendVrDeleteCommand(
     application_manager::ApplicationSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const uint32_t choice_set_id =
       (*message_)[strings::msg_params][strings::interaction_choice_set_id]

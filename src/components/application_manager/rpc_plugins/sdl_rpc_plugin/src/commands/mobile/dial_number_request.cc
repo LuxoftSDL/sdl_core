@@ -56,7 +56,7 @@ DialNumberRequest::DialNumberRequest(
 DialNumberRequest::~DialNumberRequest() {}
 
 bool DialNumberRequest::Init() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   default_timeout_ = 0;
 
@@ -64,7 +64,7 @@ bool DialNumberRequest::Init() {
 }
 
 void DialNumberRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr application =
       application_manager_.application(connection_key());
@@ -102,7 +102,7 @@ void DialNumberRequest::Run() {
 }
 
 void DialNumberRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ApplicationSharedPtr application =
       application_manager_.application(connection_key());
 

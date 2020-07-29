@@ -50,7 +50,7 @@ BasicCommunicationGetSystemTimeRequest::BasicCommunicationGetSystemTimeRequest(
                    policy_handler) {}
 
 void BasicCommunicationGetSystemTimeRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   application_manager_.protocol_handler().NotifyOnGetSystemTimeFailed();
 }
 

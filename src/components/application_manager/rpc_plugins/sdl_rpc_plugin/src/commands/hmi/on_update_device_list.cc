@@ -51,7 +51,7 @@ OnUpdateDeviceList::OnUpdateDeviceList(
 OnUpdateDeviceList::~OnUpdateDeviceList() {}
 
 void OnUpdateDeviceList::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 }  // namespace commands

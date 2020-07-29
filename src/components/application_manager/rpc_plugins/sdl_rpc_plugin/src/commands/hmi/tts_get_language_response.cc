@@ -53,7 +53,7 @@ TTSGetLanguageResponse::TTSGetLanguageResponse(
 TTSGetLanguageResponse::~TTSGetLanguageResponse() {}
 
 void TTSGetLanguageResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace hmi_apis;
 
   const Common_Result::eType result_code = static_cast<Common_Result::eType>(

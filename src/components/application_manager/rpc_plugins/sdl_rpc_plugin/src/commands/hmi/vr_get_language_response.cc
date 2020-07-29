@@ -54,7 +54,7 @@ VRGetLanguageResponse::VRGetLanguageResponse(
 VRGetLanguageResponse::~VRGetLanguageResponse() {}
 
 void VRGetLanguageResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace hmi_apis;
   const Common_Result::eType result_code = static_cast<Common_Result::eType>(
       (*message_)[strings::params][hmi_response::code].asInt());

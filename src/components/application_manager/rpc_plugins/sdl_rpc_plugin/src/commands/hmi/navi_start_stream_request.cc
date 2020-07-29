@@ -53,7 +53,7 @@ NaviStartStreamRequest::NaviStartStreamRequest(
                    policy_handle)
     , EventObserver(application_manager.event_dispatcher())
     , retry_number_(0) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::pair<uint32_t, int32_t> stream_retry =
       application_manager_.get_settings().start_stream_retry_amount();
   default_timeout_ = stream_retry.second;
@@ -71,7 +71,7 @@ NaviStartStreamRequest::~NaviStartStreamRequest() {
 }
 
 void NaviStartStreamRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!app_mngr::commands::CheckAvailabilityHMIInterfaces(
           application_manager_, HmiInterfaces::HMI_INTERFACE_Navigation)) {
     LOG4CXX_INFO(logger_, "Interface Navi is not supported by system");
@@ -94,7 +94,7 @@ void NaviStartStreamRequest::Run() {
 
 void NaviStartStreamRequest::on_event(const event_engine::Event& event) {
   using namespace protocol_handler;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app =
       application_manager_.application_by_hmi_app(application_id());
@@ -141,12 +141,12 @@ void NaviStartStreamRequest::on_event(const event_engine::Event& event) {
 }
 
 void NaviStartStreamRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   RetryStartSession();
 }
 
 void NaviStartStreamRequest::RetryStartSession() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   application_manager_.TerminateRequest(
       connection_key(), correlation_id(), function_id());

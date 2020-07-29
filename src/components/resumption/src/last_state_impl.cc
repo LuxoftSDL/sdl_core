@@ -37,23 +37,23 @@
 
 namespace resumption {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Resumption")
+SDL_CREATE_LOGGERPTR( "Resumption")
 
 LastStateImpl::LastStateImpl(const std::string& app_storage_folder,
                              const std::string& app_info_storage)
     : app_storage_folder_(app_storage_folder)
     , app_info_storage_(app_info_storage) {
   LoadFromFileSystem();
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 LastStateImpl::~LastStateImpl() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   SaveToFileSystem();
 }
 
 void LastStateImpl::SaveStateToFileSystem() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::string styled_string;
   {
@@ -71,7 +71,7 @@ void LastStateImpl::SaveStateToFileSystem() {
 }
 
 void LastStateImpl::SaveToFileSystem() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::string styled_string;
   {
@@ -102,7 +102,7 @@ void LastStateImpl::LoadFromFileSystem() {
 }
 
 void LastStateImpl::RemoveFromFileSystem() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!file_system::DeleteFile(app_info_storage_)) {
     LOG4CXX_WARN(logger_, "Failed attempt to delete " << app_info_storage_);
   }

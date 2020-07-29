@@ -144,7 +144,7 @@ void ChangeRegistrationRequest::SendUIRequest(
 }
 
 void ChangeRegistrationRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace smart_objects;
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
@@ -244,7 +244,7 @@ void ChangeRegistrationRequest::Run() {
 }
 
 void ChangeRegistrationRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
 
   hmi_apis::FunctionID::eType event_id = event.id();
@@ -331,7 +331,7 @@ void CheckInfo(std::string& str) {
 
 bool ChangeRegistrationRequest::PrepareResponseParameters(
     mobile_apis::Result::eType& result_code, std::string& response_info) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
   const bool is_tts_succeeded_unsupported =
       Compare<hmi_apis::Common_Result::eType, EQ, ONE>(
@@ -578,7 +578,7 @@ bool ChangeRegistrationRequest::IsWhiteSpaceExist() {
 
 mobile_apis::Result::eType ChangeRegistrationRequest::CheckCoincidence(
     const connection_handler::DeviceHandle& device_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const smart_objects::SmartObject& msg_params =
       (*message_)[strings::msg_params];
@@ -661,7 +661,7 @@ mobile_apis::Result::eType ChangeRegistrationRequest::CheckCoincidence(
 
 bool ChangeRegistrationRequest::IsNicknameAllowed(
     const custom_str::CustomString& app_name) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {

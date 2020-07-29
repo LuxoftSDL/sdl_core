@@ -52,7 +52,7 @@ OnStartDeviceDiscovery::OnStartDeviceDiscovery(
 OnStartDeviceDiscovery::~OnStartDeviceDiscovery() {}
 
 void OnStartDeviceDiscovery::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   application_manager_.StartDevicesDiscovery();
 }

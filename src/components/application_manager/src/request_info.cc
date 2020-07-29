@@ -40,7 +40,7 @@ namespace application_manager {
 
 namespace request_controller {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RequestController")
+SDL_CREATE_LOGGERPTR( "RequestController")
 
 uint32_t RequestInfo::HmiConnectionKey = 0;
 
@@ -174,7 +174,7 @@ RequestInfoPtr RequestInfoSet::Front() {
 }
 
 RequestInfoPtr RequestInfoSet::FrontWithNotNullTimeout() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(pending_requests_lock_);
   RequestInfoPtr result;
   TimeSortedRequestInfoSet::iterator it = time_sorted_pending_requests_.begin();
@@ -225,7 +225,7 @@ bool RequestInfoSet::RemoveRequest(const RequestInfoPtr request_info) {
 
 uint32_t RequestInfoSet::RemoveRequests(
     const RequestInfoSet::AppIdCompararator& filter) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint32_t erased = 0;
 
   sync_primitives::AutoLock lock(pending_requests_lock_);
@@ -244,13 +244,13 @@ uint32_t RequestInfoSet::RemoveRequests(
 }
 
 uint32_t RequestInfoSet::RemoveByConnectionKey(uint32_t connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return RemoveRequests(
       AppIdCompararator(AppIdCompararator::Equal, connection_key));
 }
 
 uint32_t RequestInfoSet::RemoveMobileRequests() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return RemoveRequests(AppIdCompararator(AppIdCompararator::NotEqual,
                                           RequestInfo::HmiConnectionKey));
 }

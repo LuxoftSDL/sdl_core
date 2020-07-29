@@ -41,7 +41,7 @@
 #include "rc_rpc_plugin/rc_module_constants.h"
 #include "smart_objects/enum_schema_item.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule")
+SDL_CREATE_LOGGERPTR( "RemoteControlModule")
 
 namespace rc_rpc_plugin {
 namespace commands {
@@ -75,7 +75,7 @@ bool RCCommandRequest::IsInterfaceAvailable(
 }
 
 void RCCommandRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string module_type = ModuleType();
   SetResourceState(module_type, ResourceState::FREE);
   SendResponse(
@@ -83,7 +83,7 @@ void RCCommandRequest::onTimeOut() {
 }
 
 bool RCCommandRequest::CheckDriverConsent() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   app_mngr::ApplicationSharedPtr app =
       application_manager_.application(CommandRequestImpl::connection_key());
 
@@ -108,14 +108,14 @@ rc_rpc_plugin::TypeAccess RCCommandRequest::CheckModule(
 
 bool RCCommandRequest::IsModuleIdProvided(
     const smart_objects::SmartObject& hmi_response) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return hmi_response[app_mngr::strings::msg_params]
                      [message_params::kModuleData]
                          .keyExists(message_params::kModuleId);
 }
 
 void RCCommandRequest::SendDisallowed(rc_rpc_plugin::TypeAccess access) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::string info;
   if (rc_rpc_plugin::kDisallowed == access) {
     info = disallowed_info_.empty()
@@ -129,7 +129,7 @@ void RCCommandRequest::SendDisallowed(rc_rpc_plugin::TypeAccess access) {
 }
 
 void RCCommandRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   app_mngr::ApplicationSharedPtr app =
       application_manager_.application(CommandRequestImpl::connection_key());
 
@@ -178,7 +178,7 @@ void RCCommandRequest::Run() {
 }
 
 bool RCCommandRequest::AcquireResources() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string module_type = ModuleType();
   const std::string module_id = ModuleId();
 
@@ -211,7 +211,7 @@ bool RCCommandRequest::AcquireResources() {
 }
 
 void RCCommandRequest::on_event(const app_mngr::event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (event.id() == hmi_apis::FunctionID::RC_GetInteriorVehicleDataConsent) {
     ProcessAccessResponse(event);
@@ -223,7 +223,7 @@ void RCCommandRequest::on_event(const app_mngr::event_engine::Event& event) {
 
 void RCCommandRequest::ProcessAccessResponse(
     const app_mngr::event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   app_mngr::ApplicationSharedPtr app =
       application_manager_.application(CommandRequestImpl::connection_key());
   const std::string module_type = ModuleType();
@@ -275,7 +275,7 @@ void RCCommandRequest::ProcessConsentResult(const bool is_allowed,
                                             const std::string& module_type,
                                             const std::string& module_id,
                                             const uint32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (is_allowed) {
     SetResourceState(module_type, ResourceState::BUSY);
     Execute();  // run child's logic
@@ -293,7 +293,7 @@ void RCCommandRequest::ProcessConsentResult(const bool is_allowed,
 
 void RCCommandRequest::ProcessAskDriverMode(const std::string& module_type,
                                             const std::string& module_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto app =
       application_manager_.application(CommandRequestImpl::connection_key());
   const std::string policy_app_id = app->policy_app_id();
@@ -321,7 +321,7 @@ void RCCommandRequest::ProcessAskDriverMode(const std::string& module_type,
 void RCCommandRequest::SendGetUserConsent(
     const std::string& module_type,
     const smart_objects::SmartObject& module_ids) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   app_mngr::ApplicationSharedPtr app =
       application_manager_.application(CommandRequestImpl::connection_key());
   DCHECK(app);

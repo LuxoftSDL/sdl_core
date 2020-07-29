@@ -44,7 +44,7 @@ namespace custom_str = utils::custom_string;
 
 namespace {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Policy")
+SDL_CREATE_LOGGERPTR( "Policy")
 
 bool CompareStrings(const StringsValueType& first,
                     const StringsValueType& second) {
@@ -390,7 +390,7 @@ bool CheckAppPolicy::IsKnownAppication(
 
 bool CheckAppPolicy::IsAppRevoked(
     const AppPoliciesValueType& app_policy) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   // Application params are not initialized = application revoked
   // i.e. "123":null
   return app_policy.second.is_null();
@@ -677,7 +677,7 @@ bool CheckAppPolicy::IsRequestSubTypeChanged(
 
 bool CheckAppPolicy::IsAppPropertiesProvided(
     const AppPoliciesValueType& app_policy) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (app_policy.second.hybrid_app_preference.is_initialized() ||
       app_policy.second.endpoint.is_initialized() ||
       app_policy.second.enabled.is_initialized() ||
@@ -691,7 +691,7 @@ bool CheckAppPolicy::IsAppPropertiesProvided(
 
 bool CheckAppPolicy::IsAppPropertiesChanged(
     const AppPoliciesValueType& app_policy) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!IsAppPropertiesProvided(app_policy)) {
     return false;
@@ -745,7 +745,7 @@ bool CheckAppPolicy::IsAppPropertiesChanged(
 
 bool CheckAppPolicy::IsEncryptionRequiredFlagChanged(
     const AppPoliciesValueType& app_policy) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto get_app_encryption_needed =
       [](const std::string& policy_app_id,
          policy_table::ApplicationPolicies& policies)
@@ -1193,7 +1193,7 @@ void FillFunctionalGroupPermissions(
     FunctionalGroupNames& names,
     GroupConsent state,
     std::vector<FunctionalGroupPermission>& permissions) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   FunctionalGroupIDs::const_iterator it = ids.begin();
   FunctionalGroupIDs::const_iterator it_end = ids.end();
   for (; it != it_end; ++it) {
@@ -1213,7 +1213,7 @@ bool IsPredefinedApp(const AppPoliciesValueType& app) {
 
 FunctionalGroupIDs ExcludeSame(const FunctionalGroupIDs& from,
                                const FunctionalGroupIDs& what) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   FunctionalGroupIDs from_copy(from);
   FunctionalGroupIDs what_copy(what);
 
@@ -1235,7 +1235,7 @@ FunctionalGroupIDs ExcludeSame(const FunctionalGroupIDs& from,
 
 FunctionalGroupIDs Merge(const FunctionalGroupIDs& first,
                          const FunctionalGroupIDs& second) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   FunctionalGroupIDs first_copy(first);
   FunctionalGroupIDs second_copy(second);
 

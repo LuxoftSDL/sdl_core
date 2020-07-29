@@ -55,7 +55,7 @@
 
 namespace profile {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Profile")
+SDL_CREATE_LOGGERPTR( "Profile")
 
 char* ini_write_inst(const char* fname, uint8_t flag) {
   FILE* fp = 0;

@@ -53,7 +53,7 @@ ASGetAppServiceRecordsRequest::ASGetAppServiceRecordsRequest(
 ASGetAppServiceRecordsRequest::~ASGetAppServiceRecordsRequest() {}
 
 void ASGetAppServiceRecordsRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::string type;
   if ((*message_)[strings::msg_params].keyExists(strings::service_type)) {
     type = (*message_)[strings::msg_params][strings::service_type].asString();

@@ -54,7 +54,7 @@ OnIgnitionCycleOverNotification::OnIgnitionCycleOverNotification(
 OnIgnitionCycleOverNotification::~OnIgnitionCycleOverNotification() {}
 
 void OnIgnitionCycleOverNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   policy_handler_.OnIgnitionCycleOver();
 }
 

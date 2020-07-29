@@ -35,7 +35,7 @@
 #include "application_manager/message_helper.h"
 #include "utils/helpers.h"
 
-CREATE_LOGGERPTR_LOCAL(logger_, "RPCProtectionManagerImpl");
+SDL_CREATE_LOGGERPTR( "RPCProtectionManagerImpl");
 
 namespace application_manager {
 
@@ -51,14 +51,14 @@ std::vector<std::string> kExceptionRPCs = {"RegisterAppInterface",
 RPCProtectionManagerImpl::RPCProtectionManagerImpl(
     policy::PolicyHandlerInterface& policy_handler)
     : policy_handler_(policy_handler) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 bool RPCProtectionManagerImpl::CheckPolicyEncryptionFlag(
     const uint32_t function_id,
     const ApplicationSharedPtr app,
     const bool is_rpc_service_secure) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto& policy_encryption_flag_getter =
       policy_handler_.PolicyEncryptionFlagGetter();
   if (!policy_encryption_flag_getter) {
@@ -88,7 +88,7 @@ bool RPCProtectionManagerImpl::CheckPolicyEncryptionFlag(
 
 bool RPCProtectionManagerImpl::IsEncryptionRequiredByPolicy(
     const std::string& policy_app_id, const std::string& function_name) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto it = encrypted_rpcs_.find(policy_app_id);
 
@@ -107,7 +107,7 @@ bool RPCProtectionManagerImpl::IsEncryptionRequiredByPolicy(
 
 bool RPCProtectionManagerImpl::IsInEncryptionNeededCache(
     const uint32_t app_id, const uint32_t correlation_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "correlation_id is " << correlation_id);
 
   return encryption_needed_cache_.find(std::make_pair(
@@ -124,7 +124,7 @@ bool RPCProtectionManagerImpl::IsExceptionRPC(
 
 void RPCProtectionManagerImpl::AddToEncryptionNeededCache(
     const uint32_t app_id, const uint32_t correlation_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(message_needed_encryption_lock_);
 
   LOG4CXX_DEBUG(logger_, "Adding rpc with correlation id: " << correlation_id);
@@ -134,7 +134,7 @@ void RPCProtectionManagerImpl::AddToEncryptionNeededCache(
 
 void RPCProtectionManagerImpl::RemoveFromEncryptionNeededCache(
     const uint32_t app_id, const uint32_t correlation_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(message_needed_encryption_lock_);
 
   LOG4CXX_DEBUG(logger_,
@@ -144,7 +144,7 @@ void RPCProtectionManagerImpl::RemoveFromEncryptionNeededCache(
 }
 
 void RPCProtectionManagerImpl::OnPTUFinished(const bool ptu_result) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(encrypted_rpcs_lock_);
 
   if (ptu_result) {
@@ -161,7 +161,7 @@ void RPCProtectionManagerImpl::OnPTUFinished(const bool ptu_result) {
 }
 
 void RPCProtectionManagerImpl::SaveEncryptedRPC() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const auto policy_encryption_flag_getter =
       policy_handler_.PolicyEncryptionFlagGetter();
@@ -177,7 +177,7 @@ void RPCProtectionManagerImpl::SaveEncryptedRPC() {
 }
 
 void RPCProtectionManagerImpl::OnPTInited() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   encrypted_rpcs_.clear();
 
@@ -187,7 +187,7 @@ void RPCProtectionManagerImpl::OnPTInited() {
 RPCProtectionManagerImpl::FunctionNames
 RPCProtectionManagerImpl::GetEncryptedRPCsForApp(
     const std::string& policy_app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   FunctionNames encrypted_rpcs;
 
   const auto policy_encryption_flag_getter =

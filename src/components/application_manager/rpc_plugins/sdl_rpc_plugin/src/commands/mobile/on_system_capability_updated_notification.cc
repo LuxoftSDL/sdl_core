@@ -29,7 +29,7 @@ OnSystemCapabilityUpdatedNotification::
     ~OnSystemCapabilityUpdatedNotification() {}
 
 void OnSystemCapabilityUpdatedNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject& msg_params = (*message_)[strings::msg_params];
   const auto system_capability_type =

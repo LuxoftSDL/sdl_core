@@ -55,7 +55,7 @@
 
 namespace security_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "SecurityManager")
+SDL_CREATE_LOGGERPTR( "SecurityManager")
 
 uint32_t CryptoManagerImpl::instance_count_ = 0;
 sync_primitives::Lock CryptoManagerImpl::instance_lock_;
@@ -89,7 +89,7 @@ void free_ctx(SSL_CTX** ctx) {
 CryptoManagerImpl::CryptoManagerImpl(
     const std::shared_ptr<const CryptoManagerSettings> set)
     : settings_(set), context_(NULL) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(instance_lock_);
   instance_count_++;
   if (instance_count_ == 1) {
@@ -102,7 +102,7 @@ CryptoManagerImpl::CryptoManagerImpl(
 }
 
 CryptoManagerImpl::~CryptoManagerImpl() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(instance_lock_);
   LOG4CXX_DEBUG(logger_, "Deinitilization");
   if (!context_) {
@@ -119,7 +119,7 @@ CryptoManagerImpl::~CryptoManagerImpl() {
 }
 
 bool CryptoManagerImpl::AreForceProtectionSettingsCorrect() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::vector<int>& forced_unprotected_services =
       get_settings().force_unprotected_service();
   const std::vector<int>& forced_protected_services =
@@ -140,7 +140,7 @@ bool CryptoManagerImpl::AreForceProtectionSettingsCorrect() const {
 }
 
 bool CryptoManagerImpl::Init() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const Mode mode = get_settings().security_manager_mode();
   if (!AreForceProtectionSettingsCorrect()) {
@@ -282,7 +282,7 @@ bool CryptoManagerImpl::Init() {
 }
 
 bool CryptoManagerImpl::OnCertificateUpdated(const std::string& data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(crypto_manager_lock_);
   if (!context_) {
     LOG4CXX_WARN(logger_, "Not initialized");
@@ -308,7 +308,7 @@ bool CryptoManagerImpl::OnCertificateUpdated(const std::string& data) {
 }
 
 SSLContext* CryptoManagerImpl::CreateSSLContext() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(crypto_manager_lock_);
   if (NULL == context_) {
     return NULL;
@@ -343,7 +343,7 @@ std::string CryptoManagerImpl::LastError() const {
 
 bool CryptoManagerImpl::IsCertificateUpdateRequired(
     const time_t system_time, const time_t certificates_time) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const double seconds = difftime(certificates_time, system_time);
 
@@ -367,7 +367,7 @@ const CryptoManagerSettings& CryptoManagerImpl::get_settings() const {
 
 bool CryptoManagerImpl::SaveCertificateData(
     const std::string& cert_data) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (cert_data.empty()) {
     LOG4CXX_WARN(logger_, "Empty certificate");
@@ -409,7 +409,7 @@ bool CryptoManagerImpl::SaveCertificateData(
 
 bool CryptoManagerImpl::UpdateModuleCertificateData(X509* certificate,
                                                     EVP_PKEY* key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (certificate) {
     if (!SSL_CTX_use_certificate(context_, certificate)) {
       LOG4CXX_WARN(logger_, "Could not use certificate: " << LastError());
@@ -434,7 +434,7 @@ bool CryptoManagerImpl::UpdateModuleCertificateData(X509* certificate,
 }
 
 X509* CryptoManagerImpl::LoadModuleCertificateFromFile() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const std::string cert_path = get_settings().module_cert_path();
   BIO* bio_cert = BIO_new_file(cert_path.c_str(), "r");
@@ -460,7 +460,7 @@ X509* CryptoManagerImpl::LoadModuleCertificateFromFile() {
 }
 
 EVP_PKEY* CryptoManagerImpl::LoadModulePrivateKeyFromFile() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const std::string key_path = get_settings().module_key_path();
   BIO* bio_key = BIO_new_file(key_path.c_str(), "r");
@@ -485,7 +485,7 @@ EVP_PKEY* CryptoManagerImpl::LoadModulePrivateKeyFromFile() {
 }
 
 bool CryptoManagerImpl::SaveModuleCertificateToFile(X509* certificate) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!certificate) {
     LOG4CXX_WARN(logger_, "Empty certificate. Saving will be skipped");
@@ -513,7 +513,7 @@ bool CryptoManagerImpl::SaveModuleCertificateToFile(X509* certificate) const {
 }
 
 bool CryptoManagerImpl::SaveModuleKeyToFile(EVP_PKEY* key) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!key) {
     LOG4CXX_WARN(logger_, "Empty private key. Saving will be skipped");

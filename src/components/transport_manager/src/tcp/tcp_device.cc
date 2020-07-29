@@ -36,14 +36,14 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 TcpDevice::TcpDevice(const in_addr_t& in_addr, const std::string& name)
     : Device(name, name)
     , applications_mutex_()
     , in_addr_(in_addr)
     , last_handle_(0) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 #if defined(ENABLE_IAP2EMULATION)
@@ -54,7 +54,7 @@ TcpDevice::TcpDevice(const in_addr_t& in_addr,
     , applications_mutex_()
     , in_addr_(in_addr)
     , last_handle_(0) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "Device created with transport switch emulation support.");
   LOG4CXX_DEBUG(
@@ -64,7 +64,7 @@ TcpDevice::TcpDevice(const in_addr_t& in_addr,
 #endif  // ENABLE_IAP2EMULATION
 
 bool TcpDevice::IsSameAs(const Device* other) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Device: " << other);
   const TcpDevice* other_tcp_device = dynamic_cast<const TcpDevice*>(other);
 
@@ -80,7 +80,7 @@ bool TcpDevice::IsSameAs(const Device* other) const {
 }
 
 ApplicationList TcpDevice::GetApplicationList() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock locker(applications_mutex_);
   ApplicationList app_list;
   for (std::map<ApplicationHandle, Application>::const_iterator it =
@@ -93,7 +93,7 @@ ApplicationList TcpDevice::GetApplicationList() const {
 }
 
 ApplicationHandle TcpDevice::AddIncomingApplication(int socket_fd) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Socket_fd: " << socket_fd);
   Application app;
   app.incoming = true;
@@ -107,7 +107,7 @@ ApplicationHandle TcpDevice::AddIncomingApplication(int socket_fd) {
 }
 
 ApplicationHandle TcpDevice::AddDiscoveredApplication(int port) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Port " << port);
   Application app;
   app.incoming = false;
@@ -121,18 +121,18 @@ ApplicationHandle TcpDevice::AddDiscoveredApplication(int port) {
 }
 
 void TcpDevice::RemoveApplication(const ApplicationHandle app_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "ApplicationHandle: " << app_handle);
   sync_primitives::AutoLock locker(applications_mutex_);
   applications_.erase(app_handle);
 }
 
 TcpDevice::~TcpDevice() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 int TcpDevice::GetApplicationSocket(const ApplicationHandle app_handle) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "ApplicationHandle: " << app_handle);
   std::map<ApplicationHandle, Application>::const_iterator it =
       applications_.find(app_handle);
@@ -149,7 +149,7 @@ int TcpDevice::GetApplicationSocket(const ApplicationHandle app_handle) const {
 }
 
 int TcpDevice::GetApplicationPort(const ApplicationHandle app_handle) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "ApplicationHandle: " << app_handle);
   std::map<ApplicationHandle, Application>::const_iterator it =
       applications_.find(app_handle);

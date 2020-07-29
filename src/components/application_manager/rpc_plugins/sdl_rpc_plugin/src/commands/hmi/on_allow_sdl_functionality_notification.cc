@@ -54,7 +54,7 @@ OnAllowSDLFunctionalityNotification::OnAllowSDLFunctionalityNotification(
 OnAllowSDLFunctionalityNotification::~OnAllowSDLFunctionalityNotification() {}
 
 void OnAllowSDLFunctionalityNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::string device_id;
   if ((*message_)[strings::msg_params].keyExists("device")) {
     device_id = (*message_)[strings::msg_params]["device"]["id"].asString();

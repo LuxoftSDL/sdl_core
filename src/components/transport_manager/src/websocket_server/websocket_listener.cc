@@ -5,7 +5,7 @@
 
 namespace transport_manager {
 namespace transport_adapter {
-CREATE_LOGGERPTR_GLOBAL(logger_, "WebSocketListener")
+SDL_CREATE_LOGGERPTR( "WebSocketListener")
 
 WebSocketListener::WebSocketListener(TransportAdapterController* controller,
                                      const TransportManagerSettings& settings,
@@ -29,7 +29,7 @@ WebSocketListener::~WebSocketListener() {
 }
 
 TransportAdapter::Error WebSocketListener::Init() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto old_shutdown_value = shutdown_.exchange(false);
   if (old_shutdown_value) {
     ioc_.restart();
@@ -39,12 +39,12 @@ TransportAdapter::Error WebSocketListener::Init() {
 }
 
 void WebSocketListener::Terminate() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   Shutdown();
 }
 
 TransportAdapter::Error WebSocketListener::StartListening() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (acceptor_.is_open()) {
     return TransportAdapter::OK;
   }
@@ -109,7 +109,7 @@ TransportAdapter::Error WebSocketListener::StartListening() {
 
 #ifdef ENABLE_SECURITY
 TransportAdapter::Error WebSocketListener::AddCertificateAuthority() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const auto cert_path = settings_.ws_server_cert_path();
   LOG4CXX_DEBUG(logger_, "Path to certificate : " << cert_path);
@@ -174,7 +174,7 @@ TransportAdapter::Error WebSocketListener::AddCertificateAuthority() {
 #endif  // ENABLE_SECURITY
 
 bool WebSocketListener::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const bool is_connection_open = WaitForConnection();
   if (is_connection_open) {
     boost::asio::post(*io_pool_.get(), [&]() { ioc_.run(); });
@@ -186,7 +186,7 @@ bool WebSocketListener::Run() {
 }
 
 bool WebSocketListener::WaitForConnection() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!shutdown_ && acceptor_.is_open()) {
     acceptor_.async_accept(
         socket_,
@@ -202,7 +202,7 @@ void WebSocketListener::ProcessConnection(
     std::shared_ptr<WebSocketConnection<WebSocketSession<> > > connection,
     const DeviceSptr device,
     const ApplicationHandle app_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   controller_->ConnectionCreated(
       connection, device->unique_device_id(), app_handle);
 
@@ -223,7 +223,7 @@ void WebSocketListener::ProcessConnection(
     std::shared_ptr<WebSocketConnection<WebSocketSecureSession<> > > connection,
     const DeviceSptr device,
     const ApplicationHandle app_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   controller_->ConnectionCreated(
       connection, device->unique_device_id(), app_handle);
 
@@ -240,7 +240,7 @@ void WebSocketListener::ProcessConnection(
 #endif  // ENABLE_SECURITY
 
 void WebSocketListener::StartSession(boost::system::error_code ec) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (ec) {
     std::string str_err = "ErrorAccept: " + ec.message();
     LOG4CXX_ERROR(logger_, str_err);
@@ -279,7 +279,7 @@ void WebSocketListener::StartSession(boost::system::error_code ec) {
 }
 
 void WebSocketListener::Shutdown() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (false == shutdown_.exchange(true)) {
     ioc_.stop();
     socket_.close();

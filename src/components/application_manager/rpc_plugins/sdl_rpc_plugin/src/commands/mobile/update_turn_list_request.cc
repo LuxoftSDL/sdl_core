@@ -63,7 +63,7 @@ UpdateTurnListRequest::UpdateTurnListRequest(
 UpdateTurnListRequest::~UpdateTurnListRequest() {}
 
 void UpdateTurnListRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(
       (*message_)[strings::params][strings::connection_key].asUInt());
@@ -158,7 +158,7 @@ void UpdateTurnListRequest::Run() {
 }
 
 void UpdateTurnListRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
 
   switch (event.id()) {
@@ -204,7 +204,7 @@ bool UpdateTurnListRequest::CheckTurnListArray() {
 }
 
 bool UpdateTurnListRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   if ((*message_)[strings::msg_params].keyExists(strings::turn_list)) {

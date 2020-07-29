@@ -35,7 +35,7 @@
 
 namespace media_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger, "StreamerAdapter")
+SDL_CREATE_LOGGERPTR( "StreamerAdapter")
 
 StreamerAdapter::StreamerAdapter(Streamer* const streamer)
     : current_application_(0), messages_(), streamer_(streamer), thread_(NULL) {
@@ -53,7 +53,7 @@ StreamerAdapter::~StreamerAdapter() {
 }
 
 void StreamerAdapter::StartActivity(int32_t application_key) {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
   if (is_app_performing_activity(application_key)) {
     LOG4CXX_WARN(logger,
                  "Activity for application: " << application_key
@@ -79,7 +79,7 @@ size_t StreamerAdapter::GetMsgQueueSize() {
 }
 
 void StreamerAdapter::StopActivity(int32_t application_key) {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
   if (!is_app_performing_activity(application_key)) {
     LOG4CXX_WARN(logger,
                  "Activity for application: " << application_key
@@ -100,7 +100,7 @@ void StreamerAdapter::StopActivity(int32_t application_key) {
 
 void StreamerAdapter::SendData(int32_t application_key,
                                const ::protocol_handler::RawMessagePtr msg) {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
   if (!is_app_performing_activity(application_key)) {
     LOG4CXX_ERROR(logger,
                   "Activity for application: " << application_key
@@ -123,7 +123,7 @@ StreamerAdapter::Streamer::Streamer(StreamerAdapter* const adapter)
 StreamerAdapter::Streamer::~Streamer() {}
 
 void StreamerAdapter::Streamer::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
   if (!adapter_) {
     LOG4CXX_ERROR(logger, "Null pointer to adapter");
     return;
@@ -169,7 +169,7 @@ void StreamerAdapter::Streamer::threadMain() {
 }
 
 void StreamerAdapter::Streamer::exitThreadMain() {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
   stop_flag_ = true;
   if (adapter_) {
     adapter_->messages_.Shutdown();

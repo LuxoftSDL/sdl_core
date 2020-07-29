@@ -54,13 +54,13 @@ UIIsReadyRequest::UIIsReadyRequest(
 UIIsReadyRequest::~UIIsReadyRequest() {}
 
 void UIIsReadyRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   subscribe_on_event(hmi_apis::FunctionID::UI_IsReady, correlation_id());
   SendRequest();
 }
 
 void UIIsReadyRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
   switch (event.id()) {
     case hmi_apis::FunctionID::UI_IsReady: {

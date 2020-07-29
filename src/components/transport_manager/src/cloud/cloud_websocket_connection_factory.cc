@@ -43,7 +43,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 CloudWebsocketConnectionFactory::CloudWebsocketConnectionFactory(
     TransportAdapterController* controller)
@@ -55,7 +55,7 @@ TransportAdapter::Error CloudWebsocketConnectionFactory::Init() {
 
 TransportAdapter::Error CloudWebsocketConnectionFactory::CreateConnection(
     const DeviceUID& device_uid, const ApplicationHandle& app_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto connection = controller_->FindPendingConnection(device_uid, app_handle);
 
   std::shared_ptr<WebsocketClientConnection> ws_connection =

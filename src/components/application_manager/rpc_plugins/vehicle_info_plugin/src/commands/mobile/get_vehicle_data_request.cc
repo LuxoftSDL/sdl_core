@@ -62,7 +62,7 @@ GetVehicleDataRequest::GetVehicleDataRequest(
 GetVehicleDataRequest::~GetVehicleDataRequest() {}
 
 void GetVehicleDataRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto app = application_manager_.application(connection_key());
 
@@ -110,7 +110,7 @@ void GetVehicleDataRequest::Run() {
 }
 
 void GetVehicleDataRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject message = event.smart_object();
 
   switch (event.id()) {

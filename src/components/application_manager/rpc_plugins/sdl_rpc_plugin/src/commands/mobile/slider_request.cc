@@ -72,7 +72,7 @@ bool SliderRequest::Init() {
 }
 
 void SliderRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr application = application_manager_.application(
       (*message_)[strings::params][strings::connection_key].asUInt());
@@ -126,7 +126,7 @@ void SliderRequest::Run() {
 }
 
 void SliderRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
   using namespace smart_objects;
   using namespace hmi_apis;
@@ -181,7 +181,7 @@ void SliderRequest::on_event(const event_engine::Event& event) {
 }
 
 bool SliderRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   str = (*message_)[strings::msg_params][strings::slider_header].asCharArray();

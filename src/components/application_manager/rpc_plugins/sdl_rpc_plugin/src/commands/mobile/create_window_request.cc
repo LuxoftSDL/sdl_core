@@ -132,7 +132,7 @@ app_mngr::WindowID CreateWindowRequest::window_id() const {
 }
 
 void CreateWindowRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const auto application = application_manager_.application(connection_key());
 
@@ -198,7 +198,7 @@ void CreateWindowRequest::Run() {
 }
 
 void CreateWindowRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (hmi_apis::FunctionID::UI_CreateWindow != event.id()) {
     LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
@@ -247,7 +247,7 @@ bool CreateWindowRequest::Init() {
 
 bool CreateWindowRequest::IsWindowForAssociatedServiceCreated(
     app_mngr::ApplicationSharedPtr app) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const auto window_optional_params_map =
       app->window_optional_params_map().GetData();
@@ -285,7 +285,7 @@ bool CreateWindowRequest::IsWindowForAssociatedServiceCreated(
 
 bool CreateWindowRequest::DoesExceedMaxAllowedWindows(
     app_mngr::ApplicationSharedPtr app) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto get_current_number_of_windows =
       [&app](const mobile_apis::WindowType::eType window_type) -> size_t {
@@ -351,7 +351,7 @@ bool CreateWindowRequest::DoesExceedMaxAllowedWindows(
 
 bool CreateWindowRequest::ValidateWindowCreation(
     app_mngr::ApplicationSharedPtr app, const WindowID window_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (DoesExceedMaxAllowedWindows(app)) {
     std::string info("Maximum allowed amount of windows is exceeded");

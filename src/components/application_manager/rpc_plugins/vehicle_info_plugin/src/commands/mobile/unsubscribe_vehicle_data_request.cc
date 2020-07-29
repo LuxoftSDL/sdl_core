@@ -60,7 +60,7 @@ UnsubscribeVehicleDataRequest::UnsubscribeVehicleDataRequest(
 UnsubscribeVehicleDataRequest::~UnsubscribeVehicleDataRequest() {}
 
 void UnsubscribeVehicleDataRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -177,7 +177,7 @@ void UnsubscribeVehicleDataRequest::Run() {
 }
 
 void UnsubscribeVehicleDataRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   const smart_objects::SmartObject& message = event.smart_object();
@@ -260,7 +260,7 @@ bool UnsubscribeVehicleDataRequest::Init() {
 
 bool UnsubscribeVehicleDataRequest::IsSomeoneSubscribedFor(
     const std::string& param_name) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto conn_key = connection_key();
   auto subscribed_to_ivi = [&param_name,
                             &conn_key](const ApplicationSharedPtr app) {
@@ -280,7 +280,7 @@ bool UnsubscribeVehicleDataRequest::IsSomeoneSubscribedFor(
 
 void UnsubscribeVehicleDataRequest::AddAlreadyUnsubscribedVI(
     smart_objects::SmartObject& response) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace mobile_apis;
 
   for (const auto& item : vi_already_unsubscribed_by_this_app_) {

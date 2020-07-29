@@ -36,7 +36,7 @@
 #include "utils/logger_status.h"
 
 void deinit_logger() {
-  CREATE_LOGGERPTR_LOCAL(logger_, "Utils")
+  SDL_CREATE_LOGGERPTR( "Utils")
   LOG4CXX_DEBUG(logger_, "Logger deinitialization");
   logger::set_logs_enabled(false);
   log4cxx::LoggerPtr rootLogger = log4cxx::Logger::getRootLogger();

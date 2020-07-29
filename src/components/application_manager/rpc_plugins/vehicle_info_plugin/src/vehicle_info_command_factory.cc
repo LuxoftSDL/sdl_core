@@ -32,7 +32,7 @@
 
 #include "vehicle_info_plugin/vehicle_info_command_factory.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "VehicleInfoPlugin")
+SDL_CREATE_LOGGERPTR( "VehicleInfoPlugin")
 
 namespace vehicle_info_plugin {
 
@@ -57,7 +57,7 @@ VehicleInfoCommandFactory::VehicleInfoCommandFactory(
                                               hmi_capabilities,
                                               policy_handler,
                                               custom_vehicle_data_manager)) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 VehicleInfoCommandFactory::~VehicleInfoCommandFactory() {}

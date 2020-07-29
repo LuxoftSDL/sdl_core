@@ -63,7 +63,7 @@ OnSystemRequestNotification::OnSystemRequestNotification(
 OnSystemRequestNotification::~OnSystemRequestNotification() {}
 
 void OnSystemRequestNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace application_manager;
   using namespace mobile_apis;
   using namespace helpers;
@@ -165,7 +165,7 @@ void OnSystemRequestNotification::Run() {
 
 #ifdef PROPRIETARY_MODE
 void OnSystemRequestNotification::AddHeader(BinaryMessage& message) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const uint32_t timeout = policy_handler_.TimeoutExchangeSec();
 
   size_t content_length;

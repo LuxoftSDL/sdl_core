@@ -54,7 +54,7 @@ BCGetAppPropertiesRequest::BCGetAppPropertiesRequest(
 void BCGetAppPropertiesRequest::FillAppProperties(
     const std::string& policy_app_id,
     smart_objects::SmartObject& out_properties) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   policy::AppProperties app_properties;
   const bool result =
@@ -98,7 +98,7 @@ void BCGetAppPropertiesRequest::FillAppProperties(
 }
 
 void BCGetAppPropertiesRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const auto& msg_params = (*message_)[strings::msg_params];
   smart_objects::SmartObject response_params(smart_objects::SmartType_Map);

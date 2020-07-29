@@ -35,6 +35,6 @@
 #include "utils/logger.h"
 
 namespace main_namespace {
-CREATE_LOGGERPTR_GLOBAL(logger_, "SDLMain")
+SDL_CREATE_LOGGERPTR( "SDLMain")
 
 }  // namespace main_namespace

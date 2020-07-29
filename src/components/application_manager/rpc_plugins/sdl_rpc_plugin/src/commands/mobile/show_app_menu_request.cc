@@ -56,7 +56,7 @@ ShowAppMenuRequest::~ShowAppMenuRequest() {}
 
 void ShowAppMenuRequest::Run() {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -103,7 +103,7 @@ void ShowAppMenuRequest::Run() {
 
 void ShowAppMenuRequest::on_event(const app_mngr::event_engine::Event& event) {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
 
   switch (event.id()) {

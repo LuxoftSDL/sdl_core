@@ -51,7 +51,7 @@ Copyright (c) 2018, Ford Motor Company
 namespace sdl_rpc_plugin {
 using namespace application_manager;
 
-CREATE_LOGGERPTR_LOCAL(logger_, "ApplicationManager")
+SDL_CREATE_LOGGERPTR( "ApplicationManager")
 namespace {
 
 #ifdef ENABLE_LOG
@@ -80,7 +80,7 @@ class QueryAppsDataValidator {
       : data_(object), manager_(manager) {}
 
   bool Validate() {
-    LOG4CXX_AUTO_TRACE(logger_);
+    SDL_AUTO_TRACE();
     if (!data_.isValid()) {
       LOG4CXX_ERROR(logger_,
                     kQueryAppsValidationFailedPrefix
@@ -449,7 +449,7 @@ SystemRequest::SystemRequest(
 SystemRequest::~SystemRequest() {}
 
 void SystemRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr application =
       application_manager_.application(connection_key());
@@ -662,7 +662,7 @@ void SystemRequest::Run() {
 }
 
 void SystemRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   const smart_objects::SmartObject& message = event.smart_object();

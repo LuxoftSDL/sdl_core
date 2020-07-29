@@ -52,7 +52,7 @@
 #include "vehicle_info_plugin/commands/mobile/unsubscribe_vehicle_data_request.h"
 #include "vehicle_info_plugin/commands/mobile/unsubscribe_vehicle_data_response.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "VehicleInfoPlugin")
+SDL_CREATE_LOGGERPTR( "VehicleInfoPlugin")
 
 namespace vehicle_info_plugin {
 namespace strings = app_mngr::strings;
@@ -108,7 +108,7 @@ struct VehicleInfoCommandCreatorFactory {
 
   template <typename VehicleInfoCommandType>
   application_manager::CommandCreator& GetCreator() {
-    LOG4CXX_AUTO_TRACE(logger_);
+    SDL_AUTO_TRACE();
     static VehicleInfoCommandCreator<VehicleInfoCommandType> res(params_);
     return res;
   }
@@ -126,7 +126,7 @@ VehicleInfoMobileCommandFactory::VehicleInfoMobileCommandFactory(
     , hmi_capabilities_(hmi_capabilities)
     , policy_handler_(policy_handler)
     , custom_vehicle_data_manager_(custom_vehicle_data_manager) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 app_mngr::CommandSharedPtr VehicleInfoMobileCommandFactory::CreateCommand(

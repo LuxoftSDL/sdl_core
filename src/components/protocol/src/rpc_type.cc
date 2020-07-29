@@ -37,7 +37,7 @@
 
 namespace protocol_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ProtocolHandler")
+SDL_CREATE_LOGGERPTR( "ProtocolHandler")
 
 namespace {
 bool IsSupported(RpcType rpc_type) {

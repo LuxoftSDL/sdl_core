@@ -52,7 +52,7 @@ UIShowAppMenuResponse::UIShowAppMenuResponse(
 UIShowAppMenuResponse::~UIShowAppMenuResponse() {}
 
 void UIShowAppMenuResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   app_mngr::event_engine::Event event(hmi_apis::FunctionID::UI_ShowAppMenu);
   event.set_smart_object(*message_);

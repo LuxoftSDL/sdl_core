@@ -265,7 +265,7 @@
 namespace sdl_rpc_plugin {
 using namespace application_manager;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "HMICommandFactory")
+SDL_CREATE_LOGGERPTR( "HMICommandFactory")
 
 HMICommandFactory::HMICommandFactory(
     ApplicationManager& application_manager,

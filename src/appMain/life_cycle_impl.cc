@@ -53,7 +53,7 @@ using threads::Thread;
 
 namespace main_namespace {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "SDLMain")
+SDL_CREATE_LOGGERPTR( "SDLMain")
 
 LifeCycleImpl::LifeCycleImpl(const profile::Profile& profile)
     : transport_manager_(NULL)
@@ -78,7 +78,7 @@ LifeCycleImpl::LifeCycleImpl(const profile::Profile& profile)
 }
 
 bool LifeCycleImpl::StartComponents() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(!last_state_wrapper_);
 
   auto last_state = std::make_shared<resumption::LastStateImpl>(
@@ -193,7 +193,7 @@ bool LifeCycleImpl::StartComponents() {
 }
 
 void LifeCycleImpl::LowVoltage() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   transport_manager_->PerformActionOnClients(
       transport_manager::TransportAction::kListeningOff);
   transport_manager_->StopEventsProcessing();
@@ -202,12 +202,12 @@ void LifeCycleImpl::LowVoltage() {
 }
 
 void LifeCycleImpl::IgnitionOff() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   kill(getpid(), SIGINT);
 }
 
 void LifeCycleImpl::WakeUp() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   transport_manager_->Reinit();
   transport_manager_->PerformActionOnClients(
       transport_manager::TransportAction::kListeningOn);
@@ -242,7 +242,7 @@ void sig_handler(int sig) {
       break;
     case SIGSEGV:
       LOG4CXX_DEBUG(logger_, "SIGSEGV signal has been caught");
-      FLUSH_LOGGER();
+      SDL_FLUSH_LOGGER()();
       // exit need to prevent endless sending SIGSEGV
       // http://stackoverflow.com/questions/2663456/how-to-write-a-signal-handler-to-catch-sigsegv
       abort();
@@ -254,7 +254,7 @@ void sig_handler(int sig) {
 }  //  namespace
 
 void LifeCycleImpl::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   // Register signal handlers and wait sys signals
   // from OS
   if (!utils::Signals::WaitTerminationSignals(&sig_handler)) {
@@ -263,7 +263,7 @@ void LifeCycleImpl::Run() {
 }
 
 void LifeCycleImpl::StopComponents() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   DCHECK_OR_RETURN_VOID(hmi_handler_);
   hmi_handler_->set_message_observer(NULL);

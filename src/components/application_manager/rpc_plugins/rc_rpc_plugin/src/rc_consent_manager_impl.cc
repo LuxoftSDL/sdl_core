@@ -45,7 +45,7 @@
 namespace rc_rpc_plugin {
 namespace app_mngr = application_manager;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RCConsentManager")
+SDL_CREATE_LOGGERPTR( "RCConsentManager")
 
 RCConsentManagerImpl::RCConsentManagerImpl(
     resumption::LastStateWrapperPtr last_state,
@@ -59,7 +59,7 @@ void RCConsentManagerImpl::SaveModuleConsents(
     const std::string& policy_app_id,
     const std::string& mac_address,
     const rc_rpc_types::ModuleIdConsentVector& module_consents) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   for (const auto& consent : module_consents) {
     std::string module_type = consent.module_id.first;
@@ -112,7 +112,7 @@ rc_rpc_types::ModuleConsent RCConsentManagerImpl::GetModuleConsent(
 }
 
 void RCConsentManagerImpl::RemoveExpiredConsents() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto last_state_accessor = last_state_->get_accessor();
   auto last_state_dictionary = last_state_accessor.GetData().dictionary();

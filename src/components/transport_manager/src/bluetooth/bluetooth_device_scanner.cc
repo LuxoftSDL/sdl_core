@@ -57,7 +57,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 namespace {
 char* SplitToAddr(char* dev_list_entry) {
@@ -168,7 +168,7 @@ bool BluetoothDeviceScanner::IsInitialised() const {
 }
 
 void BluetoothDeviceScanner::UpdateTotalDeviceList() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DeviceVector devices;
   devices.insert(devices.end(),
                  paired_devices_with_sdl_.begin(),
@@ -180,7 +180,7 @@ void BluetoothDeviceScanner::UpdateTotalDeviceList() {
 }
 
 void BluetoothDeviceScanner::DoInquiry() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const int device_id = hci_get_route(0);
   if (device_id < 0) {
@@ -427,7 +427,7 @@ bool BluetoothDeviceScanner::DiscoverSmartDeviceLinkRFCOMMChannels(
 }
 
 void BluetoothDeviceScanner::Thread() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ready_ = true;
   if (auto_repeat_search_) {
     while (!shutdown_requested_) {
@@ -453,7 +453,7 @@ void BluetoothDeviceScanner::Thread() {
 }
 
 void BluetoothDeviceScanner::TimedWaitForDeviceScanRequest() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (auto_repeat_pause_sec_ == 0) {
     LOG4CXX_TRACE(logger_, "exit. Condition: auto_repeat_pause_sec_ == 0");
@@ -475,7 +475,7 @@ void BluetoothDeviceScanner::TimedWaitForDeviceScanRequest() {
 }
 
 TransportAdapter::Error BluetoothDeviceScanner::Init() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!thread_->start()) {
     LOG4CXX_ERROR(logger_, "Bluetooth device scanner thread start failed");
     return TransportAdapter::FAIL;
@@ -485,7 +485,7 @@ TransportAdapter::Error BluetoothDeviceScanner::Init() {
 }
 
 void BluetoothDeviceScanner::Terminate() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   shutdown_requested_ = true;
   if (thread_) {
     {
@@ -501,7 +501,7 @@ void BluetoothDeviceScanner::Terminate() {
 }
 
 TransportAdapter::Error BluetoothDeviceScanner::Scan() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if ((!IsInitialised()) || shutdown_requested_) {
     LOG4CXX_WARN(logger_, "BAD_STATE");
     return TransportAdapter::BAD_STATE;
@@ -528,7 +528,7 @@ BluetoothDeviceScanner::BluetoothDeviceScannerDelegate::
     : scanner_(scanner) {}
 
 void BluetoothDeviceScanner::BluetoothDeviceScannerDelegate::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(scanner_);
   scanner_->Thread();
 }

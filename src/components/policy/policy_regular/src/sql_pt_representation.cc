@@ -49,7 +49,7 @@
 
 namespace policy {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Policy")
+SDL_CREATE_LOGGERPTR( "Policy")
 
 namespace {
 template <typename T, typename K>
@@ -157,7 +157,7 @@ int SQLPTRepresentation::KilometersBeforeExchange(int current) {
 
 bool SQLPTRepresentation::SetCountersPassedForSuccessfulUpdate(
     int kilometers, int days_after_epoch) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kUpdateCountersSuccessfulUpdate)) {
     LOG4CXX_WARN(logger_,
@@ -253,7 +253,7 @@ EndpointUrls SQLPTRepresentation::GetUpdateUrls(int service_type) {
 }
 
 int SQLPTRepresentation::GetNotificationsNumber(const std::string& priority) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kSelectNotificationsPerPriority)) {
     LOG4CXX_WARN(logger_,
@@ -276,7 +276,7 @@ int SQLPTRepresentation::GetNotificationsNumber(const std::string& priority) {
 
 bool SQLPTRepresentation::GetPriority(const std::string& policy_app_id,
                                       std::string* priority) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (NULL == priority) {
     LOG4CXX_WARN(logger_, "Input priority parameter is null.");
     return false;
@@ -306,7 +306,7 @@ bool SQLPTRepresentation::GetPriority(const std::string& policy_app_id,
 
 InitResult SQLPTRepresentation::Init(const PolicySettings* settings) {
   settings_ = settings;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 #ifdef BUILD_TESTS
   open_counter_ = 0;
 #endif  // BUILD_TESTS
@@ -467,7 +467,7 @@ bool SQLPTRepresentation::RefreshDB() {
 
 std::shared_ptr<policy_table::Table> SQLPTRepresentation::GenerateSnapshot()
     const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto table = std::make_shared<policy_table::Table>();
   GatherModuleMeta(&*table->policy_table.module_meta);
   GatherModuleConfig(&table->policy_table.module_config);
@@ -709,7 +709,7 @@ bool SQLPTRepresentation::GatherConsumerFriendlyMessages(
 }
 
 bool SQLPTRepresentation::SetMetaInfo(const std::string& ccpu_version) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kUpdateMetaParams)) {
     LOG4CXX_WARN(logger_, "Incorrect statement for insert to module meta.");
@@ -845,7 +845,7 @@ bool SQLPTRepresentation::GatherVehicleData(
 
 bool SQLPTRepresentation::GatherVehicleDataItems(
     policy_table::VehicleDataItems* vehicle_data_items) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto parameterized_vdi = SelectCompositeVehicleDataItems();
   if (!parameterized_vdi.is_initialized()) {
     return false;
@@ -867,7 +867,7 @@ bool SQLPTRepresentation::GatherVehicleDataItems(
 }
 
 bool SQLPTRepresentation::Save(const policy_table::Table& table) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   db_->BeginTransaction();
   if (!SaveFunctionalGroupings(table.policy_table.functional_groupings)) {
     db_->RollbackTransaction();
@@ -960,7 +960,7 @@ bool SQLPTRepresentation::SaveFunctionalGroupings(
 
 bool SQLPTRepresentation::SaveRpcs(int64_t group_id,
                                    const policy_table::Rpc& rpcs) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   utils::dbms::SQLQuery query_parameter(db());
   if (!query.Prepare(sql_pt::kInsertRpc) ||
@@ -1553,7 +1553,7 @@ bool SQLPTRepresentation::SaveServiceEndpointProperties(
 
 bool SQLPTRepresentation::SaveConsumerFriendlyMessages(
     const policy_table::ConsumerFriendlyMessages& messages) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // According CRS-2419  If there is no “consumer_friendly_messages” key,
   // the current local consumer_friendly_messages section shall be maintained in
@@ -1772,7 +1772,7 @@ bool SQLPTRepresentation::SaveUsageAndErrorCounts(
 
 bool SQLPTRepresentation::SaveVehicleData(
     const policy_table::VehicleData& vehicle_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (vehicle_data.is_initialized() &&
       vehicle_data.schema_version.is_initialized()) {
     utils::dbms::SQLQuery query(db());
@@ -1798,7 +1798,7 @@ bool SQLPTRepresentation::SaveVehicleData(
 
 bool SQLPTRepresentation::SaveVehicleDataItems(
     const policy_table::VehicleDataItems& vehicle_data_items) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DeleteVehicleDataItems();
   for (const auto& item : vehicle_data_items) {
     if (!InsertVehicleDataItem(item)) {
@@ -1816,7 +1816,7 @@ void SQLPTRepresentation::IncrementIgnitionCycles() {
 }
 
 void SQLPTRepresentation::ResetIgnitionCycles() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Exec(sql_pt::kResetIgnitionCycles)) {
     LOG4CXX_WARN(logger_, "Failed to reset ignition cycles number.");
@@ -1878,7 +1878,7 @@ bool SQLPTRepresentation::GetInitialAppData(const std::string& app_id,
 
 bool SQLPTRepresentation::GetFunctionalGroupings(
     policy_table::FunctionalGroupings& groups) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return GatherFunctionalGroupings(&groups);
 }
 
@@ -2037,7 +2037,7 @@ bool SQLPTRepresentation::GatherAppGroup(
 
 bool SQLPTRepresentation::GatherRemoteControlDenied(const std::string& app_id,
                                                     bool* denied) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kSelectRemoteControlDenied)) {
     LOG4CXX_WARN(logger_, "Incorrect select remote control flag");
@@ -2077,7 +2077,7 @@ bool SQLPTRepresentation::GatherModuleType(
 
 bool SQLPTRepresentation::SaveRemoteControlDenied(const std::string& app_id,
                                                   bool deny) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kUpdateRemoteControlDenied)) {
     LOG4CXX_WARN(logger_, "Incorrect update statement for remote control flag");
@@ -2131,7 +2131,7 @@ bool SQLPTRepresentation::SaveModuleType(
 
 bool SQLPTRepresentation::SaveAccessModule(
     TypeAccess access, const policy_table::AccessModules& modules) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kInsertAccessModule)) {
     LOG4CXX_WARN(logger_, "Incorrect insert statement for access module");
@@ -2162,7 +2162,7 @@ bool SQLPTRepresentation::SaveAccessModule(
 
 bool SQLPTRepresentation::GatherAccessModule(
     TypeAccess access, policy_table::AccessModules* modules) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kSelectAccessModules)) {
     LOG4CXX_WARN(logger_, "Incorrect select from access module");
@@ -2184,7 +2184,7 @@ bool SQLPTRepresentation::GatherAccessModule(
 
 bool SQLPTRepresentation::SaveRemoteRpc(int module_id,
                                         const policy_table::RemoteRpcs& rpcs) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kInsertRemoteRpc)) {
     LOG4CXX_WARN(logger_, "Incorrect insert statement for remote rpc");
@@ -2221,7 +2221,7 @@ bool SQLPTRepresentation::SaveRemoteRpc(int module_id,
 
 bool SQLPTRepresentation::GatherRemoteRpc(
     int module_id, policy_table::RemoteRpcs* rpcs) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kSelectRemoteRpcs)) {
     LOG4CXX_WARN(logger_, "Incorrect select from remote rpc");
@@ -2387,7 +2387,7 @@ void SQLPTRepresentation::RemoveDB() const {
 }
 
 bool SQLPTRepresentation::IsDBVersionActual() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kSelectDBVersion) || !query.Exec()) {
     LOG4CXX_ERROR(logger_,
@@ -2406,7 +2406,7 @@ bool SQLPTRepresentation::IsDBVersionActual() const {
 }
 
 bool SQLPTRepresentation::UpdateDBVersion() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt::kUpdateDBVersion)) {
     LOG4CXX_ERROR(logger_,
@@ -2756,7 +2756,7 @@ bool SQLPTRepresentation::InsertVehicleDataItem(
 policy_table::VehicleDataItems
 SQLPTRepresentation::SelectCompositeVehicleDataItems() const {
   utils::dbms::SQLQuery query(db());
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!query.Prepare(sql_pt::kSelectCompositeVehicleDataItemsKey)) {
     LOG4CXX_ERROR(logger_,
                   "Incorrect statement for parameterized vehicle data items");
@@ -2782,7 +2782,7 @@ SQLPTRepresentation::SelectCompositeVehicleDataItems() const {
 policy_table::VehicleDataItems
 SQLPTRepresentation::SelectPrimitiveVehicleDataItems() const {
   utils::dbms::SQLQuery query(db());
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!query.Prepare(sql_pt::kSelectPrimitiveVehicleDataItems)) {
     LOG4CXX_ERROR(
         logger_,
@@ -2805,7 +2805,7 @@ SQLPTRepresentation::SelectPrimitiveVehicleDataItems() const {
 
 bool SQLPTRepresentation::DeleteVehicleDataItems() const {
   utils::dbms::SQLQuery query(db());
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!query.Exec(sql_pt::kDeleteVehicleDataItems)) {
     LOG4CXX_ERROR(logger_,

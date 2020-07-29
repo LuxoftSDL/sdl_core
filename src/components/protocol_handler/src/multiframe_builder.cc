@@ -41,7 +41,7 @@
 
 namespace protocol_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ProtocolHandler")
+SDL_CREATE_LOGGERPTR( "ProtocolHandler")
 
 MultiFrameBuilder::MultiFrameBuilder() : consecutive_frame_wait_msecs_(0u) {}
 
@@ -89,7 +89,7 @@ bool MultiFrameBuilder::RemoveConnection(const ConnectionID connection_id) {
 }
 
 ProtocolFramePtrList MultiFrameBuilder::PopMultiframes() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Current state is: " << multiframes_map_);
   LOG4CXX_DEBUG(logger_,
                 "Current multiframe map size is: " << multiframes_map_.size());
@@ -142,7 +142,7 @@ ProtocolFramePtrList MultiFrameBuilder::PopMultiframes() {
 }
 
 RESULT_CODE MultiFrameBuilder::AddFrame(const ProtocolFramePtr packet) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Handling frame: " << packet);
   LOG4CXX_DEBUG(logger_, "Current state is: " << multiframes_map_);
   if (!packet) {

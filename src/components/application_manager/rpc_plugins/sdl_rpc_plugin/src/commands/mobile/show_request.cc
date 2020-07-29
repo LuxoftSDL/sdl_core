@@ -101,7 +101,7 @@ void ShowRequest::HandleMetadata(const char* field_id,
 
 bool ShowRequest::CheckTemplateConfigurationForApp(
     application_manager::Application& app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if ((*message_)[strings::msg_params].keyExists(strings::window_id)) {
     current_window_id_ =
@@ -192,7 +192,7 @@ bool ShowRequest::CheckTemplateConfigurationForApp(
 
 void ShowRequest::ApplyTemplateConfigurationForApp(
     mobile_apis::Result::eType result, application_manager::Application& app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (helpers::Compare<mobile_apis::Result::eType, helpers::EQ, helpers::ONE>(
           result,
           mobile_apis::Result::SUCCESS,
@@ -231,7 +231,7 @@ void ShowRequest::ApplyTemplateConfigurationForApp(
 }
 
 void ShowRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -453,7 +453,7 @@ void ShowRequest::Run() {
 }
 
 void ShowRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   const smart_objects::SmartObject& message = event.smart_object();
@@ -505,7 +505,7 @@ void ShowRequest::on_event(const event_engine::Event& event) {
 }
 
 bool ShowRequest::CheckStringsOfShowRequest() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str;
 
   if ((*message_)[strings::msg_params].keyExists(strings::main_field_4)) {

@@ -55,7 +55,7 @@ OnSystemInfoChangedNotification::OnSystemInfoChangedNotification(
 OnSystemInfoChangedNotification::~OnSystemInfoChangedNotification() {}
 
 void OnSystemInfoChangedNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint32_t lang_code =
       (*message_)[strings::msg_params][strings::language].asUInt();
   const std::string language =

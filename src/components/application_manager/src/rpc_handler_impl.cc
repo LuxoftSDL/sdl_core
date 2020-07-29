@@ -37,7 +37,7 @@
 namespace application_manager {
 namespace rpc_handler {
 
-CREATE_LOGGERPTR_LOCAL(logger_, "RPCHandlerImpl")
+SDL_CREATE_LOGGERPTR( "RPCHandlerImpl")
 namespace formatters = ns_smart_device_link::ns_json_handler::formatters;
 namespace jhs = ns_smart_device_link::ns_json_handler::strings;
 namespace plugin_names = application_manager::plugin_manager::plugin_names;
@@ -60,7 +60,7 @@ RPCHandlerImpl::~RPCHandlerImpl() {}
 
 void RPCHandlerImpl::ProcessMessageFromMobile(
     const std::shared_ptr<Message> message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 #ifdef TELEMETRY_MONITOR
   AMTelemetryObserver::MessageMetricSharedPtr metric(
       new AMTelemetryObserver::MessageMetric());
@@ -160,7 +160,7 @@ void RPCHandlerImpl::ProcessMessageFromMobile(
 
 void RPCHandlerImpl::ProcessMessageFromHMI(
     const std::shared_ptr<Message> message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObjectSPtr smart_object =
       std::make_shared<smart_objects::SmartObject>();
   bool allow_unknown_parameters = false;
@@ -209,7 +209,7 @@ void RPCHandlerImpl::ProcessMessageFromHMI(
 }
 
 void RPCHandlerImpl::Handle(const impl::MessageFromMobile message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!message) {
     LOG4CXX_ERROR(logger_, "Null-pointer message received.");
@@ -228,7 +228,7 @@ void RPCHandlerImpl::Handle(const impl::MessageFromMobile message) {
 }
 
 void RPCHandlerImpl::Handle(const impl::MessageFromHmi message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!message) {
     LOG4CXX_ERROR(logger_, "Null-pointer message received.");
@@ -244,7 +244,7 @@ void RPCHandlerImpl::Handle(const impl::MessageFromHmi message) {
 
 void RPCHandlerImpl::OnMessageReceived(
     const protocol_handler::RawMessagePtr message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (app_manager_.IsLowVoltage()) {
     LOG4CXX_ERROR(logger_, "Low Voltage is active.");
@@ -268,12 +268,12 @@ void RPCHandlerImpl::OnMessageReceived(
 
 void RPCHandlerImpl::OnMobileMessageSent(
     const protocol_handler::RawMessagePtr message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 void RPCHandlerImpl::OnMessageReceived(
     hmi_message_handler::MessageSharedPointer message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!message) {
     LOG4CXX_ERROR(logger_, "Null-pointer message received.");
@@ -335,7 +335,7 @@ bool RPCHandlerImpl::ConvertMessageToSO(
     std::string& out_warning_info,
     const bool allow_unknown_parameters,
     const bool validate_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "\t\t\tMessage to convert: protocol "
                     << message.protocol_version() << "; json "
@@ -506,7 +506,7 @@ bool RPCHandlerImpl::ConvertMessageToSO(
 
 bool RPCHandlerImpl::HandleWrongMessageType(
     smart_objects::SmartObject& output, rpc::ValidationReport report) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   switch (output[strings::params][strings::message_type].asInt()) {
     case application_manager::MessageType::kNotification: {
       LOG4CXX_ERROR(logger_, "Ignore wrong HMI notification");
@@ -561,7 +561,7 @@ bool RPCHandlerImpl::ValidateRpcSO(smart_objects::SmartObject& message,
 
 std::shared_ptr<Message> RPCHandlerImpl::ConvertRawMsgToMessage(
     const protocol_handler::RawMessagePtr message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(message);
   std::shared_ptr<Message> outgoing_message;
 

@@ -42,7 +42,7 @@
 
 namespace media_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger, "SocketStreamerAdapter")
+SDL_CREATE_LOGGERPTR( "SocketStreamerAdapter")
 
 SocketStreamerAdapter::SocketStreamerAdapter(const std::string& ip,
                                              const uint16_t port,
@@ -67,7 +67,7 @@ SocketStreamerAdapter::SocketStreamer::SocketStreamer(
 SocketStreamerAdapter::SocketStreamer::~SocketStreamer() {}
 
 bool SocketStreamerAdapter::SocketStreamer::Connect() {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
   socket_fd_ = socket(AF_INET, SOCK_STREAM, 0);
   if (0 >= socket_fd_) {
     LOG4CXX_ERROR(logger, "Unable to create socket");
@@ -113,7 +113,7 @@ void SocketStreamerAdapter::SocketStreamer::Close() {
 }
 
 void SocketStreamerAdapter::SocketStreamer::Disconnect() {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
   if (0 < send_socket_fd_) {
     shutdown(send_socket_fd_, SHUT_RDWR);
     close(send_socket_fd_);
@@ -128,7 +128,7 @@ void SocketStreamerAdapter::SocketStreamer::Disconnect() {
 
 bool SocketStreamerAdapter::SocketStreamer::Send(
     protocol_handler::RawMessagePtr msg) {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
   ssize_t ret;
   if (is_first_frame_) {
     ret = send(send_socket_fd_, header_.c_str(), header_.size(), MSG_NOSIGNAL);

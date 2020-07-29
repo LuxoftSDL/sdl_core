@@ -39,14 +39,14 @@ namespace application_manager {
 
 namespace request_controller {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RequestController")
+SDL_CREATE_LOGGERPTR( "RequestController")
 
 RequestTracker::RequestTracker(const RequestControlerSettings& settings)
     : settings_(settings) {}
 
 TrackResult RequestTracker::Track(const ApplicationID& app_id,
                                   const mobile_apis::HMILevel::eType level) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool track_result = false;
 
   LOG4CXX_DEBUG(logger_,
@@ -76,7 +76,7 @@ bool RequestTracker::Track(const ApplicationID& app_id,
                            const uint32_t time_scale,
                            const uint32_t max_requests,
                            ApplicationsRequestsTracker& tracker) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace date_time;
 
   if (!time_scale || !max_requests) {

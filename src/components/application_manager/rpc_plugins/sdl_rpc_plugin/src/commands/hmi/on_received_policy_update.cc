@@ -56,7 +56,7 @@ OnReceivedPolicyUpdate::OnReceivedPolicyUpdate(
 OnReceivedPolicyUpdate::~OnReceivedPolicyUpdate() {}
 
 void OnReceivedPolicyUpdate::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 #if defined(PROPRIETARY_MODE) || defined(EXTERNAL_PROPRIETARY_MODE)
   const std::string& file_path =
       (*message_)[strings::msg_params][hmi_notification::policyfile].asString();

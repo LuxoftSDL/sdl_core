@@ -54,7 +54,7 @@ NaviUpdateTurnListResponse::NaviUpdateTurnListResponse(
 NaviUpdateTurnListResponse::~NaviUpdateTurnListResponse() {}
 
 void NaviUpdateTurnListResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   event_engine::Event event(hmi_apis::FunctionID::Navigation_UpdateTurnList);
   event.set_smart_object(*message_);

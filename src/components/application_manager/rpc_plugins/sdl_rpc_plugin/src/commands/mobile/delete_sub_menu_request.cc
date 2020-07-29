@@ -58,7 +58,7 @@ DeleteSubMenuRequest::DeleteSubMenuRequest(
 DeleteSubMenuRequest::~DeleteSubMenuRequest() {}
 
 void DeleteSubMenuRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -90,7 +90,7 @@ void DeleteSubMenuRequest::Run() {
 
 void DeleteSubMenuRequest::DeleteSubMenuVRCommands(
     ApplicationConstSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const DataAccessor<CommandsMap> accessor = app->commands_map();
   const CommandsMap& commands = accessor.GetData();
@@ -117,7 +117,7 @@ void DeleteSubMenuRequest::DeleteSubMenuVRCommands(
 
 void DeleteSubMenuRequest::DeleteSubMenuUICommands(
     ApplicationSharedPtr const app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const DataAccessor<CommandsMap> accessor(app->commands_map());
   const CommandsMap& commands = accessor.GetData();
@@ -150,7 +150,7 @@ void DeleteSubMenuRequest::DeleteSubMenuUICommands(
 }
 
 void DeleteSubMenuRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
 
   switch (event.id()) {

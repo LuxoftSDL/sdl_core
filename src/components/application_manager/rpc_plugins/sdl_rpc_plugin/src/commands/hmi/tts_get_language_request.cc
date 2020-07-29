@@ -52,13 +52,13 @@ TTSGetLanguageRequest::TTSGetLanguageRequest(
 TTSGetLanguageRequest::~TTSGetLanguageRequest() {}
 
 void TTSGetLanguageRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   SendRequest();
 }
 
 void TTSGetLanguageRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   hmi_capabilities_.UpdateRequestsRequiredForCapabilities(
       hmi_apis::FunctionID::TTS_GetLanguage);
 }

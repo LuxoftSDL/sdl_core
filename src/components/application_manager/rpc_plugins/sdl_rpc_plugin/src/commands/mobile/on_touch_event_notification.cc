@@ -57,7 +57,7 @@ OnTouchEventNotification::OnTouchEventNotification(
 OnTouchEventNotification::~OnTouchEventNotification() {}
 
 void OnTouchEventNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const std::vector<ApplicationSharedPtr>& applications_with_navi =
       application_manager_.applications_with_navi();

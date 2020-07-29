@@ -3,7 +3,7 @@
 #include "utils/custom_string.h"
 #include "utils/logger.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "SDLMain")
+SDL_CREATE_LOGGERPTR( "SDLMain")
 int main(int argc, char** argv) {
   namespace custom_str = utils::custom_string;
   testing::InitGoogleMock(&argc, argv);
@@ -11,6 +11,6 @@ int main(int argc, char** argv) {
       custom_str::CustomString(""));
   const int result = RUN_ALL_TESTS();
 
-  DEINIT_LOGGER();
+  SDL_DEINIT_LOGGER()();
   return result;
 }

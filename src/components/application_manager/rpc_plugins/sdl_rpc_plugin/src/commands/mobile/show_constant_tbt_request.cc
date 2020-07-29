@@ -61,7 +61,7 @@ ShowConstantTBTRequest::ShowConstantTBTRequest(
 ShowConstantTBTRequest::~ShowConstantTBTRequest() {}
 
 void ShowConstantTBTRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(
       (*message_)[strings::params][strings::connection_key].asUInt());
@@ -185,7 +185,7 @@ void ShowConstantTBTRequest::Run() {
 }
 
 void ShowConstantTBTRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace hmi_apis;
   const smart_objects::SmartObject& message = event.smart_object();
 
@@ -214,7 +214,7 @@ void ShowConstantTBTRequest::on_event(const event_engine::Event& event) {
 }
 
 bool ShowConstantTBTRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   if ((*message_)[strings::msg_params].keyExists(strings::turn_icon)) {

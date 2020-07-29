@@ -35,7 +35,7 @@
 
 namespace sync_primitives {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Utils")
+SDL_CREATE_LOGGERPTR( "Utils")
 
 RWLock::RWLock() {
   if (pthread_rwlock_init(&rwlock_, 0) != 0) {

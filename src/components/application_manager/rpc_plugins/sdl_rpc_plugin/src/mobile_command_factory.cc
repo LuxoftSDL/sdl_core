@@ -143,7 +143,7 @@
 #include "sdl_rpc_plugin/commands/mobile/update_turn_list_request.h"
 #include "sdl_rpc_plugin/commands/mobile/update_turn_list_response.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ApplicationManager")
+SDL_CREATE_LOGGERPTR( "ApplicationManager")
 namespace sdl_rpc_plugin {
 using namespace application_manager;
 

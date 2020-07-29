@@ -63,7 +63,7 @@ OnSystemRequestNotification::OnSystemRequestNotification(
 OnSystemRequestNotification::~OnSystemRequestNotification() {}
 
 void OnSystemRequestNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject& params = (*message_)[strings::params];
   smart_objects::SmartObject& msg_params = (*message_)[strings::msg_params];

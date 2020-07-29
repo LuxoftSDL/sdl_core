@@ -43,7 +43,7 @@ using namespace application_manager;
 namespace commands {
 
 void RegisterAppInterfaceResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   mobile_apis::Result::eType result_code = mobile_apis::Result::SUCCESS;
   bool success = (*message_)[strings::msg_params][strings::success].asBool();
@@ -113,7 +113,7 @@ void RegisterAppInterfaceResponse::Run() {
 
 void RegisterAppInterfaceResponse::SetHeartBeatTimeout(
     uint32_t connection_key, const std::string& mobile_app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   policy::PolicyHandlerInterface& policy_handler = policy_handler_;
   if (policy_handler.PolicyEnabled()) {
     const uint32_t timeout = policy_handler.HeartBeatTimeout(mobile_app_id);

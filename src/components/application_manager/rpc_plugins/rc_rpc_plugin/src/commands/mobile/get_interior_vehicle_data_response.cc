@@ -49,7 +49,7 @@ GetInteriorVehicleDataResponse::GetInteriorVehicleDataResponse(
 GetInteriorVehicleDataResponse::~GetInteriorVehicleDataResponse() {}
 
 void GetInteriorVehicleDataResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   RCHelpers::RemoveRedundantGPSDataFromIVDataMsg(
       (*message_)[app_mngr::strings::msg_params]);

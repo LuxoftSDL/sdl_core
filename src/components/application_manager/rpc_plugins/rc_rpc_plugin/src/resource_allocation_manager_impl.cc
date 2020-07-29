@@ -45,7 +45,7 @@
 
 namespace rc_rpc_plugin {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule")
+SDL_CREATE_LOGGERPTR( "RemoteControlModule")
 
 ResourceAllocationManagerImpl::ResourceAllocationManagerImpl(
     application_manager::ApplicationManager& app_mngr,
@@ -63,7 +63,7 @@ AcquireResult::eType ResourceAllocationManagerImpl::AcquireResource(
     const std::string& module_type,
     const std::string& module_id,
     const uint32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const application_manager::ApplicationSharedPtr acquiring_app =
       app_mngr_.application(app_id);
   if (!acquiring_app) {
@@ -154,7 +154,7 @@ AcquireResult::eType ResourceAllocationManagerImpl::AcquireResource(
 
 bool ResourceAllocationManagerImpl::IsUserLocationValid(
     ModuleUid& module, application_manager::ApplicationSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto extension = RCHelpers::GetRCExtension(*app);
   DCHECK_OR_RETURN(extension, false);
   const auto user_location = extension->GetUserLocation();
@@ -172,7 +172,7 @@ bool ResourceAllocationManagerImpl::IsUserLocationValid(
 
 void ResourceAllocationManagerImpl::ReleaseModuleType(
     const std::string& module_type, const uint32_t application_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "Release " << module_type << " "
                            << " by " << application_id);
@@ -185,7 +185,7 @@ void ResourceAllocationManagerImpl::ReleaseModuleType(
 }
 
 void ResourceAllocationManagerImpl::ProcessApplicationPolicyUpdate() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   Apps app_list = RCRPCPlugin::GetRCApplications(app_mngr_);
 
   Apps::const_iterator app = app_list.begin();
@@ -242,7 +242,7 @@ void ConstructOnRCStatusNotificationParams(
   using smart_objects::SmartObject;
   using smart_objects::SmartType_Array;
   using smart_objects::SmartType_Map;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto modules_inserter = [](SmartObject& result_modules) {
     return [&result_modules](const ModuleUid& module) {
@@ -275,7 +275,7 @@ void ConstructOnRCStatusNotificationParams(
 smart_objects::SmartObjectSPtr
 ResourceAllocationManagerImpl::CreateOnRCStatusNotificationToMobile(
     const application_manager::ApplicationSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using application_manager::MessageHelper;
   auto msg_to_mobile = MessageHelper::CreateNotification(
       mobile_apis::FunctionID::OnRCStatusID, app->app_id());
@@ -298,7 +298,7 @@ ResourceAllocationManagerImpl::CreateOnRCStatusNotificationToMobile(
 smart_objects::SmartObjectSPtr
 ResourceAllocationManagerImpl::CreateOnRCStatusNotificationToHmi(
     const application_manager::ApplicationSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using application_manager::MessageHelper;
   auto msg_to_hmi =
       MessageHelper::CreateHMINotification(hmi_apis::FunctionID::RC_OnRCStatus);
@@ -314,7 +314,7 @@ ResourceAllocationManagerImpl::CreateOnRCStatusNotificationToHmi(
 void ResourceAllocationManagerImpl::SendOnRCStatusNotifications(
     NotificationTrigger::eType event,
     application_manager::ApplicationSharedPtr application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObjectSPtr msg_to_mobile;
   smart_objects::SmartObjectSPtr msg_to_hmi;
   if (NotificationTrigger::APP_REGISTRATION == event) {
@@ -351,7 +351,7 @@ ResourceReleasedState::eType ResourceAllocationManagerImpl::ReleaseResource(
     const std::string& module_type,
     const std::string& module_id,
     const uint32_t application_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "Release " << module_type << " " << module_id << " by "
                            << application_id);
@@ -362,14 +362,14 @@ void ResourceAllocationManagerImpl::SetResourceAcquired(
     const std::string& module_type,
     const std::string& module_id,
     const uint32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ModuleUid module(module_type, module_id);
   allocated_resources_[module] = app_id;
 }
 
 bool ResourceAllocationManagerImpl::IsResourceAlreadyAcquiredByApp(
     const ModuleUid& moduleUid, const uint32_t app_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto allocation = allocated_resources_.find(moduleUid);
 
@@ -423,7 +423,7 @@ ResourceReleasedState::eType ResourceAllocationManagerImpl::SetResourceFree(
 
 std::vector<ModuleUid> ResourceAllocationManagerImpl::GetAcquiredResources(
     const uint32_t application_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   Resources allocated_resources;
   AllocatedResources::const_iterator allocation = allocated_resources_.begin();
   for (; allocated_resources_.end() != allocation; ++allocation) {
@@ -442,7 +442,7 @@ std::vector<ModuleUid> ResourceAllocationManagerImpl::GetAcquiredResources(
 
 std::set<std::string> ResourceAllocationManagerImpl::GetAcquiredModuleTypes(
     const uint32_t application_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   Resources allocated_resources = GetAcquiredResources(application_id);
   std::set<std::string> acquired_module_types;
   for (const auto& resource : allocated_resources) {
@@ -462,7 +462,7 @@ void ResourceAllocationManagerImpl::SetResourceState(
     const std::string& module_id,
     const uint32_t app_id,
     const ResourceState::eType state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "Setting state for " << module_type << " by app_id " << app_id
                                      << " to state " << state);
@@ -492,7 +492,7 @@ void ResourceAllocationManagerImpl::SetResourceState(
 
 bool ResourceAllocationManagerImpl::IsResourceFree(
     const std::string& module_type, const std::string& module_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ModuleUid module(module_type, module_id);
   sync_primitives::AutoLock lock(resources_state_lock_);
   const ResourcesState::const_iterator resource = resources_state_.find(module);
@@ -535,7 +535,7 @@ bool ResourceAllocationManagerImpl::IsModuleTypeRejected(
     const std::string& module_type,
     const std::string& module_id,
     const uint32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ModuleUid module(module_type, module_id);
   sync_primitives::AutoLock lock(rejected_resources_for_application_lock_);
   RejectedResources::iterator it =
@@ -555,7 +555,7 @@ void ResourceAllocationManagerImpl::OnDriverDisallowed(
     const std::string& module_type,
     const std::string& module_id,
     const uint32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ModuleUid module(module_type, module_id);
   sync_primitives::AutoLock lock(rejected_resources_for_application_lock_);
   auto it = rejected_resources_for_application_.find(app_id);
@@ -572,7 +572,7 @@ void ResourceAllocationManagerImpl::OnApplicationEvent(
     application_manager::plugin_manager::ApplicationEvent event,
     application_manager::ApplicationSharedPtr application) {
   using application_manager::plugin_manager::ApplicationEvent;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "Event " << event << " came for " << application->app_id());
 
@@ -594,7 +594,7 @@ void ResourceAllocationManagerImpl::OnApplicationEvent(
 void ResourceAllocationManagerImpl::OnPolicyEvent(
     application_manager::plugin_manager::PolicyEvent event) {
   using application_manager::plugin_manager::PolicyEvent;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Event " << event);
 
   if (PolicyEvent::kApplicationPolicyUpdated == event) {
@@ -609,7 +609,7 @@ void ResourceAllocationManagerImpl::OnPolicyEvent(
 }
 
 void ResourceAllocationManagerImpl::ResetAllAllocations() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     sync_primitives::AutoLock lock(resources_state_lock_);
     resources_state_.clear();

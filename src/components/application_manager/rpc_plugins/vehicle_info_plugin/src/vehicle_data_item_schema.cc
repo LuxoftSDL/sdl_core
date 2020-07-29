@@ -4,7 +4,7 @@
 namespace vehicle_info_plugin {
 
 #ifdef ENABLE_LOG
-CREATE_LOGGERPTR_LOCAL(vehicle_data_logger, "VehicleDataItemSchema");
+SDL_CREATE_LOGGERPTR( "VehicleDataItemSchema");
 #endif  // ENABLE_LOG
 
 VehicleDataItemSchema::VehicleDataItemSchema(PolicyDataItem& policy_item,

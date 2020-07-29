@@ -40,7 +40,7 @@
 namespace rc_rpc_plugin {
 namespace commands {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule")
+SDL_CREATE_LOGGERPTR( "RemoteControlModule")
 
 OnInteriorVehicleDataNotification::OnInteriorVehicleDataNotification(
     const app_mngr::commands::MessageSharedPtr& message,
@@ -65,7 +65,7 @@ void OnInteriorVehicleDataNotification::AddDataToCache(
 }
 
 void OnInteriorVehicleDataNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const std::string module_type = ModuleType();
   const std::string module_id = ModuleId();
@@ -105,7 +105,7 @@ void OnInteriorVehicleDataNotification::Run() {
 }
 
 std::string OnInteriorVehicleDataNotification::ModuleId() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto msg_params = (*message_)[app_mngr::strings::msg_params];
   if (msg_params[message_params::kModuleData].keyExists(
           message_params::kModuleId)) {

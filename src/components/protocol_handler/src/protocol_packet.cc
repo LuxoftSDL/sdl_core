@@ -46,7 +46,7 @@
 
 namespace protocol_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ProtocolHandler")
+SDL_CREATE_LOGGERPTR( "ProtocolHandler")
 
 namespace {
 std::string StringifyFrameType(uint8_t type) {
@@ -117,7 +117,7 @@ inline uint32_t read_be_uint32(const uint8_t* const data) {
 
 void ProtocolPacket::ProtocolHeader::deserialize(const uint8_t* message,
                                                  const size_t messageSize) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(message);
   if (messageSize < PROTOCOL_HEADER_V1_SIZE) {
     LOG4CXX_DEBUG(logger_,
@@ -444,7 +444,7 @@ ProtocolPacket::ProtocolPacket(ConnectionID connection_id)
 
 // Serialization
 RawMessagePtr ProtocolPacket::serializePacket() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   // TODO(EZamakhov): Move header serialization to ProtocolHeader
   // version is low byte
   const uint8_t version_byte = packet_header_.version << 4;
@@ -541,7 +541,7 @@ bool ProtocolPacket::operator==(const ProtocolPacket& other) const {
 }
 
 void ProtocolPacket::HandleRawFirstFrameData(const uint8_t* message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   payload_size_ = 0;
   const uint8_t* data = message;
   uint32_t total_data_bytes = data[0] << 24;
@@ -553,7 +553,7 @@ void ProtocolPacket::HandleRawFirstFrameData(const uint8_t* message) {
 
 RESULT_CODE ProtocolPacket::deserializePacket(const uint8_t* message,
                                               const size_t messageSize) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(message, RESULT_FAIL);
   packet_header_.deserialize(message, messageSize);
   const uint8_t offset = packet_header_.version == PROTOCOL_VERSION_1
@@ -630,7 +630,7 @@ uint8_t* ProtocolPacket::data() const {
 }
 
 void ProtocolPacket::set_total_data_bytes(size_t dataBytes) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Data bytes : " << dataBytes);
   if (dataBytes) {
     delete[] packet_data_.data;

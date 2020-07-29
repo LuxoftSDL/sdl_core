@@ -49,7 +49,7 @@ struct AppExtensionPredicate {
 
 namespace commands {
 
-CREATE_LOGGERPTR_LOCAL(CommandImpl::logger_, "Commands")
+SDL_CREATE_LOGGERPTR( "Commands")
 
 const int32_t CommandImpl::hmi_protocol_type_ = 1;
 const int32_t CommandImpl::mobile_protocol_type_ = 0;
@@ -130,7 +130,7 @@ void CommandImpl::SetAllowedToTerminate(const bool allowed) {
 }
 
 bool CommandImpl::CheckAllowedParameters(const Command::CommandSource source) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const ApplicationSharedPtr app =
       application_manager_.application(connection_key());
@@ -199,7 +199,7 @@ bool CommandImpl::CheckAllowedParameters(const Command::CommandSource source) {
 }
 
 void CommandImpl::RemoveDisallowedParameters() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject& params = (*message_)[strings::msg_params];
 
@@ -236,7 +236,7 @@ void CommandImpl::RemoveDisallowedParameters() {
 
 bool CommandImpl::ReplaceMobileWithHMIAppId(
     ns_smart_device_link::ns_smart_objects::SmartObject& message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (message.keyExists(strings::app_id)) {
     ApplicationSharedPtr application =
         application_manager_.application(message[strings::app_id].asUInt());
@@ -326,7 +326,7 @@ bool CommandImpl::ReplaceHMIWithMobileAppId(
 
 uint32_t CommandImpl::CalcCommandInternalConsecutiveNumber(
     ApplicationConstSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const DataAccessor<CommandsMap> accessor = app->commands_map();
   const CommandsMap& commands = accessor.GetData();
 

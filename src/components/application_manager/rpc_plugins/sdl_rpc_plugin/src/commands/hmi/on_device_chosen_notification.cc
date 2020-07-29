@@ -52,7 +52,7 @@ OnDeviceChosenNotification::OnDeviceChosenNotification(
 OnDeviceChosenNotification::~OnDeviceChosenNotification() {}
 
 void OnDeviceChosenNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if ((*message_)[strings::msg_params].keyExists(strings::device_info)) {
     application_manager_.ConnectToDevice(

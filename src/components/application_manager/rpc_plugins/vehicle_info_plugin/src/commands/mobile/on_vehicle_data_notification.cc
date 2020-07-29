@@ -58,7 +58,7 @@ OnVehicleDataNotification::OnVehicleDataNotification(
 OnVehicleDataNotification::~OnVehicleDataNotification() {}
 
 void OnVehicleDataNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::vector<ApplicationSharedPtr> notify_apps;
   std::vector<ApplicationSharedPtr>::iterator notified_app_it =

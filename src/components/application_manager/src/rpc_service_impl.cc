@@ -41,7 +41,7 @@
 namespace application_manager {
 namespace rpc_service {
 
-CREATE_LOGGERPTR_LOCAL(logger_, "RPCServiceImpl")
+SDL_CREATE_LOGGERPTR( "RPCServiceImpl")
 namespace formatters = ns_smart_device_link::ns_json_handler::formatters;
 namespace jhs = ns_smart_device_link::ns_json_handler::strings;
 namespace plugin_names = application_manager::plugin_manager::plugin_names;
@@ -69,7 +69,7 @@ RPCServiceImpl::RPCServiceImpl(
 RPCServiceImpl::~RPCServiceImpl() {}
 
 void RPCServiceImpl::Stop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   messages_to_mobile_.Shutdown();
   messages_to_hmi_.Shutdown();
@@ -79,7 +79,7 @@ EncryptionFlagCheckResult RPCServiceImpl::IsEncryptionRequired(
     const smart_objects::SmartObject& message,
     std::shared_ptr<Application> app,
     const bool is_rpc_service_secure) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto function_id =
       message[strings::params][strings::function_id].asUInt();
   const auto correlation_id =
@@ -122,7 +122,7 @@ bool RPCServiceImpl::ManageMobileCommand(
     const commands::MessageSharedPtr message,
     commands::Command::CommandSource source,
     const std::string warning_info) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!message) {
     LOG4CXX_WARN(logger_, "Null-pointer message received.");
@@ -338,7 +338,7 @@ bool RPCServiceImpl::ManageHMICommand(const commands::MessageSharedPtr message,
 bool RPCServiceImpl::ManageHMICommand(const commands::MessageSharedPtr message,
                                       commands::Command::CommandSource source,
                                       const std::string warning_info) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!message) {
     LOG4CXX_WARN(logger_, "Null-pointer message received.");
@@ -406,7 +406,7 @@ bool RPCServiceImpl::ManageHMICommand(const commands::MessageSharedPtr message,
 }
 
 void RPCServiceImpl::Handle(const impl::MessageToHmi message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!hmi_handler_) {
     LOG4CXX_ERROR(logger_, "Observer is not set for HMIMessageHandler");
     return;
@@ -417,7 +417,7 @@ void RPCServiceImpl::Handle(const impl::MessageToHmi message) {
 }
 
 void RPCServiceImpl::Handle(const impl::MessageToMobile message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!protocol_handler_) {
     LOG4CXX_WARN(logger_,
                  "Protocol Handler is not set; cannot send message to mobile.");
@@ -479,7 +479,7 @@ void RPCServiceImpl::Handle(const impl::MessageToMobile message) {
 void RPCServiceImpl::SendMessageToMobile(
     const application_manager::commands::MessageSharedPtr message,
     bool final_message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!message) {
     LOG4CXX_ERROR(logger_, "Null-pointer message received.");
@@ -622,7 +622,7 @@ void RPCServiceImpl::SendMessageToMobile(
 
 void RPCServiceImpl::SendMessageToHMI(
     const commands::MessageSharedPtr message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!message) {
     LOG4CXX_WARN(logger_, "Null-pointer message received.");
     NOTREACHED();
@@ -716,7 +716,7 @@ bool RPCServiceImpl::ConvertSOtoMessage(
     const ns_smart_device_link::ns_smart_objects::SmartObject& message,
     Message& output,
     const bool allow_unknown_parameters) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (smart_objects::SmartType_Null == message.getType() ||
       smart_objects::SmartType_Invalid == message.getType()) {

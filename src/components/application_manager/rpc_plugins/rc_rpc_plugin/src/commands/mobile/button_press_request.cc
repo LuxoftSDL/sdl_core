@@ -45,7 +45,7 @@ namespace commands {
 using namespace json_keys;
 using namespace message_params;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule")
+SDL_CREATE_LOGGERPTR( "RemoteControlModule")
 
 ButtonPressRequest::ButtonPressRequest(
     const app_mngr::commands::MessageSharedPtr& message,
@@ -78,7 +78,7 @@ const mobile_apis::ButtonName::eType ButtonPressRequest::GetButtonId() const {
 }
 
 void ButtonPressRequest::Execute() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string module_type = ModuleType();
 
   const bool button_name_matches_module_type =
@@ -123,7 +123,7 @@ void ButtonPressRequest::Execute() {
 
 AcquireResult::eType ButtonPressRequest::AcquireResource(
     const app_mngr::commands::MessageSharedPtr& message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string module_type = ModuleType();
   app_mngr::ApplicationSharedPtr app =
       application_manager_.application(CommandRequestImpl::connection_key());
@@ -134,13 +134,13 @@ AcquireResult::eType ButtonPressRequest::AcquireResource(
 
 bool ButtonPressRequest::IsResourceFree(const std::string& module_type,
                                         const std::string& module_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return resource_allocation_manager_.IsResourceFree(module_type, module_id);
 }
 
 void ButtonPressRequest::SetResourceState(const std::string& module_type,
                                           const ResourceState::eType state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   app_mngr::ApplicationSharedPtr app =
       application_manager_.application(CommandRequestImpl::connection_key());
 
@@ -149,7 +149,7 @@ void ButtonPressRequest::SetResourceState(const std::string& module_type,
 }
 
 void ButtonPressRequest::on_event(const app_mngr::event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   RCCommandRequest::on_event(event);
 
   if (hmi_apis::FunctionID::Buttons_ButtonPress != event.id()) {
@@ -221,7 +221,7 @@ std::string ButtonPressRequest::ModuleType() const {
 }
 
 std::string ButtonPressRequest::ModuleId() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto msg_params = (*message_)[app_mngr::strings::msg_params];
   if (msg_params.keyExists(message_params::kModuleId)) {
     return msg_params[message_params::kModuleId].asString();

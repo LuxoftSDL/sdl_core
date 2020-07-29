@@ -51,7 +51,7 @@ MixingAudioSupportedResponse::MixingAudioSupportedResponse(
 MixingAudioSupportedResponse::~MixingAudioSupportedResponse() {}
 
 void MixingAudioSupportedResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   hmi_capabilities_.set_attenuated_supported(
       (*message_)[strings::msg_params][hmi_response::attenuated_supported]

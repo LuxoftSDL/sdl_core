@@ -56,7 +56,7 @@ ASPerformAppServiceInteractionRequestFromHMI::
     ~ASPerformAppServiceInteractionRequestFromHMI() {}
 
 void ASPerformAppServiceInteractionRequestFromHMI::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject& msg_params = (*message_)[strings::msg_params];
   std::string hmi_origin_id =
@@ -148,7 +148,7 @@ void ASPerformAppServiceInteractionRequestFromHMI::on_event(
 }
 
 void ASPerformAppServiceInteractionRequestFromHMI::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject response_params;
   response_params[strings::info] =
       "The provider did not respond to the request";

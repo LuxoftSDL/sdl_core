@@ -53,7 +53,7 @@ BasicCommunicationCloseApplicationRequest::
     ~BasicCommunicationCloseApplicationRequest() {}
 
 void BasicCommunicationCloseApplicationRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   SendRequest();
 }
 

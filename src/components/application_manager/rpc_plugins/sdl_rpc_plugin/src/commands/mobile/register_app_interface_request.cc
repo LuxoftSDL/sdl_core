@@ -192,13 +192,13 @@ RegisterAppInterfaceRequest::RegisterAppInterfaceRequest(
 RegisterAppInterfaceRequest::~RegisterAppInterfaceRequest() {}
 
 bool RegisterAppInterfaceRequest::Init() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return true;
 }
 
 void RegisterAppInterfaceRequest::Run() {
   using namespace helpers;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Connection key is " << connection_key());
 
   // Fix problem with SDL and HMI HTML. This problem is not actual for HMI PASA.
@@ -681,7 +681,7 @@ void FillUIRelatedFields(smart_objects::SmartObject& response_params,
 
 void RegisterAppInterfaceRequest::SendRegisterAppInterfaceResponseToMobile(
     ApplicationType app_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject response_params(smart_objects::SmartType_Map);
 
   mobile_apis::Result::eType result_code = mobile_apis::Result::SUCCESS;
@@ -1023,7 +1023,7 @@ void RegisterAppInterfaceRequest::SendOnAppRegisteredNotificationToHMI(
 }
 
 mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckCoincidence() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& msg_params =
       (*message_)[strings::msg_params];
 
@@ -1096,7 +1096,7 @@ mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckCoincidence() {
 
 bool RegisterAppInterfaceRequest::GetDuplicateNames(
     std::vector<ApplicationSharedPtr>& out_duplicate_apps) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& msg_params =
       (*message_)[strings::msg_params];
 
@@ -1130,7 +1130,7 @@ bool RegisterAppInterfaceRequest::GetDuplicateNames(
 }
 
 mobile_apis::Result::eType RegisterAppInterfaceRequest::CheckWithPolicyData() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   // TODO(AOleynik): Check is necessary to allow register application in case
   // of disabled policy
   // Remove this check, when HMI will support policy
@@ -1245,7 +1245,7 @@ void RegisterAppInterfaceRequest::FillDeviceInfo(
 }
 
 bool RegisterAppInterfaceRequest::IsApplicationWithSameAppIdRegistered() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const custom_string::CustomString mobile_app_id(
       application_manager_.GetCorrectMobileIDFromMessage(message_));
@@ -1271,7 +1271,7 @@ bool RegisterAppInterfaceRequest::IsApplicationWithSameAppIdRegistered() {
 }
 
 bool RegisterAppInterfaceRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   str = (*message_)[strings::msg_params][strings::app_name].asCharArray();
@@ -1497,7 +1497,7 @@ bool RegisterAppInterfaceRequest::GetDataOnSessionKey(
     const uint32_t key,
     connection_handler::DeviceHandle* device_id,
     std::string* mac_address) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if ((nullptr == mac_address) && (nullptr == device_id)) {
     LOG4CXX_ERROR(logger_,

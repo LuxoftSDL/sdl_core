@@ -42,7 +42,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 class AoaInitSequence : public UsbControlTransferSequence {
  public:
@@ -57,7 +57,7 @@ class AoaInitSequence : public UsbControlTransferSequence {
 };
 
 void UsbDeviceScanner::OnDeviceArrived(PlatformUsbDevice* device) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (IsAppleDevice(device)) {
     SupportedDeviceFound(device);
   } else {
@@ -70,7 +70,7 @@ void UsbDeviceScanner::OnDeviceArrived(PlatformUsbDevice* device) {
 }
 
 void UsbDeviceScanner::OnDeviceLeft(PlatformUsbDevice* device) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "PlatformUsbDevice " << device);
   bool list_changed = false;
   devices_mutex_.Acquire();
@@ -192,14 +192,14 @@ AoaInitSequence::AoaInitSequence(const TransportManagerSettings& settings)
 }
 
 void UsbDeviceScanner::TurnIntoAccessoryMode(PlatformUsbDevice* device) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "PlatformUsbDevice: " << device);
   GetUsbHandler()->StartControlTransferSequence(new AoaInitSequence(settings_),
                                                 device);
 }
 
 void UsbDeviceScanner::SupportedDeviceFound(PlatformUsbDevice* device) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_TRACE(logger_, "PlatformUsbDevice: " << device);
 
   devices_mutex_.Acquire();
@@ -224,7 +224,7 @@ TransportAdapter::Error UsbDeviceScanner::Scan() {
 }
 
 void UsbDeviceScanner::UpdateList() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DeviceVector device_vector;
   devices_mutex_.Acquire();
   for (Devices::const_iterator it = devices_.begin(); it != devices_.end();

@@ -41,7 +41,7 @@
 #include "utils/threads/thread_delegate.h"
 #include "utils/timer_task.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Utils")
+SDL_CREATE_LOGGERPTR( "Utils")
 
 timer::Timer::Timer(const std::string& name, TimerTask* task)
     : name_(name)
@@ -51,7 +51,7 @@ timer::Timer::Timer(const std::string& name, TimerTask* task)
     , thread_(threads::CreateThread(name_.c_str(), delegate_.get()))
     , single_shot_(true)
     , completed_flag_(false) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(!name_.empty());
   DCHECK(task_);
   DCHECK(thread_);
@@ -59,7 +59,7 @@ timer::Timer::Timer(const std::string& name, TimerTask* task)
 }
 
 timer::Timer::~Timer() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock auto_lock(state_lock_);
   StopThread();
   StopDelegate();
@@ -74,7 +74,7 @@ timer::Timer::~Timer() {
 
 void timer::Timer::Start(const Milliseconds timeout,
                          const TimerType timer_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock auto_lock(state_lock_);
   StopThread();
   completed_flag_ = false;
@@ -95,7 +95,7 @@ void timer::Timer::Start(const Milliseconds timeout,
 }
 
 void timer::Timer::Stop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock auto_lock(state_lock_);
   StopThread();
   StopDelegate();

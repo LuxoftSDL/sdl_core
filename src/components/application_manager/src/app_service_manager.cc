@@ -45,7 +45,7 @@
 #include "smart_objects/enum_schema_item.h"
 #include "utils/logger.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "AppServiceManager")
+SDL_CREATE_LOGGERPTR( "AppServiceManager")
 
 namespace application_manager {
 
@@ -59,14 +59,14 @@ AppServiceManager::AppServiceManager(ApplicationManager& app_manager,
     , rpc_passing_handler_(*this, app_manager_) {}
 
 AppServiceManager::~AppServiceManager() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 smart_objects::SmartObject AppServiceManager::PublishAppService(
     const smart_objects::SmartObject& manifest,
     const bool mobile_service,
     const uint32_t connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::string str_to_hash = "";
   std::string service_id = "";
 
@@ -183,7 +183,7 @@ smart_objects::SmartObject AppServiceManager::PublishAppService(
 }
 
 bool AppServiceManager::UnpublishAppService(const std::string service_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
@@ -222,7 +222,7 @@ bool AppServiceManager::UnpublishAppService(const std::string service_id) {
 }
 
 void AppServiceManager::UnpublishServices(const uint32_t connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Unpublishing all app services: " << connection_key);
 
   std::list<std::string> app_published_services;
@@ -242,7 +242,7 @@ void AppServiceManager::UnpublishServices(const uint32_t connection_key) {
 }
 
 void AppServiceManager::OnAppActivated(ApplicationConstSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.begin();
   // Activate all services published by the app
@@ -255,7 +255,7 @@ void AppServiceManager::OnAppActivated(ApplicationConstSharedPtr app) {
 
 std::vector<smart_objects::SmartObject>
 AppServiceManager::GetAllServiceRecords() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::vector<smart_objects::SmartObject> services;
   sync_primitives::AutoLock lock(published_services_lock_);
   for (auto it = published_services_.begin(); it != published_services_.end();
@@ -269,7 +269,7 @@ void AppServiceManager::GetProviderByType(const std::string& service_type,
                                           const bool mobile_consumer,
                                           ApplicationSharedPtr& app,
                                           bool& hmi_service) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto active_service = ActiveServiceForType(service_type);
   if (!active_service) {
     LOG4CXX_ERROR(logger_,
@@ -286,7 +286,7 @@ void AppServiceManager::GetProviderByID(const std::string& service_id,
                                         const bool mobile_consumer,
                                         ApplicationSharedPtr& app,
                                         bool& hmi_service) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
@@ -302,7 +302,7 @@ void AppServiceManager::GetProviderFromService(const AppService& service,
                                                const bool mobile_consumer,
                                                ApplicationSharedPtr& app,
                                                bool& hmi_service) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (mobile_consumer &&
       !service.record[strings::service_manifest][strings::allow_app_consumers]
            .asBool()) {
@@ -319,7 +319,7 @@ void AppServiceManager::GetProviderFromService(const AppService& service,
 }
 
 bool AppServiceManager::SetDefaultService(const std::string service_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
@@ -350,7 +350,7 @@ bool AppServiceManager::SetDefaultService(const std::string service_id) {
 }
 
 bool AppServiceManager::RemoveDefaultService(const std::string service_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
@@ -377,7 +377,7 @@ bool AppServiceManager::RemoveDefaultService(const std::string service_id) {
 }
 
 bool AppServiceManager::ActivateAppService(const std::string service_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
@@ -424,7 +424,7 @@ bool AppServiceManager::ActivateAppService(const std::string service_id) {
 }
 
 bool AppServiceManager::DeactivateAppService(const std::string service_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
@@ -465,7 +465,7 @@ bool AppServiceManager::DeactivateAppService(const std::string service_id) {
 
 AppService* AppServiceManager::ActiveServiceForType(
     const std::string service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   for (auto it = published_services_.begin(); it != published_services_.end();
        ++it) {
@@ -481,7 +481,7 @@ AppService* AppServiceManager::ActiveServiceForType(
 
 AppService* AppServiceManager::EmbeddedServiceForType(
     const std::string service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   for (auto it = published_services_.begin(); it != published_services_.end();
        ++it) {
@@ -496,7 +496,7 @@ AppService* AppServiceManager::EmbeddedServiceForType(
 
 AppService* AppServiceManager::FindServiceByPolicyAppID(
     const std::string policy_app_id, const std::string type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   for (auto it = published_services_.begin(); it != published_services_.end();
        ++it) {
@@ -513,7 +513,7 @@ AppService* AppServiceManager::FindServiceByPolicyAppID(
 }
 
 AppService* AppServiceManager::FindServiceByID(const std::string service_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
 
   auto it = published_services_.find(service_id);
@@ -526,7 +526,7 @@ AppService* AppServiceManager::FindServiceByID(const std::string service_id) {
 
 AppService* AppServiceManager::FindServiceByProvider(
     const uint32_t connection_key, const std::string service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   for (auto& service : published_services_) {
     if (service.second.connection_key == connection_key &&
@@ -539,7 +539,7 @@ AppService* AppServiceManager::FindServiceByProvider(
 }
 
 AppService* AppServiceManager::FindServiceByName(std::string name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   for (auto& service : published_services_) {
     if (service.second.record[strings::service_manifest][strings::service_name]
@@ -552,7 +552,7 @@ AppService* AppServiceManager::FindServiceByName(std::string name) {
 
 std::string AppServiceManager::DefaultServiceByType(
     const std::string service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto last_state_accessor = last_state_->get_accessor();
   Json::Value dictionary = last_state_accessor.GetData().dictionary();
@@ -564,7 +564,7 @@ std::string AppServiceManager::DefaultServiceByType(
 
 void AppServiceManager::SetServicePublished(const std::string service_id,
                                             const bool service_published) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
@@ -584,7 +584,7 @@ std::string AppServiceManager::GetPolicyAppID(AppService service) {
 
 bool AppServiceManager::UpdateNavigationCapabilities(
     smart_objects::SmartObject& out_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::string navi_service_type;
   ns_smart_device_link::ns_smart_objects::
       EnumConversionHelper<mobile_apis::AppServiceType::eType>::EnumToString(
@@ -623,7 +623,7 @@ void AppServiceManager::AppServiceUpdated(
     const smart_objects::SmartObject& service_record,
     const mobile_apis::ServiceUpdateReason::eType update_reason,
     smart_objects::SmartObject& msg_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject& services =
       msg_params[strings::system_capability][strings::app_services_capabilities]
                 [strings::app_services];

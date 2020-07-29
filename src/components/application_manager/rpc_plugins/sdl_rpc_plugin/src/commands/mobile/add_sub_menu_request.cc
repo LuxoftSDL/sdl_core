@@ -57,7 +57,7 @@ AddSubMenuRequest::AddSubMenuRequest(
 AddSubMenuRequest::~AddSubMenuRequest() {}
 
 void AddSubMenuRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -137,7 +137,7 @@ void AddSubMenuRequest::Run() {
 }
 
 void AddSubMenuRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
 
   switch (event.id()) {
@@ -194,7 +194,7 @@ bool AddSubMenuRequest::Init() {
 }
 
 bool AddSubMenuRequest::CheckSubMenuName() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   str = (*message_)[strings::msg_params][strings::menu_name].asCharArray();

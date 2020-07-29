@@ -50,7 +50,7 @@ OnAppPropertiesChangeNotification::OnAppPropertiesChangeNotification(
                         policy_handle) {}
 
 void OnAppPropertiesChangeNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   SendNotification();
 }
 

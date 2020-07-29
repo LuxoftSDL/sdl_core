@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(wsc_logger_, "WebSocketConnection")
+SDL_CREATE_LOGGERPTR( "WebSocketConnection")
 
 using namespace boost::beast::websocket;
 
@@ -103,7 +103,7 @@ WebSocketConnection<Session>::~WebSocketConnection() {
 
 template <typename Session>
 void WebSocketConnection<Session>::OnError() {
-  LOG4CXX_AUTO_TRACE(wsc_logger_);
+  SDL_AUTO_TRACE();
 
   controller_->ConnectionAborted(
       device_uid_, app_handle_, CommunicationError());
@@ -113,7 +113,7 @@ void WebSocketConnection<Session>::OnError() {
 
 template <typename Session>
 TransportAdapter::Error WebSocketConnection<Session>::Disconnect() {
-  LOG4CXX_AUTO_TRACE(wsc_logger_);
+   SDL_AUTO_TRACE();
   if (!IsShuttingDown()) {
     Shutdown();
     controller_->DisconnectDone(device_uid_, app_handle_);
@@ -142,13 +142,13 @@ void WebSocketConnection<Session>::DataReceive(
 
 template <typename Session>
 void WebSocketConnection<Session>::Run() {
-  LOG4CXX_AUTO_TRACE(wsc_logger_);
+   SDL_AUTO_TRACE();
   session_->AsyncAccept();
 }
 
 template <typename Session>
 void WebSocketConnection<Session>::Shutdown() {
-  LOG4CXX_AUTO_TRACE(wsc_logger_);
+   SDL_AUTO_TRACE();
   shutdown_ = true;
   if (thread_delegate_) {
     session_->Shutdown();

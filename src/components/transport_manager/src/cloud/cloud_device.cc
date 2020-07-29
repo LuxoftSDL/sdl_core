@@ -37,7 +37,7 @@
 
 namespace transport_manager {
 namespace transport_adapter {
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 CloudDevice::CloudDevice(std::string& host,
                          std::string& port,

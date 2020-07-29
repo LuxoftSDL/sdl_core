@@ -139,7 +139,7 @@ OnDriverDistractionNotification::OnDriverDistractionNotification(
 OnDriverDistractionNotification::~OnDriverDistractionNotification() {}
 
 void OnDriverDistractionNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto state =
       static_cast<hmi_apis::Common_DriverDistractionState::eType>(
           (*message_)[strings::msg_params][hmi_notification::state].asInt());

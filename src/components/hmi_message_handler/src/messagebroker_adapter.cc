@@ -38,7 +38,7 @@
 
 namespace hmi_message_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "HMIMessageHandler")
+SDL_CREATE_LOGGERPTR( "HMIMessageHandler")
 
 typedef hmi_message_handler::CMessageBrokerController MessageBrokerController;
 
@@ -54,7 +54,7 @@ MessageBrokerAdapter::~MessageBrokerAdapter() {}
 
 void MessageBrokerAdapter::SendMessageToHMI(
     hmi_message_handler::MessageSharedPointer message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (message.use_count() == 0) {
     LOG4CXX_ERROR(logger_, "Can`t send not valid message");
@@ -75,17 +75,17 @@ void MessageBrokerAdapter::SendMessageToHMI(
 
 void MessageBrokerAdapter::processResponse(std::string method,
                                            Json::Value& root) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ProcessRecievedFromMB(root);
 }
 
 void MessageBrokerAdapter::processRequest(Json::Value& root) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ProcessRecievedFromMB(root);
 }
 
 void MessageBrokerAdapter::processNotification(Json::Value& root) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ProcessRecievedFromMB(root);
 }
 
@@ -157,7 +157,7 @@ void* MessageBrokerAdapter::SubscribeAndBeginReceiverThread(void* param) {
 }
 
 void MessageBrokerAdapter::ProcessRecievedFromMB(Json::Value& root) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_INFO(logger_, "MB_Adapter: " << root);
   if (root.isNull()) {
     // LOG

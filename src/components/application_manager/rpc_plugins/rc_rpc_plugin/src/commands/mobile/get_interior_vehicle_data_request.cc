@@ -44,7 +44,7 @@ namespace commands {
 using namespace json_keys;
 using namespace message_params;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule")
+SDL_CREATE_LOGGERPTR( "RemoteControlModule")
 
 GetInteriorVehicleDataRequest::GetInteriorVehicleDataRequest(
     const app_mngr::commands::MessageSharedPtr& message,
@@ -53,7 +53,7 @@ GetInteriorVehicleDataRequest::GetInteriorVehicleDataRequest(
     , excessive_subscription_occured_(false) {}
 
 bool GetInteriorVehicleDataRequest::ProcessCapabilities() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto rc_capability = hmi_capabilities_.rc_capability();
 
   const std::string module_type = ModuleType();
@@ -100,7 +100,7 @@ void GetInteriorVehicleDataRequest::FilterDisabledModuleData(
 
 void GetInteriorVehicleDataRequest::ProcessResponseToMobileFromCache(
     app_mngr::ApplicationSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto& data_mapping = RCHelpers::GetModuleTypeToDataMapping();
   const std::string module_type = ModuleType();
   const std::string module_id = ModuleId();
@@ -140,7 +140,7 @@ void GetInteriorVehicleDataRequest::ProcessResponseToMobileFromCache(
 }
 
 bool GetInteriorVehicleDataRequest::CheckRateLimits() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string module_type = ModuleType();
   const std::string module_id = ModuleId();
   const ModuleUid module(module_type, module_id);
@@ -148,7 +148,7 @@ bool GetInteriorVehicleDataRequest::CheckRateLimits() {
 }
 
 bool GetInteriorVehicleDataRequest::AppShouldBeUnsubscribed() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto& msg_params = (*message_)[app_mngr::strings::msg_params];
   if (msg_params.keyExists(message_params::kSubscribe)) {
     return !(msg_params[message_params::kSubscribe].asBool());
@@ -158,7 +158,7 @@ bool GetInteriorVehicleDataRequest::AppShouldBeUnsubscribed() {
 
 bool GetInteriorVehicleDataRequest::TheLastAppShouldBeUnsubscribed(
     app_mngr::ApplicationSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (AppShouldBeUnsubscribed()) {
     const std::string module_type = ModuleType();
     const std::string module_id = ModuleId();
@@ -177,7 +177,7 @@ bool GetInteriorVehicleDataRequest::TheLastAppShouldBeUnsubscribed(
 }
 
 void GetInteriorVehicleDataRequest::Execute() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!ProcessCapabilities()) {
     return;
@@ -216,7 +216,7 @@ void GetInteriorVehicleDataRequest::Execute() {
 
 void GetInteriorVehicleDataRequest::on_event(
     const app_mngr::event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   RCCommandRequest::on_event(event);
 
   if (hmi_apis::FunctionID::RC_GetInteriorVehicleData != event.id()) {
@@ -288,7 +288,7 @@ GetInteriorVehicleDataRequest::~GetInteriorVehicleDataRequest() {}
 
 void GetInteriorVehicleDataRequest::ProccessSubscription(
     const ns_smart_device_link::ns_smart_objects::SmartObject& hmi_response) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const bool is_subscribe_present_in_request =
       (*message_)[app_mngr::strings::msg_params].keyExists(
@@ -388,7 +388,7 @@ void GetInteriorVehicleDataRequest::ProccessSubscription(
 }
 
 bool GetInteriorVehicleDataRequest::HasRequestExcessiveSubscription() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const bool is_subscribe_present_in_request =
       (*message_)[app_mngr::strings::msg_params].keyExists(
           message_params::kSubscribe);
@@ -416,12 +416,12 @@ bool GetInteriorVehicleDataRequest::HasRequestExcessiveSubscription() {
 }
 
 void GetInteriorVehicleDataRequest::RemoveExcessiveSubscription() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   (*message_)[app_mngr::strings::msg_params].erase(message_params::kSubscribe);
 }
 
 std::string GetInteriorVehicleDataRequest::ModuleType() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   mobile_apis::ModuleType::eType module_type =
       static_cast<mobile_apis::ModuleType::eType>(
           (*message_)[app_mngr::strings::msg_params]
@@ -434,7 +434,7 @@ std::string GetInteriorVehicleDataRequest::ModuleType() const {
 }
 
 std::string GetInteriorVehicleDataRequest::ModuleId() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto msg_params = (*message_)[app_mngr::strings::msg_params];
   if (msg_params.keyExists(message_params::kModuleId)) {
     return msg_params[message_params::kModuleId].asString();

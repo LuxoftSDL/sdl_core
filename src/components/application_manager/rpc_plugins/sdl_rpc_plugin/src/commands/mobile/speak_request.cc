@@ -60,7 +60,7 @@ SpeakRequest::SpeakRequest(
 SpeakRequest::~SpeakRequest() {}
 
 void SpeakRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -103,7 +103,7 @@ void SpeakRequest::Run() {
 }
 
 void SpeakRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   switch (event.id()) {
     case hmi_apis::FunctionID::TTS_Speak: {
       LOG4CXX_INFO(logger_, "Received TTS_Speak event");
@@ -127,7 +127,7 @@ void SpeakRequest::on_event(const event_engine::Event& event) {
 
 void SpeakRequest::ProcessTTSSpeakResponse(
     const smart_objects::SmartObject& message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   ApplicationSharedPtr application =
@@ -158,7 +158,7 @@ void SpeakRequest::ProcessTTSSpeakResponse(
 }
 
 bool SpeakRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   if ((*message_)[strings::msg_params].keyExists(strings::tts_chunks)) {

@@ -59,7 +59,7 @@ MessageTypeMap message_types = {std::make_pair(kRequest, "Request"),
                                 std::make_pair(kResponse, "Response"),
                                 std::make_pair(kNotification, "Notification")};
 }  // namespace
-CREATE_LOGGERPTR_GLOBAL(logger_, "ApplicationManager")
+SDL_CREATE_LOGGERPTR( "ApplicationManager")
 
 application_manager::Message*
 MobileMessageHandler::HandleIncomingMessageProtocol(
@@ -136,7 +136,7 @@ MobileMessageHandler::HandleOutgoingMessageProtocol(
 application_manager::Message*
 MobileMessageHandler::HandleIncomingMessageProtocolV1(
     const ::protocol_handler::RawMessagePtr message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   application_manager::Message* outgoing_message =
       new application_manager::Message(
           protocol_handler::MessagePriority::FromServiceType(
@@ -165,7 +165,7 @@ MobileMessageHandler::HandleIncomingMessageProtocolV1(
 application_manager::Message*
 MobileMessageHandler::HandleIncomingMessageProtocolV2(
     const ::protocol_handler::RawMessagePtr message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::BitStream message_bytestream(message->data(), message->data_size());
   protocol_handler::ProtocolPayloadV2 payload;
   protocol_handler::Extract(
@@ -207,7 +207,7 @@ MobileMessageHandler::HandleIncomingMessageProtocolV2(
 protocol_handler::RawMessage*
 MobileMessageHandler::HandleOutgoingMessageProtocolV1(
     const MobileMessage& message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::string message_string = message->json_message();
   if (message_string.length() == 0) {
     LOG4CXX_WARN(logger_, "Drop ill-formed message from mobile");
@@ -230,7 +230,7 @@ MobileMessageHandler::HandleOutgoingMessageProtocolV1(
 protocol_handler::RawMessage*
 MobileMessageHandler::HandleOutgoingMessageProtocolV2(
     const MobileMessage& message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (message->json_message().length() == 0) {
     LOG4CXX_ERROR(logger_, "json string is empty.");
   }

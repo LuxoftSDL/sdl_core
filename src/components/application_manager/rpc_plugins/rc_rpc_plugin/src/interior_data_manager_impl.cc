@@ -5,7 +5,7 @@
 #include "rc_rpc_plugin/rc_rpc_plugin.h"
 
 namespace rc_rpc_plugin {
-CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule");
+SDL_CREATE_LOGGERPTR( "RemoteControlModule");
 
 InteriorDataManagerImpl::InteriorDataManagerImpl(
     RCRPCPlugin& rc_plugin,
@@ -31,7 +31,7 @@ void InteriorDataManagerImpl::OnApplicationEvent(
 }
 
 void InteriorDataManagerImpl::OnDisablingRC() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto existing_subscription = AppsSubscribedModules();
   std::set<ModuleUid> subscribed_modules;
   for (auto& pair : existing_subscription) {
@@ -51,14 +51,14 @@ void InteriorDataManagerImpl::OnDisablingRC() {
 }
 
 void InteriorDataManagerImpl::StoreRequestToHMITime(const ModuleUid& module) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(requests_to_hmi_history_lock_);
   requests_to_hmi_history_[module].push_back(date_time::getCurrentTime());
 }
 
 bool InteriorDataManagerImpl::CheckRequestsToHMIFrequency(
     const ModuleUid& module) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(requests_to_hmi_history_lock_);
   ClearOldRequestsToHMIHistory();
   const auto& history = requests_to_hmi_history_[module];
@@ -107,7 +107,7 @@ void InteriorDataManagerImpl::UpdateHMISubscriptionsOnPolicyUpdated() {
 
 void InteriorDataManagerImpl::UpdateHMISubscriptionsOnAppUnregistered(
     application_manager::Application& app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto rc_extension = RCHelpers::GetRCExtension(app);
   auto subscribed_data = rc_extension->InteriorVehicleDataSubscriptions();
   rc_extension->UnsubscribeFromInteriorVehicleData();

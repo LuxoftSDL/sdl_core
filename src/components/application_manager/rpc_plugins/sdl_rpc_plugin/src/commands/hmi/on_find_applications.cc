@@ -52,7 +52,7 @@ OnFindApplications::OnFindApplications(
 OnFindApplications::~OnFindApplications() {}
 
 void OnFindApplications::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // TODO(PV): add UpdateAppsOnDevice to ApplicationManager
 }

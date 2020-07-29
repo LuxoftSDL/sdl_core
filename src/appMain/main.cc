@@ -62,7 +62,7 @@
 
 #include "media_manager/media_manager_impl.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "SDLMain")
+SDL_CREATE_LOGGERPTR( "SDLMain")
 
 namespace {
 
@@ -148,8 +148,8 @@ int32_t main(int32_t argc, char** argv) {
   // Check if no error values were read from config file
   if (profile_instance.ErrorOccured()) {
     LOG4CXX_FATAL(logger_, profile_instance.ErrorDescription());
-    FLUSH_LOGGER();
-    DEINIT_LOGGER();
+    SDL_FLUSH_LOGGER()();
+    SDL_DEINIT_LOGGER()();
     exit(EXIT_FAILURE);
   }
 
@@ -158,7 +158,7 @@ int32_t main(int32_t argc, char** argv) {
   if (!life_cycle->StartComponents()) {
     LOG4CXX_FATAL(logger_, "Failed to start components");
     life_cycle->StopComponents();
-    DEINIT_LOGGER();
+    SDL_DEINIT_LOGGER()();
     exit(EXIT_FAILURE);
   }
   LOG4CXX_INFO(logger_, "Components Started");
@@ -169,7 +169,7 @@ int32_t main(int32_t argc, char** argv) {
   if (!life_cycle->InitMessageSystem()) {
     LOG4CXX_FATAL(logger_, "Failed to init message system");
     life_cycle->StopComponents();
-    DEINIT_LOGGER();
+    SDL_DEINIT_LOGGER()();
     _exit(EXIT_FAILURE);
   }
   LOG4CXX_INFO(logger_, "InitMessageBroker successful");
@@ -194,7 +194,7 @@ int32_t main(int32_t argc, char** argv) {
   life_cycle->StopComponents();
   LOG4CXX_INFO(logger_, "Application has been stopped successfuly");
 
-  DEINIT_LOGGER();
+  SDL_DEINIT_LOGGER()();
 
   return EXIT_SUCCESS;
 }

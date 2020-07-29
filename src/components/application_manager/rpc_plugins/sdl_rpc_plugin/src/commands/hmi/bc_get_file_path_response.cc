@@ -55,7 +55,7 @@ BCGetFilePathResponse::BCGetFilePathResponse(
 BCGetFilePathResponse::~BCGetFilePathResponse() {}
 
 void BCGetFilePathResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   application_manager::event_engine::Event event(
       hmi_apis::FunctionID::BasicCommunication_GetFilePath);
   event.set_smart_object(*message_);

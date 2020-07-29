@@ -52,7 +52,7 @@ VRDeleteCommandRequest::VRDeleteCommandRequest(
 VRDeleteCommandRequest::~VRDeleteCommandRequest() {}
 
 void VRDeleteCommandRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   SendRequest();
 }

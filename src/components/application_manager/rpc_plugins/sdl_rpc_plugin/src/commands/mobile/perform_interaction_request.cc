@@ -108,7 +108,7 @@ bool PerformInteractionRequest::Init() {
 }
 
 void PerformInteractionRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -234,7 +234,7 @@ void PerformInteractionRequest::Run() {
 }
 
 void PerformInteractionRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
 
   switch (event.id()) {
@@ -292,7 +292,7 @@ void PerformInteractionRequest::on_event(const event_engine::Event& event) {
 }
 
 void PerformInteractionRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   switch (interaction_mode_) {
     case mobile_apis::InteractionMode::BOTH: {
@@ -331,7 +331,7 @@ void PerformInteractionRequest::onTimeOut() {
 bool PerformInteractionRequest::ProcessVRResponse(
     const smart_objects::SmartObject& message,
     smart_objects::SmartObject& msg_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace hmi_apis;
   using namespace mobile_apis;
   using namespace smart_objects;
@@ -407,7 +407,7 @@ bool PerformInteractionRequest::ProcessVRResponse(
 void PerformInteractionRequest::ProcessUIResponse(
     const smart_objects::SmartObject& message,
     smart_objects::SmartObject& msg_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
   using namespace smart_objects;
 
@@ -476,7 +476,7 @@ void PerformInteractionRequest::ProcessUIResponse(
 
 void PerformInteractionRequest::SendUIPerformInteractionRequest(
     application_manager::ApplicationSharedPtr const app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject& choice_set_id_list =
       (*message_)[strings::msg_params][strings::interaction_choice_set_id_list];
 
@@ -562,7 +562,7 @@ void PerformInteractionRequest::SendUIPerformInteractionRequest(
 
 void PerformInteractionRequest::SendVRPerformInteractionRequest(
     application_manager::ApplicationSharedPtr const app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject msg_params =
       smart_objects::SmartObject(smart_objects::SmartType_Map);
@@ -703,7 +703,7 @@ void PerformInteractionRequest::SendVRPerformInteractionRequest(
 
 bool PerformInteractionRequest::CheckChoiceSetMenuNames(
     application_manager::ApplicationSharedPtr const app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject& choice_list =
       (*message_)[strings::msg_params][strings::interaction_choice_set_id_list];
@@ -756,7 +756,7 @@ bool PerformInteractionRequest::CheckChoiceSetMenuNames(
 
 bool PerformInteractionRequest::CheckChoiceSetVRSynonyms(
     application_manager::ApplicationSharedPtr const app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject& choice_list =
       (*message_)[strings::msg_params][strings::interaction_choice_set_id_list];
@@ -825,7 +825,7 @@ bool PerformInteractionRequest::CheckChoiceSetVRSynonyms(
 
 bool PerformInteractionRequest::CheckVrHelpItemPositions(
     application_manager::ApplicationSharedPtr const app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!(*message_)[strings::msg_params].keyExists(strings::vr_help)) {
     LOG4CXX_DEBUG(logger_, strings::vr_help << " is omitted.");
@@ -850,7 +850,7 @@ bool PerformInteractionRequest::CheckVrHelpItemPositions(
 }
 
 void PerformInteractionRequest::DisablePerformInteraction() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
   if (!app) {
@@ -870,7 +870,7 @@ void PerformInteractionRequest::DisablePerformInteraction() {
 }
 
 bool PerformInteractionRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   str = (*message_)[strings::msg_params][strings::initial_text].asCharArray();
@@ -955,7 +955,7 @@ bool PerformInteractionRequest::IsWhiteSpaceExist() {
 }
 
 void PerformInteractionRequest::TerminatePerformInteraction() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   SendClosePopupRequestToHMI();
   DisablePerformInteraction();
@@ -970,7 +970,7 @@ void PerformInteractionRequest::SendClosePopupRequestToHMI() {
 
 bool PerformInteractionRequest::CheckChoiceIDFromResponse(
     ApplicationSharedPtr app, const int32_t choice_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const DataAccessor<PerformChoiceSetMap> accessor =
       app->performinteraction_choice_set_map();
   const PerformChoiceSetMap& choice_set_map = accessor.GetData();
@@ -998,7 +998,7 @@ bool PerformInteractionRequest::CheckChoiceIDFromResponse(
 
 bool PerformInteractionRequest::CheckChoiceSetListVRCommands(
     ApplicationSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const smart_objects::SmartObject& choice_set_id_list =
       (*message_)[strings::msg_params][strings::interaction_choice_set_id_list];
@@ -1039,7 +1039,7 @@ bool PerformInteractionRequest::CheckChoiceIDFromRequest(
     ApplicationSharedPtr app,
     const size_t choice_set_id_list_length,
     const smart_objects::SmartObject& choice_set_id_list) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   size_t choice_list_length = 0;
   std::set<uint32_t> choice_id_set;
@@ -1074,13 +1074,13 @@ bool PerformInteractionRequest::CheckChoiceIDFromRequest(
 }
 
 const bool PerformInteractionRequest::HasHMIResponsesToWait() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return !ui_response_received_ || !vr_response_received_;
 }
 
 void PerformInteractionRequest::SendBothModeResponse(
     const smart_objects::SmartObject& msg_param) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   mobile_apis::Result::eType perform_interaction_result_code =
       mobile_apis::Result::INVALID_ENUM;
   app_mngr::commands::ResponseInfo ui_perform_info(
@@ -1159,7 +1159,7 @@ bool PerformInteractionRequest::PrepareResultForMobileResponse(
 
 bool PerformInteractionRequest::SetChoiceIdToResponseMsgParams(
     ns_smart_device_link::ns_smart_objects::SmartObject& msg_param) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const bool ui_choice_id_valid = INVALID_CHOICE_ID != ui_choice_id_received_;
   const bool vr_choice_id_valid = INVALID_CHOICE_ID != vr_choice_id_received_;

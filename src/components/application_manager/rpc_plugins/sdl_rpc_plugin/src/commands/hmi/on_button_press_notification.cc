@@ -56,7 +56,7 @@ OnButtonPressNotification::OnButtonPressNotification(
                           policy_handle) {}
 
 void OnButtonPressNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   event_engine::Event event(hmi_apis::FunctionID::Buttons_OnButtonPress);
   event.set_smart_object(*message_);
   event.raise(application_manager_.event_dispatcher());

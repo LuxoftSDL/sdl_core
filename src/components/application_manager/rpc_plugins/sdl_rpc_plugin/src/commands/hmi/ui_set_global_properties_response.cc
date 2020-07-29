@@ -53,7 +53,7 @@ UISetGlobalPropertiesResponse::UISetGlobalPropertiesResponse(
 UISetGlobalPropertiesResponse::~UISetGlobalPropertiesResponse() {}
 
 void UISetGlobalPropertiesResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   event_engine::Event event(hmi_apis::FunctionID::UI_SetGlobalProperties);
   event.set_smart_object(*message_);

@@ -66,7 +66,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 static bool SetNonblocking(int s);
 
@@ -96,7 +96,7 @@ TcpClientListener::TcpClientListener(TransportAdapterController* controller,
 }
 
 TransportAdapter::Error TcpClientListener::Init() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   thread_stop_requested_ = false;
 
   if (!IsListeningOnSpecificInterface()) {
@@ -130,7 +130,7 @@ TransportAdapter::Error TcpClientListener::Init() {
 }
 
 void TcpClientListener::Terminate() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!initialized_) {
     return;
@@ -154,7 +154,7 @@ bool TcpClientListener::IsInitialised() const {
 }
 
 TcpClientListener::~TcpClientListener() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   StopListening();
   delete thread_->delegate();
   threads::DeleteThread(thread_);
@@ -163,7 +163,7 @@ TcpClientListener::~TcpClientListener() {
 }
 
 void SetKeepaliveOptions(const int fd) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "fd: " << fd);
   int yes = 1;
   int keepidle = 3;  // 3 seconds to disconnection detecting
@@ -224,7 +224,7 @@ void SetKeepaliveOptions(const int fd) {
 }
 
 void TcpClientListener::Loop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   fd_set rfds;
   char dummy[16];
   std::vector<DeviceUID> device_uid_list;
@@ -342,7 +342,7 @@ void TcpClientListener::Loop() {
 }
 
 void TcpClientListener::StopLoop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (pipe_fds_[1] < 0) {
     LOG4CXX_WARN(logger_, "StopLoop called in invalid state");
     return;
@@ -359,7 +359,7 @@ void TcpClientListener::StopLoop() {
 }
 
 TransportAdapter::Error TcpClientListener::StartListening() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (started_) {
     LOG4CXX_WARN(
         logger_,
@@ -386,7 +386,7 @@ TransportAdapter::Error TcpClientListener::StartListening() {
 }
 
 TransportAdapter::Error TcpClientListener::ResumeListening() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   interface_listener_->Init();
   StartListeningThread();
@@ -397,7 +397,7 @@ TransportAdapter::Error TcpClientListener::ResumeListening() {
 }
 
 TransportAdapter::Error TcpClientListener::StopListening() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!started_) {
     LOG4CXX_DEBUG(logger_, "TcpClientListener is not running now");
     return TransportAdapter::BAD_STATE;
@@ -413,7 +413,7 @@ TransportAdapter::Error TcpClientListener::StopListening() {
 }
 
 TransportAdapter::Error TcpClientListener::SuspendListening() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!started_) {
     LOG4CXX_DEBUG(logger_, "TcpClientListener is not running now");
     return TransportAdapter::BAD_STATE;
@@ -448,7 +448,7 @@ TcpClientListener::ListeningThreadDelegate::ListeningThreadDelegate(
     : parent_(parent) {}
 
 TransportAdapter::Error TcpClientListener::StartListeningThread() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // StartListening() can be called from multiple threads
   sync_primitives::AutoLock auto_lock(start_stop_lock_);
@@ -474,7 +474,7 @@ TransportAdapter::Error TcpClientListener::StartListeningThread() {
 }
 
 TransportAdapter::Error TcpClientListener::StopListeningThread() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // StopListening() can be called from multiple threads
   sync_primitives::AutoLock auto_lock(start_stop_lock_);
@@ -491,7 +491,7 @@ TransportAdapter::Error TcpClientListener::StopListeningThread() {
 
 void TcpClientListener::OnIPAddressUpdated(const std::string ipv4_addr,
                                            const std::string ipv6_addr) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // Since we only create a TCP socket with IPv4 option (AF_INET), currently we
   // do not use IPv6 address.
@@ -528,7 +528,7 @@ void TcpClientListener::OnIPAddressUpdated(const std::string ipv4_addr,
 }
 
 bool TcpClientListener::StartOnNetworkInterface() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // this method is only for the case that network interface is specified
   if (IsListeningOnSpecificInterface()) {
@@ -557,7 +557,7 @@ bool TcpClientListener::StartOnNetworkInterface() {
 }
 
 bool TcpClientListener::StopOnNetworkInterface() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (IsListeningOnSpecificInterface()) {
     if (TransportAdapter::OK != StopListeningThread()) {
@@ -586,7 +586,7 @@ bool TcpClientListener::IsListeningOnSpecificInterface() const {
 
 int TcpClientListener::CreateIPv4ServerSocket(
     uint16_t port, const std::string interface_name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   struct in_addr ipv4_address;
   memset(&ipv4_address, 0, sizeof(ipv4_address));
@@ -632,7 +632,7 @@ int TcpClientListener::CreateIPv4ServerSocket(
 }
 
 void TcpClientListener::DestroyServerSocket(int sock) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (sock >= 0) {
     if (shutdown(sock, SHUT_RDWR) != 0) {
       LOG4CXX_ERROR_WITH_ERRNO(logger_, "Failed to shutdown socket");
@@ -645,7 +645,7 @@ void TcpClientListener::DestroyServerSocket(int sock) {
 
 bool TcpClientListener::GetIPv4Address(const std::string interface_name,
                                        struct in_addr* ip_address) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
 #ifdef BUILD_TESTS
   if (testing_) {

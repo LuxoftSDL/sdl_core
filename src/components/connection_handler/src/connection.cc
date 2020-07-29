@@ -52,7 +52,7 @@
  */
 namespace connection_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ConnectionHandler")
+SDL_CREATE_LOGGERPTR( "ConnectionHandler")
 
 Service* Session::FindService(
     const protocol_handler::ServiceType& service_type) {
@@ -83,7 +83,7 @@ Connection::Connection(ConnectionHandle connection_handle,
     , connection_device_handle_(connection_device_handle)
     , primary_connection_handle_(0)
     , heartbeat_timeout_(heartbeat_timeout) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(connection_handler_);
 
   heartbeat_monitor_ = new HeartBeatMonitor(heartbeat_timeout_, this);
@@ -93,7 +93,7 @@ Connection::Connection(ConnectionHandle connection_handle,
 }
 
 Connection::~Connection() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   heart_beat_monitor_thread_->join();
   delete heartbeat_monitor_;
   threads::DeleteThread(heart_beat_monitor_thread_);
@@ -120,7 +120,7 @@ Connection::~Connection() {
 
 uint32_t Connection::AddNewSession(
     const transport_manager::ConnectionUID connection_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // NESTED LOCK: make sure to lock session_map_lock_ then ConnectionHandler's
   // session_connection_map_lock_ptr_ (which will be taken in AddSession)
@@ -144,7 +144,7 @@ uint32_t Connection::AddNewSession(
 }
 
 uint32_t Connection::RemoveSession(uint8_t session_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // Again, a NESTED lock, but it follows the rules.
   sync_primitives::AutoLock lock(session_map_lock_);
@@ -277,7 +277,7 @@ bool Connection::RemoveService(uint8_t session_id,
 uint8_t Connection::RemoveSecondaryServices(
     transport_manager::ConnectionUID secondary_connection_handle,
     std::list<protocol_handler::ServiceType>& removed_services_list) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint8_t found_session_id = 0;
   sync_primitives::AutoLock lock(session_map_lock_);
@@ -348,7 +348,7 @@ int Connection::SetSSLContext(uint8_t session_id,
 security_manager::SSLContext* Connection::GetSSLContext(
     const uint8_t session_id,
     const protocol_handler::ServiceType& service_type) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(session_map_lock_);
   SessionMap::const_iterator session_it = session_map_.find(session_id);
   if (session_it == session_map_.end()) {
@@ -373,7 +373,7 @@ security_manager::SSLContext* Connection::GetSSLContext(
 void Connection::SetProtectionFlag(
     const uint8_t session_id,
     const protocol_handler::ServiceType& service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(session_map_lock_);
   SessionMap::iterator session_it = session_map_.find(session_id);
   if (session_it == session_map_.end()) {
@@ -404,7 +404,7 @@ void Connection::SetProtectionFlag(
 bool Connection::SessionServiceExists(
     const uint8_t session_id,
     const protocol_handler::ServiceType& service_type) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(session_map_lock_);
 
   SessionMap::const_iterator session_it = session_map_.find(session_id);
@@ -457,7 +457,7 @@ void Connection::UpdateProtocolVersionSession(uint8_t session_id,
 }
 
 bool Connection::SupportHeartBeat(uint8_t session_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(session_map_lock_);
   SessionMap::iterator session_it = session_map_.find(session_id);
   if (session_map_.end() == session_it) {
@@ -472,7 +472,7 @@ bool Connection::SupportHeartBeat(uint8_t session_id) {
 
 bool Connection::ProtocolVersion(uint8_t session_id,
                                  uint8_t& protocol_version) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(session_map_lock_);
   SessionMap::iterator session_it = session_map_.find(session_id);
   if (session_map_.end() == session_it) {

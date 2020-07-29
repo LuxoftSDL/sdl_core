@@ -55,7 +55,7 @@ OnButtonEventNotification::OnButtonEventNotification(
                           policy_handle) {}
 
 void OnButtonEventNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   (*message_)[strings::params][strings::function_id] =
       static_cast<int32_t>(mobile_apis::FunctionID::OnButtonEventID);

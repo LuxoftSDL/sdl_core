@@ -52,13 +52,13 @@ UIGetCapabilitiesRequest::UIGetCapabilitiesRequest(
 UIGetCapabilitiesRequest::~UIGetCapabilitiesRequest() {}
 
 void UIGetCapabilitiesRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   SendRequest();
 }
 
 void UIGetCapabilitiesRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   hmi_capabilities_.UpdateRequestsRequiredForCapabilities(
       hmi_apis::FunctionID::UI_GetCapabilities);
 }

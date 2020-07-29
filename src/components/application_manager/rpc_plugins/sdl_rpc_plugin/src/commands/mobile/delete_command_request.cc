@@ -65,7 +65,7 @@ DeleteCommandRequest::DeleteCommandRequest(
 DeleteCommandRequest::~DeleteCommandRequest() {}
 
 void DeleteCommandRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr application =
       application_manager_.application(connection_key());
@@ -152,7 +152,7 @@ bool DeleteCommandRequest::PrepareResponseParameters(
 }
 
 void DeleteCommandRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const smart_objects::SmartObject& message = event.smart_object();
   switch (event.id()) {
@@ -227,7 +227,7 @@ bool DeleteCommandRequest::Init() {
 }
 
 bool DeleteCommandRequest::IsPendingResponseExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return is_ui_send_ != is_ui_received_ || is_vr_send_ != is_vr_received_;
 }
 

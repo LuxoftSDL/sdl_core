@@ -54,7 +54,7 @@ UnsubscribeWayPointsRequest::UnsubscribeWayPointsRequest(
 UnsubscribeWayPointsRequest::~UnsubscribeWayPointsRequest() {}
 
 void UnsubscribeWayPointsRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -88,7 +88,7 @@ void UnsubscribeWayPointsRequest::Run() {
 }
 
 void UnsubscribeWayPointsRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ApplicationSharedPtr app = application_manager_.application(connection_key());
   const smart_objects::SmartObject& message = event.smart_object();
   switch (event.id()) {

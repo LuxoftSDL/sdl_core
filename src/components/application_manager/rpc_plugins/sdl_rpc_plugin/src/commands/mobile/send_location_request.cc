@@ -57,7 +57,7 @@ SendLocationRequest::~SendLocationRequest() {}
 void SendLocationRequest::Run() {
   using namespace hmi_apis;
   using smart_objects::SmartObject;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -140,7 +140,7 @@ void SendLocationRequest::Run() {
 }
 
 void SendLocationRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace hmi_apis;
   const smart_objects::SmartObject& message = event.smart_object();
   if (hmi_apis::FunctionID::Navigation_SendLocation == event.id()) {
@@ -194,7 +194,7 @@ void insert_if_contains(
 }
 
 bool SendLocationRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::vector<utils::custom_string::CustomString> fields_to_check;
   const smart_objects::SmartObject& msg_params =
       (*message_)[strings::msg_params];

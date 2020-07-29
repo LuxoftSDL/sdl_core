@@ -52,7 +52,7 @@
 #include "smart_objects/enum_schema_item.h"
 #include "utils/timer_task_impl.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RPCPassingHandler")
+SDL_CREATE_LOGGERPTR( "RPCPassingHandler")
 
 namespace application_manager {
 
@@ -98,7 +98,7 @@ bool RPCPassingHandler::ExtractRPCParams(
     const smart_objects::SmartObject& s_map,
     const ApplicationSharedPtr app,
     const std::string& function_id_str) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   RPCParams params;
 
   if (smart_objects::SmartType_Map == s_map.getType()) {
@@ -131,7 +131,7 @@ bool RPCPassingHandler::ExtractRPCParams(
 
 bool RPCPassingHandler::IsPassthroughAllowed(
     smart_objects::SmartObject rpc_message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint32_t connection_key =
       rpc_message[strings::params][strings::connection_key].asUInt();
   ApplicationSharedPtr app = app_manager_.application(connection_key);
@@ -162,7 +162,7 @@ bool RPCPassingHandler::IsPassthroughAllowed(
 }
 
 bool RPCPassingHandler::RPCPassThrough(smart_objects::SmartObject rpc_message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint32_t correlation_id =
       rpc_message[strings::params][strings::correlation_id].asUInt();

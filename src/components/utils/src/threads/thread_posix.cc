@@ -53,13 +53,13 @@ const size_t THREAD_NAME_SIZE = 15;
 
 namespace threads {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Utils")
+SDL_CREATE_LOGGERPTR( "Utils")
 
 size_t Thread::kMinStackSize =
     PTHREAD_STACK_MIN; /* Ubuntu : 16384 ; QNX : 256; */
 
 void Thread::cleanup(void* arg) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   Thread* thread = reinterpret_cast<Thread*>(arg);
   sync_primitives::AutoLock auto_lock(thread->state_lock_);
   thread->isThreadRunning_ = false;
@@ -157,7 +157,7 @@ bool Thread::IsCurrentThread() const {
 }
 
 bool Thread::start(const ThreadOptions& options) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   sync_primitives::AutoLock auto_lock(state_lock_);
   // 1 - state_lock locked
@@ -247,7 +247,7 @@ void Thread::yield() {
 }
 
 void Thread::stop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock auto_lock(state_lock_);
 
   stopped_ = true;
@@ -264,7 +264,7 @@ void Thread::stop() {
 }
 
 void Thread::join() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(!IsCurrentThread());
 
   stop();

@@ -59,7 +59,7 @@ namespace websocket =
 namespace ssl = boost::asio::ssl;  // from <boost/asio/ssl.hpp>
 #endif                             // ENABLE_SECURITY
 
-CREATE_LOGGERPTR_GLOBAL(ws_logger_, "WebSocketSession")
+SDL_CREATE_LOGGERPTR( "WebSocketSession")
 
 class TransportAdapterController;
 

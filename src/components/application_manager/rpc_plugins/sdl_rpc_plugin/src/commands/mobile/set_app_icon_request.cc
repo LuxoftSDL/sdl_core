@@ -75,7 +75,7 @@ SetAppIconRequest::SetAppIconRequest(
 SetAppIconRequest::~SetAppIconRequest() {}
 
 void SetAppIconRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -129,7 +129,7 @@ void SetAppIconRequest::Run() {
 
 void SetAppIconRequest::CopyToIconStorage(
     const std::string& policy_app_id, const std::string& path_to_file) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!(application_manager_.protocol_handler()
             .get_settings()
             .max_supported_protocol_version() >=
@@ -252,7 +252,7 @@ bool SetAppIconRequest::IsEnoughSpaceForIcon(const uint64_t icon_size) const {
 }
 
 void SetAppIconRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
 
   switch (event.id()) {

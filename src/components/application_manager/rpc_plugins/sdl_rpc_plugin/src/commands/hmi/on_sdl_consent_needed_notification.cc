@@ -53,7 +53,7 @@ OnSDLConsentNeededNotification::OnSDLConsentNeededNotification(
 OnSDLConsentNeededNotification::~OnSDLConsentNeededNotification() {}
 
 void OnSDLConsentNeededNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   SendNotification();
 }
 

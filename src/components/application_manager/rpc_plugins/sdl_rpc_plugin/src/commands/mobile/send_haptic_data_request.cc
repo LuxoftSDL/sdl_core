@@ -55,7 +55,7 @@ SendHapticDataRequest::SendHapticDataRequest(
 SendHapticDataRequest::~SendHapticDataRequest() {}
 
 void SendHapticDataRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject& msg_params = (*message_)[strings::msg_params];
 
@@ -77,7 +77,7 @@ void SendHapticDataRequest::Run() {
 }
 
 void SendHapticDataRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   const smart_objects::SmartObject& message = event.smart_object();

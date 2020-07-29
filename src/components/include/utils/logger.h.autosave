@@ -72,7 +72,7 @@ void deinit_logger();
 
 // special macros to dump logs from queue
 // it's need, for example, when crash happend
-#define SDL_FLUSH_LOGGER()() logger::flush_logger()
+#define FLUSH_LOGGER() logger::flush_logger()
 
 #define LOG4CXX_IS_TRACE_ENABLED(logger) logger->isTraceEnabled()
 
@@ -148,7 +148,7 @@ log4cxx_time_t time_now();
 
 #define DELETE_THREAD_LOGGER(logger_var)
 
-#define SDL_FLUSH_LOGGER()()
+#define FLUSH_LOGGER()
 
 #define LOG4CXX_IS_TRACE_ENABLED(logger) false
 

@@ -57,7 +57,7 @@ UpdateDeviceListRequest::UpdateDeviceListRequest(
 UpdateDeviceListRequest::~UpdateDeviceListRequest() {}
 
 void UpdateDeviceListRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock auto_lock(wait_hmi_lock);
   // Fix problem with SDL and HMI HTML. This problem is not actual for HMI PASA.
   // Flag conditional compilation for specific customer is used in order to
@@ -76,7 +76,7 @@ void UpdateDeviceListRequest::Run() {
 }
 
 void UpdateDeviceListRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock auto_lock(wait_hmi_lock);
   switch (event.id()) {
     case hmi_apis::FunctionID::BasicCommunication_OnReady: {

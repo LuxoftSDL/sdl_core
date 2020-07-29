@@ -57,7 +57,7 @@ OnTTSLanguageChangeNotification::OnTTSLanguageChangeNotification(
 OnTTSLanguageChangeNotification::~OnTTSLanguageChangeNotification() {}
 
 void OnTTSLanguageChangeNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   hmi_capabilities_.set_active_tts_language(
       static_cast<hmi_apis::Common_Language::eType>(

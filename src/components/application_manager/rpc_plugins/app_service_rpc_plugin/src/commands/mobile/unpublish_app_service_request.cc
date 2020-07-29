@@ -56,7 +56,7 @@ UnpublishAppServiceRequest::UnpublishAppServiceRequest(
 UnpublishAppServiceRequest::~UnpublishAppServiceRequest() {}
 
 void UnpublishAppServiceRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::string service_id =
       (*message_)[strings::msg_params][strings::service_id].asString();

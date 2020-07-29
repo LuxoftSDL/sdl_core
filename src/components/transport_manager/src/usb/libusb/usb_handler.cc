@@ -46,7 +46,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 class UsbHandler::ControlTransferSequenceState {
  public:
@@ -517,13 +517,13 @@ UsbHandler::UsbHandlerDelegate::UsbHandlerDelegate(UsbHandler* handler)
     : handler_(handler) {}
 
 void UsbHandler::UsbHandlerDelegate::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(handler_);
   handler_->Thread();
 }
 
 void UsbHandler::UsbHandlerDelegate::exitThreadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   // Empty method required in order to avoid force delegate thread
   // finishing by exitThreadMain() of the base class
 }

@@ -59,7 +59,7 @@ OnExitApplicationNotification::OnExitApplicationNotification(
 OnExitApplicationNotification::~OnExitApplicationNotification() {}
 
 void OnExitApplicationNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   using namespace mobile_apis;
   using namespace hmi_apis;

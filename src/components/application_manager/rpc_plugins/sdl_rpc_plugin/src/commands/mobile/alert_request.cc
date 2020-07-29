@@ -92,7 +92,7 @@ bool AlertRequest::Init() {
 }
 
 void AlertRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint32_t app_id =
       (*message_)[strings::params][strings::connection_key].asInt();
@@ -123,7 +123,7 @@ void AlertRequest::Run() {
 }
 
 void AlertRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
 
   switch (event.id()) {
@@ -239,7 +239,7 @@ bool AlertRequest::PrepareResponseParameters(
 }
 
 bool AlertRequest::Validate(uint32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ApplicationSharedPtr app = application_manager_.application(app_id);
 
   if (!app) {
@@ -310,7 +310,7 @@ bool AlertRequest::Validate(uint32_t app_id) {
 }
 
 void AlertRequest::SendAlertRequest(int32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ApplicationSharedPtr app = application_manager_.application(app_id);
 
   smart_objects::SmartObject msg_params =
@@ -402,7 +402,7 @@ void AlertRequest::SendAlertRequest(int32_t app_id) {
 void AlertRequest::SendSpeakRequest(int32_t app_id,
                                     bool tts_chunks_exists,
                                     size_t length_tts_chunks) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace hmi_apis;
   using namespace smart_objects;
   // crate HMI speak request
@@ -424,7 +424,7 @@ void AlertRequest::SendSpeakRequest(int32_t app_id,
 }
 
 bool AlertRequest::CheckStringsOfAlertRequest() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   if ((*message_)[strings::msg_params].keyExists(strings::alert_text1)) {
@@ -466,7 +466,7 @@ bool AlertRequest::CheckStringsOfAlertRequest() {
 }
 
 bool AlertRequest::HasHmiResponsesToWait() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return awaiting_ui_alert_response_ || awaiting_tts_speak_response_ ||
          awaiting_tts_stop_speaking_response_;
 }

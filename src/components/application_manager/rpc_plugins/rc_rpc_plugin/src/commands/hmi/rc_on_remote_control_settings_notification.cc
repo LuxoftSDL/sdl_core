@@ -47,7 +47,7 @@ std::map<std::string, hmi_apis::Common_RCAccessMode::eType> access_modes{
     {enums_value::kAskDriver, hmi_apis::Common_RCAccessMode::ASK_DRIVER}};
 }
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule")
+SDL_CREATE_LOGGERPTR( "RemoteControlModule")
 
 RCOnRemoteControlSettingsNotification::RCOnRemoteControlSettingsNotification(
     const app_mngr::commands::MessageSharedPtr& message,
@@ -89,12 +89,12 @@ std::string AccessModeToString(
 }
 
 void RCOnRemoteControlSettingsNotification::DisallowRCFunctionality() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   interior_data_manager_.OnDisablingRC();
 }
 
 void RCOnRemoteControlSettingsNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!(*message_)[app_mngr::strings::msg_params].keyExists(
           message_params::kAllowed)) {

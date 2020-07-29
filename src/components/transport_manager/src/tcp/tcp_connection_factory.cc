@@ -39,7 +39,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 TcpConnectionFactory::TcpConnectionFactory(
     TransportAdapterController* controller)
@@ -51,7 +51,7 @@ TransportAdapter::Error TcpConnectionFactory::Init() {
 
 TransportAdapter::Error TcpConnectionFactory::CreateConnection(
     const DeviceUID& device_uid, const ApplicationHandle& app_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(
       logger_,
       "DeviceUID: " << &device_uid << ", ApplicationHandle: " << &app_handle);

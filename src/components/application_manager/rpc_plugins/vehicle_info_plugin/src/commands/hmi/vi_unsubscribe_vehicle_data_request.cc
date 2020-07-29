@@ -51,7 +51,7 @@ VIUnsubscribeVehicleDataRequest::VIUnsubscribeVehicleDataRequest(
 VIUnsubscribeVehicleDataRequest::~VIUnsubscribeVehicleDataRequest() {}
 
 void VIUnsubscribeVehicleDataRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto& rpc_spec_vehicle_data = MessageHelper::vehicle_data();
   auto& msg_params = (*message_)[strings::msg_params];
 

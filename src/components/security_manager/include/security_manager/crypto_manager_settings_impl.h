@@ -19,7 +19,7 @@ class CryptoManagerSettingsImpl : public CryptoManagerSettings {
   }
 
   Protocol security_manager_protocol_name() const OVERRIDE {
-    CREATE_LOGGERPTR_LOCAL(logger_, "SecurityManager")
+    SDL_CREATE_LOGGERPTR( "SecurityManager")
 
     const std::string& protocol_str = profile_.security_manager_protocol_name();
     if (protocol_str == "TLSv1.0") {

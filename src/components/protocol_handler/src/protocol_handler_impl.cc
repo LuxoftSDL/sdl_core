@@ -50,7 +50,7 @@
 
 namespace protocol_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ProtocolHandler")
+SDL_CREATE_LOGGERPTR( "ProtocolHandler")
 
 /**
  * Function return packet data as std::string.
@@ -93,7 +93,7 @@ ProtocolHandlerImpl::ProtocolHandlerImpl(
 #endif  // TELEMETRY_MONITOR
 
 {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   protocol_header_validator_.set_max_payload_size(
       get_settings().maximum_payload_size());
   protocol_header_validator_.set_max_control_payload_size(
@@ -167,7 +167,7 @@ void ProtocolHandlerImpl::AddProtocolObserver(ProtocolObserver* observer) {
 }
 
 void ProtocolHandlerImpl::RemoveProtocolObserver(ProtocolObserver* observer) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!observer) {
     LOG4CXX_ERROR(logger_, "Invalid (NULL) pointer to IProtocolObserver.");
     return;
@@ -201,7 +201,7 @@ void ProtocolHandlerImpl::SendStartSessionAck(ConnectionID connection_id,
                                               uint32_t hash_id,
                                               uint8_t service_type,
                                               bool protection) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::SemanticVersion fullVersion;
   SendStartSessionAck(connection_id,
                       session_id,
@@ -220,7 +220,7 @@ void ProtocolHandlerImpl::SendStartSessionAck(
     uint8_t service_type,
     bool protection,
     utils::SemanticVersion& full_version) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   BsonObject empty_param;
   bson_object_initialize_default(&empty_param);
@@ -246,7 +246,7 @@ void ProtocolHandlerImpl::SendStartSessionAck(
     bool protection,
     utils::SemanticVersion& full_version,
     BsonObject& params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   bool send_transport_update_event = false;
 
@@ -473,7 +473,7 @@ void ProtocolHandlerImpl::SendStartSessionNAck(
     uint8_t protocol_version,
     uint8_t service_type,
     std::vector<std::string>& rejectedParams) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ProtocolFramePtr ptr(
       new protocol_handler::ProtocolPacket(connection_id,
@@ -536,7 +536,7 @@ void ProtocolHandlerImpl::SendEndSessionNAck(
     uint8_t protocol_version,
     uint8_t service_type,
     std::vector<std::string>& rejectedParams) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ProtocolFramePtr ptr(
       new protocol_handler::ProtocolPacket(connection_id,
@@ -589,7 +589,7 @@ void ProtocolHandlerImpl::SendEndSessionAck(ConnectionID connection_id,
                                             uint8_t session_id,
                                             uint8_t protocol_version,
                                             uint8_t service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ProtocolFramePtr ptr(
       new protocol_handler::ProtocolPacket(connection_id,
@@ -616,7 +616,7 @@ void ProtocolHandlerImpl::SendEndServicePrivate(int32_t primary_connection_id,
                                                 int32_t connection_id,
                                                 uint8_t session_id,
                                                 uint8_t service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint8_t protocol_version;
   if (session_observer_.ProtocolVersionUsed(
@@ -668,7 +668,7 @@ void ProtocolHandlerImpl::SendEndService(int32_t primary_connection_id,
 RESULT_CODE ProtocolHandlerImpl::SendHeartBeatAck(ConnectionID connection_id,
                                                   uint8_t session_id,
                                                   uint32_t message_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint8_t protocol_version;
   if (session_observer_.ProtocolVersionUsed(
@@ -696,7 +696,7 @@ RESULT_CODE ProtocolHandlerImpl::SendHeartBeatAck(ConnectionID connection_id,
 
 void ProtocolHandlerImpl::SendTransportUpdateEvent(ConnectionID connection_id,
                                                    uint8_t session_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint8_t protocol_version;
   if (session_observer_.ProtocolVersionUsed(
@@ -756,7 +756,7 @@ RESULT_CODE ProtocolHandlerImpl::SendRegisterSecondaryTransportAck(
     ConnectionID connection_id,
     ConnectionID primary_transport_connection_id,
     uint8_t session_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // acquire the protocol version from primary transport
   uint8_t protocol_version;
@@ -788,7 +788,7 @@ RESULT_CODE ProtocolHandlerImpl::SendRegisterSecondaryTransportNAck(
     ConnectionID primary_transport_connection_id,
     uint8_t session_id,
     BsonObject* reason) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // If mobile sends an invalid session ID and we cannot find out the Connection
   // ID of primary transport, then we use version 5. (The multiple-transports
@@ -829,7 +829,7 @@ RESULT_CODE ProtocolHandlerImpl::SendRegisterSecondaryTransportNAck(
 
 void ProtocolHandlerImpl::SendHeartBeat(int32_t connection_id,
                                         uint8_t session_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint8_t protocol_version;
   if (session_observer_.ProtocolVersionUsed(
           connection_id, session_id, protocol_version)) {
@@ -859,7 +859,7 @@ void ProtocolHandlerImpl::SendMessageToMobileApp(const RawMessagePtr message,
 #ifdef TELEMETRY_MONITOR
   const date_time::TimeDuration start_time = date_time::getCurrentTime();
 #endif  // TELEMETRY_MONITOR
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!message) {
     LOG4CXX_ERROR(logger_,
                   "Invalid message for sending to mobile app is received.");
@@ -959,7 +959,7 @@ void ProtocolHandlerImpl::SendMessageToMobileApp(const RawMessagePtr message,
 }
 
 void ProtocolHandlerImpl::OnTMMessageReceived(const RawMessagePtr tm_message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!tm_message) {
     LOG4CXX_ERROR(logger_,
@@ -1032,7 +1032,7 @@ void ProtocolHandlerImpl::OnTMMessageReceiveFailed(
 }
 
 void ProtocolHandlerImpl::NotifySubscribers(const RawMessagePtr message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(protocol_observers_lock_);
   if (protocol_observers_.empty()) {
     LOG4CXX_ERROR(
@@ -1134,7 +1134,7 @@ void ProtocolHandlerImpl::OnUnexpectedDisconnect(
 }
 
 void ProtocolHandlerImpl::NotifyOnGetSystemTimeFailed() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 #ifdef ENABLE_SECURITY
   security_manager_->ResetPendingSystemTimeRequests();
   security_manager_->NotifyListenersOnGetSystemTimeFailed();
@@ -1149,14 +1149,14 @@ void ProtocolHandlerImpl::ProcessFailedPTU() {
 
 #ifdef EXTERNAL_PROPRIETARY_MODE
 void ProtocolHandlerImpl::ProcessFailedCertDecrypt() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   security_manager_->ProcessFailedCertDecrypt();
 }
 #endif
 
 void ProtocolHandlerImpl::OnTransportConfigUpdated(
     const transport_manager::transport_adapter::TransportConfig& configs) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   transport_manager::transport_adapter::TransportConfig::const_iterator it =
       configs.find(transport_manager::transport_adapter::tc_enabled);
@@ -1222,7 +1222,7 @@ void ProtocolHandlerImpl::OnTransportConfigUpdated(
 
 void ProtocolHandlerImpl::OnAuthTokenUpdated(const std::string& policy_app_id,
                                              const std::string& auth_token) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(auth_token_map_lock_);
   if (auth_token.empty()) {
     auth_token_map_.erase(policy_app_id);
@@ -1233,7 +1233,7 @@ void ProtocolHandlerImpl::OnAuthTokenUpdated(const std::string& policy_app_id,
 
 bool ProtocolHandlerImpl::IsRPCServiceSecure(
     const uint32_t connection_key) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 #ifdef ENABLE_SECURITY
 
   security_manager::SSLContext* context =
@@ -1245,7 +1245,7 @@ bool ProtocolHandlerImpl::IsRPCServiceSecure(
 }
 
 RESULT_CODE ProtocolHandlerImpl::SendFrame(const ProtocolFramePtr packet) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!packet) {
     LOG4CXX_ERROR(logger_, "Failed to send empty packet.");
     return RESULT_FAIL;
@@ -1290,7 +1290,7 @@ RESULT_CODE ProtocolHandlerImpl::SendSingleFrameMessage(
     const uint8_t* data,
     const bool needs_encryption,
     const bool is_final_message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   LOG4CXX_DEBUG(
       logger_,
@@ -1323,7 +1323,7 @@ RESULT_CODE ProtocolHandlerImpl::SendMultiFrameMessage(
     const size_t max_frame_size,
     const bool needs_encryption,
     const bool is_final_message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   LOG4CXX_DEBUG(
       logger_,
@@ -1426,7 +1426,7 @@ RESULT_CODE ProtocolHandlerImpl::HandleMessage(const ProtocolFramePtr packet) {
 
 RESULT_CODE ProtocolHandlerImpl::HandleSingleFrameMessage(
     const ProtocolFramePtr packet) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   LOG4CXX_DEBUG(
       logger_,
@@ -1471,7 +1471,7 @@ RESULT_CODE ProtocolHandlerImpl::HandleSingleFrameMessage(
 
 RESULT_CODE ProtocolHandlerImpl::HandleMultiFrameMessage(
     const ProtocolFramePtr packet) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // Replace a potential secondary transport ID in the packet with the primary
   // transport ID
@@ -1490,7 +1490,7 @@ RESULT_CODE ProtocolHandlerImpl::HandleMultiFrameMessage(
 
 RESULT_CODE ProtocolHandlerImpl::HandleControlMessage(
     const ProtocolFramePtr packet) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // TODO{ALeshin}: Rename "Session" to "Service" on PH, CH, AM levels
   switch (packet->frame_data()) {
@@ -1565,7 +1565,7 @@ uint32_t get_hash_id(const ProtocolPacket& packet) {
 
 RESULT_CODE ProtocolHandlerImpl::HandleControlMessageEndSession(
     const ProtocolPacket& packet) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const uint8_t current_session_id = packet.session_id();
   uint32_t hash_id = get_hash_id(packet);
@@ -1612,7 +1612,7 @@ const ServiceStatus ProtocolHandlerImpl::ServiceDisallowedBySettings(
     const ConnectionID connection_id,
     const uint8_t session_id,
     const bool protection) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string& transport =
       session_observer_.TransportTypeProfileStringFromConnHandle(connection_id);
 
@@ -1662,7 +1662,7 @@ const ServiceStatus ProtocolHandlerImpl::ServiceDisallowedBySettings(
 
 RESULT_CODE ProtocolHandlerImpl::HandleControlMessageEndServiceACK(
     const ProtocolPacket& packet) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const uint8_t current_session_id = packet.session_id();
   uint32_t hash_id = get_hash_id(packet);
@@ -1682,7 +1682,7 @@ RESULT_CODE ProtocolHandlerImpl::HandleControlMessageEndServiceACK(
 
 RESULT_CODE ProtocolHandlerImpl::HandleControlMessageStartSession(
     const ProtocolFramePtr packet) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(
       logger_,
       "Protocol version:" << static_cast<int>(packet->protocol_version()));
@@ -1753,7 +1753,7 @@ RESULT_CODE ProtocolHandlerImpl::HandleControlMessageStartSession(
 
 RESULT_CODE ProtocolHandlerImpl::HandleControlMessageRegisterSecondaryTransport(
     const ProtocolFramePtr packet) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const uint8_t session_id = packet->session_id();
   const ConnectionID connection_id = packet->connection_id();
   ConnectionID primary_connection_id = 0;
@@ -1797,7 +1797,7 @@ RESULT_CODE ProtocolHandlerImpl::HandleControlMessageRegisterSecondaryTransport(
 
 void ProtocolHandlerImpl::NotifySessionStarted(
     const SessionContext& context, std::vector<std::string>& rejected_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ProtocolFramePtr packet;
   {
@@ -2048,7 +2048,7 @@ RESULT_CODE ProtocolHandlerImpl::HandleControlMessageHeartBeat(
 }
 
 void ProtocolHandlerImpl::PopValideAndExpirateMultiframes() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const ProtocolFramePtrList& frame_list = multiframe_builder_.PopMultiframes();
   for (ProtocolFramePtrList::const_iterator it = frame_list.begin();
        it != frame_list.end();
@@ -2085,7 +2085,7 @@ void ProtocolHandlerImpl::PopValideAndExpirateMultiframes() {
 }
 
 bool ProtocolHandlerImpl::TrackMessage(const uint32_t& connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const size_t& frequency_time = get_settings().message_frequency_time();
   const size_t& frequency_count = get_settings().message_frequency_count();
   if (frequency_time > 0u && frequency_count > 0u) {
@@ -2109,7 +2109,7 @@ bool ProtocolHandlerImpl::TrackMalformedMessage(const uint32_t& connection_key,
                                                 const size_t count) {
   const size_t& malformed_frequency_count =
       get_settings().malformed_frequency_count();
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (get_settings().malformed_frequency_time() > 0u &&
       malformed_frequency_count > 0u) {
     const size_t malformed_message_frequency =
@@ -2131,7 +2131,7 @@ bool ProtocolHandlerImpl::TrackMalformedMessage(const uint32_t& connection_key,
 }
 
 void ProtocolHandlerImpl::Handle(const impl::RawFordMessageFromMobile message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   switch (message->service_type()) {
     case kMobileNav:
@@ -2401,7 +2401,7 @@ std::string ConvertPacketDataToString(const uint8_t* data,
 }
 
 uint8_t ProtocolHandlerImpl::SupportedSDLProtocolVersion() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return get_settings().max_supported_protocol_version();
 }
 
@@ -2455,7 +2455,7 @@ const bool ProtocolHandlerImpl::ParseSecondaryTransportConfiguration(
     std::vector<std::string>& secondaryTransports,
     std::vector<int32_t>& audioServiceTransports,
     std::vector<int32_t>& videoServiceTransports) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::vector<std::string> secondary_transport_types;
 
   // First discover what the connection type of the primary transport is
@@ -2515,7 +2515,7 @@ void ProtocolHandlerImpl::GenerateSecondaryTransportsForStartSessionAck(
     bool device_is_ios,
     bool device_is_android,
     std::vector<std::string>& secondaryTransports) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // Parse the "secondary_transport_types" vector (which comes from
   // smartDeviceLink.ini). For each entry in the vector, add an
@@ -2569,7 +2569,7 @@ void ProtocolHandlerImpl::GenerateServiceTransportsForStartSessionAck(
     const impl::TransportType primary_transport_type,
     const std::vector<std::string>& secondary_transport_types,
     std::vector<int32_t>& serviceTransports) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (service_transports.size() == 0) {
     if (secondary_enabled && !secondary_transport_types.empty()) {

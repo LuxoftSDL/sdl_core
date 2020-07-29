@@ -57,7 +57,7 @@ GetAppServiceDataRequest::GetAppServiceDataRequest(
 GetAppServiceDataRequest::~GetAppServiceDataRequest() {}
 
 void GetAppServiceDataRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   SendProviderRequest(mobile_apis::FunctionID::GetAppServiceDataID,
                       hmi_apis::FunctionID::AppService_GetAppServiceData,

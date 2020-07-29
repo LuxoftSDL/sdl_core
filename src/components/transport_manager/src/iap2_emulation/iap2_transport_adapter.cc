@@ -50,7 +50,7 @@ static const auto out_signals_channel = "iap_signals_out";
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "IAP2Emulation");
+SDL_CREATE_LOGGERPTR( "IAP2Emulation");
 
 IAP2BluetoothEmulationTransportAdapter::IAP2BluetoothEmulationTransportAdapter(
     const uint16_t port,
@@ -60,7 +60,7 @@ IAP2BluetoothEmulationTransportAdapter::IAP2BluetoothEmulationTransportAdapter(
 
 void IAP2BluetoothEmulationTransportAdapter::DeviceSwitched(
     const DeviceUID& device_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   UNUSED(device_handle);
   DCHECK(!"Switching for iAP2 Bluetooth is not supported.");
 }
@@ -99,7 +99,7 @@ IAP2USBEmulationTransportAdapter::~IAP2USBEmulationTransportAdapter() {
 
 void IAP2USBEmulationTransportAdapter::DeviceSwitched(
     const DeviceUID& device_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   UNUSED(device_handle);
   const auto switch_signal_ack = std::string("SDL_TRANSPORT_SWITCH_ACK\n");
 
@@ -139,7 +139,7 @@ IAP2USBEmulationTransportAdapter::IAPSignalHandlerDelegate::
 }
 
 void IAP2USBEmulationTransportAdapter::IAPSignalHandlerDelegate::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Signal handling is started");
   const auto switch_signal = "SDL_TRANSPORT_SWITCH";
   LOG4CXX_DEBUG(logger_, "Waiting for signal: " << switch_signal);
@@ -177,7 +177,7 @@ void IAP2USBEmulationTransportAdapter::IAPSignalHandlerDelegate::threadMain() {
 
 void IAP2USBEmulationTransportAdapter::IAPSignalHandlerDelegate::
     exitThreadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Stopping signal handling.");
   run_flag_ = false;
   ThreadDelegate::exitThreadMain();

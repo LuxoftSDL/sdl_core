@@ -50,7 +50,7 @@
  */
 namespace connection_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ConnectionHandler")
+SDL_CREATE_LOGGERPTR( "ConnectionHandler")
 
 ConnectionHandle HandleFromConnectionUID(transport_manager::ConnectionUID uid) {
   return ConnectionHandle(uid);
@@ -78,11 +78,11 @@ ConnectionHandlerImpl::ConnectionHandlerImpl(
     , ending_connection_(NULL) {}
 
 ConnectionHandlerImpl::~ConnectionHandlerImpl() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 void ConnectionHandlerImpl::Stop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ConnectionList::iterator itr = connection_list_.begin();
   while (itr != connection_list_.end()) {
     RemoveConnection(itr->second->connection_handle());
@@ -118,7 +118,7 @@ void ConnectionHandlerImpl::set_protocol_handler(
 
 void ConnectionHandlerImpl::OnDeviceListUpdated(
     const std::vector<transport_manager::DeviceInfo>&) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoReadLock read_lock(connection_handler_observer_lock_);
   sync_primitives::AutoReadLock lock(device_list_lock_);
   if (connection_handler_observer_) {
@@ -135,12 +135,12 @@ void ConnectionHandlerImpl::OnFindNewApplicationsRequest() {
 
 void ConnectionHandlerImpl::OnDeviceFound(
     const transport_manager::DeviceInfo&) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 void ConnectionHandlerImpl::OnDeviceAdded(
     const transport_manager::DeviceInfo& device_info) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto handle = device_info.device_handle();
 
   LOG4CXX_DEBUG(logger_,
@@ -173,7 +173,7 @@ void ConnectionHandlerImpl::OnDeviceAdded(
 
 void ConnectionHandlerImpl::OnDeviceRemoved(
     const transport_manager::DeviceInfo& device_info) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   // Device has been removed. Perform all needed actions.
   // 1. Delete all the connections and sessions of this device
   // 2. Delete device from a list
@@ -252,7 +252,7 @@ void ConnectionHandlerImpl::OnDeviceSwitchingStart(
 }
 
 void ConnectionHandlerImpl::OnScanDevicesFinished() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 void ConnectionHandlerImpl::OnScanDevicesFailed(
@@ -267,7 +267,7 @@ void ConnectionHandlerImpl::OnConnectionStatusUpdated() {
 void ConnectionHandlerImpl::OnConnectionPending(
     const transport_manager::DeviceInfo& device_info,
     const transport_manager::ConnectionUID connection_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "OnConnectionPending!!!: " << device_info.device_handle() << " "
                                            << device_info.name() << " "
@@ -321,7 +321,7 @@ void ConnectionHandlerImpl::OnConnectionPending(
 void ConnectionHandlerImpl::OnConnectionEstablished(
     const transport_manager::DeviceInfo& device_info,
     const transport_manager::ConnectionUID connection_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "OnConnectionEstablished!!!: "
                     << device_info.device_handle() << " " << device_info.name()
@@ -358,7 +358,7 @@ void ConnectionHandlerImpl::OnConnectionFailed(
 
 void ConnectionHandlerImpl::OnConnectionClosed(
     transport_manager::ConnectionUID connection_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   OnConnectionEnded(connection_id);
 }
@@ -373,7 +373,7 @@ void ConnectionHandlerImpl::OnConnectionClosedFailure(
 void ConnectionHandlerImpl::OnUnexpectedDisconnect(
     transport_manager::ConnectionUID connection_id,
     const transport_manager::CommunicationError& error) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   OnConnectionEnded(connection_id);
 }
@@ -394,7 +394,7 @@ void ConnectionHandlerImpl::OnDisconnectFailed(
 
 void ConnectionHandlerImpl::RemoveConnection(
     const ConnectionHandle connection_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   OnConnectionEnded(connection_handle);
 }
@@ -403,7 +403,7 @@ void ConnectionHandlerImpl::RemoveConnection(
 bool AllowProtection(const ConnectionHandlerSettings& settings,
                      const protocol_handler::ServiceType& service_type,
                      const bool is_protected) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::vector<int>& force_unprotected_list =
       is_protected ? settings.force_unprotected_service()
                    : settings.force_protected_service();
@@ -428,7 +428,7 @@ void ConnectionHandlerImpl::OnSessionStartedCallback(
     const protocol_handler::ServiceType& service_type,
     const bool is_protected,
     const BsonObject* params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::vector<std::string> rejected_params;
 
@@ -541,7 +541,7 @@ void ConnectionHandlerImpl::NotifyServiceStartedResult(
     uint32_t session_key,
     bool result,
     std::vector<std::string>& rejected_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   protocol_handler::SessionContext context;
   {
@@ -588,7 +588,7 @@ void ConnectionHandlerImpl::NotifyServiceStartedResult(
 
 void ConnectionHandlerImpl::OnApplicationFloodCallBack(
     const uint32_t& connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   transport_manager::ConnectionUID connection_handle = 0;
   uint8_t session_id = 0;
@@ -627,7 +627,7 @@ void ConnectionHandlerImpl::OnApplicationFloodCallBack(
 
 void ConnectionHandlerImpl::OnMalformedMessageCallback(
     const uint32_t& connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   transport_manager::ConnectionUID connection_handle = 0;
   uint8_t session_id = 0;
@@ -665,7 +665,7 @@ uint32_t ConnectionHandlerImpl::OnSessionEndedCallback(
     const uint8_t session_id,
     uint32_t* hashCode,
     const protocol_handler::ServiceType& service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // In case this is a Session running on a Secondary Transport, we need to
   // find the Sessions's primary transport. In this case, "connection_handle"
@@ -752,7 +752,7 @@ bool ConnectionHandlerImpl::OnSecondaryTransportStarted(
     transport_manager::ConnectionUID& primary_connection_handle,
     const transport_manager::ConnectionUID secondary_connection_handle,
     const uint8_t session_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (session_id == 0) {
     LOG4CXX_WARN(logger_, "Session id for secondary transport is invalid");
@@ -805,7 +805,7 @@ bool ConnectionHandlerImpl::OnSecondaryTransportStarted(
 void ConnectionHandlerImpl::OnSecondaryTransportEnded(
     const transport_manager::ConnectionUID primary_connection_handle,
     const transport_manager::ConnectionUID secondary_connection_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   LOG4CXX_INFO(logger_,
                "Secondary Transport: "
@@ -877,7 +877,7 @@ void ConnectionHandlerImpl::CreateWebEngineDevice() {
 const std::string
 ConnectionHandlerImpl::TransportTypeProfileStringFromConnHandle(
     transport_manager::ConnectionUID connection_handle) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   sync_primitives::AutoReadLock lock(connection_list_lock_);
   ConnectionList::const_iterator it = connection_list_.find(connection_handle);
@@ -969,7 +969,7 @@ int32_t ConnectionHandlerImpl::GetDataOnSessionKey(
     uint32_t* app_id,
     std::list<int32_t>* sessions_list,
     connection_handler::DeviceHandle* device_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const int32_t error_result = -1;
   transport_manager::ConnectionUID conn_handle = 0;
@@ -1041,7 +1041,7 @@ uint32_t findGap(const std::map<unsigned char, T>& map) {
 
 uint32_t ConnectionHandlerImpl::AddSession(
     const transport_manager::ConnectionUID primary_transport_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   sync_primitives::AutoLock auto_lock(session_connection_map_lock_ptr_);
   const uint32_t session_id = findGap(session_connection_map_);
@@ -1063,7 +1063,7 @@ uint32_t ConnectionHandlerImpl::AddSession(
 }
 
 bool ConnectionHandlerImpl::RemoveSession(uint8_t session_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   sync_primitives::AutoLock auto_lock(session_connection_map_lock_ptr_);
   SessionConnectionMap::iterator itr = session_connection_map_.find(session_id);
@@ -1220,7 +1220,7 @@ int32_t ConnectionHandlerImpl::GetDataOnDeviceID(
     std::list<uint32_t>* applications_list,
     std::string* mac_address,
     std::string* connection_type) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   int32_t result = -1;
 
@@ -1283,7 +1283,7 @@ void ConnectionHandlerImpl::GetConnectedDevicesMAC(
 #ifdef ENABLE_SECURITY
 int ConnectionHandlerImpl::SetSSLContext(
     const uint32_t& key, security_manager::SSLContext* context) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   transport_manager::ConnectionUID connection_handle = 0;
   uint8_t session_id = 0;
   PairFromKey(key, &connection_handle, &session_id);
@@ -1299,7 +1299,7 @@ int ConnectionHandlerImpl::SetSSLContext(
 
 security_manager::SSLContext* ConnectionHandlerImpl::GetSSLContext(
     const uint32_t& key, const protocol_handler::ServiceType& service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   transport_manager::ConnectionUID connection_handle = 0;
   uint8_t session_id = 0;
   PairFromKey(key, &connection_handle, &session_id);
@@ -1315,7 +1315,7 @@ security_manager::SSLContext* ConnectionHandlerImpl::GetSSLContext(
 
 void ConnectionHandlerImpl::SetProtectionFlag(
     const uint32_t& key, const protocol_handler::ServiceType& service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   transport_manager::ConnectionUID connection_handle = 0;
   uint8_t session_id = 0;
   PairFromKey(key, &connection_handle, &session_id);
@@ -1350,7 +1350,7 @@ ConnectionHandlerImpl::GetHandshakeContext(uint32_t key) const {
 bool ConnectionHandlerImpl::SessionServiceExists(
     const uint32_t connection_key,
     const protocol_handler::ServiceType& service_type) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   transport_manager::ConnectionUID connection_handle = 0;
   uint8_t session_id = 0;
   PairFromKey(connection_key, &connection_handle, &session_id);
@@ -1366,7 +1366,7 @@ bool ConnectionHandlerImpl::SessionServiceExists(
 }
 
 void ConnectionHandlerImpl::StartDevicesDiscovery() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   transport_manager_.SearchDevices();
   sync_primitives::AutoReadLock read_lock(connection_handler_observer_lock_);
@@ -1443,13 +1443,13 @@ void ConnectionHandlerImpl::RemoveCloudAppDevice(const DeviceHandle device_id) {
 }
 
 void ConnectionHandlerImpl::StartTransportManager() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   transport_manager_.PerformActionOnClients(
       transport_manager::TransportAction::kVisibilityOn);
 }
 
 void ConnectionHandlerImpl::CloseRevokedConnection(uint32_t connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint32_t connection_handle = 0;
   uint8_t session_id = 0;
@@ -1460,7 +1460,7 @@ void ConnectionHandlerImpl::CloseRevokedConnection(uint32_t connection_key) {
 
 void ConnectionHandlerImpl::CloseConnection(
     ConnectionHandle connection_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   transport_manager::ConnectionUID connection_uid =
       ConnectionUIDFromHandle(connection_handle);
   transport_manager_.DisconnectForce(connection_uid);
@@ -1476,7 +1476,7 @@ void ConnectionHandlerImpl::CloseConnection(
 
 uint32_t ConnectionHandlerImpl::GetConnectionSessionsCount(
     uint32_t connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint32_t connection_handle = 0;
   uint8_t session_id = 0;
   PairFromKey(connection_key, &connection_handle, &session_id);
@@ -1503,7 +1503,7 @@ void ConnectionHandlerImpl::CloseSession(uint32_t key,
 void ConnectionHandlerImpl::CloseSession(ConnectionHandle connection_handle,
                                          uint8_t session_id,
                                          CloseSessionReason close_reason) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "Closing session with id: " << static_cast<int>(session_id));
 
@@ -1564,7 +1564,7 @@ void ConnectionHandlerImpl::CloseSession(ConnectionHandle connection_handle,
 
 void ConnectionHandlerImpl::CloseConnectionSessions(
     ConnectionHandle connection_handle, CloseSessionReason close_reason) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   transport_manager::ConnectionUID connection_id =
       ConnectionUIDFromHandle(connection_handle);
@@ -1640,7 +1640,7 @@ void ConnectionHandlerImpl::SendEndService(uint32_t key, uint8_t service_type) {
 }
 
 void ConnectionHandlerImpl::StartSessionHeartBeat(uint32_t connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint32_t connection_handle = 0;
   uint8_t session_id = 0;
   PairFromKey(connection_key, &connection_handle, &session_id);
@@ -1654,7 +1654,7 @@ void ConnectionHandlerImpl::StartSessionHeartBeat(uint32_t connection_key) {
 
 void ConnectionHandlerImpl::SetHeartBeatTimeout(uint32_t connection_key,
                                                 uint32_t timeout) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint32_t connection_handle = 0;
   uint8_t session_id = 0;
   PairFromKey(connection_key, &connection_handle, &session_id);
@@ -1676,7 +1676,7 @@ void ConnectionHandlerImpl::SendHeartBeat(ConnectionHandle connection_handle,
 
 void ConnectionHandlerImpl::KeepConnectionAlive(uint32_t connection_key,
                                                 uint8_t session_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoReadLock lock(connection_list_lock_);
   ConnectionList::iterator it = connection_list_.find(connection_key);
   if (connection_list_.end() != it) {
@@ -1740,7 +1740,7 @@ void ConnectionHandlerImpl::OnConnectionEnded(
 
 void ConnectionHandlerImpl::BindProtocolVersionWithSession(
     uint32_t connection_key, uint8_t protocol_version) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint32_t connection_handle = 0;
   uint8_t session_id = 0;
   PairFromKey(connection_key, &connection_handle, &session_id);
@@ -1755,7 +1755,7 @@ void ConnectionHandlerImpl::BindProtocolVersionWithSession(
 bool ConnectionHandlerImpl::IsHeartBeatSupported(
     transport_manager::ConnectionUID connection_handle,
     uint8_t session_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoReadLock lock(connection_list_lock_);
   const uint32_t connection_id = static_cast<uint32_t>(connection_handle);
   auto connection = GetPrimaryConnection(connection_id);
@@ -1771,7 +1771,7 @@ bool ConnectionHandlerImpl::ProtocolVersionUsed(
     uint32_t connection_id,
     uint8_t session_id,
     uint8_t& protocol_version) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoReadLock lock(connection_list_lock_);
   auto connection = GetPrimaryConnection(connection_id);
 

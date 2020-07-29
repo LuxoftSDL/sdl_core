@@ -44,7 +44,7 @@ namespace request_controller {
 
 using namespace sync_primitives;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RequestController")
+SDL_CREATE_LOGGERPTR( "RequestController")
 
 RequestController::RequestController(const RequestControlerSettings& settings)
     : pool_state_(UNDEFINED)
@@ -57,13 +57,13 @@ RequestController::RequestController(const RequestControlerSettings& settings)
     , timer_stop_flag_(false)
     , is_low_voltage_(false)
     , settings_(settings) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   InitializeThreadpool();
   timer_.Start(0, timer::kSingleShot);
 }
 
 RequestController::~RequestController() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     sync_primitives::AutoLock auto_lock(timer_lock);
     timer_stop_flag_ = true;
@@ -76,7 +76,7 @@ RequestController::~RequestController() {
 }
 
 void RequestController::InitializeThreadpool() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   // TODO(DK): Consider lazy loading threads instead of creating all at once
   pool_state_ = TPoolState::STARTED;
   char name[50];
@@ -89,7 +89,7 @@ void RequestController::InitializeThreadpool() {
 }
 
 void RequestController::DestroyThreadpool() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     AutoLock auto_lock(mobile_request_list_lock_);
     pool_state_ = TPoolState::STOPPED;
@@ -107,7 +107,7 @@ void RequestController::DestroyThreadpool() {
 
 RequestController::TResult RequestController::CheckPosibilitytoAdd(
     const RequestPtr request, const mobile_apis::HMILevel::eType level) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!CheckPendingRequestsAmount(settings_.pending_requests_amount())) {
     LOG4CXX_ERROR(logger_, "Too many pending request");
     return RequestController::TOO_MANY_PENDING_REQUESTS;
@@ -137,7 +137,7 @@ RequestController::TResult RequestController::CheckPosibilitytoAdd(
 
 bool RequestController::CheckPendingRequestsAmount(
     const uint32_t& pending_requests_amount) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (pending_requests_amount > 0) {
     const size_t pending_requests_size = mobile_request_list_.size();
     const bool available_to_add =
@@ -156,7 +156,7 @@ bool RequestController::CheckPendingRequestsAmount(
 
 RequestController::TResult RequestController::addMobileRequest(
     const RequestPtr request, const mobile_apis::HMILevel::eType& hmi_level) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!request) {
     LOG4CXX_ERROR(logger_, "Null Pointer request");
     cond_var_.NotifyOne();
@@ -180,7 +180,7 @@ RequestController::TResult RequestController::addMobileRequest(
 
 RequestController::TResult RequestController::addHMIRequest(
     const RequestPtr request) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (request.use_count() == 0) {
     LOG4CXX_ERROR(logger_, "HMI request pointer is invalid");
@@ -214,7 +214,7 @@ RequestController::TResult RequestController::addHMIRequest(
 }
 
 void RequestController::addNotification(const RequestPtr ptr) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (IsLowVoltage()) {
     LOG4CXX_ERROR(
         logger_, "Impossible to add notification due to Low Voltage is active");
@@ -225,7 +225,7 @@ void RequestController::addNotification(const RequestPtr ptr) {
 
 void RequestController::removeNotification(
     const commands::Command* notification) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::list<RequestPtr>::iterator it = notification_list_.begin();
   for (; notification_list_.end() != it;) {
     if (it->get() == notification) {
@@ -243,7 +243,7 @@ void RequestController::TerminateRequest(const uint32_t correlation_id,
                                          const uint32_t connection_key,
                                          const int32_t function_id,
                                          bool force_terminate) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "correlation_id = "
                     << correlation_id << " connection_key = " << connection_key
@@ -285,19 +285,19 @@ void RequestController::TerminateRequest(const uint32_t correlation_id,
 void RequestController::OnMobileResponse(const uint32_t mobile_correlation_id,
                                          const uint32_t connection_key,
                                          const int32_t function_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   TerminateRequest(mobile_correlation_id, connection_key, function_id);
 }
 
 void RequestController::OnHMIResponse(const uint32_t correlation_id,
                                       const int32_t function_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   TerminateRequest(correlation_id, RequestInfo::HmiConnectionKey, function_id);
 }
 
 void RequestController::terminateWaitingForExecutionAppRequests(
     const uint32_t& app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "app_id: " << app_id << "Waiting for execution"
                            << mobile_request_list_.size());
@@ -317,14 +317,14 @@ void RequestController::terminateWaitingForExecutionAppRequests(
 
 void RequestController::terminateWaitingForResponseAppRequests(
     const uint32_t& app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   waiting_for_response_.RemoveByConnectionKey(app_id);
   LOG4CXX_DEBUG(
       logger_, "Waiting for response count : " << waiting_for_response_.Size());
 }
 
 void RequestController::terminateAppRequests(const uint32_t& app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "app_id : " << app_id
                             << "Requests waiting for execution count : "
@@ -338,12 +338,12 @@ void RequestController::terminateAppRequests(const uint32_t& app_id) {
 }
 
 void RequestController::terminateAllHMIRequests() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   terminateWaitingForResponseAppRequests(RequestInfo::HmiConnectionKey);
 }
 
 void RequestController::terminateAllMobileRequests() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   waiting_for_response_.RemoveMobileRequests();
   LOG4CXX_DEBUG(logger_, "Mobile Requests waiting for response cleared");
   AutoLock waiting_execution_auto_lock(mobile_request_list_lock_);
@@ -355,7 +355,7 @@ void RequestController::terminateAllMobileRequests() {
 void RequestController::updateRequestTimeout(const uint32_t& app_id,
                                              const uint32_t& correlation_id,
                                              const uint32_t& new_timeout) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   LOG4CXX_DEBUG(logger_,
                 "app_id : " << app_id
@@ -385,12 +385,12 @@ void RequestController::updateRequestTimeout(const uint32_t& app_id,
 }
 
 void RequestController::OnLowVoltage() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   is_low_voltage_ = true;
 }
 
 void RequestController::OnWakeUp() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   terminateAllHMIRequests();
   terminateAllMobileRequests();
   is_low_voltage_ = false;
@@ -403,7 +403,7 @@ bool RequestController::IsLowVoltage() {
 }
 
 void RequestController::TimeoutThread() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(
       logger_,
       "ENTER Waiting fore response count: " << waiting_for_response_.Size());
@@ -473,7 +473,7 @@ RequestController::Worker::Worker(RequestController* requestController)
 RequestController::Worker::~Worker() {}
 
 void RequestController::Worker::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   AutoLock auto_lock(thread_lock_);
   while (!stop_flag_) {
     // Try to pick a request
@@ -558,7 +558,7 @@ void RequestController::Worker::exitThreadMain() {
 }
 
 void RequestController::NotifyTimer() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   timer_condition_.NotifyOne();
 }
 

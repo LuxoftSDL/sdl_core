@@ -88,7 +88,7 @@ SetGlobalPropertiesRequest::SetGlobalPropertiesRequest(
 SetGlobalPropertiesRequest::~SetGlobalPropertiesRequest() {}
 
 void SetGlobalPropertiesRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject& msg_params = (*message_)[strings::msg_params];
 
@@ -319,7 +319,7 @@ void SetGlobalPropertiesRequest::Run() {
 
 bool SetGlobalPropertiesRequest::CheckVrHelpItemsOrder(
     const smart_objects::SmartObject& vr_help) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(vr_help.getType() == smart_objects::SmartType_Array, false);
   const size_t vr_help_length = vr_help.length();
   DCHECK_OR_RETURN(vr_help_length > 0, false);
@@ -339,7 +339,7 @@ bool SetGlobalPropertiesRequest::CheckVrHelpItemsOrder(
 }
 
 void SetGlobalPropertiesRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
   const smart_objects::SmartObject& message = event.smart_object();
 
@@ -420,7 +420,7 @@ bool SetGlobalPropertiesRequest::Init() {
 
 bool SetGlobalPropertiesRequest::PrepareResponseParameters(
     mobile_apis::Result::eType& result_code, std::string& info) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   app_mngr::commands::ResponseInfo ui_properties_info(
@@ -475,7 +475,7 @@ bool SetGlobalPropertiesRequest::PrepareResultForMobileResponse(
     const app_mngr::commands::ResponseInfo& first,
     const app_mngr::commands::ResponseInfo& second,
     const app_mngr::commands::ResponseInfo& third) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   app_mngr::commands::ResponseInfo both_info;
   std::vector<hmi_apis::Common_Result::eType> success_result_codes{
@@ -508,7 +508,7 @@ SetGlobalPropertiesRequest::PrepareResultCodeForResponse(
     const app_mngr::commands::ResponseInfo& first,
     const app_mngr::commands::ResponseInfo& second,
     const app_mngr::commands::ResponseInfo& third) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   mobile_apis::Result::eType result_code = mobile_apis::Result::INVALID_ENUM;
   if (IsResultCodeUnsupported(first, second, third) ||
       IsResultCodeUnsupported(second, third, first) ||
@@ -599,7 +599,7 @@ void SetGlobalPropertiesRequest::PrepareUIRequestVRHelpData(
     const ApplicationSharedPtr app,
     const smart_objects::SmartObject& msg_params,
     smart_objects::SmartObject& out_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
 
   app->set_vr_help_title(msg_params.getElement(strings::vr_help_title));
@@ -613,7 +613,7 @@ void SetGlobalPropertiesRequest::PrepareUIRequestMenuAndKeyboardData(
     const ApplicationSharedPtr app,
     const smart_objects::SmartObject& msg_params,
     smart_objects::SmartObject& out_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
 
   const bool is_menu_title_present =
@@ -641,7 +641,7 @@ void SetGlobalPropertiesRequest::PrepareUIRequestMenuAndKeyboardData(
 
 void SetGlobalPropertiesRequest::SendTTSRequest(
     const smart_objects::SmartObject& params, bool use_events) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   is_tts_send_ = true;
   StartAwaitForInterface(HmiInterfaces::HMI_INTERFACE_TTS);
   SendHMIRequest(
@@ -650,7 +650,7 @@ void SetGlobalPropertiesRequest::SendTTSRequest(
 
 void SetGlobalPropertiesRequest::SendUIRequest(
     const smart_objects::SmartObject& params, bool use_events) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   is_ui_send_ = true;
   StartAwaitForInterface(HmiInterfaces::HMI_INTERFACE_UI);
   SendHMIRequest(
@@ -660,7 +660,7 @@ void SetGlobalPropertiesRequest::SendUIRequest(
 void SetGlobalPropertiesRequest::SendRCRequest(
     const ns_smart_device_link::ns_smart_objects::SmartObject& params,
     bool use_events) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   is_rc_send_ = true;
   StartAwaitForInterface(HmiInterfaces::HMI_INTERFACE_RC);
   SendHMIRequest(
@@ -674,7 +674,7 @@ bool SetGlobalPropertiesRequest::IsPendingResponseExist() {
 
 bool SetGlobalPropertiesRequest::ValidateConditionalMandatoryParameters(
     const smart_objects::SmartObject& params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return params.keyExists(strings::help_prompt) ||
          params.keyExists(strings::timeout_prompt) ||
          params.keyExists(strings::vr_help_title) ||
@@ -687,7 +687,7 @@ bool SetGlobalPropertiesRequest::ValidateConditionalMandatoryParameters(
 }
 
 bool SetGlobalPropertiesRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str;
 
   const smart_objects::SmartObject& msg_params =

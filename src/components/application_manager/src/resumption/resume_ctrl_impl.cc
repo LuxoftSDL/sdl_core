@@ -61,7 +61,7 @@ static mobile_api::HMILevel::eType PickLowerHmiLevel(
     mobile_api::HMILevel::eType val1, mobile_api::HMILevel::eType val2);
 static mobile_api::HMILevel::eType ConvertHmiLevelString(const std::string str);
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Resumption")
+SDL_CREATE_LOGGERPTR( "Resumption")
 
 ResumeCtrlImpl::ResumeCtrlImpl(ApplicationManager& application_manager)
     : event_engine::EventObserver(application_manager.event_dispatcher())
@@ -147,7 +147,7 @@ void ResumeCtrlImpl::SaveAllApplications() {
 }
 
 void ResumeCtrlImpl::SaveApplication(ApplicationSharedPtr application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(application);
   if (application_manager_.IsLowVoltage()) {
     LOG4CXX_DEBUG(logger_, "Low Voltage state is active");
@@ -171,7 +171,7 @@ void ResumeCtrlImpl::on_event(const event_engine::Event& event) {
 
 bool ResumeCtrlImpl::RestoreAppHMIState(ApplicationSharedPtr application) {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(application, false);
   LOG4CXX_DEBUG(logger_,
                 "app_id : " << application->app_id() << "; policy_app_id : "
@@ -240,7 +240,7 @@ bool ResumeCtrlImpl::RestoreAppHMIState(ApplicationSharedPtr application) {
 
 void ResumeCtrlImpl::RestoreWidgetsHMIState(
     const smart_objects::SmartObject& response_message) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto correlation_id =
       response_message[strings::params][strings::correlation_id].asInt();
   const auto& request = requests_msg_.find(correlation_id);
@@ -311,7 +311,7 @@ void ResumeCtrlImpl::RestoreWidgetsHMIState(
 
 void ResumeCtrlImpl::ProcessSystemCapabilityUpdated(
     Application& app, const smart_objects::SmartObject& display_capabilities) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto notification = MessageHelper::CreateDisplayCapabilityUpdateToMobile(
       display_capabilities, app);
@@ -322,7 +322,7 @@ void ResumeCtrlImpl::ProcessSystemCapabilityUpdated(
 }
 
 bool ResumeCtrlImpl::SetupDefaultHMILevel(ApplicationSharedPtr application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(application, false);
   mobile_apis::HMILevel::eType hmi_level =
       application_manager_.GetDefaultHmiLevel(application);
@@ -344,7 +344,7 @@ bool ResumeCtrlImpl::SetupDefaultHMILevel(ApplicationSharedPtr application) {
 }
 
 void ResumeCtrlImpl::ApplicationResumptiOnTimer() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock auto_lock(queue_lock_);
   WaitingForTimerList::iterator it = waiting_for_timer_.begin();
 
@@ -371,7 +371,7 @@ void ResumeCtrlImpl::OnAppActivated(ApplicationSharedPtr application) {
 }
 
 void ResumeCtrlImpl::RemoveFromResumption(uint32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   queue_lock_.Acquire();
   waiting_for_timer_.remove(app_id);
   queue_lock_.Release();
@@ -386,7 +386,7 @@ bool ResumeCtrlImpl::SetAppHMIState(
     const mobile_apis::HMILevel::eType hmi_level,
     bool check_policy) {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(application, false);
   LOG4CXX_TRACE(logger_,
                 " app_id : " << application->app_id()
@@ -414,7 +414,7 @@ size_t ResumeCtrlImpl::RestoreAppWidgets(
     application_manager::ApplicationSharedPtr application,
     const smart_objects::SmartObject& saved_app) {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(application);
   if (!saved_app.keyExists(strings::windows_info)) {
     LOG4CXX_ERROR(logger_, "windows_info section does not exist");
@@ -461,13 +461,13 @@ bool ResumeCtrlImpl::RemoveApplicationFromSaved(
 }
 
 void ResumeCtrlImpl::OnSuspend() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   is_suspended_ = true;
   FinalPersistData();
 }
 
 void ResumeCtrlImpl::OnIgnitionOff() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(resumption_storage_);
   if (!application_manager_.IsLowVoltage()) {
     resumption_storage_->IncrementIgnOffCount();
@@ -477,7 +477,7 @@ void ResumeCtrlImpl::OnIgnitionOff() {
 }
 
 void ResumeCtrlImpl::OnAwake() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   is_suspended_ = false;
   ResetLaunchTime();
   StartSavePersistentDataTimer();
@@ -507,7 +507,7 @@ bool ResumeCtrlImpl::is_suspended() const {
 }
 
 void ResumeCtrlImpl::StartSavePersistentDataTimer() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!save_persistent_data_timer_.is_running()) {
     save_persistent_data_timer_.Start(
         application_manager_.get_settings()
@@ -517,7 +517,7 @@ void ResumeCtrlImpl::StartSavePersistentDataTimer() {
 }
 
 void ResumeCtrlImpl::StopSavePersistentDataTimer() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (save_persistent_data_timer_.is_running()) {
     save_persistent_data_timer_.Stop();
   }
@@ -525,7 +525,7 @@ void ResumeCtrlImpl::StopSavePersistentDataTimer() {
 
 bool ResumeCtrlImpl::StartResumption(ApplicationSharedPtr application,
                                      const std::string& hash) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(application, false);
   LOG4CXX_DEBUG(
       logger_,
@@ -557,7 +557,7 @@ bool ResumeCtrlImpl::StartResumption(ApplicationSharedPtr application,
 
 bool ResumeCtrlImpl::StartResumptionOnlyHMILevel(
     ApplicationSharedPtr application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!application) {
     LOG4CXX_WARN(logger_, "Application does not exist.");
     return false;
@@ -588,7 +588,7 @@ bool ResumeCtrlImpl::StartResumptionOnlyHMILevel(
 }
 
 void ResumeCtrlImpl::RetryResumption(const uint32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(app_id);
   if (!app) {
@@ -612,7 +612,7 @@ void ResumeCtrlImpl::RetryResumption(const uint32_t app_id) {
 bool ResumeCtrlImpl::StartAppHmiStateResumption(
     ApplicationSharedPtr application) {
   using namespace date_time;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(application, false);
   smart_objects::SmartObject saved_app;
   const std::string& device_mac = application->mac_address();
@@ -664,13 +664,13 @@ bool ResumeCtrlImpl::StartAppHmiStateResumption(
 }
 
 void ResumeCtrlImpl::ResetLaunchTime() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   launch_time_ = time(NULL);
 }
 
 bool ResumeCtrlImpl::CheckPersistenceFilesForResumption(
     ApplicationSharedPtr application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(application, false);
   LOG4CXX_DEBUG(logger_,
                 " Resume app_id = " << application->app_id() << " policy_id = "
@@ -697,7 +697,7 @@ bool ResumeCtrlImpl::CheckPersistenceFilesForResumption(
 
 bool ResumeCtrlImpl::CheckApplicationHash(ApplicationSharedPtr application,
                                           const std::string& hash) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(application, false);
   LOG4CXX_DEBUG(logger_,
                 "app_id : " << application->app_id() << " hash : " << hash);
@@ -714,7 +714,7 @@ bool ResumeCtrlImpl::CheckApplicationHash(ApplicationSharedPtr application,
 }
 
 void ResumeCtrlImpl::SaveDataOnTimer() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (is_resumption_active_) {
     LOG4CXX_WARN(logger_, "Resumption timer is active skip saving");
     return;
@@ -730,7 +730,7 @@ void ResumeCtrlImpl::SaveDataOnTimer() {
 }
 
 void ResumeCtrlImpl::FinalPersistData() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(resumption_storage_);
   StopSavePersistentDataTimer();
   SaveAllApplications();
@@ -739,13 +739,13 @@ void ResumeCtrlImpl::FinalPersistData() {
 
 bool ResumeCtrlImpl::IsDeviceMacAddressEqual(
     ApplicationSharedPtr application, const std::string& saved_device_mac) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string device_mac = application->mac_address();
   return device_mac == saved_device_mac;
 }
 
 bool ResumeCtrlImpl::RestoreApplicationData(ApplicationSharedPtr application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(application, false);
   LOG4CXX_DEBUG(logger_, "app_id : " << application->app_id());
 
@@ -778,14 +778,14 @@ bool ResumeCtrlImpl::RestoreApplicationData(ApplicationSharedPtr application) {
 
 void ResumeCtrlImpl::StartWaitingForDisplayCapabilitiesUpdate(
     app_mngr::ApplicationSharedPtr application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject saved_app(smart_objects::SmartType_Map);
   resumption_storage_->GetSavedApplication(
       application->policy_app_id(), application->mac_address(), saved_app);
   auto resume_callback =
       [this](Application& app,
              const smart_objects::SmartObject& display_capabilities) -> void {
-    LOG4CXX_AUTO_TRACE(logger_);
+    SDL_AUTO_TRACE();
     ProcessSystemCapabilityUpdated(app, display_capabilities);
   };
   auto& builder = application->display_capabilities_builder();
@@ -799,7 +799,7 @@ void ResumeCtrlImpl::StartWaitingForDisplayCapabilitiesUpdate(
 
 void ResumeCtrlImpl::AddFiles(ApplicationSharedPtr application,
                               const smart_objects::SmartObject& saved_app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (saved_app.keyExists(strings::application_files)) {
     const smart_objects::SmartObject& application_files =
@@ -827,7 +827,7 @@ void ResumeCtrlImpl::AddFiles(ApplicationSharedPtr application,
 
 void ResumeCtrlImpl::AddSubmenues(ApplicationSharedPtr application,
                                   const smart_objects::SmartObject& saved_app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (saved_app.keyExists(strings::application_submenus)) {
     const smart_objects::SmartObject& app_submenus =
@@ -845,7 +845,7 @@ void ResumeCtrlImpl::AddSubmenues(ApplicationSharedPtr application,
 
 void ResumeCtrlImpl::AddCommands(ApplicationSharedPtr application,
                                  const smart_objects::SmartObject& saved_app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (saved_app.keyExists(strings::application_commands)) {
     const smart_objects::SmartObject& app_commands =
@@ -873,7 +873,7 @@ void ResumeCtrlImpl::AddCommands(ApplicationSharedPtr application,
 void ResumeCtrlImpl::AddChoicesets(
     ApplicationSharedPtr application,
     const smart_objects::SmartObject& saved_app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (saved_app.keyExists(strings::application_choice_sets)) {
     const smart_objects::SmartObject& app_choice_sets =
@@ -894,7 +894,7 @@ void ResumeCtrlImpl::AddChoicesets(
 void ResumeCtrlImpl::SetGlobalProperties(
     ApplicationSharedPtr application,
     const smart_objects::SmartObject& saved_app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (saved_app.keyExists(strings::application_global_properties)) {
     const smart_objects::SmartObject& properties_so =
@@ -907,7 +907,7 @@ void ResumeCtrlImpl::SetGlobalProperties(
 void ResumeCtrlImpl::AddWayPointsSubscription(
     app_mngr::ApplicationSharedPtr application,
     const smart_objects::SmartObject& saved_app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (saved_app.keyExists(strings::subscribed_for_way_points)) {
     const smart_objects::SmartObject& subscribed_for_way_points_so =
@@ -921,7 +921,7 @@ void ResumeCtrlImpl::AddWayPointsSubscription(
 void ResumeCtrlImpl::AddSubscriptions(
     ApplicationSharedPtr application,
     const smart_objects::SmartObject& saved_app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (saved_app.keyExists(strings::application_subscriptions)) {
     const smart_objects::SmartObject& subscriptions =
         saved_app[strings::application_subscriptions];
@@ -947,7 +947,7 @@ void ResumeCtrlImpl::AddSubscriptions(
 
 bool ResumeCtrlImpl::CheckIgnCycleRestrictions(
     const smart_objects::SmartObject& saved_app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!CheckDelayAfterIgnOn()) {
     LOG4CXX_DEBUG(logger_, "Application was connected long after ign on");
@@ -963,7 +963,7 @@ bool ResumeCtrlImpl::CheckIgnCycleRestrictions(
 
 bool ResumeCtrlImpl::CheckLowVoltageRestrictions(
     const smart_objects::SmartObject& saved_app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!CheckDelayBeforeLowVoltage(saved_app)) {
     LOG4CXX_DEBUG(logger_,
@@ -983,7 +983,7 @@ bool ResumeCtrlImpl::CheckLowVoltageRestrictions(
 bool ResumeCtrlImpl::CheckDelayBeforeIgnOff(
     const smart_objects::SmartObject& saved_app) const {
   using namespace date_time;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(saved_app.keyExists(strings::time_stamp), false);
 
   const time_t time_stamp =
@@ -1019,7 +1019,7 @@ bool ResumeCtrlImpl::CheckDelayBeforeIgnOff(
 bool ResumeCtrlImpl::CheckDelayBeforeLowVoltage(
     const smart_objects::SmartObject& saved_app) const {
   using namespace date_time;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(saved_app.keyExists(strings::time_stamp), false);
 
   if (0 == LowVoltageTime()) {
@@ -1058,7 +1058,7 @@ bool ResumeCtrlImpl::CheckDelayBeforeLowVoltage(
 
 bool ResumeCtrlImpl::CheckDelayAfterWakeUp() const {
   using namespace date_time;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (0 == WakeUpTime()) {
     LOG4CXX_DEBUG(logger_, "No WakeUp signal timestamp saved");
@@ -1086,7 +1086,7 @@ bool ResumeCtrlImpl::CheckAppRestrictions(
     const smart_objects::SmartObject& saved_app) {
   using namespace mobile_apis;
   using namespace helpers;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN(saved_app.keyExists(strings::hmi_level), false);
 
   HMILevel::eType hmi_level;
@@ -1112,14 +1112,14 @@ bool ResumeCtrlImpl::CheckAppRestrictions(
 bool ResumeCtrlImpl::CheckIcons(ApplicationSharedPtr application,
                                 smart_objects::SmartObject& obj) {
   using namespace smart_objects;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const mobile_apis::Result::eType verify_images =
       MessageHelper::VerifyImageFiles(obj, application, application_manager_);
   return mobile_apis::Result::INVALID_DATA != verify_images;
 }
 
 bool ResumeCtrlImpl::CheckIgnCyclesData() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const uint32_t global_ign_on_count =
       resumption_storage_->GetGlobalIgnOnCounter();
   const uint32_t the_first_ignition = 1;
@@ -1138,7 +1138,7 @@ bool ResumeCtrlImpl::CheckIgnCyclesData() const {
 
 bool ResumeCtrlImpl::CheckDelayAfterIgnOn() const {
   using namespace date_time;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const time_t ign_off_time = GetIgnOffTime();
 
   if (CheckIgnCyclesData() && 0 == ign_off_time) {
@@ -1169,7 +1169,7 @@ time_t ResumeCtrlImpl::GetIgnOffTime() const {
 
 bool ResumeCtrlImpl::ProcessHMIRequest(smart_objects::SmartObjectSPtr request,
                                        bool use_events) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (use_events) {
     const hmi_apis::FunctionID::eType function_id =
         static_cast<hmi_apis::FunctionID::eType>(
@@ -1198,7 +1198,7 @@ void ResumeCtrlImpl::ProcessHMIRequests(
 }
 
 void ResumeCtrlImpl::AddToResumptionTimerQueue(const uint32_t app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool run_resumption = false;
   queue_lock_.Acquire();
   waiting_for_timer_.push_back(app_id);
@@ -1222,7 +1222,7 @@ void ResumeCtrlImpl::AddToResumptionTimerQueue(const uint32_t app_id) {
 }
 
 void ResumeCtrlImpl::LoadResumeData() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject so_applications_data;
   resumption_storage_->GetDataForLoadResumeData(so_applications_data);
   size_t length = so_applications_data.length();
@@ -1244,7 +1244,7 @@ void ResumeCtrlImpl::LoadResumeData() {
 
 void ResumeCtrlImpl::OnAppRegistrationStart(const std::string& policy_app_id,
                                             const std::string& device_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (IsApplicationSaved(policy_app_id, device_id)) {
     LOG4CXX_INFO(
         logger_,
@@ -1255,7 +1255,7 @@ void ResumeCtrlImpl::OnAppRegistrationStart(const std::string& policy_app_id,
 }
 
 void ResumeCtrlImpl::OnAppRegistrationEnd() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   StartSavePersistentDataTimer();
 }
 
@@ -1282,7 +1282,7 @@ bool ResumeCtrlImpl::IsAppDataResumptionExpired(
 mobile_apis::HMILevel::eType ResumeCtrlImpl::GetHmiLevelOnLowBandwidthTransport(
     ApplicationConstSharedPtr application) const {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const ApplicationManagerSettings& settings =
       application_manager_.get_settings();

@@ -46,7 +46,7 @@ GetInteriorVehicleDataConsentResponse::GetInteriorVehicleDataConsentResponse(
           params.policy_handler_) {}
 
 void GetInteriorVehicleDataConsentResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   application_manager_.GetRPCService().SendMessageToMobile(message_);
 }
 

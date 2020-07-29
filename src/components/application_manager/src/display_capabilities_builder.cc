@@ -35,19 +35,19 @@
 #include "application_manager/smart_object_keys.h"
 namespace application_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "DisplayCapabilitiesBuilder")
+SDL_CREATE_LOGGERPTR( "DisplayCapabilitiesBuilder")
 
 const WindowID kDefaultWindowID = 0;
 
 DisplayCapabilitiesBuilder::DisplayCapabilitiesBuilder(Application& application)
     : owner_(application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 void DisplayCapabilitiesBuilder::InitBuilder(
     DisplayCapabilitiesBuilder::ResumeCallback resume_callback,
     const smart_objects::SmartObject& windows_info) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(display_capabilities_lock_);
   resume_callback_ = resume_callback;
   window_ids_to_resume_.insert(kDefaultWindowID);
@@ -61,7 +61,7 @@ void DisplayCapabilitiesBuilder::InitBuilder(
 
 void DisplayCapabilitiesBuilder::UpdateDisplayCapabilities(
     const smart_objects::SmartObject& incoming_display_capabilities) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace smart_objects;
   sync_primitives::AutoLock lock(display_capabilities_lock_);
 
@@ -100,19 +100,19 @@ void DisplayCapabilitiesBuilder::UpdateDisplayCapabilities(
 
 const smart_objects::SmartObjectSPtr
 DisplayCapabilitiesBuilder::display_capabilities() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return display_capabilities_;
 }
 
 void DisplayCapabilitiesBuilder::ResetDisplayCapabilities() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(display_capabilities_lock_);
   display_capabilities_.reset();
 }
 
 void DisplayCapabilitiesBuilder::StopWaitingForWindow(
     const WindowID window_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(display_capabilities_lock_);
   LOG4CXX_DEBUG(logger_,
                 "Window id " << window_id << " will be erased due to failure");

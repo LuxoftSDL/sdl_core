@@ -32,7 +32,7 @@
 
 #include "app_service_rpc_plugin/app_service_command_factory.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "AppServiceRpcPlugin")
+SDL_CREATE_LOGGERPTR( "AppServiceRpcPlugin")
 
 namespace app_service_rpc_plugin {
 
@@ -45,11 +45,11 @@ AppServiceCommandFactory::AppServiceCommandFactory(
           application_manager, rpc_service, hmi_capabilities, policy_handler))
     , mobile_command_factory_(new AppServiceMobileCommandFactory(
           application_manager, rpc_service, hmi_capabilities, policy_handler)) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 AppServiceCommandFactory::~AppServiceCommandFactory() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 app_mngr::CommandSharedPtr AppServiceCommandFactory::CreateCommand(

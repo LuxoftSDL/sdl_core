@@ -12,7 +12,7 @@ bool IsTypeInvalid(
 namespace rpc {
 namespace policy_table_interface_base {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Policy")
+SDL_CREATE_LOGGERPTR( "Policy")
 
 void RemoveInvalidTypes(RequestTypes& types) {
   types.erase(std::remove_if(types.begin(), types.end(), &IsTypeInvalid),

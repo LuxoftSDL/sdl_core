@@ -55,7 +55,7 @@ OnSystemContextNotification::OnSystemContextNotification(
 OnSystemContextNotification::~OnSystemContextNotification() {}
 
 void OnSystemContextNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   mobile_api::SystemContext::eType system_context =
       static_cast<mobile_api::SystemContext::eType>(

@@ -37,7 +37,7 @@
 
 namespace media_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "MediaManager")
+SDL_CREATE_LOGGERPTR( "MediaManager")
 
 FromMicRecorderListener::FromMicRecorderListener(
     const std::string& file_name,
@@ -48,7 +48,7 @@ FromMicRecorderListener::FromMicRecorderListener(
     , application_manager_(app_mngr) {}
 
 FromMicRecorderListener::~FromMicRecorderListener() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (reader_) {
     reader_->join();
     delete reader_->delegate();

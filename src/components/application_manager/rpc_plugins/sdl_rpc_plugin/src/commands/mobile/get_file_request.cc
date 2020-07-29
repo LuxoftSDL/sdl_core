@@ -110,7 +110,7 @@ bool GetFileRequest::GetFilePath(std::string& file_path, bool& forward_to_hmi) {
 }
 
 void GetFileRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_INFO(logger_, "Received GetFile request");
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
@@ -248,7 +248,7 @@ void GetFileRequest::Run() {
 }
 
 void GetFileRequest::on_event(const app_mngr::event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (hmi_apis::FunctionID::BasicCommunication_GetFilePath != event.id()) {
     return;

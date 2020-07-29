@@ -95,7 +95,7 @@ OnDeviceStateChangedNotification::OnDeviceStateChangedNotification(
 OnDeviceStateChangedNotification::~OnDeviceStateChangedNotification() {}
 
 void OnDeviceStateChangedNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if ((*message_)[strings::msg_params]["deviceState"] ==
       hmi_apis::Common_DeviceState::UNPAIRED) {

@@ -204,7 +204,7 @@ bool OnASAppServiceDataNotification::ValidateParams(
 }
 
 void OnASAppServiceDataNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Sending AS data to HMI");
   if (ValidateParams((*message_)[strings::msg_params])) {
     SendNotification();

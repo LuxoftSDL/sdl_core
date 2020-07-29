@@ -73,7 +73,7 @@ mobile_apis::FileType::eType StringToFileType(const char* str) {
 }
 }  // namespace
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ApplicationManager")
+SDL_CREATE_LOGGERPTR( "ApplicationManager")
 
 namespace application_manager {
 
@@ -81,7 +81,7 @@ void SwitchApplicationParameters(ApplicationSharedPtr app,
                                  const uint32_t app_id,
                                  const size_t device_id,
                                  const std::string& mac_address) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::shared_ptr<ApplicationImpl> application =
       std::dynamic_pointer_cast<ApplicationImpl>(app);
   DCHECK_OR_RETURN_VOID(application);
@@ -270,23 +270,23 @@ bool ApplicationImpl::IsVideoApplication() const {
 
 void ApplicationImpl::SetRegularState(const WindowID window_id,
                                       HmiStatePtr state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   state_.AddState(window_id, state);
 }
 
 void ApplicationImpl::RemovePostponedState(const WindowID window_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   state_.RemoveState(window_id, HmiState::STATE_ID_POSTPONED);
 }
 
 void ApplicationImpl::SetPostponedState(const WindowID window_id,
                                         HmiStatePtr state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   state_.AddState(window_id, state);
 }
 
 void ApplicationImpl::set_mobile_projection_enabled(bool option) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   mobile_projection_enabled_ = option;
 }
 
@@ -303,13 +303,13 @@ struct StateIDComparator {
 };
 
 void ApplicationImpl::AddHMIState(const WindowID window_id, HmiStatePtr state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   state_.AddState(window_id, state);
 }
 
 void ApplicationImpl::RemoveHMIState(const WindowID window_id,
                                      HmiState::StateID state_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   state_.RemoveState(window_id, state_id);
 }
 
@@ -524,7 +524,7 @@ bool ApplicationImpl::audio_streaming_allowed() const {
 bool ApplicationImpl::SetVideoConfig(protocol_handler::ServiceType service_type,
                                      const smart_objects::SmartObject& params) {
   using namespace protocol_handler;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (ServiceType::kMobileNav == service_type) {
     // See StartStreaming(). We issue SetVideoConfig and StartStream
@@ -542,7 +542,7 @@ bool ApplicationImpl::SetVideoConfig(protocol_handler::ServiceType service_type,
 void ApplicationImpl::StartStreaming(
     protocol_handler::ServiceType service_type) {
   using namespace protocol_handler;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (ServiceType::kMobileNav == service_type) {
     LOG4CXX_TRACE(logger_, "ServiceType = Video");
@@ -564,7 +564,7 @@ void ApplicationImpl::StartStreaming(
 void ApplicationImpl::StopStreamingForce(
     protocol_handler::ServiceType service_type) {
   using namespace protocol_handler;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // see the comment in StopStreaming()
   sync_primitives::AutoLock lock(streaming_stop_lock_);
@@ -581,7 +581,7 @@ void ApplicationImpl::StopStreamingForce(
 void ApplicationImpl::StopStreaming(
     protocol_handler::ServiceType service_type) {
   using namespace protocol_handler;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // since WakeUpStreaming() is called from another thread, it is possible that
   // the stream will be restarted after we call SuspendStreaming() and before
@@ -600,7 +600,7 @@ void ApplicationImpl::StopStreaming(
 }
 
 void ApplicationImpl::StopNaviStreaming() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   video_stream_suspend_timer_.Stop();
   MessageHelper::SendNaviStopStream(app_id(), application_manager_);
   set_video_streaming_approved(false);
@@ -608,7 +608,7 @@ void ApplicationImpl::StopNaviStreaming() {
 }
 
 void ApplicationImpl::StopAudioStreaming() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   audio_stream_suspend_timer_.Stop();
   MessageHelper::SendAudioStopStream(app_id(), application_manager_);
   set_audio_streaming_approved(false);
@@ -618,7 +618,7 @@ void ApplicationImpl::StopAudioStreaming() {
 void ApplicationImpl::SuspendStreaming(
     protocol_handler::ServiceType service_type) {
   using namespace protocol_handler;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (ServiceType::kMobileNav == service_type) {
     video_stream_suspend_timer_.Stop();
@@ -638,7 +638,7 @@ void ApplicationImpl::SuspendStreaming(
 void ApplicationImpl::WakeUpStreaming(
     protocol_handler::ServiceType service_type, uint32_t timer_len) {
   using namespace protocol_handler;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // See the comment in StopStreaming(). Also, please make sure that we acquire
   // streaming_stop_lock_ then xxx_streaming_suspended_lock_ in this order!
@@ -675,14 +675,14 @@ void ApplicationImpl::WakeUpStreaming(
 
 void ApplicationImpl::OnVideoStreamSuspend() {
   using namespace protocol_handler;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_INFO(logger_, "Suspend video streaming by timer");
   SuspendStreaming(ServiceType::kMobileNav);
 }
 
 void ApplicationImpl::OnAudioStreamSuspend() {
   using namespace protocol_handler;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_INFO(logger_, "Suspend audio streaming by timer");
   SuspendStreaming(ServiceType::kAudio);
 }
@@ -999,7 +999,7 @@ void ApplicationImpl::set_is_application_data_changed(
 }
 
 void ApplicationImpl::UpdateHash() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   hash_val_ =
       utils::gen_hash(application_manager_.get_settings().hash_string_size());
   set_is_application_data_changed(true);
@@ -1152,7 +1152,7 @@ struct FindSoftButtonId {
 };
 
 bool ApplicationImpl::IsSubscribedToSoftButton(const uint32_t softbutton_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(cmd_softbuttonid_lock_);
   CommandSoftButtonID::iterator it = cmd_softbuttonid_.begin();
   for (; it != cmd_softbuttonid_.end(); ++it) {
@@ -1168,7 +1168,7 @@ bool ApplicationImpl::IsSubscribedToSoftButton(const uint32_t softbutton_id) {
 }
 
 WindowID ApplicationImpl::GetSoftButtonWindowID(const uint32_t softbutton_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   sync_primitives::AutoLock lock(cmd_softbuttonid_lock_);
   CommandSoftButtonID::iterator it = cmd_softbuttonid_.begin();

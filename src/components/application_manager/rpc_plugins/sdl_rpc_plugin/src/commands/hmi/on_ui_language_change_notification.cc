@@ -57,7 +57,7 @@ OnUILanguageChangeNotification::OnUILanguageChangeNotification(
 OnUILanguageChangeNotification::~OnUILanguageChangeNotification() {}
 
 void OnUILanguageChangeNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   hmi_capabilities_.set_active_ui_language(
       static_cast<hmi_apis::Common_Language::eType>(

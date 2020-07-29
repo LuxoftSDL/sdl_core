@@ -45,7 +45,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 UsbConnection::UsbConnection(const DeviceUID& device_uid,
                              const ApplicationHandle& app_handle,

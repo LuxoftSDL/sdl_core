@@ -60,7 +60,7 @@ OnVRCommandNotification::OnVRCommandNotification(
 OnVRCommandNotification::~OnVRCommandNotification() {}
 
 void OnVRCommandNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const uint32_t cmd_id =
       (*message_)[strings::msg_params][strings::cmd_id].asUInt();
   uint32_t max_cmd_id = application_manager_.get_settings().max_cmd_id();

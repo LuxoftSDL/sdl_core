@@ -57,7 +57,7 @@ DeleteFileRequest::DeleteFileRequest(
 DeleteFileRequest::~DeleteFileRequest() {}
 
 void DeleteFileRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr application =
       application_manager_.application(connection_key());

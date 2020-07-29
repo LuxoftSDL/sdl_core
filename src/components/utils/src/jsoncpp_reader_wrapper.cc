@@ -35,14 +35,14 @@
 
 namespace utils {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "JsoncppReaderWrapper")
+SDL_CREATE_LOGGERPTR( "JsoncppReaderWrapper")
 
 JsonReader::JsonReader() {
   reader_ = std::unique_ptr<Json::CharReader>(reader_builder_.newCharReader());
 }
 
 bool JsonReader::parse(const std::string& json, Json::Value* root) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   JSONCPP_STRING err;
   bool is_parsing_ok = false;
   const size_t json_len = json.length();

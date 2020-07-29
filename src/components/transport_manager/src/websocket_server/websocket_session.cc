@@ -72,7 +72,7 @@ WebSocketSession<ExecutorType>::~WebSocketSession() {}
 
 template <typename ExecutorType>
 void WebSocketSession<ExecutorType>::AsyncAccept() {
-  LOG4CXX_AUTO_TRACE(ws_logger_);
+ SDL_AUTO_TRACE();
   ws_.async_accept(
       boost::asio::bind_executor(strand_,
                                  std::bind(&WebSocketSession::AsyncRead,
@@ -82,7 +82,7 @@ void WebSocketSession<ExecutorType>::AsyncAccept() {
 
 template <typename ExecutorType>
 void WebSocketSession<ExecutorType>::AsyncRead(boost::system::error_code ec) {
-  LOG4CXX_AUTO_TRACE(ws_logger_);
+ SDL_AUTO_TRACE();
   if (ec) {
     auto str_err = "ErrorMessage: " + ec.message();
     LOG4CXX_ERROR(ws_logger_, str_err);
@@ -114,7 +114,7 @@ TransportAdapter::Error WebSocketSession<ExecutorType>::WriteDown(
 template <typename ExecutorType>
 void WebSocketSession<ExecutorType>::Read(boost::system::error_code ec,
                                           std::size_t bytes_transferred) {
-  LOG4CXX_AUTO_TRACE(ws_logger_);
+ SDL_AUTO_TRACE();
   boost::ignore_unused(bytes_transferred);
   if (ec) {
     LOG4CXX_ERROR(ws_logger_, ec.message());
@@ -142,7 +142,7 @@ void WebSocketSession<ExecutorType>::Read(boost::system::error_code ec,
 
 template <typename ExecutorType>
 bool WebSocketSession<ExecutorType>::Shutdown() {
-  LOG4CXX_AUTO_TRACE(ws_logger_);
+ SDL_AUTO_TRACE();
   boost::system::error_code ec;
   if (socket_.is_open()) {
     socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);

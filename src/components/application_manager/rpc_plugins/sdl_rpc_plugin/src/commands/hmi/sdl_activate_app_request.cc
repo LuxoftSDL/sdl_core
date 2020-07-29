@@ -112,7 +112,7 @@ uint32_t SDLActivateAppRequest::app_id() const {
 
 #ifdef EXTERNAL_PROPRIETARY_MODE
 void SDLActivateAppRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace hmi_apis::FunctionID;
 
   ApplicationConstSharedPtr app =
@@ -144,7 +144,7 @@ void SDLActivateAppRequest::Run() {
 
 #else  // EXTERNAL_PROPRIETARY_MODE
 void SDLActivateAppRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace hmi_apis::FunctionID;
   using namespace hmi_apis::Common_Result;
 

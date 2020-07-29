@@ -46,7 +46,7 @@
 
 namespace main_namespace {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "LowVoltageSignalsHandler")
+SDL_CREATE_LOGGERPTR( "LowVoltageSignalsHandler")
 
 LowVoltageSignalsHandler::LowVoltageSignalsHandler(
     LifeCycle& life_cycle, const LowVoltageSignalsOffset& offset_data)
@@ -158,7 +158,7 @@ void NotificationThreadDelegate::threadMain() {
 }
 
 void NotificationThreadDelegate::exitThreadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ThreadDelegate::exitThreadMain();
 }
 

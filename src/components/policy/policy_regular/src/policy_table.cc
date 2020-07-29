@@ -38,7 +38,7 @@
 
 namespace policy {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Policy")
+SDL_CREATE_LOGGERPTR( "Policy")
 
 PolicyTable::PolicyTable() : pt_data_(new SQLPTRepresentation()) {}
 

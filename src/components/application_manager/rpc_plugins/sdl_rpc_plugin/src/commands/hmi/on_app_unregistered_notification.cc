@@ -54,13 +54,13 @@ OnAppUnregisteredNotification::OnAppUnregisteredNotification(
 OnAppUnregisteredNotification::~OnAppUnregisteredNotification() {}
 
 bool OnAppUnregisteredNotification::Init() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Replacement of hmi id is skipped.");
   return true;
 }
 
 void OnAppUnregisteredNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // sending event for delete VRCommand on PerformInteraction
   event_engine::Event event(

@@ -43,7 +43,7 @@
 #include "smart_objects/smart_object.h"
 #include "utils/logger.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "HelpPromptManagerImpl")
+SDL_CREATE_LOGGERPTR( "HelpPromptManagerImpl")
 
 namespace {
 const size_t kLimitCommand = 30;
@@ -60,7 +60,7 @@ HelpPromptManagerImpl::HelpPromptManagerImpl(Application& app,
     , is_ui_send_(false) {}
 
 HelpPromptManagerImpl::~HelpPromptManagerImpl() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 bool HelpPromptManagerImpl::AddCommand(
@@ -107,7 +107,7 @@ bool HelpPromptManagerImpl::AddCommand(
 }
 
 bool HelpPromptManagerImpl::DeleteCommand(const uint32_t cmd_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   sync_primitives::AutoLock lock(vr_commands_lock_);
 
@@ -136,7 +136,7 @@ void HelpPromptManagerImpl::OnVrCommandAdded(
     const uint32_t cmd_id,
     const smart_objects::SmartObject& command,
     const bool is_resumption) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (SendingType::kNoneSend == sending_type_) {
     LOG4CXX_DEBUG(logger_,
                   "SendingType::kNoneSend"
@@ -151,7 +151,7 @@ void HelpPromptManagerImpl::OnVrCommandAdded(
 
 void HelpPromptManagerImpl::OnVrCommandDeleted(const uint32_t cmd_id,
                                                const bool is_resumption) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (SendingType::kNoneSend == sending_type_) {
     LOG4CXX_DEBUG(logger_,
                   "SendingType::kNoneSend"
@@ -166,7 +166,7 @@ void HelpPromptManagerImpl::OnVrCommandDeleted(const uint32_t cmd_id,
 
 void HelpPromptManagerImpl::OnSetGlobalPropertiesReceived(
     const smart_objects::SmartObject& msg, const bool is_response) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (SendingType::kNoneSend == sending_type_) {
     LOG4CXX_DEBUG(logger_,
                   "SendingType::kNoneSend"
@@ -222,7 +222,7 @@ void HelpPromptManagerImpl::GenerateVrItems(
 }
 
 void HelpPromptManagerImpl::SendTTSRequest() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "TTS request for appID:" << app_.app_id());
   smart_objects::SmartObjectSPtr tts_global_properties =
       std::make_shared<smart_objects::SmartObject>(
@@ -256,7 +256,7 @@ void HelpPromptManagerImpl::SendTTSRequest() {
 }
 
 void HelpPromptManagerImpl::SendUIRequest() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "UI request for appID:" << app_.app_id());
   smart_objects::SmartObjectSPtr ui_global_properties =
       std::make_shared<smart_objects::SmartObject>(
@@ -290,13 +290,13 @@ void HelpPromptManagerImpl::SendUIRequest() {
 }
 
 void HelpPromptManagerImpl::SendBothRequests() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   SendTTSRequest();
   SendUIRequest();
 }
 
 void HelpPromptManagerImpl::SendRequests() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   sync_primitives::AutoLock lock(vr_commands_lock_);
   switch (sending_type_) {
@@ -319,14 +319,14 @@ void HelpPromptManagerImpl::SendRequests() {
 
 void HelpPromptManagerImpl::CreatePromptMsg(
     smart_objects::SmartObject& out_msg_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   GenerateVrItems(out_msg_params, strings::help_prompt);
   app_.set_help_prompt(out_msg_params[strings::help_prompt]);
 }
 
 void HelpPromptManagerImpl::CreateVRMsg(
     smart_objects::SmartObject& out_msg_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (false == out_msg_params.keyExists(strings::vr_help_title)) {
     if (app_.vr_help_title()) {
       out_msg_params[strings::vr_help_title] = (*app_.vr_help_title());
@@ -347,7 +347,7 @@ void HelpPromptManagerImpl::CreateVRMsg(
 
 void HelpPromptManagerImpl::SetSendingType(
     const smart_objects::SmartObject& msg) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   hmi_apis::Common_Result::eType result =
       static_cast<hmi_apis::Common_Result::eType>(

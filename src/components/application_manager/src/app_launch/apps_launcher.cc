@@ -28,7 +28,7 @@ struct LauncherGenerator {
   const uint16_t app_launch_retry_wait_time_;
 };
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "AppLaunch")
+SDL_CREATE_LOGGERPTR( "AppLaunch")
 AppsLauncher::AppsLauncher(
     connection_handler::ConnectionHandler& connection_handler,
     const uint16_t max_number_of_ios_device,
@@ -45,7 +45,7 @@ AppsLauncher::AppsLauncher(
 }
 
 void AppsLauncher::StartLaunching(ApplicationDataPtr app_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(launchers_lock_);
   DCHECK_OR_RETURN_VOID(!free_launchers_.empty())
   const AppLaunchers::iterator it = free_launchers_.begin();
@@ -81,12 +81,12 @@ void AppsLauncher::StopLaunching(ApplicationDataPtr app_data) {
 }
 
 void AppsLauncher::OnLaunched(ApplicationDataPtr app_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   StopLaunching(app_data);
 }
 
 void AppsLauncher::OnRetryAttemptsExhausted(ApplicationDataPtr app_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   StopLaunching(app_data);
 }
 

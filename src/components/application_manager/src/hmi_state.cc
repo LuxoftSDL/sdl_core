@@ -40,7 +40,7 @@
 
 namespace application_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "HmiState")
+SDL_CREATE_LOGGERPTR( "HmiState")
 
 HmiState::HmiState(std::shared_ptr<Application> app,
                    const ApplicationManager& app_mngr,

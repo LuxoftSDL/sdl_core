@@ -33,7 +33,7 @@
 #include "vehicle_info_plugin/vehicle_info_app_extension.h"
 #include "vehicle_info_plugin/vehicle_info_plugin.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "VehicleInfoPlugin")
+SDL_CREATE_LOGGERPTR( "VehicleInfoPlugin")
 
 namespace vehicle_info_plugin {
 
@@ -45,11 +45,11 @@ VehicleInfoAppExtension::VehicleInfoAppExtension(
           VehicleInfoAppExtension::VehicleInfoAppExtensionUID)
     , plugin_(plugin)
     , app_(app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 VehicleInfoAppExtension::~VehicleInfoAppExtension() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 bool VehicleInfoAppExtension::subscribeToVehicleInfo(
@@ -70,7 +70,7 @@ bool VehicleInfoAppExtension::unsubscribeFromVehicleInfo(
 }
 
 void VehicleInfoAppExtension::unsubscribeFromVehicleInfo() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   subscribed_data_.clear();
 }
 

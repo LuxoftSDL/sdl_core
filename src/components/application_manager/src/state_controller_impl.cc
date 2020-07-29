@@ -40,7 +40,7 @@
 
 namespace application_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "StateControllerImpl")
+SDL_CREATE_LOGGERPTR( "StateControllerImpl")
 
 namespace {
 bool IsStateChanged(const HmiState& old_state, const HmiState& new_state) {
@@ -70,7 +70,7 @@ void StateControllerImpl::SetRegularState(ApplicationSharedPtr app,
                                           const WindowID window_id,
                                           HmiStatePtr state,
                                           const bool request_hmi_state_change) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
   DCHECK_OR_RETURN_VOID(state);
   DCHECK_OR_RETURN_VOID(HmiState::STATE_ID_REGULAR == state->state_id());
@@ -130,7 +130,7 @@ void StateControllerImpl::SetRegularState(
     const mobile_apis::AudioStreamingState::eType audio_state,
     const mobile_apis::VideoStreamingState::eType video_state,
     const bool request_hmi_state_change) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
   HmiStatePtr prev_regular = app->RegularHmiState(window_id);
   DCHECK_OR_RETURN_VOID(prev_regular);
@@ -151,7 +151,7 @@ void StateControllerImpl::SetRegularState(
     const mobile_apis::HMILevel::eType hmi_level,
     const bool request_hmi_state_change) {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
 
   HmiStatePtr prev_regular = app->RegularHmiState(window_id);
@@ -177,7 +177,7 @@ void StateControllerImpl::SetRegularState(
     const mobile_apis::VideoStreamingState::eType video_state,
     const mobile_apis::SystemContext::eType system_context,
     const bool request_hmi_state_change) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
 
   HmiStatePtr prev_regular = app->RegularHmiState(window_id);
@@ -199,7 +199,7 @@ void StateControllerImpl::SetRegularState(
     ApplicationSharedPtr app,
     const WindowID window_id,
     const mobile_apis::HMILevel::eType hmi_level) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
   HmiStatePtr prev_state = app->RegularHmiState(window_id);
   HmiStatePtr hmi_state =
@@ -218,7 +218,7 @@ void StateControllerImpl::SetRegularState(
     ApplicationSharedPtr app,
     const WindowID window_id,
     const mobile_apis::SystemContext::eType system_context) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
   HmiStatePtr prev_regular = app->RegularHmiState(window_id);
   DCHECK_OR_RETURN_VOID(prev_regular);
@@ -240,7 +240,7 @@ void StateControllerImpl::SetRegularState(
     const WindowID window_id,
     const mobile_apis::AudioStreamingState::eType audio_state,
     const mobile_apis::VideoStreamingState::eType video_state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
   HmiStatePtr prev_state = app->RegularHmiState(window_id);
   DCHECK_OR_RETURN_VOID(prev_state);
@@ -258,7 +258,7 @@ void StateControllerImpl::SetRegularState(
 void StateControllerImpl::SetRegularState(ApplicationSharedPtr app,
                                           const WindowID window_id,
                                           HmiStatePtr state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
   DCHECK_OR_RETURN_VOID(state);
 
@@ -436,7 +436,7 @@ void StateControllerImpl::HmiLevelConflictResolver::operator()(
 HmiStatePtr StateControllerImpl::ResolveHmiState(ApplicationSharedPtr app,
                                                  HmiStatePtr state) const {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "State to resolve: " << *state);
 
   HmiStatePtr available_state =
@@ -463,7 +463,7 @@ HmiStatePtr StateControllerImpl::ResolveHmiState(ApplicationSharedPtr app,
 
 bool StateControllerImpl::IsResumptionAllowed(ApplicationSharedPtr app,
                                               HmiStatePtr state) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace mobile_apis;
   if (!app->is_resuming() || !IsStreamableHMILevel(state->hmi_level())) {
     LOG4CXX_DEBUG(logger_, "Application is not in resuming mode.");
@@ -491,7 +491,7 @@ bool StateControllerImpl::IsResumptionAllowed(ApplicationSharedPtr app,
 
 mobile_apis::HMILevel::eType StateControllerImpl::GetAvailableHmiLevel(
     ApplicationSharedPtr app, mobile_apis::HMILevel::eType hmi_level) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   mobile_apis::HMILevel::eType result = hmi_level;
   LOG4CXX_DEBUG(logger_, "HMI Level: " << hmi_level);
@@ -542,7 +542,7 @@ mobile_apis::HMILevel::eType StateControllerImpl::GetAvailableHmiLevel(
 bool StateControllerImpl::IsStateAvailable(ApplicationSharedPtr app,
                                            HmiStatePtr state) const {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Checking state: " << *state);
 
   if (app->is_resuming()) {
@@ -565,7 +565,7 @@ bool StateControllerImpl::IsStateAvailable(ApplicationSharedPtr app,
 
 bool StateControllerImpl::IsStateAvailableForResumption(
     ApplicationSharedPtr app, HmiStatePtr state) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace mobile_apis;
 
   if (!app->is_resuming() || !IsStreamableHMILevel(state->hmi_level())) {
@@ -604,7 +604,7 @@ void StateControllerImpl::SetupRegularHmiState(ApplicationSharedPtr app,
                                                const WindowID window_id,
                                                HmiStatePtr state) {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(state);
   LOG4CXX_DEBUG(logger_,
                 "Setup window #" << window_id << " regular state: " << *state);
@@ -637,7 +637,7 @@ void StateControllerImpl::SetupRegularHmiState(
     const mobile_apis::HMILevel::eType hmi_level,
     const mobile_apis::AudioStreamingState::eType audio_state,
     const mobile_apis::VideoStreamingState::eType video_state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
   HmiStatePtr prev_state = app->RegularHmiState(window_id);
   DCHECK_OR_RETURN_VOID(prev_state);
@@ -655,7 +655,7 @@ void StateControllerImpl::SetupRegularHmiState(
 void StateControllerImpl::ApplyRegularState(ApplicationSharedPtr app,
                                             const WindowID window_id,
                                             HmiStatePtr state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
   DCHECK_OR_RETURN_VOID(state);
   DCHECK_OR_RETURN_VOID(state->state_id() == HmiState::STATE_ID_REGULAR);
@@ -676,7 +676,7 @@ void StateControllerImpl::ApplyRegularState(ApplicationSharedPtr app,
 
 void StateControllerImpl::UpdateAppWindowsStreamingState(
     ApplicationSharedPtr app, HmiStatePtr state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto window_ids = app->GetWindowIds();
   for (auto window_id : window_ids) {
     HmiStatePtr window_hmi_state = app->RegularHmiState(window_id);
@@ -714,7 +714,7 @@ void StateControllerImpl::on_event(const event_engine::Event& event) {
   using namespace hmi_apis;
   namespace FunctionID = hmi_apis::FunctionID;
 
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const SmartObject& message = event.smart_object();
   const FunctionID::eType id = static_cast<FunctionID::eType>(event.id());
   switch (id) {
@@ -809,7 +809,7 @@ void StateControllerImpl::on_event(const event_engine::Event& event) {
 }
 
 void StateControllerImpl::ActivateDefaultWindow(ApplicationSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace mobile_apis;
 
   const WindowID window_id = PredefinedWindows::DEFAULT_WINDOW;
@@ -831,7 +831,7 @@ void StateControllerImpl::ActivateDefaultWindow(ApplicationSharedPtr app) {
 }
 
 void StateControllerImpl::ExitDefaultWindow(ApplicationSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace mobile_apis;
 
   const WindowID window_id = PredefinedWindows::DEFAULT_WINDOW;
@@ -854,7 +854,7 @@ void StateControllerImpl::OnStateChanged(ApplicationSharedPtr app,
                                          const WindowID window_id,
                                          HmiStatePtr old_state,
                                          HmiStatePtr new_state) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
   DCHECK_OR_RETURN_VOID(old_state);
   DCHECK_OR_RETURN_VOID(new_state);
@@ -893,7 +893,7 @@ bool StateControllerImpl::IsTempStateActive(HmiState::StateID id) const {
 void StateControllerImpl::OnApplicationRegistered(
     ApplicationSharedPtr app,
     const mobile_apis::HMILevel::eType default_level) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // After app registration HMI level should be set for DEFAUL_WINDOW only
   OnAppWindowAdded(app,
@@ -910,7 +910,7 @@ void StateControllerImpl::OnAppWindowAdded(
   namespace HMILevel = mobile_apis::HMILevel;
   namespace AudioStreamingState = mobile_apis::AudioStreamingState;
   namespace SystemContext = mobile_apis::SystemContext;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
 
   {
@@ -949,7 +949,7 @@ int64_t StateControllerImpl::RequestHMIStateChange(
     ApplicationConstSharedPtr app,
     hmi_apis::Common_HMILevel::eType level,
     bool send_policy_priority) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObjectSPtr request = NULL;
   if (hmi_apis::Common_HMILevel::NONE == level) {
     request = MessageHelper::GetBCCloseApplicationRequestToHMI(app, app_mngr_);
@@ -975,7 +975,7 @@ int64_t StateControllerImpl::RequestHMIStateChange(
 }
 
 void StateControllerImpl::ApplyPostponedStateForApp(ApplicationSharedPtr app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(app);
   const WindowIds window_ids = app->GetWindowIds();
 
@@ -990,7 +990,7 @@ void StateControllerImpl::ApplyPostponedStateForApp(ApplicationSharedPtr app) {
 }
 
 void StateControllerImpl::TempStateStarted(HmiState::StateID id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   {
     sync_primitives::AutoLock autolock(active_states_lock_);
@@ -1004,7 +1004,7 @@ void StateControllerImpl::TempStateStarted(HmiState::StateID id) {
 }
 
 void StateControllerImpl::TempStateStopped(HmiState::StateID ID) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     sync_primitives::AutoLock autolock(active_states_lock_);
     active_states_.remove(ID);
@@ -1016,7 +1016,7 @@ void StateControllerImpl::TempStateStopped(HmiState::StateID ID) {
 void StateControllerImpl::DeactivateApp(ApplicationSharedPtr app,
                                         const WindowID window_id) {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   DCHECK_OR_RETURN_VOID(app);
   const HmiStatePtr regular = app->RegularHmiState(window_id);
@@ -1076,7 +1076,7 @@ void StateControllerImpl::OnHMIResponse(
 void StateControllerImpl::OnAppActivated(
     const smart_objects::SmartObject& message) {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint32_t app_id = message[strings::msg_params][strings::app_id].asUInt();
   ApplicationSharedPtr app = app_mngr_.application(app_id);
@@ -1117,7 +1117,7 @@ void StateControllerImpl::OnAppActivated(
 void StateControllerImpl::OnAppDeactivated(
     const smart_objects::SmartObject& message) {
   using namespace mobile_apis;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint32_t app_id = message[strings::msg_params][strings::app_id].asUInt();
   ApplicationSharedPtr app = app_mngr_.application(app_id);
@@ -1180,7 +1180,7 @@ void StateControllerImpl::OnVideoStreamingStopped(
 }
 
 bool StateControllerImpl::IsStateActive(HmiState::StateID state_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   switch (state_id) {
     case HmiState::STATE_ID_CURRENT:
     case HmiState::STATE_ID_REGULAR:
@@ -1194,7 +1194,7 @@ bool StateControllerImpl::IsStateActive(HmiState::StateID state_id) const {
 HmiStatePtr StateControllerImpl::CreateHmiState(
     std::shared_ptr<Application> app, HmiState::StateID state_id) const {
   using namespace utils;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   HmiStatePtr new_state;
   switch (state_id) {
     case HmiState::STATE_ID_PHONE_CALL: {

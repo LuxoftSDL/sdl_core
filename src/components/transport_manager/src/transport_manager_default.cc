@@ -57,7 +57,7 @@
 #endif  // ENABLE_IAP2EMULATION
 
 namespace transport_manager {
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 TransportAdapterFactory::TransportAdapterFactory() {
 #ifdef BLUETOOTH_SUPPORT

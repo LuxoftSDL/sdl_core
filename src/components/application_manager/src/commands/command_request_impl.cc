@@ -102,7 +102,7 @@ const std::string CreateInfoForUnsupportedResult(
     }
     default:
 #ifdef ENABLE_LOG
-      CREATE_LOGGERPTR_LOCAL(logger, "Commands");
+      SDL_CREATE_LOGGERPTR( "Commands");
       LOG4CXX_WARN(logger,
                    "Could not create info because"
                    " interface isn't valid. Interface is:"
@@ -232,7 +232,7 @@ bool CommandRequestImpl::CleanUp() {
 void CommandRequestImpl::Run() {}
 
 void CommandRequestImpl::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   unsubscribe_from_all_hmi_events();
   unsubscribe_from_all_mobile_events();
@@ -267,7 +267,7 @@ void CommandRequestImpl::SendResponse(
     const char* info,
     const smart_objects::SmartObject* response_params,
     const std::vector<uint8_t> binary_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     sync_primitives::AutoLock auto_lock(state_lock_);
     if (kTimedOut == current_state_) {
@@ -355,7 +355,7 @@ smart_objects::SmartObject CreateUnsupportedResourceResponse(
 bool CommandRequestImpl::ProcessHMIInterfacesAvailability(
     const uint32_t hmi_correlation_id,
     const hmi_apis::FunctionID::eType& function_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   HmiInterfaces& hmi_interfaces = application_manager_.hmi_interfaces();
   HmiInterfaces::InterfaceID interface =
       hmi_interfaces.GetInterfaceFromFunction(function_id);
@@ -373,7 +373,7 @@ bool CommandRequestImpl::ProcessHMIInterfacesAvailability(
 }
 
 void CommandRequestImpl::UpdateHash() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (hash_update_mode_ == kSkipHashUpdate) {
     LOG4CXX_DEBUG(logger_, "Hash update is disabled for " << function_id());
     return;
@@ -417,7 +417,7 @@ void CommandRequestImpl::SendProviderRequest(
     const hmi_apis::FunctionID::eType& hmi_function_id,
     const smart_objects::SmartObject* msg,
     bool use_events) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool hmi_destination = false;
   ApplicationSharedPtr app;
   // Default error code and error message
@@ -684,7 +684,7 @@ mobile_apis::Result::eType CommandRequestImpl::GetMobileResultCode(
 
 bool CommandRequestImpl::CheckAllowedParameters(
     const Command::CommandSource source) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // RegisterAppInterface should always be allowed
   if (mobile_apis::FunctionID::RegisterAppInterfaceID ==
@@ -697,7 +697,7 @@ bool CommandRequestImpl::CheckAllowedParameters(
 
 bool CommandRequestImpl::CheckHMICapabilities(
     const mobile_apis::ButtonName::eType button) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   using namespace smart_objects;
   using namespace mobile_apis;
@@ -789,7 +789,7 @@ bool CommandRequestImpl::HasDisallowedParams() const {
 
 bool CommandRequestImpl::IsMobileResultSuccess(
     const mobile_apis::Result::eType result_code) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
   return Compare<mobile_apis::Result::eType, EQ, ONE>(
       result_code,
@@ -803,7 +803,7 @@ bool CommandRequestImpl::IsMobileResultSuccess(
 
 bool CommandRequestImpl::IsHMIResultSuccess(
     const hmi_apis::Common_Result::eType result_code) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
   return Compare<hmi_apis::Common_Result::eType, EQ, ONE>(
       result_code,
@@ -818,7 +818,7 @@ bool CommandRequestImpl::IsHMIResultSuccess(
 bool CommandRequestImpl::PrepareResultForMobileResponse(
     hmi_apis::Common_Result::eType result_code,
     HmiInterfaces::InterfaceID interface) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (IsHMIResultSuccess(result_code)) {
     return true;
   }
@@ -834,7 +834,7 @@ bool CommandRequestImpl::PrepareResultForMobileResponse(
 
 bool CommandRequestImpl::PrepareResultForMobileResponse(
     ResponseInfo& out_first, ResponseInfo& out_second) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool result =
       CheckResult(out_first, out_second) || CheckResult(out_second, out_first);
   return result;
@@ -853,7 +853,7 @@ void CommandRequestImpl::GetInfo(
 
 mobile_apis::Result::eType CommandRequestImpl::PrepareResultCodeForResponse(
     const ResponseInfo& first, const ResponseInfo& second) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   mobile_apis::Result::eType result_code = mobile_apis::Result::INVALID_ENUM;
   if (IsResultCodeUnsupported(first, second) ||
       IsResultCodeUnsupported(second, first)) {
@@ -961,7 +961,7 @@ const std::string InfoInterfaceSeparator(
 void CommandRequestImpl::AddTimeOutComponentInfoToMessage(
     smart_objects::SmartObject& response) const {
   using ns_smart_device_link::ns_smart_objects::SmartObject;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(awaiting_response_interfaces_lock_);
   if (awaiting_response_interfaces_.empty()) {
     LOG4CXX_ERROR(logger_, "No interfaces awaiting, info param is empty");

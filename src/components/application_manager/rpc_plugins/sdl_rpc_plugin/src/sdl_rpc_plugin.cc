@@ -39,7 +39,7 @@ namespace sdl_rpc_plugin {
 namespace app_mngr = application_manager;
 namespace plugins = application_manager::plugin_manager;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "SdlRPCPlugin")
+SDL_CREATE_LOGGERPTR( "SdlRPCPlugin")
 
 bool SDLRPCPlugin::Init(app_mngr::ApplicationManager& app_manager,
                         app_mngr::rpc_service::RPCService& rpc_service,
@@ -113,5 +113,4 @@ Create() {
 extern "C" __attribute__((visibility("default"))) void Delete(
     application_manager::plugin_manager::RPCPlugin* data) {
   delete data;
-  DELETE_THREAD_LOGGER(sdl_rpc_plugin::logger_);
-}
+  SDL_DELETE_THREAD_LOGGER();

@@ -42,7 +42,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 UsbAoaAdapter::UsbAoaAdapter(resumption::LastStateWrapperPtr last_state_wrapper,
                              const TransportManagerSettings& settings)
     : TransportAdapterImpl(new UsbDeviceScanner(this, settings),

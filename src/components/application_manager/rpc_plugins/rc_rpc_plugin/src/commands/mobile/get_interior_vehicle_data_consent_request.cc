@@ -51,7 +51,7 @@ GetInteriorVehicleDataConsentRequest::GetInteriorVehicleDataConsentRequest(
     : RCCommandRequest(message, params) {}
 
 void GetInteriorVehicleDataConsentRequest::Execute() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto& msg_params = (*message_)[app_mngr::strings::msg_params];
 
@@ -136,7 +136,7 @@ void GetInteriorVehicleDataConsentRequest::Execute() {
 
 void GetInteriorVehicleDataConsentRequest::on_event(
     const app_mngr::event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (event.id() != hmi_apis::FunctionID::RC_GetInteriorVehicleDataConsent) {
     LOG4CXX_ERROR(logger_, "Received wrong event. FunctionID: " << event.id());
@@ -255,7 +255,7 @@ GetInteriorVehicleDataConsentRequest::~GetInteriorVehicleDataConsentRequest() {}
 
 bool GetInteriorVehicleDataConsentRequest::IsUserLocationValid(
     const ModuleUid& module_uid) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!rc_capabilities_manager_.IsSeatLocationCapabilityProvided()) {
     return true;
@@ -278,7 +278,7 @@ rc_rpc_types::ModuleConsent
 GetInteriorVehicleDataConsentRequest::GetModuleConsentByAccessMode(
     const ModuleUid& module_uid,
     const hmi_apis::Common_RCAccessMode::eType access_mode) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto get_auto_allow_consent = [](const ModuleUid& module_uid) {
     return rc_rpc_types::ModuleConsent::CONSENTED;
@@ -360,7 +360,7 @@ GetInteriorVehicleDataConsentRequest::GetModuleConsentByAccessMode(
 
 bool GetInteriorVehicleDataConsentRequest::GetCalculatedVehicleDataConsent(
     smart_objects::SmartObject& out_response) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   out_response =
       smart_objects::SmartObject(smart_objects::SmartType::SmartType_Map);
@@ -434,7 +434,7 @@ bool GetInteriorVehicleDataConsentRequest::GetCalculatedVehicleDataConsent(
 
 bool GetInteriorVehicleDataConsentRequest::SaveModuleIdConsents(
     std::string& info_out, const smart_objects::SmartObject& msg_params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const auto& allowed = msg_params[message_params::kAllowed];
   const auto& moduleIds =

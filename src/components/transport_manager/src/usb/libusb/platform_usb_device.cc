@@ -39,7 +39,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 PlatformUsbDevice::PlatformUsbDevice(
     uint8_t bus_number,

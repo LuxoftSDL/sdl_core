@@ -58,7 +58,7 @@ UnsubscribeButtonRequest::UnsubscribeButtonRequest(
 UnsubscribeButtonRequest::~UnsubscribeButtonRequest() {}
 
 void UnsubscribeButtonRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 

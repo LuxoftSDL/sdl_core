@@ -47,14 +47,14 @@
 #include <cstdio>
 #include <fstream>
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Utils::FileSystem")
+SDL_CREATE_LOGGERPTR( "Utils::FileSystem")
 
 // Easier reference
 namespace fs = boost::filesystem;
 using boost::system::error_code;
 
 uint64_t file_system::GetAvailableDiskSpace(const std::string& path) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   error_code ec;
   fs::space_info si = {0, 0, 0};
   si = fs::space(path, ec);
@@ -69,7 +69,7 @@ uint64_t file_system::GetAvailableDiskSpace(const std::string& path) {
 }
 
 uint64_t file_system::FileSize(const std::string& path) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   error_code ec;
   // Boost returns sizes as unsigned
   const uint64_t fsize = static_cast<uint64_t>(fs::file_size(path, ec));
@@ -84,7 +84,7 @@ uint64_t file_system::FileSize(const std::string& path) {
 }
 
 size_t file_system::DirectorySize(const std::string& path) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   size_t dir_size = 0;
   error_code ec;
   // Recursively iterate through directory to accumulate file sizes
@@ -135,7 +135,7 @@ size_t file_system::DirectorySize(const std::string& path) {
 
 // NOTE that boost makes 0777 permissions by default
 bool file_system::CreateDirectory(const std::string& name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   error_code ec;
   const bool success = fs::create_directory(name, ec);
   if (!success || ec) {
@@ -148,7 +148,7 @@ bool file_system::CreateDirectory(const std::string& name) {
 }
 
 bool file_system::CreateDirectoryRecursively(const std::string& path) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   error_code ec;
   // Create directory and all parents
   fs::create_directories(path, ec);
@@ -165,7 +165,7 @@ bool file_system::CreateDirectoryRecursively(const std::string& path) {
 }
 
 bool file_system::IsDirectory(const std::string& name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   error_code ec;
   const bool is_directory = fs::is_directory(name, ec);
   if (ec) {
@@ -179,7 +179,7 @@ bool file_system::IsDirectory(const std::string& name) {
 // NOTE this may be a duplicate of IsDirectory since it already checks
 // existence
 bool file_system::DirectoryExists(const std::string& name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const bool exists = FileExists(name) && IsDirectory(name);
   LOG4CXX_DEBUG(
       logger_,
@@ -188,7 +188,7 @@ bool file_system::DirectoryExists(const std::string& name) {
 }
 
 bool file_system::FileExists(const std::string& name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   error_code ec;
   const bool exists = fs::exists(name, ec);
   if (ec) {
@@ -202,7 +202,7 @@ bool file_system::FileExists(const std::string& name) {
 bool file_system::Write(const std::string& file_name,
                         const std::vector<uint8_t>& data,
                         std::ios_base::openmode mode) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::ofstream file(file_name.c_str(), std::ios_base::binary | mode);
   if (file.is_open()) {
     for (uint32_t i = 0; i < data.size(); ++i) {
@@ -216,7 +216,7 @@ bool file_system::Write(const std::string& file_name,
 
 std::ofstream* file_system::Open(const std::string& file_name,
                                  std::ios_base::openmode mode) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::ofstream* file = new std::ofstream();
   file->open(file_name.c_str(), std::ios_base::binary | mode);
   if (file->is_open()) {
@@ -230,7 +230,7 @@ std::ofstream* file_system::Open(const std::string& file_name,
 bool file_system::Write(std::ofstream* const file_stream,
                         const uint8_t* data,
                         uint32_t data_size) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool result = false;
   if (file_stream) {
     for (size_t i = 0; i < data_size; ++i) {
@@ -242,14 +242,14 @@ bool file_system::Write(std::ofstream* const file_stream,
 }
 
 void file_system::Close(std::ofstream* file_stream) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (file_stream) {
     file_stream->close();
   }
 }
 
 std::string file_system::CurrentWorkingDirectory() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   error_code ec;
   const fs::path currpath = fs::current_path(ec);
   if (ec) {
@@ -261,7 +261,7 @@ std::string file_system::CurrentWorkingDirectory() {
 }
 
 std::string file_system::GetAbsolutePath(const std::string& path) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   error_code ec;
   const fs::path absolute = fs::canonical(path, ec);
   if (ec) {
@@ -274,13 +274,13 @@ std::string file_system::GetAbsolutePath(const std::string& path) {
 }
 
 bool file_system::IsFileNameValid(const std::string& file_name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return file_name.end() == std::find(file_name.begin(), file_name.end(), '/');
 }
 
 // Does not remove if file is write-protected
 bool file_system::DeleteFile(const std::string& name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (FileExists(name) && IsAccessible(name, W_OK)) {
     error_code ec;
     const bool success = fs::remove(name.c_str(), ec);
@@ -300,7 +300,7 @@ bool file_system::DeleteFile(const std::string& name) {
 }
 
 void file_system::remove_directory_content(const std::string& directory_name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   error_code ec;
   fs::directory_iterator dir_iter(directory_name, ec);
@@ -335,7 +335,7 @@ void file_system::remove_directory_content(const std::string& directory_name) {
 
 bool file_system::RemoveDirectory(const std::string& directory_name,
                                   const bool is_recursively) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   // Make sure the directory exists
   if (!DirectoryExists(directory_name) && IsAccessible(directory_name, W_OK)) {
     LOG4CXX_WARN(
@@ -368,23 +368,23 @@ bool file_system::RemoveDirectory(const std::string& directory_name,
 }
 
 bool file_system::IsAccessible(const std::string& name, const int32_t how) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return !access(name.c_str(), how);
 }
 
 bool file_system::IsWritingAllowed(const std::string& name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return IsAccessible(name, W_OK);
 }
 
 bool file_system::IsReadingAllowed(const std::string& name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return IsAccessible(name, R_OK);
 }
 
 std::vector<std::string> file_system::ListFiles(
     const std::string& directory_name) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   error_code ec;
   fs::directory_iterator iter(directory_name, ec), end;
@@ -422,7 +422,7 @@ bool file_system::WriteBinaryFile(const std::string& name,
 
 bool file_system::ReadBinaryFile(const std::string& name,
                                  std::vector<uint8_t>& result) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Filename: " << name);
   if (!FileExists(name) || !IsAccessible(name, R_OK)) {
     LOG4CXX_ERROR(logger_, "Not able to read binary file: " << name);
@@ -466,7 +466,7 @@ bool file_system::ReadBinaryFile(const std::string& name,
 }
 
 bool file_system::ReadFile(const std::string& name, std::string& result) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!FileExists(name) || !IsAccessible(name, R_OK)) {
     LOG4CXX_ERROR(logger_, "Not able to read file: " << name);
     return false;
@@ -483,7 +483,7 @@ bool file_system::ReadFile(const std::string& name, std::string& result) {
 }
 
 const std::string file_system::ConvertPathForURL(const std::string& path) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string reserved_symbols = "!#$&'()*+,:;=?@[] ";
   size_t pos = std::string::npos;
   std::string converted_path;
@@ -503,7 +503,7 @@ const std::string file_system::ConvertPathForURL(const std::string& path) {
 }
 
 bool file_system::CreateFile(const std::string& path) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::ofstream file(path);
   if (!(file.is_open())) {
@@ -515,7 +515,7 @@ bool file_system::CreateFile(const std::string& path) {
 }
 
 time_t file_system::GetFileModificationTime(const std::string& path) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   error_code ec;
   std::time_t time = fs::last_write_time(path, ec);
@@ -530,7 +530,7 @@ time_t file_system::GetFileModificationTime(const std::string& path) {
 }
 
 bool file_system::CopyFile(const std::string& src, const std::string& dst) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!FileExists(src) || FileExists(dst) || !CreateFile(dst)) {
     LOG4CXX_WARN(
         logger_,
@@ -550,7 +550,7 @@ bool file_system::CopyFile(const std::string& src, const std::string& dst) {
 }
 
 bool file_system::MoveFile(const std::string& src, const std::string& dst) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (std::rename(src.c_str(), dst.c_str()) == 0) {
     return true;

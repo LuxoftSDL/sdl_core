@@ -58,7 +58,7 @@ PublishAppServiceRequest::PublishAppServiceRequest(
 PublishAppServiceRequest::~PublishAppServiceRequest() {}
 
 void PublishAppServiceRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Received a PublishAppService " << connection_key());
   MessageHelper::PrintSmartObject(*message_);
 

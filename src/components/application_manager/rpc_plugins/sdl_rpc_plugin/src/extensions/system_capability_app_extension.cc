@@ -1,7 +1,7 @@
 #include "sdl_rpc_plugin/extensions/system_capability_app_extension.h"
 
 namespace sdl_rpc_plugin {
-CREATE_LOGGERPTR_GLOBAL(logger_, "GetSystemCapabilitiesAppExtension")
+SDL_CREATE_LOGGERPTR( "GetSystemCapabilitiesAppExtension")
 
 namespace app_mngr_ = application_manager;
 const app_mngr_::AppExtensionUID
@@ -54,7 +54,7 @@ SystemCapabilitySubscriptions SystemCapabilityAppExtension::Subscriptions() {
 
 void SystemCapabilityAppExtension::SaveResumptionData(
     ns_smart_device_link::ns_smart_objects::SmartObject& resumption_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* application_system_capability = "systemCapability";
 
   resumption_data[application_system_capability] =
@@ -69,7 +69,7 @@ void SystemCapabilityAppExtension::SaveResumptionData(
 
 void SystemCapabilityAppExtension::ProcessResumption(
     const smart_objects::SmartObject& resumption_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const char* application_system_capability = "systemCapability";
   if (resumption_data.keyExists(application_system_capability)) {
@@ -85,7 +85,7 @@ void SystemCapabilityAppExtension::ProcessResumption(
 
 SystemCapabilityAppExtension& SystemCapabilityAppExtension::ExtractExtension(
     app_mngr_::Application& app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto ext_ptr = app.QueryInterface(
       SystemCapabilityAppExtension::SystemCapabilityAppExtensionUID);
   DCHECK(ext_ptr);

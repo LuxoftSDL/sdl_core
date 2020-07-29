@@ -61,7 +61,7 @@ OnAppServiceDataNotification::OnAppServiceDataNotification(
 OnAppServiceDataNotification::~OnAppServiceDataNotification() {}
 
 void OnAppServiceDataNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Sending OnAppServiceData to consumer");
 
   std::string service_id =

@@ -40,7 +40,7 @@
 #include "vehicle_info_plugin/vehicle_info_command_factory.h"
 
 namespace vehicle_info_plugin {
-CREATE_LOGGERPTR_GLOBAL(logger_, "VehicleInfoPlugin")
+SDL_CREATE_LOGGERPTR( "VehicleInfoPlugin")
 
 namespace strings = application_manager::strings;
 namespace plugins = application_manager::plugin_manager;
@@ -117,7 +117,7 @@ void VehicleInfoPlugin::OnApplicationEvent(
 }
 
 void VehicleInfoPlugin::UnsubscribeFromRemovedVDItems() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   typedef std::vector<std::string> StringsVector;
 
   auto get_items_to_unsubscribe = [this]() -> StringsVector {
@@ -172,7 +172,7 @@ bool IsOtherAppAlreadySubscribedFor(
 
 void VehicleInfoPlugin::ProcessResumptionSubscription(
     application_manager::Application& app, VehicleInfoAppExtension& ext) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject msg_params =
       smart_objects::SmartObject(smart_objects::SmartType_Map);
 
@@ -216,7 +216,7 @@ application_manager::ApplicationSharedPtr FindAppSubscribedToIVI(
 
 smart_objects::SmartObjectSPtr VehicleInfoPlugin::GetUnsubscribeIVIRequest(
     const std::vector<std::string>& ivi_names) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace smart_objects;
 
   auto msg_params = smart_objects::SmartObject(smart_objects::SmartType_Map);
@@ -291,5 +291,5 @@ Create() {
 extern "C" __attribute__((visibility("default"))) void Delete(
     application_manager::plugin_manager::RPCPlugin* data) {
   delete data;
-  DELETE_THREAD_LOGGER(vehicle_info_plugin::logger_);
+  SDL_DELETE_THREAD_LOGGER();
 }

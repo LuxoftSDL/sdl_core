@@ -50,7 +50,7 @@ DecryptCertificateRequest::DecryptCertificateRequest(
                    policy_handle) {}
 
 void DecryptCertificateRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const uint32_t correlation_id = RequestToHMI::correlation_id();
   const uint32_t app_id = RequestToHMI::application_id();
   application_manager_.set_application_id(correlation_id, app_id);

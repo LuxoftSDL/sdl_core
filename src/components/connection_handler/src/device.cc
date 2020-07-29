@@ -43,7 +43,7 @@
  */
 namespace connection_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ConnectionHandler")
+SDL_CREATE_LOGGERPTR( "ConnectionHandler")
 
 Device::Device(DeviceHandle device_handle,
                const std::string& user_friendly_name,

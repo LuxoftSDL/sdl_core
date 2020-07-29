@@ -58,7 +58,7 @@ ASGetAppServiceDataRequestFromHMI::ASGetAppServiceDataRequestFromHMI(
 ASGetAppServiceDataRequestFromHMI::~ASGetAppServiceDataRequestFromHMI() {}
 
 void ASGetAppServiceDataRequestFromHMI::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::string service_type =
       (*message_)[strings::msg_params][strings::service_type].asString();
@@ -277,7 +277,7 @@ void ASGetAppServiceDataRequestFromHMI::on_event(
 }
 
 void ASGetAppServiceDataRequestFromHMI::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   SendErrorResponse(correlation_id(),
                     hmi_apis::FunctionID::AppService_GetAppServiceData,
                     hmi_apis::Common_Result::GENERIC_ERROR,

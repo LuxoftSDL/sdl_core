@@ -55,7 +55,7 @@ PutFileResponse::PutFileResponse(
 PutFileResponse::~PutFileResponse() {}
 
 void PutFileResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint32_t app_id =
       (*message_)[strings::params][strings::connection_key].asUInt();
   ApplicationSharedPtr app = application_manager_.application(app_id);

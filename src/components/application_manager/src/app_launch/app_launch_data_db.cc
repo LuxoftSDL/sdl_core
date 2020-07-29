@@ -39,7 +39,7 @@
 #include "application_manager/smart_object_keys.h"
 
 namespace app_launch {
-CREATE_LOGGERPTR_GLOBAL(logger_, "AppLaunch")
+SDL_CREATE_LOGGERPTR( "AppLaunch")
 
 AppLaunchDataDB::AppLaunchDataDB(const AppLaunchSettings& settings,
                                  DbStorage db_storage)
@@ -56,7 +56,7 @@ AppLaunchDataDB::AppLaunchDataDB(const AppLaunchSettings& settings,
 #endif  // __QNX__
     DCHECK(db_.get());
   } else {
-    LOG4CXX_AUTO_TRACE(logger_);
+    SDL_AUTO_TRACE();
     LOG4CXX_ERROR(logger_, "Get not existed type of database storage");
   }
 
@@ -69,7 +69,7 @@ AppLaunchDataDB::~AppLaunchDataDB() {
 }
 
 bool AppLaunchDataDB::Init() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!db()->Open()) {
     LOG4CXX_ERROR(logger_, "Failed opening database.");
@@ -119,7 +119,7 @@ bool AppLaunchDataDB::Init() {
 }
 
 bool AppLaunchDataDB::Persist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool retVal = false;
 
   if (!init_successeful_) {
@@ -140,7 +140,7 @@ bool AppLaunchDataDB::Persist() {
 
 bool AppLaunchDataDB::IsAppDataAlreadyExisted(
     const ApplicationData& app_data) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool retVal = false;
 
   if (!init_successeful_) {
@@ -174,7 +174,7 @@ bool AppLaunchDataDB::IsAppDataAlreadyExisted(
 }
 
 bool AppLaunchDataDB::RefreshAppSessionTime(const ApplicationData& app_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool retVal = false;
 
   if (!init_successeful_) {
@@ -210,7 +210,7 @@ bool AppLaunchDataDB::RefreshAppSessionTime(const ApplicationData& app_data) {
 }
 
 bool AppLaunchDataDB::AddNewAppData(const ApplicationData& app_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool retVal = false;
 
   if (!init_successeful_) {
@@ -247,7 +247,7 @@ bool AppLaunchDataDB::AddNewAppData(const ApplicationData& app_data) {
 
 std::vector<ApplicationDataPtr> AppLaunchDataDB::GetAppDataByDevMac(
     const std::string& dev_mac) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::vector<ApplicationDataPtr> dev_apps;
 
   if (!init_successeful_) {
@@ -289,7 +289,7 @@ std::vector<ApplicationDataPtr> AppLaunchDataDB::GetAppDataByDevMac(
 }
 
 bool AppLaunchDataDB::Clear() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool retVal = false;
 
   utils::dbms::SQLQuery query(db());
@@ -308,7 +308,7 @@ bool AppLaunchDataDB::Clear() {
 }
 
 uint32_t AppLaunchDataDB::GetCurentNumberOfAppData() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   uint32_t number_of_app_data = 0u;
 
   if (!init_successeful_) {
@@ -345,7 +345,7 @@ uint32_t AppLaunchDataDB::GetCurentNumberOfAppData() const {
 }
 
 bool AppLaunchDataDB::DeleteOldestAppData() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool retVal = false;
 
   if (!init_successeful_) {
@@ -377,7 +377,7 @@ bool AppLaunchDataDB::DeleteOldestAppData() {
 }
 
 bool AppLaunchDataDB::WriteDb() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return db_->Backup();
 }
 

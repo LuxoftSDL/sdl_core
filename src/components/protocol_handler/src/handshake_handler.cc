@@ -42,7 +42,7 @@
 
 namespace protocol_handler {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "ProtocolHandler")
+SDL_CREATE_LOGGERPTR( "ProtocolHandler")
 
 HandshakeHandler::HandshakeHandler(
     ProtocolHandlerImpl& protocol_handler,
@@ -79,12 +79,12 @@ bool HandshakeHandler::GetPolicyCertificateData(std::string& data) const {
 }
 
 void HandshakeHandler::OnCertificateUpdateRequired() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 #if defined(EXTERNAL_PROPRIETARY_MODE) && defined(ENABLE_SECURITY)
 bool HandshakeHandler::OnCertDecryptFailed() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (payload_) {
     ProcessFailedHandshake(*payload_, ServiceStatus::CERT_INVALID);
   }
@@ -94,7 +94,7 @@ bool HandshakeHandler::OnCertDecryptFailed() {
 #endif
 
 bool HandshakeHandler::OnGetSystemTimeFailed() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (payload_) {
     ProcessFailedHandshake(*payload_, ServiceStatus::INVALID_TIME);
@@ -109,7 +109,7 @@ bool HandshakeHandler::OnGetSystemTimeFailed() {
 }
 
 bool HandshakeHandler::OnPTUFailed() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (payload_) {
     ProcessFailedHandshake(*payload_, ServiceStatus::PTU_FAILED);
   }
@@ -120,7 +120,7 @@ bool HandshakeHandler::OnPTUFailed() {
 bool HandshakeHandler::OnHandshakeDone(
     uint32_t connection_key,
     security_manager::SSLContext::HandshakeResult result) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   LOG4CXX_DEBUG(logger_,
                 "OnHandshakeDone for service : " << context_.service_type_);
@@ -172,7 +172,7 @@ bool HandshakeHandler::IsAlreadyProtected() const {
 
 void HandshakeHandler::ProcessSuccessfulHandshake(const uint32_t connection_key,
                                                   BsonObject& params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const bool is_service_already_protected = IsAlreadyProtected();
 
@@ -211,7 +211,7 @@ void HandshakeHandler::ProcessSuccessfulHandshake(const uint32_t connection_key,
 
 void HandshakeHandler::ProcessFailedHandshake(BsonObject& params,
                                               ServiceStatus service_status) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Handshake failed");
   const std::vector<int>& force_protected =
       protocol_handler_.get_settings().force_protected_service();

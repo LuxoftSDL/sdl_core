@@ -70,7 +70,7 @@ const uint32_t kMqueueMessageSize = 4095;
 // the files.
 static const uint32_t kRIFFHeaderSize = 44;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "MediaManager")
+SDL_CREATE_LOGGERPTR( "MediaManager")
 
 AudioStreamSenderThread::AudioStreamSenderThread(
     const std::string& fileName,
@@ -83,13 +83,13 @@ AudioStreamSenderThread::AudioStreamSenderThread(
     , shouldBeStoped_lock_()
     , shouldBeStoped_cv_()
     , application_manager_(app_mngr) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 AudioStreamSenderThread::~AudioStreamSenderThread() {}
 
 void AudioStreamSenderThread::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   offset_ = kRIFFHeaderSize;
 
@@ -101,7 +101,7 @@ void AudioStreamSenderThread::threadMain() {
 }
 
 void AudioStreamSenderThread::sendAudioChunkToMobile() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::vector<uint8_t> binaryData;
   std::vector<uint8_t>::iterator from;
@@ -140,7 +140,7 @@ void AudioStreamSenderThread::sendAudioChunkToMobile() {
 
 void AudioStreamSenderThread::SendAudioPassThroughNotification(
     uint32_t session_key, std::vector<uint8_t>& binary_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!application_manager_.is_audio_pass_thru_active()) {
     LOG4CXX_ERROR(logger_,
@@ -195,7 +195,7 @@ void AudioStreamSenderThread::setShouldBeStopped(bool should_stop) {
 }
 
 void AudioStreamSenderThread::exitThreadMain() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   setShouldBeStopped(true);
 }
 

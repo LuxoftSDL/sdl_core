@@ -445,7 +445,7 @@ const char* kDefaultAOAFilterSerialNumber = "N000000";
 
 namespace profile {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Profile")
+SDL_CREATE_LOGGERPTR( "Profile")
 
 Profile::Profile()
     : sdl_version_(kDefaultSDLVersion)
@@ -1247,7 +1247,7 @@ const std::string Profile::hmi_origin_id() const {
 }
 
 void Profile::UpdateValues() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // SDL version
   ReadStringValue(

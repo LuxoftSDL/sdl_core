@@ -39,7 +39,7 @@
 #include "transport_manager/transport_manager_impl.h"
 
 namespace transport_manager {
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 TransportAdapterListenerImpl::TransportAdapterListenerImpl(
     TransportManager* manager, TransportAdapter* adapter)
@@ -400,7 +400,7 @@ void TransportAdapterListenerImpl::OnCommunicationError(
 
 void TransportAdapterListenerImpl::OnTransportSwitchRequested(
     const transport_adapter::TransportAdapter* adapter) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const TransportAdapterEvent event(
       EventTypeEnum::ON_TRANSPORT_SWITCH_REQUESTED,
       transport_adapter_,
@@ -417,7 +417,7 @@ void TransportAdapterListenerImpl::OnTransportSwitchRequested(
 
 void TransportAdapterListenerImpl::OnTransportConfigUpdated(
     const transport_adapter::TransportAdapter* adapter) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const TransportAdapterEvent event(EventTypeEnum::ON_TRANSPORT_CONFIG_UPDATED,
                                     transport_adapter_,

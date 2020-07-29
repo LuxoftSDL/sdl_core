@@ -85,7 +85,7 @@ void DeleteWindowRequest::DeleteWindow(
 }
 
 void DeleteWindowRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr application =
       application_manager_.application(connection_key());
@@ -109,7 +109,7 @@ void DeleteWindowRequest::Run() {
 }
 
 void DeleteWindowRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (hmi_apis::FunctionID::UI_DeleteWindow != event.id()) {
     LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());

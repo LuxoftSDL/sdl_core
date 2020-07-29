@@ -49,7 +49,7 @@
 
 namespace utils {
 
-CREATE_LOGGERPTR_LOCAL(logger_, "Utils")
+SDL_CREATE_LOGGERPTR( "Utils")
 
 struct GetCString {
   char* operator()(const std::string& string) {

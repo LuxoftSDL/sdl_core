@@ -56,7 +56,7 @@ CancelInteractionRequest::CancelInteractionRequest(
 CancelInteractionRequest::~CancelInteractionRequest() {}
 
 void CancelInteractionRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto function_id = static_cast<mobile_apis::FunctionID::eType>(
       (*message_)[strings::msg_params][strings::func_id].asInt());
@@ -86,7 +86,7 @@ void CancelInteractionRequest::Run() {
 }
 
 void CancelInteractionRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (event.id() != hmi_apis::FunctionID::UI_CancelInteraction) {
     LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());

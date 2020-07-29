@@ -90,7 +90,7 @@ ReleaseInteriorVehicleDataModuleRequest::
     : RCCommandRequest(message, params) {}
 
 bool ReleaseInteriorVehicleDataModuleRequest::ProcessCapabilities() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto rc_capability = hmi_capabilities_.rc_capability();
 
   const std::string module_type = ModuleType();
@@ -110,7 +110,7 @@ bool ReleaseInteriorVehicleDataModuleRequest::ProcessCapabilities() {
 }
 
 void ReleaseInteriorVehicleDataModuleRequest::Execute() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!ProcessCapabilities()) {
     return;
@@ -162,7 +162,7 @@ void ReleaseInteriorVehicleDataModuleRequest::Execute() {
 }
 
 std::string ReleaseInteriorVehicleDataModuleRequest::ModuleType() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   mobile_apis::ModuleType::eType module_type =
       static_cast<mobile_apis::ModuleType::eType>(
           (*message_)[app_mngr::strings::msg_params]
@@ -176,7 +176,7 @@ std::string ReleaseInteriorVehicleDataModuleRequest::ModuleType() const {
 }
 
 std::string ReleaseInteriorVehicleDataModuleRequest::ModuleId() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto msg_params = (*message_)[app_mngr::strings::msg_params];
   if (msg_params.keyExists(message_params::kModuleId)) {
     return msg_params[message_params::kModuleId].asString();

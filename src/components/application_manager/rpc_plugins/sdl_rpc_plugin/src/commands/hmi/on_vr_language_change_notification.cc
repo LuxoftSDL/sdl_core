@@ -58,7 +58,7 @@ OnVRLanguageChangeNotification::OnVRLanguageChangeNotification(
 OnVRLanguageChangeNotification::~OnVRLanguageChangeNotification() {}
 
 void OnVRLanguageChangeNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   hmi_capabilities_.set_active_vr_language(
       static_cast<hmi_apis::Common_Language::eType>(

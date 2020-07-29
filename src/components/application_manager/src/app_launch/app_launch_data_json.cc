@@ -38,7 +38,7 @@
 
 namespace app_launch {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "AppLaunch")
+SDL_CREATE_LOGGERPTR( "AppLaunch")
 
 AppLaunchDataJson::AppLaunchDataJson(
     const AppLaunchSettings& settings,
@@ -50,7 +50,7 @@ AppLaunchDataJson::~AppLaunchDataJson() {}
 Json::Value& AppLaunchDataJson::GetSavedApplicationDataList(
     Json::Value& dictionary) const {
   using namespace application_manager;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(app_launch_json_lock_);
   Json::Value& app_launch = GetApplicationData(dictionary);
   if (!app_launch.isMember(strings::app_launch_list)) {
@@ -68,7 +68,7 @@ Json::Value& AppLaunchDataJson::GetSavedApplicationDataList(
 Json::Value& AppLaunchDataJson::GetApplicationData(
     Json::Value& dictionary) const {
   using namespace application_manager;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(app_launch_json_lock_);
   if (!dictionary.isMember(strings::app_launch)) {
     dictionary[strings::app_launch] = Json::Value(Json::objectValue);
@@ -87,7 +87,7 @@ Json::Value& AppLaunchDataJson::GetApplicationListAndIndex(
     int32_t& found_index,
     Json::Value& dictionary) const {
   using namespace application_manager;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(app_launch_json_lock_);
 
   Json::Value& apps_list = GetSavedApplicationDataList(dictionary);
@@ -116,7 +116,7 @@ Json::Value& AppLaunchDataJson::GetApplicationListAndIndex(
 
 bool AppLaunchDataJson::IsAppDataAlreadyExisted(
     const ApplicationData& app_data) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   int32_t index = NotFound;
 
@@ -130,7 +130,7 @@ bool AppLaunchDataJson::IsAppDataAlreadyExisted(
 bool AppLaunchDataJson::RefreshAppSessionTime(const ApplicationData& app_data) {
   using namespace application_manager;
   using namespace date_time;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool retVal = false;
 
   int32_t index = NotFound;
@@ -152,7 +152,7 @@ bool AppLaunchDataJson::RefreshAppSessionTime(const ApplicationData& app_data) {
 bool AppLaunchDataJson::AddNewAppData(const ApplicationData& app_data) {
   using namespace application_manager;
   using namespace date_time;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(app_launch_json_lock_);
 
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
@@ -177,7 +177,7 @@ bool AppLaunchDataJson::AddNewAppData(const ApplicationData& app_data) {
 std::vector<ApplicationDataPtr> AppLaunchDataJson::GetAppDataByDevMac(
     const std::string& dev_mac) const {
   using namespace application_manager;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(app_launch_json_lock_);
   std::vector<ApplicationDataPtr> dev_apps;
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
@@ -207,7 +207,7 @@ std::vector<ApplicationDataPtr> AppLaunchDataJson::GetAppDataByDevMac(
 }
 
 bool AppLaunchDataJson::Clear() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
   GetSavedApplicationDataList(dictionary).clear();
@@ -219,7 +219,7 @@ bool AppLaunchDataJson::Clear() {
 }
 
 uint32_t AppLaunchDataJson::GetCurentNumberOfAppData() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
   const uint32_t list_size = GetSavedApplicationDataList(dictionary).size();
@@ -232,7 +232,7 @@ uint32_t AppLaunchDataJson::GetCurentNumberOfAppData() const {
 
 bool AppLaunchDataJson::DeleteOldestAppData() {
   using namespace application_manager;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(app_launch_json_lock_);
   std::vector<uint64_t> temp_array;
   std::vector<Json::Value> temp_json_list;
@@ -286,7 +286,7 @@ bool AppLaunchDataJson::DeleteOldestAppData() {
 }
 
 bool AppLaunchDataJson::Persist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   last_state_wrapper_->get_accessor().GetMutableData().SaveToFileSystem();
   return true;
 }

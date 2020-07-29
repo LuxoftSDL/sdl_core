@@ -48,7 +48,7 @@ VIGetVehicleTypeResponse::VIGetVehicleTypeResponse(
 VIGetVehicleTypeResponse::~VIGetVehicleTypeResponse() {}
 
 void VIGetVehicleTypeResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const auto result_code = static_cast<hmi_apis::Common_Result::eType>(
       (*message_)[strings::params][hmi_response::code].asInt());

@@ -35,7 +35,7 @@
 #include "application_manager/commands/command.h"
 
 namespace application_manager {
-CREATE_LOGGERPTR_GLOBAL(logger_, "ApplicationManager")
+SDL_CREATE_LOGGERPTR( "ApplicationManager")
 
 CommandHolderImpl::CommandHolderImpl(ApplicationManager& app_manager)
     : app_manager_(app_manager) {}
@@ -45,7 +45,7 @@ void CommandHolderImpl::Suspend(
     CommandType type,
     commands::Command::CommandSource source,
     std::shared_ptr<smart_objects::SmartObject> command) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(application);
   LOG4CXX_DEBUG(logger_,
                 "Suspending command(s) for application: "
@@ -68,7 +68,7 @@ void CommandHolderImpl::Suspend(
 
 void CommandHolderImpl::Resume(ApplicationSharedPtr application,
                                CommandType type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(application);
   LOG4CXX_DEBUG(
       logger_,
@@ -81,7 +81,7 @@ void CommandHolderImpl::Resume(ApplicationSharedPtr application,
 }
 
 void CommandHolderImpl::Clear(ApplicationSharedPtr application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(application);
   LOG4CXX_DEBUG(
       logger_,

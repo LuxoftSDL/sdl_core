@@ -39,7 +39,7 @@
 
 namespace media_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "MediaManager")
+SDL_CREATE_LOGGERPTR( "MediaManager")
 
 FromMicRecorderAdapter::FromMicRecorderAdapter()
     : recorder_thread_(NULL)
@@ -51,7 +51,7 @@ FromMicRecorderAdapter::FromMicRecorderAdapter()
     , duration_(kDefaultDuration) {}
 
 FromMicRecorderAdapter::~FromMicRecorderAdapter() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (recorder_thread_) {
     recorder_thread_->join();
     delete recorder_thread_->delegate();

@@ -51,7 +51,7 @@ const char* tc_enabled = "enabled";
 const char* tc_tcp_port = "tcp_port";
 const char* tc_tcp_ip_address = "tcp_ip_address";
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 namespace {
 DeviceTypes devicesType = {
     std::make_pair(DeviceType::AOA, std::string("USB_AOA")),
@@ -432,7 +432,7 @@ TransportAdapter::Error TransportAdapterImpl::SendData(
 
 TransportAdapter::Error TransportAdapterImpl::ChangeClientListening(
     TransportAction required_change) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (client_connection_listener_ == 0) {
     LOG4CXX_TRACE(logger_, "exit with NOT_SUPPORTED");
     return NOT_SUPPORTED;
@@ -482,7 +482,7 @@ TransportAdapter::Error TransportAdapterImpl::ChangeClientListening(
 }
 
 DeviceList TransportAdapterImpl::GetDeviceList() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DeviceList devices;
   sync_primitives::AutoLock locker(devices_mutex_);
   for (DeviceMap::const_iterator it = devices_.begin(); it != devices_.end();
@@ -500,7 +500,7 @@ DeviceSptr TransportAdapterImpl::GetWebEngineDevice() const {
                 "Web engine support is disabled. Device does not exist");
   return DeviceSptr();
 #else
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock locker(devices_mutex_);
 
   auto web_engine_device =
@@ -659,17 +659,17 @@ void TransportAdapterImpl::SearchDeviceFailed(const SearchDeviceError& error) {
 }
 
 bool TransportAdapterImpl::IsSearchDevicesSupported() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return device_scanner_ != 0;
 }
 
 bool TransportAdapterImpl::IsServerOriginatedConnectSupported() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return server_connection_factory_ != 0;
 }
 
 bool TransportAdapterImpl::IsClientOriginatedConnectSupported() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return client_connection_listener_ != 0;
 }
 
@@ -847,7 +847,7 @@ void TransportAdapterImpl::DataSendFailed(
 
 void TransportAdapterImpl::TransportConfigUpdated(
     const TransportConfig& new_config) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   for (TransportAdapterListenerList::iterator it = listeners_.begin();
        it != listeners_.end();
        ++it) {
@@ -856,7 +856,7 @@ void TransportAdapterImpl::TransportConfigUpdated(
 }
 
 void TransportAdapterImpl::DoTransportSwitch() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::for_each(
       listeners_.begin(),
       listeners_.end(),
@@ -909,7 +909,7 @@ DeviceSptr TransportAdapterImpl::FindDevice(const DeviceUID& device_id) const {
 
 void TransportAdapterImpl::ConnectPending(const DeviceUID& device_id,
                                           const ApplicationHandle& app_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   connections_lock_.AcquireForWriting();
   ConnectionMap::iterator it_conn =
       connections_.find(std::make_pair(device_id, app_handle));
@@ -979,7 +979,7 @@ void TransportAdapterImpl::ConnectFailed(const DeviceUID& device_handle,
 void TransportAdapterImpl::RemoveFinalizedConnection(
     const DeviceUID& device_handle, const ApplicationHandle& app_handle) {
   const DeviceUID device_uid = device_handle;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     connections_lock_.AcquireForWriting();
     auto it_conn = connections_.find(std::make_pair(device_uid, app_handle));
@@ -1136,7 +1136,7 @@ std::string TransportAdapterImpl::DeviceName(const DeviceUID& device_id) const {
 }
 
 void TransportAdapterImpl::StopDevice(const DeviceUID& device_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DeviceSptr device = FindDevice(device_id);
   if (device) {
     device->Stop();
@@ -1148,7 +1148,7 @@ std::string TransportAdapterImpl::GetConnectionType() const {
 }
 
 SwitchableDevices TransportAdapterImpl::GetSwitchableDevices() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   SwitchableDevices devices;
   sync_primitives::AutoLock locker(devices_mutex_);
   for (DeviceMap::const_iterator it = devices_.begin(); it != devices_.end();
@@ -1258,7 +1258,7 @@ TransportAdapter::Error TransportAdapterImpl::ConnectDevice(DeviceSptr device) {
 
 void TransportAdapterImpl::RunAppOnDevice(const DeviceUID& device_uid,
                                           const std::string& bundle_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   DeviceSptr device = FindDevice(device_uid);
   if (!device) {
@@ -1272,7 +1272,7 @@ void TransportAdapterImpl::RunAppOnDevice(const DeviceUID& device_uid,
 }
 
 void TransportAdapterImpl::RemoveDevice(const DeviceUID& device_handle) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Remove Device_handle: " << &device_handle);
   sync_primitives::AutoLock locker(devices_mutex_);
   DeviceMap::iterator i = devices_.find(device_handle);

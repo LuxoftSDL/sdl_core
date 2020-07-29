@@ -46,7 +46,7 @@
 
 namespace security_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "SecurityManager")
+SDL_CREATE_LOGGERPTR( "SecurityManager")
 
 CryptoManagerImpl::SSLContextImpl::SSLContextImpl(SSL* conn,
                                                   Mode mode,
@@ -78,7 +78,7 @@ bool CryptoManagerImpl::SSLContextImpl::IsInitCompleted() const {
 
 SSLContext::HandshakeResult CryptoManagerImpl::SSLContextImpl::StartHandshake(
     const uint8_t** const out_data, size_t* out_data_size) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   is_handshake_pending_ = true;
   return DoHandshakeStep(NULL, 0, out_data, out_data_size);
 }
@@ -182,7 +182,7 @@ const std::string CryptoManagerImpl::SSLContextImpl::RemoveDisallowedInfo(
 
 void CryptoManagerImpl::SSLContextImpl::PrintCertData(
     X509* cert, const std::string& cert_owner) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!cert) {
     LOG4CXX_DEBUG(logger_, "Empty certificate data");
     return;
@@ -215,7 +215,7 @@ void CryptoManagerImpl::SSLContextImpl::PrintCertData(
 }
 
 void CryptoManagerImpl::SSLContextImpl::PrintCertInfo() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   PrintCertData(SSL_get_certificate(connection_), "HU's");
 
   STACK_OF(X509)* peer_certs = SSL_get_peer_cert_chain(connection_);
@@ -227,7 +227,7 @@ void CryptoManagerImpl::SSLContextImpl::PrintCertInfo() {
 
 SSLContext::HandshakeResult
 CryptoManagerImpl::SSLContextImpl::CheckCertContext() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   X509* cert = SSL_get_peer_certificate(connection_);
   if (!cert) {
     // According to the openssl documentation the peer certificate
@@ -334,7 +334,7 @@ time_t CryptoManagerImpl::SSLContextImpl::convert_asn1_time_to_time_t(
 
 bool CryptoManagerImpl::SSLContextImpl::ReadHandshakeData(
     const uint8_t** const out_data, size_t* out_data_size) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const size_t pend = BIO_ctrl_pending(bioOut_);
   LOG4CXX_DEBUG(logger_, "Available " << pend << " bytes for handshake");
 
@@ -359,7 +359,7 @@ bool CryptoManagerImpl::SSLContextImpl::ReadHandshakeData(
 
 bool CryptoManagerImpl::SSLContextImpl::WriteHandshakeData(
     const uint8_t* const in_data, size_t in_data_size) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (in_data && in_data_size) {
     const int ret = BIO_write(bioIn_, in_data, in_data_size);
     if (ret <= 0) {
@@ -373,7 +373,7 @@ bool CryptoManagerImpl::SSLContextImpl::WriteHandshakeData(
 
 SSLContext::HandshakeResult
 CryptoManagerImpl::SSLContextImpl::PerformHandshake() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const int handshake_result = SSL_do_handshake(connection_);
   LOG4CXX_TRACE(logger_, "Handshake result: " << handshake_result);
   if (handshake_result == 1) {
@@ -426,7 +426,7 @@ SSLContext::HandshakeResult CryptoManagerImpl::SSLContextImpl::DoHandshakeStep(
     size_t in_data_size,
     const uint8_t** const out_data,
     size_t* out_data_size) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(out_data);
   DCHECK(out_data_size);
   *out_data = NULL;
@@ -491,7 +491,7 @@ bool CryptoManagerImpl::SSLContextImpl::Decrypt(const uint8_t* const in_data,
                                                 size_t in_data_size,
                                                 const uint8_t** const out_data,
                                                 size_t* out_data_size) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock locker(bio_locker);
   if (!SSL_is_init_finished(connection_)) {
     LOG4CXX_ERROR(logger_, "SSL initilization is not finished");
@@ -529,7 +529,7 @@ bool CryptoManagerImpl::SSLContextImpl::Decrypt(const uint8_t* const in_data,
 }
 
 size_t CryptoManagerImpl::SSLContextImpl::get_max_block_size(size_t mtu) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!max_block_size_) {
     // FIXME(EZamakhov): add correct logics for TLS1/1.2/SSL3
     // For SSL3.0 set temporary value 90, old TLS1.2 value is 29
@@ -549,7 +549,7 @@ bool CryptoManagerImpl::SSLContextImpl::IsHandshakePending() const {
 
 bool CryptoManagerImpl::SSLContextImpl::GetCertificateDueDate(
     time_t& due_date) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   X509* cert = SSL_get_certificate(connection_);
   if (!cert) {
@@ -583,7 +583,7 @@ void CryptoManagerImpl::SSLContextImpl::SetHandshakeError(const int error) {
 }
 
 void CryptoManagerImpl::SSLContextImpl::ResetConnection() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const int shutdown_result = SSL_shutdown(connection_);
   if (shutdown_result != 1) {
     const size_t pend = BIO_ctrl_pending(bioOut_);

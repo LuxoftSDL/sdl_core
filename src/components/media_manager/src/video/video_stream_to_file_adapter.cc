@@ -37,7 +37,7 @@
 
 namespace media_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger, "VideoStreamToFileAdapter")
+SDL_CREATE_LOGGERPTR( "VideoStreamToFileAdapter")
 
 VideoStreamToFileAdapter::VideoStreamToFileAdapter(const std::string& file_name)
     : file_name_(file_name)
@@ -47,7 +47,7 @@ VideoStreamToFileAdapter::VideoStreamToFileAdapter(const std::string& file_name)
 }
 
 VideoStreamToFileAdapter::~VideoStreamToFileAdapter() {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
   if ((0 != current_application_) && (is_ready_)) {
     StopActivity(current_application_);
   }
@@ -133,7 +133,7 @@ VideoStreamToFileAdapter::Streamer::~Streamer() {
 }
 
 void VideoStreamToFileAdapter::Streamer::threadMain() {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
 
   open();
 
@@ -167,7 +167,7 @@ void VideoStreamToFileAdapter::Streamer::threadMain() {
 }
 
 void VideoStreamToFileAdapter::Streamer::exitThreadMain() {
-  LOG4CXX_AUTO_TRACE(logger);
+  SDL_AUTO_TRACE();
   stop_flag_ = true;
   server_->messages_.Shutdown();
 }

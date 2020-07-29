@@ -34,7 +34,7 @@
 
 namespace app_launch {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "AppLaunch")
+SDL_CREATE_LOGGERPTR( "AppLaunch")
 
 AppLaunchDataImpl::AppLaunchDataImpl(const AppLaunchSettings& settings)
     : settings_(settings)
@@ -43,7 +43,7 @@ AppLaunchDataImpl::AppLaunchDataImpl(const AppLaunchSettings& settings)
 AppLaunchDataImpl::~AppLaunchDataImpl() {}
 
 bool AppLaunchDataImpl::AddApplicationData(const ApplicationData& app_data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool retVal = true;
 
   if (app_data.device_mac_.empty() == false &&
@@ -70,7 +70,7 @@ bool AppLaunchDataImpl::AddApplicationData(const ApplicationData& app_data) {
 
 std::vector<ApplicationDataPtr> AppLaunchDataImpl::GetApplicationDataByDevice(
     const std::string& dev_mac) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::vector<ApplicationDataPtr> apps = GetAppDataByDevMac(dev_mac);
 
   if (apps.empty()) {

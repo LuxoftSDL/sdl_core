@@ -57,7 +57,7 @@
 
 namespace media_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "MediaManager")
+SDL_CREATE_LOGGERPTR( "MediaManager")
 
 MediaManagerImpl::MediaManagerImpl(
     application_manager::ApplicationManager& application_manager,
@@ -185,7 +185,7 @@ void MediaManagerImpl::Init() {
 }
 
 void MediaManagerImpl::PlayA2DPSource(int32_t application_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
 #if defined(EXTENDED_MEDIA_MODE)
   if (!a2dp_player_ && protocol_handler_) {
@@ -200,7 +200,7 @@ void MediaManagerImpl::PlayA2DPSource(int32_t application_key) {
 }
 
 void MediaManagerImpl::StopA2DPSource(int32_t application_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (a2dp_player_) {
     a2dp_player_->StopActivity(application_key);
   }
@@ -271,7 +271,7 @@ void MediaManagerImpl::StartMicrophoneRecording(
 }
 
 void MediaManagerImpl::StopMicrophoneRecording(int32_t application_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 #if defined(EXTENDED_MEDIA_MODE)
   if (from_mic_recorder_) {
     from_mic_recorder_->StopActivity(application_key);
@@ -289,7 +289,7 @@ void MediaManagerImpl::StopMicrophoneRecording(int32_t application_key) {
 
 void MediaManagerImpl::StartStreaming(
     int32_t application_key, protocol_handler::ServiceType service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (streamer_[service_type]) {
     streamer_[service_type]->StartActivity(application_key);
@@ -298,7 +298,7 @@ void MediaManagerImpl::StartStreaming(
 
 void MediaManagerImpl::StopStreaming(
     int32_t application_key, protocol_handler::ServiceType service_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   stream_data_size_ = 0ull;
 
@@ -317,7 +317,7 @@ void MediaManagerImpl::OnMessageReceived(
   using namespace protocol_handler;
   using namespace application_manager;
   using namespace helpers;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const uint32_t streaming_app_id = message->connection_key();
   const ServiceType service_type = message->service_type();

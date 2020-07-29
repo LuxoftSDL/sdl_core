@@ -55,7 +55,7 @@ SubscribeVehicleDataRequest::SubscribeVehicleDataRequest(
 SubscribeVehicleDataRequest::~SubscribeVehicleDataRequest() {}
 
 void SubscribeVehicleDataRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -90,7 +90,7 @@ void SubscribeVehicleDataRequest::Run() {
 }
 
 void SubscribeVehicleDataRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   const smart_objects::SmartObject& message = event.smart_object();
@@ -245,7 +245,7 @@ bool SubscribeVehicleDataRequest::Init() {
 
 void SubscribeVehicleDataRequest::AddAlreadySubscribedVI(
     smart_objects::SmartObject& msg_params) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace mobile_apis;
 
   for (const auto& item : vi_already_subscribed_by_this_app_) {
@@ -272,7 +272,7 @@ struct SubscribedToIVIPredicate {
 
 bool SubscribeVehicleDataRequest::IsSomeoneSubscribedFor(
     const std::string& param_name) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   SubscribedToIVIPredicate finder(param_name);
   DataAccessor<ApplicationSet> accessor = application_manager_.applications();
   ApplicationSetConstIt it = std::find_if(

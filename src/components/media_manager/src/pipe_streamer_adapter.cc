@@ -40,7 +40,7 @@
 
 namespace media_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "PipeStreamerAdapter")
+SDL_CREATE_LOGGERPTR( "PipeStreamerAdapter")
 
 PipeStreamerAdapter::PipeStreamerAdapter(const std::string& named_pipe_path,
                                          const std::string& app_storage_folder)
@@ -80,7 +80,7 @@ PipeStreamerAdapter::PipeStreamer::~PipeStreamer() {
 }
 
 bool PipeStreamerAdapter::PipeStreamer::Connect() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   pipe_fd_ = open(named_pipe_path_.c_str(), O_RDWR | O_NONBLOCK, 0);
   if (-1 == pipe_fd_) {
@@ -95,7 +95,7 @@ bool PipeStreamerAdapter::PipeStreamer::Connect() {
 }
 
 void PipeStreamerAdapter::PipeStreamer::Disconnect() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (0 == close(pipe_fd_)) {
     LOG4CXX_INFO(logger_, "Pipe " << named_pipe_path_ << " was closed");
   } else {
@@ -105,7 +105,7 @@ void PipeStreamerAdapter::PipeStreamer::Disconnect() {
 
 bool PipeStreamerAdapter::PipeStreamer::Send(
     protocol_handler::RawMessagePtr msg) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   fd_set wfds;
   FD_ZERO(&wfds);
   FD_SET(pipe_fd_, &wfds);

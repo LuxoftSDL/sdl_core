@@ -55,7 +55,7 @@ OnSystemErrorNotification::OnSystemErrorNotification(
 OnSystemErrorNotification::~OnSystemErrorNotification() {}
 
 void OnSystemErrorNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const int code =
       (*message_)[strings::msg_params][hmi_notification::error].asInt();

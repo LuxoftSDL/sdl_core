@@ -20,7 +20,7 @@
 
 namespace utils {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Utils")
+SDL_CREATE_LOGGERPTR( "Utils")
 
 const char* Resources::proc = "/proc/";
 

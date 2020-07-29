@@ -54,7 +54,7 @@ TTSSetGlobalPropertiesResponse::TTSSetGlobalPropertiesResponse(
 TTSSetGlobalPropertiesResponse::~TTSSetGlobalPropertiesResponse() {}
 
 void TTSSetGlobalPropertiesResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   event_engine::Event event(hmi_apis::FunctionID::TTS_SetGlobalProperties);
   event.set_smart_object(*message_);

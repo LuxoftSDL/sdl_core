@@ -39,7 +39,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 TcpServerOriginatedSocketConnection::TcpServerOriginatedSocketConnection(
     const DeviceUID& device_uid,
@@ -52,7 +52,7 @@ TcpServerOriginatedSocketConnection::~TcpServerOriginatedSocketConnection() {
 }
 
 bool TcpServerOriginatedSocketConnection::Establish(ConnectError** error) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK(error);
   LOG4CXX_DEBUG(logger_, "error " << error);
   DeviceSptr device = controller()->FindDevice(device_handle());

@@ -56,7 +56,7 @@ AlertManeuverRequest::AlertManeuverRequest(
 AlertManeuverRequest::~AlertManeuverRequest() {}
 
 void AlertManeuverRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if ((!(*message_)[strings::msg_params].keyExists(strings::soft_buttons)) &&
       (!(*message_)[strings::msg_params].keyExists(strings::tts_chunks))) {
@@ -154,7 +154,7 @@ void AlertManeuverRequest::Run() {
 }
 
 void AlertManeuverRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
   hmi_apis::FunctionID::eType event_id = event.id();
   switch (event_id) {
@@ -214,7 +214,7 @@ void AlertManeuverRequest::on_event(const event_engine::Event& event) {
 
 bool AlertManeuverRequest::PrepareResponseParameters(
     mobile_apis::Result::eType& result_code, std::string& return_info) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   app_mngr::commands::ResponseInfo navigation_alert_info(
@@ -246,7 +246,7 @@ bool AlertManeuverRequest::PrepareResponseParameters(
 }
 
 bool AlertManeuverRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using smart_objects::SmartArray;
 
   if ((*message_)[strings::msg_params].keyExists(strings::tts_chunks)) {

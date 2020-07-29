@@ -54,7 +54,7 @@ CloseApplicationRequest::CloseApplicationRequest(
 CloseApplicationRequest::~CloseApplicationRequest() {}
 
 void CloseApplicationRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (app.use_count() == 0) {
@@ -71,7 +71,7 @@ void CloseApplicationRequest::Run() {
 }
 
 void CloseApplicationRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const smart_objects::SmartObject& message = event.smart_object();
 
   auto msg_params = message[strings::msg_params];

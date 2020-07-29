@@ -12,7 +12,7 @@
 #include "utils/timer_task_impl.h"
 
 namespace app_launch {
-CREATE_LOGGERPTR_GLOBAL(logger_, "AppLaunch")
+SDL_CREATE_LOGGERPTR( "AppLaunch")
 
 typedef std::pair<std::string, std::vector<ApplicationDataPtr> > AppsOnDevice;
 typedef std::shared_ptr<AppsOnDevice> AppsOnDevicePtr;
@@ -135,7 +135,7 @@ bool DeviceAppsLauncherImpl::LauncherFinder::operator()(
 bool DeviceAppsLauncherImpl::LaunchAppsOnDevice(
     const std::string& device_mac,
     const std::vector<ApplicationDataPtr>& applications_to_launch) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_,
                 "On Device " << device_mac << " will be launched "
                              << applications_to_launch.size() << " apps");
@@ -153,7 +153,7 @@ bool DeviceAppsLauncherImpl::LaunchAppsOnDevice(
 
 bool DeviceAppsLauncherImpl::StopLaunchingAppsOnDevice(
     const std::string& device_mac) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(launchers_lock_);
   const Launchers::iterator it = std::find_if(works_launchers_.begin(),
                                               works_launchers_.end(),

@@ -43,7 +43,7 @@ namespace resumption {
 
 namespace formatters = ns_smart_device_link::ns_json_handler::formatters;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Resumption")
+SDL_CREATE_LOGGERPTR( "Resumption")
 
 ResumptionDataJson::ResumptionDataJson(
     resumption::LastStateWrapperPtr last_state_wrapper,
@@ -54,7 +54,7 @@ ResumptionDataJson::ResumptionDataJson(
 void ResumptionDataJson::SaveApplication(
     app_mngr::ApplicationSharedPtr application) {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(application);
 
   const std::string& policy_app_id = application->policy_app_id();
@@ -115,7 +115,7 @@ void ResumptionDataJson::SaveApplication(
 
 bool ResumptionDataJson::IsHMIApplicationIdExist(uint32_t hmi_app_id) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
@@ -134,7 +134,7 @@ bool ResumptionDataJson::IsHMIApplicationIdExist(uint32_t hmi_app_id) const {
 uint32_t ResumptionDataJson::GetHMIApplicationID(
     const std::string& policy_app_id, const std::string& device_id) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint32_t hmi_app_id = 0;
 
@@ -156,7 +156,7 @@ uint32_t ResumptionDataJson::GetHMIApplicationID(
 
 void ResumptionDataJson::IncrementIgnOffCount() {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   Json::Value to_save = Json::arrayValue;
   Json::Value dictionary;
@@ -183,7 +183,7 @@ void ResumptionDataJson::IncrementIgnOffCount() {
 
 void ResumptionDataJson::DecrementIgnOffCount() {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
@@ -208,7 +208,7 @@ bool ResumptionDataJson::GetHashId(const std::string& policy_app_id,
                                    const std::string& device_id,
                                    std::string& hash_id) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const int idx = GetObjectIndex(policy_app_id, device_id);
   if (-1 == idx) {
@@ -235,7 +235,7 @@ bool ResumptionDataJson::GetSavedApplication(
     const std::string& device_id,
     smart_objects::SmartObject& saved_app) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const int idx = GetObjectIndex(policy_app_id, device_id);
   if (-1 == idx) {
@@ -252,7 +252,7 @@ bool ResumptionDataJson::GetSavedApplication(
 bool ResumptionDataJson::RemoveApplicationFromSaved(
     const std::string& policy_app_id, const std::string& device_id) {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   bool result = false;
   std::vector<Json::Value> temp;
@@ -289,7 +289,7 @@ bool ResumptionDataJson::RemoveApplicationFromSaved(
 
 uint32_t ResumptionDataJson::GetIgnOffTime() const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
@@ -304,7 +304,7 @@ uint32_t ResumptionDataJson::GetIgnOffTime() const {
 
 uint32_t ResumptionDataJson::GetGlobalIgnOnCounter() const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
@@ -320,7 +320,7 @@ uint32_t ResumptionDataJson::GetGlobalIgnOnCounter() const {
 
 void ResumptionDataJson::IncrementGlobalIgnOnCounter() {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
@@ -344,7 +344,7 @@ void ResumptionDataJson::IncrementGlobalIgnOnCounter() {
 
 void ResumptionDataJson::ResetGlobalIgnOnCount() {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
@@ -357,7 +357,7 @@ void ResumptionDataJson::ResetGlobalIgnOnCount() {
 
 ssize_t ResumptionDataJson::IsApplicationSaved(
     const std::string& policy_app_id, const std::string& device_id) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   return GetObjectIndex(policy_app_id, device_id);
 }
@@ -367,7 +367,7 @@ Json::Value& ResumptionDataJson::GetFromSavedOrAppend(
     const std::string& device_id,
     Json::Value& dictionary) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   Json::Value& saved_apps = GetSavedApplications(dictionary);
   for (auto& saved_app : saved_apps) {
@@ -383,7 +383,7 @@ Json::Value& ResumptionDataJson::GetFromSavedOrAppend(
 void ResumptionDataJson::GetDataForLoadResumeData(
     smart_objects::SmartObject& saved_data) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject so_array_data(smart_objects::SmartType_Array);
   int i = 0;
@@ -417,7 +417,7 @@ void ResumptionDataJson::UpdateHmiLevel(
     const std::string& policy_app_id,
     const std::string& device_id,
     mobile_apis::HMILevel::eType hmi_level) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace app_mngr;
 
   int idx = GetObjectIndex(policy_app_id, device_id);
@@ -436,7 +436,7 @@ void ResumptionDataJson::UpdateHmiLevel(
 Json::Value& ResumptionDataJson::GetSavedApplications(
     Json::Value& dictionary) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   Json::Value& resumption = GetResumptionData(dictionary);
   if (!resumption.isMember(strings::resume_app_list)) {
@@ -454,7 +454,7 @@ Json::Value& ResumptionDataJson::GetSavedApplications(
 Json::Value& ResumptionDataJson::GetResumptionData(
     Json::Value& dictionary) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!dictionary.isMember(strings::resumption)) {
     dictionary[strings::resumption] = Json::Value(Json::objectValue);
@@ -471,7 +471,7 @@ Json::Value& ResumptionDataJson::GetResumptionData(
 ssize_t ResumptionDataJson::GetObjectIndex(const std::string& policy_app_id,
                                            const std::string& device_id) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
@@ -495,7 +495,7 @@ ssize_t ResumptionDataJson::GetObjectIndex(const std::string& policy_app_id,
 
 bool ResumptionDataJson::IsResumptionDataValid(uint32_t index) const {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
@@ -521,7 +521,7 @@ bool ResumptionDataJson::IsResumptionDataValid(uint32_t index) const {
 
 void ResumptionDataJson::SetSavedApplication(Json::Value& apps_json,
                                              Json::Value& dictionary) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   Json::Value& app_list = GetSavedApplications(dictionary);
   app_list = apps_json;
@@ -530,7 +530,7 @@ void ResumptionDataJson::SetSavedApplication(Json::Value& apps_json,
 void ResumptionDataJson::SetLastIgnOffTime(time_t ign_off_time,
                                            Json::Value& dictionary) {
   using namespace app_mngr;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   LOG4CXX_WARN(logger_, "ign_off_time = " << ign_off_time);
   Json::Value& resumption = GetResumptionData(dictionary);
@@ -538,13 +538,13 @@ void ResumptionDataJson::SetLastIgnOffTime(time_t ign_off_time,
 }
 
 bool ResumptionDataJson::Init() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return true;
 }
 
 bool ResumptionDataJson::DropAppDataResumption(const std::string& device_id,
                                                const std::string& app_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace app_mngr;
 
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();

@@ -39,7 +39,7 @@
 
 namespace sync_primitives {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Utils")
+SDL_CREATE_LOGGERPTR( "Utils")
 
 Lock::Lock() : lock_taken_(0) {}
 

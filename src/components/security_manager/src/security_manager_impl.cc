@@ -42,7 +42,7 @@
 
 namespace security_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "SecurityManager")
+SDL_CREATE_LOGGERPTR( "SecurityManager")
 
 static const char* kErrId = "id";
 static const char* kErrText = "text";
@@ -269,7 +269,7 @@ bool SecurityManagerImpl::IsSystemTimeProviderReady() const {
 
 void SecurityManagerImpl::ProceedHandshake(
     security_manager::SSLContext* ssl_context, uint32_t connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!ssl_context) {
     LOG4CXX_WARN(logger_,
                  "Unable to process handshake. No SSL context for key "
@@ -333,7 +333,7 @@ void SecurityManagerImpl::ProceedHandshake(
 
 bool SecurityManagerImpl::IsCertificateUpdateRequired(
     const uint32_t connection_key) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   security_manager::SSLContext* ssl_context =
       CreateSSLContext(connection_key, kUseExisting);
   DCHECK_OR_RETURN(ssl_context, true);
@@ -368,7 +368,7 @@ void SecurityManagerImpl::RemoveListener(
 }
 
 bool SecurityManagerImpl::OnCertificateUpdated(const std::string& data) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     sync_primitives::AutoLock lock(waiters_lock_);
     waiting_for_certificate_ = false;
@@ -384,7 +384,7 @@ bool SecurityManagerImpl::OnCertificateUpdated(const std::string& data) {
 }
 
 void SecurityManagerImpl::OnSystemTimeArrived(const time_t utc_time) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     sync_primitives::AutoLock lock(waiters_lock_);
     waiting_for_time_ = false;
@@ -399,7 +399,7 @@ void SecurityManagerImpl::OnSystemTimeArrived(const time_t utc_time) {
 }
 
 void SecurityManagerImpl::OnSystemTimeFailed() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     sync_primitives::AutoLock lock(waiters_lock_);
     waiting_for_time_ = false;
@@ -411,7 +411,7 @@ void SecurityManagerImpl::OnSystemTimeFailed() {
 }
 
 void SecurityManagerImpl::ProcessFailedPTU() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (listeners_.empty()) {
     LOG4CXX_DEBUG(logger_, "listeners arrays IS EMPTY!");
     return;
@@ -435,7 +435,7 @@ void SecurityManagerImpl::ProcessFailedPTU() {
 
 #ifdef EXTERNAL_PROPRIETARY_MODE
 void SecurityManagerImpl::ProcessFailedCertDecrypt() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   {
     sync_primitives::AutoLock lock(waiters_lock_);
     waiting_for_certificate_ = false;
@@ -462,7 +462,7 @@ void SecurityManagerImpl::ProcessFailedCertDecrypt() {
 
 void SecurityManagerImpl::NotifyListenersOnHandshakeDone(
     const uint32_t& connection_key, SSLContext::HandshakeResult error) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::list<SecurityManagerListener*>::iterator it = listeners_.begin();
   while (it != listeners_.end()) {
     if ((*it)->OnHandshakeDone(connection_key, error)) {
@@ -476,7 +476,7 @@ void SecurityManagerImpl::NotifyListenersOnHandshakeDone(
 }
 
 void SecurityManagerImpl::NotifyOnCertificateUpdateRequired() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::list<SecurityManagerListener*>::iterator it = listeners_.begin();
   while (it != listeners_.end()) {
     (*it)->OnCertificateUpdateRequired();
@@ -489,7 +489,7 @@ void SecurityManagerImpl::ResetPendingSystemTimeRequests() {
 }
 
 void SecurityManagerImpl::NotifyListenersOnGetSystemTimeFailed() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   std::list<SecurityManagerListener*>::iterator it = listeners_.begin();
   while (it != listeners_.end()) {
     if ((*it)->OnGetSystemTimeFailed()) {
@@ -503,7 +503,7 @@ void SecurityManagerImpl::NotifyListenersOnGetSystemTimeFailed() {
 }
 
 bool SecurityManagerImpl::IsPolicyCertificateDataEmpty() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::string certificate_data;
   for (auto it = listeners_.begin(); it != listeners_.end(); ++it) {

@@ -52,13 +52,13 @@ VRGetSupportedLanguagesRequest::VRGetSupportedLanguagesRequest(
 VRGetSupportedLanguagesRequest::~VRGetSupportedLanguagesRequest() {}
 
 void VRGetSupportedLanguagesRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   SendRequest();
 }
 
 void VRGetSupportedLanguagesRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   hmi_capabilities_.UpdateRequestsRequiredForCapabilities(
       hmi_apis::FunctionID::VR_GetSupportedLanguages);
 }

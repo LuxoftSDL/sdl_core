@@ -53,7 +53,7 @@ AllowAppResponse::AllowAppResponse(
 AllowAppResponse::~AllowAppResponse() {}
 
 void AllowAppResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   uint32_t connection_key =
       (*message_)[strings::params][strings::connection_key].asInt();

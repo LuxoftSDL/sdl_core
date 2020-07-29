@@ -62,7 +62,7 @@
 #include "rc_rpc_plugin/interior_data_cache.h"
 #include "rc_rpc_plugin/resource_allocation_manager.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule")
+SDL_CREATE_LOGGERPTR( "RemoteControlModule")
 namespace application_manager {
 using rc_rpc_plugin::InteriorDataCache;
 using rc_rpc_plugin::RCCommandParams;
@@ -113,7 +113,7 @@ struct RCCommandCreatorFactory {
 
   template <typename RCCommandType>
   CommandCreator& GetCreator() {
-    LOG4CXX_AUTO_TRACE(logger_);
+    SDL_AUTO_TRACE();
     static RCCommandCreator<RCCommandType> res(params_);
     return res;
   }

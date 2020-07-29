@@ -41,7 +41,7 @@
 namespace utils {
 namespace dbms {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Utils")
+SDL_CREATE_LOGGERPTR( "Utils")
 
 class SetBindInteger {
  public:

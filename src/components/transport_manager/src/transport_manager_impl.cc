@@ -76,7 +76,7 @@ struct ConnectionFinder {
 
 namespace transport_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 TransportManagerImpl::Connection TransportManagerImpl::convert(
     const TransportManagerImpl::ConnectionInternal& p) {
@@ -139,7 +139,7 @@ TransportManagerImpl::~TransportManagerImpl() {
 }
 
 void TransportManagerImpl::ReconnectionTimeout() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   RaiseEvent(&TransportManagerListener::OnDeviceSwitchingFinish,
              device_to_reconnect_);
 }
@@ -340,7 +340,7 @@ int TransportManagerImpl::AddEventListener(TransportManagerListener* listener) {
 }
 
 void TransportManagerImpl::DisconnectAllDevices() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   sync_primitives::AutoReadLock lock(device_list_lock_);
   for (DeviceInfoList::iterator i = device_list_.begin();
        i != device_list_.end();
@@ -351,7 +351,7 @@ void TransportManagerImpl::DisconnectAllDevices() {
 }
 
 void TransportManagerImpl::TerminateAllAdapters() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   for (std::vector<TransportAdapter*>::iterator i = transport_adapters_.begin();
        i != transport_adapters_.end();
        ++i) {
@@ -360,7 +360,7 @@ void TransportManagerImpl::TerminateAllAdapters() {
 }
 
 int TransportManagerImpl::InitAllAdapters() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   for (std::vector<TransportAdapter*>::iterator i = transport_adapters_.begin();
        i != transport_adapters_.end();
        ++i) {
@@ -372,7 +372,7 @@ int TransportManagerImpl::InitAllAdapters() {
 }
 
 int TransportManagerImpl::Stop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!is_initialized_) {
     LOG4CXX_WARN(logger_, "TransportManager is not initialized_");
     return E_TM_IS_NOT_INITIALIZED;
@@ -609,7 +609,7 @@ int TransportManagerImpl::Init(resumption::LastState& last_state) {
 }
 
 void TransportManagerImpl::Deinit() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   DisconnectAllDevices();
   TerminateAllAdapters();
   device_to_adapter_map_.clear();
@@ -622,12 +622,12 @@ int TransportManagerImpl::Reinit() {
 }
 
 void TransportManagerImpl::StopEventsProcessing() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   events_processing_is_active_ = false;
 }
 
 void TransportManagerImpl::StartEventsProcessing() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   events_processing_is_active_ = true;
   events_processing_cond_var_.Broadcast();
 }
@@ -667,7 +667,7 @@ void TransportManagerImpl::CreateWebEngineDevice() {
 #ifndef WEBSOCKET_SERVER_TRANSPORT_SUPPORT
   LOG4CXX_TRACE(logger_, "Web engine support is disabled. Exiting function");
 #else
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   auto web_socket_ta_iterator = std::find_if(
       transport_adapters_.begin(),
       transport_adapters_.end(),
@@ -717,7 +717,7 @@ void TransportManagerImpl::CreateWebEngineDevice() {
 }
 
 const DeviceInfo& TransportManagerImpl::GetWebEngineDeviceInfo() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   return web_engine_device_info_;
 }
 
@@ -786,7 +786,7 @@ void TransportManagerImpl::PostMessage(
 }
 
 void TransportManagerImpl::PostEvent(const TransportAdapterEvent& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "TransportAdapterEvent: " << &event);
   event_queue_.PostMessage(event);
 }
@@ -796,7 +796,7 @@ const TransportManagerSettings& TransportManagerImpl::get_settings() const {
 }
 
 void TransportManagerImpl::AddConnection(const ConnectionInternal& c) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "ConnectionInternal: " << &c);
   sync_primitives::AutoWriteLock lock(connections_lock_);
   connections_.push_back(c);
@@ -804,7 +804,7 @@ void TransportManagerImpl::AddConnection(const ConnectionInternal& c) {
 
 void TransportManagerImpl::RemoveConnection(
     const uint32_t id, transport_adapter::TransportAdapter* transport_adapter) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Id: " << id);
   sync_primitives::AutoWriteLock lock(connections_lock_);
   LOG4CXX_DEBUG(logger_, "Removing connection with id: " << id);
@@ -820,7 +820,7 @@ void TransportManagerImpl::RemoveConnection(
 
 void TransportManagerImpl::DeactivateDeviceConnections(
     const DeviceUID& device_uid) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   sync_primitives::AutoWriteLock lock(connections_lock_);
   LOG4CXX_DEBUG(logger_,
@@ -843,7 +843,7 @@ void TransportManagerImpl::DeactivateDeviceConnections(
 
 TransportManagerImpl::ConnectionInternal* TransportManagerImpl::GetConnection(
     const ConnectionUID id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "ConnectionUID: " << id);
   for (std::vector<ConnectionInternal>::iterator it = connections_.begin();
        it != connections_.end();
@@ -858,7 +858,7 @@ TransportManagerImpl::ConnectionInternal* TransportManagerImpl::GetConnection(
 
 TransportManagerImpl::ConnectionInternal* TransportManagerImpl::GetConnection(
     const DeviceUID& device, const ApplicationHandle& application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(
       logger_, "DeviceUID: " << device << "ApplicationHandle: " << application);
   for (std::vector<ConnectionInternal>::iterator it = connections_.begin();
@@ -875,7 +875,7 @@ TransportManagerImpl::ConnectionInternal* TransportManagerImpl::GetConnection(
 TransportManagerImpl::ConnectionInternal*
 TransportManagerImpl::GetActiveConnection(
     const DeviceUID& device, const ApplicationHandle& application) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(
       logger_,
       "DeviceUID: " << device << " ApplicationHandle: " << application);
@@ -913,7 +913,7 @@ struct SwitchableFinder {
 
 void TransportManagerImpl::TryDeviceSwitch(
     transport_adapter::TransportAdapter* adapter) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (adapter->GetDeviceType() != transport_adapter::DeviceType::IOS_USB) {
     LOG4CXX_ERROR(logger_, "Switching requested not from iAP-USB transport.");
     return;

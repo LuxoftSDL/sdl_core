@@ -50,7 +50,7 @@ UnsubscribeVehicleDataResponse::UnsubscribeVehicleDataResponse(
 UnsubscribeVehicleDataResponse::~UnsubscribeVehicleDataResponse() {}
 
 void UnsubscribeVehicleDataResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // check if response false
   if (true == (*message_)[strings::msg_params].keyExists(strings::success)) {

@@ -51,7 +51,7 @@
 namespace application_manager {
 namespace formatters = ns_smart_device_link::ns_json_handler::formatters;
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "HMICapabilities")
+SDL_CREATE_LOGGERPTR( "HMICapabilities")
 
 namespace {
 std::map<std::string, hmi_apis::Common_VrCapabilities::eType>
@@ -1646,7 +1646,7 @@ bool HMICapabilitiesImpl::LoadCapabilitiesFromFile() {
 hmi_apis::Common_Language::eType
 HMICapabilitiesImpl::GetActiveLanguageForInterface(
     const std::string& interface_name) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (hmi_interface::ui == interface_name) {
     return active_ui_language();
   }
@@ -1661,7 +1661,7 @@ HMICapabilitiesImpl::GetActiveLanguageForInterface(
 
 void HMICapabilitiesImpl::UpdateRequestsRequiredForCapabilities(
     hmi_apis::FunctionID::eType requested_interface) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (app_mngr_.IsHMICooperating()) {
     LOG4CXX_DEBUG(logger_,
                   "Remove from default initialized capabilities skipped, "
@@ -1677,7 +1677,7 @@ void HMICapabilitiesImpl::UpdateRequestsRequiredForCapabilities(
 
 void HMICapabilitiesImpl::OnSoftwareVersionReceived(
     const std::string& ccpu_version) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (ccpu_version == ccpu_version_) {
     LOG4CXX_DEBUG(logger_, "Software version not changed");
@@ -1694,7 +1694,7 @@ void HMICapabilitiesImpl::OnSoftwareVersionReceived(
 }
 
 void HMICapabilitiesImpl::UpdateCachedCapabilities() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   DeleteCachedCapabilitiesFile();
 
@@ -1709,7 +1709,7 @@ bool HMICapabilitiesImpl::AllFieldsSaved(
     const Json::Value& root_node,
     const std::string& interface_name,
     const std::vector<std::string>& sections_to_check) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!JsonIsMemberSafe(root_node, interface_name.c_str())) {
     LOG4CXX_DEBUG(logger_,
                   interface_name
@@ -1748,7 +1748,7 @@ bool HMICapabilitiesImpl::AllFieldsSaved(
 
 void HMICapabilitiesImpl::RemoveFromRequestsRequiredForCapabilities(
     hmi_apis::FunctionID::eType requested_interface) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   auto it = find(requests_required_for_capabilities_.begin(),
                  requests_required_for_capabilities_.end(),
@@ -1765,7 +1765,7 @@ void HMICapabilitiesImpl::PrepareUiJsonValueForSaving(
     const std::vector<std::string>& sections_to_update,
     const smart_objects::CSmartSchema& schema,
     Json::Value& out_node) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject capability(smart_objects::SmartType_Map);
   auto system_capabilities = std::make_shared<smart_objects::SmartObject>(
@@ -1884,7 +1884,7 @@ void HMICapabilitiesImpl::PrepareVrJsonValueForSaving(
     const std::vector<std::string>& sections_to_update,
     const smart_objects::CSmartSchema& schema,
     Json::Value& out_node) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   for (const auto& section_to_update : sections_to_update) {
     if (section_to_update == hmi_response::language) {
@@ -1908,7 +1908,7 @@ void HMICapabilitiesImpl::PrepareTtsJsonValueForSaving(
     const std::vector<std::string>& sections_to_update,
     const smart_objects::CSmartSchema& schema,
     Json::Value& out_node) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   for (const auto& section_to_update : sections_to_update) {
     if (section_to_update == hmi_response::language) {
@@ -1942,7 +1942,7 @@ void HMICapabilitiesImpl::PrepareButtonsJsonValueForSaving(
     const std::vector<std::string>& sections_to_update,
     const smart_objects::CSmartSchema& schema,
     Json::Value& out_node) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   for (const auto& section_to_update : sections_to_update) {
     if (section_to_update == hmi_response::button_capabilities) {
@@ -1963,7 +1963,7 @@ void HMICapabilitiesImpl::PrepareVehicleInfoJsonValueForSaving(
     const std::vector<std::string>& sections_to_update,
     const smart_objects::CSmartSchema& schema,
     Json::Value& out_node) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (helpers::in_range(sections_to_update, hmi_response::vehicle_type)) {
     save_hmi_capability_field_to_json(
         hmi_response::vehicle_type, schema, vehicle_type(), out_node);
@@ -1974,7 +1974,7 @@ void HMICapabilitiesImpl::PrepareRCJsonValueForSaving(
     const std::vector<std::string>& sections_to_update,
     const smart_objects::CSmartSchema& schema,
     Json::Value& out_node) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   for (const auto& section_to_update : sections_to_update) {
     if (section_to_update == strings::rc_capability) {
@@ -2086,7 +2086,7 @@ bool HMICapabilitiesImpl::SaveCachedCapabilitiesToFile(
     const std::string& interface_name,
     const std::vector<std::string>& sections_to_update,
     const smart_objects::CSmartSchema& schema) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (sections_to_update.empty()) {
     LOG4CXX_DEBUG(logger_,
@@ -2145,7 +2145,7 @@ bool HMICapabilitiesImpl::SaveCachedCapabilitiesToFile(
 }
 
 bool HMICapabilitiesImpl::DeleteCachedCapabilitiesFile() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const std::string cache_file_name =
       app_mngr_.get_settings().hmi_capabilities_cache_file_name();
   if (cache_file_name.empty()) {

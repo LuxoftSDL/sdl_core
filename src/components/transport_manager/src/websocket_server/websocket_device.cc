@@ -37,7 +37,7 @@
 
 namespace transport_manager {
 namespace transport_adapter {
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 WebSocketDevice::WebSocketDevice(const std::string& name,
                                  const DeviceUID& unique_device_id)

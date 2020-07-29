@@ -38,7 +38,7 @@
 
 namespace policy {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "PolicyHandler")
+SDL_CREATE_LOGGERPTR( "PolicyHandler")
 
 RetrySequence::RetrySequence(PolicyHandler* const policy_handler)
     // TODO (Risk copy of PolicyHandler Pointer)

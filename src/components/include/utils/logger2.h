@@ -54,7 +54,7 @@ typedef logger::Log4CXXLogger ExternalLogger;
 // Logger deinitilization function and macro, need to stop log4cxx writing
 // without this deinitilization log4cxx threads continue using some instances
 // destroyed by exit()
-#define SDL_DEINIT_LOGGER() logger::Logger<ExternalLogger>::instance().DeInit();
+#define SDL_SDL_DEINIT_LOGGER()() logger::Logger<ExternalLogger>::instance().DeInit();
 
 // Logger thread deinitilization macro that need to stop the thread of handling
 // messages for the log4cxx
@@ -63,7 +63,7 @@ typedef logger::Log4CXXLogger ExternalLogger;
 
 // special macros to dump logs from queue
 // it's need, for example, when crash happend
-#define SDL_FLUSH_LOGGER() logger::Logger<ExternalLogger>::instance().Flush();
+#define SDL_SDL_FLUSH_LOGGER()() logger::Logger<ExternalLogger>::instance().Flush();
 
 #define SDL_IS_TRACE_ENABLED(logger) \
   logger::Logger<ExternalLogger>::instance().IsEnabledFor( \
@@ -123,11 +123,11 @@ typedef logger::Log4CXXLogger ExternalLogger;
 
 #define INIT_LOGGER(file_name, logs_enabled)
 
-#define DEINIT_LOGGER()
+#define SDL_DEINIT_LOGGER()()
 
 #define DELETE_THREAD_LOGGER(logger_var)
 
-#define SDL_FLUSH_LOGGER()
+#define SDL_SDL_FLUSH_LOGGER()()
 
 #define SDL_IS_TRACE_ENABLED(logger) false
 

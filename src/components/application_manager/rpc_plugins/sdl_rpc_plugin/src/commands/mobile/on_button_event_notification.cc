@@ -58,7 +58,7 @@ OnButtonEventNotification::OnButtonEventNotification(
 OnButtonEventNotification::~OnButtonEventNotification() {}
 
 void OnButtonEventNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const uint32_t btn_id = static_cast<uint32_t>(
       (*message_)[strings::msg_params][hmi_response::button_name].asInt());

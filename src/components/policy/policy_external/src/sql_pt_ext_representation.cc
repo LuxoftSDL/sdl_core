@@ -41,7 +41,7 @@
 
 namespace policy {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Policy")
+SDL_CREATE_LOGGERPTR( "Policy")
 
 SQLPTExtRepresentation::SQLPTExtRepresentation() {}
 SQLPTExtRepresentation::SQLPTExtRepresentation(bool in_memory)
@@ -90,7 +90,7 @@ bool SQLPTExtRepresentation::GetUserPermissionsForDevice(
     const std::string& device_id,
     StringArray* consented_groups,
     StringArray* disallowed_groups) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kSelectDeviceConsentedGroup)) {
     LOG4CXX_WARN(logger_, "Incorrect select from device consented groups");
@@ -118,7 +118,7 @@ bool SQLPTExtRepresentation::GetPermissionsForApp(
     const std::string& device_id,
     const std::string& policy_app_id,
     FunctionalIdType* group_types) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!group_types) {
     LOG4CXX_WARN(logger_, "Input parameter for group types is null.");
     return false;
@@ -171,7 +171,7 @@ bool SQLPTExtRepresentation::GetPermissionsForApp(
 
 bool SQLPTExtRepresentation::GetDeviceGroupsFromPolicies(
     policy_table::Strings* groups, policy_table::Strings* preconsented_groups) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (groups) {
     GatherAppGroup(kDeviceId, groups);
   }
@@ -189,7 +189,7 @@ bool SQLPTExtRepresentation::SetDeviceData(const std::string& device_id,
                                            const std::string& carrier,
                                            const uint32_t number_of_ports,
                                            const std::string& connection_type) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery count_query(db());
   if (!count_query.Prepare(sql_pt_ext::kCountDevice)) {
     LOG4CXX_WARN(logger_, "Incorrect statement for count of device.");
@@ -260,7 +260,7 @@ bool SQLPTExtRepresentation::SetUserPermissionsForDevice(
     const std::string& device_id,
     const StringArray& consented_groups,
     const StringArray& disallowed_groups) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery count_query(db());
   if (!count_query.Prepare(sql_pt_ext::kCountDeviceConsentGroup)) {
     LOG4CXX_WARN(logger_, "Incorrect count of device consented groups");
@@ -408,7 +408,7 @@ bool SQLPTExtRepresentation::ReactOnUserDevConsentForApp(
 
 bool SQLPTExtRepresentation::SetUserPermissionsForApp(
     const PermissionConsent& permissions) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   // TODO(AOleynik): Handle situation, when no application was specified, i.e.
   // general permissions were set
   std::vector<FunctionalGroupPermission>::const_iterator it =
@@ -591,7 +591,7 @@ bool SQLPTExtRepresentation::GatherConsumerFriendlyMessages(
 bool SQLPTExtRepresentation::SetMetaInfo(const std::string& ccpu_version,
                                          const std::string& wers_country_code,
                                          const std::string& language) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kUpdateMetaParams)) {
     LOG4CXX_WARN(logger_, "Incorrect statement for insert to module meta.");
@@ -610,7 +610,7 @@ bool SQLPTExtRepresentation::SetMetaInfo(const std::string& ccpu_version,
 }
 
 bool SQLPTExtRepresentation::IsMetaInfoPresent() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kSelectMetaParams)) {
     LOG4CXX_WARN(logger_, "Incorrect statement for selecting meta info.");
@@ -626,7 +626,7 @@ bool SQLPTExtRepresentation::IsMetaInfoPresent() {
 }
 
 bool SQLPTExtRepresentation::SetSystemLanguage(const std::string& language) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kUpdateMetaLanguage)) {
     LOG4CXX_WARN(logger_, "Incorrect statement for update meta language.");
@@ -1159,7 +1159,7 @@ void SQLPTExtRepresentation::GatherConsentGroup(
 
 bool SQLPTExtRepresentation::SaveDeviceData(
     const policy_table::DeviceData& devices) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery drop_device_query(db());
   const std::string drop_device = "DELETE FROM `device`";
   if (!drop_device_query.Exec(drop_device)) {
@@ -1216,7 +1216,7 @@ bool SQLPTExtRepresentation::SaveDeviceData(
 bool SQLPTExtRepresentation::SaveConsentGroup(
     const std::string& device_id,
     const policy_table::UserConsentRecords& records) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
 
   policy_table::UserConsentRecords::const_iterator it = records.begin();
@@ -1314,7 +1314,7 @@ bool SQLPTExtRepresentation::SaveConsentGroup(
 
 bool SQLPTExtRepresentation::SavePreconsentedGroup(
     const std::string& app_id, const policy_table::Strings& groups) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kInsertPreconsentedGroups)) {
     LOG4CXX_WARN(logger_, "Incorrect insert statement for preconsented groups");
@@ -1395,7 +1395,7 @@ bool SQLPTExtRepresentation::GetConsentedGroups(
     const std::string& device_id,
     FunctionalGroupIDs& allowed_groups,
     FunctionalGroupIDs& disallowed_groups) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kSelectConsentedGroupsId)) {
     LOG4CXX_WARN(logger_, "Incorrect statement for select consent groups id.");
@@ -1418,7 +1418,7 @@ bool SQLPTExtRepresentation::GetConsentedGroups(
 
 bool SQLPTExtRepresentation::GetPreconsentedGroups(
     const std::string& policy_app_id, FunctionalGroupIDs& preconsented_groups) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kSelectPreconsentedGroupsId)) {
     LOG4CXX_WARN(logger_,
@@ -1437,7 +1437,7 @@ bool SQLPTExtRepresentation::GetPreconsentedGroups(
 
 bool SQLPTExtRepresentation::GetFunctionalGroupNames(
     FunctionalGroupNames& names) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kSelectFunctionalGroupNames)) {
     LOG4CXX_WARN(logger_,
@@ -1555,7 +1555,7 @@ void SQLPTExtRepresentation::Add(const std::string& app_id,
 
 bool SQLPTExtRepresentation::GetDefaultHMI(const std::string& policy_app_id,
                                            std::string* default_hmi) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kSelectDefaultHmi)) {
     LOG4CXX_INFO(logger_, "Incorrect statement for default hmi.");
@@ -1583,7 +1583,7 @@ bool SQLPTExtRepresentation::CountUnconsentedGroups(
     const std::string& policy_app_id,
     const std::string& device_id,
     int* result) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kCountUnconsentedGroups)) {
     LOG4CXX_WARN(logger_, "Incorrect select for unconsented groups.");
@@ -1750,7 +1750,7 @@ bool SQLPTExtRepresentation::SaveGlobalCounters(
 
 bool SQLPTExtRepresentation::CleanupUnpairedDevices(
     const DeviceIds& device_ids) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery delete_device_query(db());
   if (!delete_device_query.Prepare(sql_pt::kDeleteDevice)) {
     LOG4CXX_WARN(logger_, "Incorrect statement for device delete.");
@@ -1958,7 +1958,7 @@ bool SQLPTExtRepresentation::SetVINValue(const std::string& value) {
 
 bool SQLPTExtRepresentation::SaveExternalConsentStatus(
     const ExternalConsentStatus& status) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kInsertExternalConsentStatus)) {
     LOG4CXX_ERROR(logger_,
@@ -1987,7 +1987,7 @@ bool SQLPTExtRepresentation::SaveExternalConsentStatus(
 }
 
 ExternalConsentStatus SQLPTExtRepresentation::GetExternalConsentStatus() const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(sql_pt_ext::kSelectExternalConsentStatus)) {
     LOG4CXX_ERROR(logger_,

@@ -55,7 +55,7 @@ NaviSetVideoConfigRequest::NaviSetVideoConfigRequest(
 NaviSetVideoConfigRequest::~NaviSetVideoConfigRequest() {}
 
 void NaviSetVideoConfigRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!app_mngr::commands::CheckAvailabilityHMIInterfaces(
           application_manager_, HmiInterfaces::HMI_INTERFACE_Navigation)) {
     LOG4CXX_WARN(logger_, "HMI interface Navigation is not supported");
@@ -77,7 +77,7 @@ void NaviSetVideoConfigRequest::Run() {
 }
 
 void NaviSetVideoConfigRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app =
       application_manager_.application_by_hmi_app(application_id());

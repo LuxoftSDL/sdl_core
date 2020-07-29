@@ -54,7 +54,7 @@ UpdateSDLRequest::UpdateSDLRequest(
 UpdateSDLRequest::~UpdateSDLRequest() {}
 
 void UpdateSDLRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   policy_handler_.PTExchangeAtUserRequest(
       (*message_)[strings::params][strings::correlation_id].asInt());

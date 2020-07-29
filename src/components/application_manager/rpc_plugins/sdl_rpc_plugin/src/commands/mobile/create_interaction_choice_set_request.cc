@@ -68,11 +68,11 @@ CreateInteractionChoiceSetRequest::CreateInteractionChoiceSetRequest(
     , is_timed_out_(false) {}
 
 CreateInteractionChoiceSetRequest::~CreateInteractionChoiceSetRequest() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 void CreateInteractionChoiceSetRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace mobile_apis;
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
@@ -160,7 +160,7 @@ void CreateInteractionChoiceSetRequest::Run() {
 mobile_apis::Result::eType CreateInteractionChoiceSetRequest::CheckChoiceSet(
     ApplicationConstSharedPtr app) {
   using namespace smart_objects;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::set<uint32_t> choice_id_set;
 
@@ -235,7 +235,7 @@ bool CreateInteractionChoiceSetRequest::compareStr(
 
 bool CreateInteractionChoiceSetRequest::IsWhiteSpaceExist(
     const smart_objects::SmartObject& choice_set) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   str = choice_set[strings::menu_name].asCharArray();
@@ -294,7 +294,7 @@ bool CreateInteractionChoiceSetRequest::IsWhiteSpaceExist(
 
 void CreateInteractionChoiceSetRequest::SendVRAddCommandRequests(
     application_manager::ApplicationSharedPtr const app) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject& choice_set = (*message_)[strings::msg_params];
   smart_objects::SmartObject msg_params =
@@ -386,7 +386,7 @@ void CreateInteractionChoiceSetRequest::on_event(
     const event_engine::Event& event) {
   using namespace hmi_apis;
   using namespace helpers;
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   const smart_objects::SmartObject& message = event.smart_object();
   const Common_Result::eType result = static_cast<Common_Result::eType>(
@@ -412,7 +412,7 @@ void CreateInteractionChoiceSetRequest::on_event(
 }
 
 void CreateInteractionChoiceSetRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!error_from_hmi_) {
     SendResponse(false, mobile_apis::Result::GENERIC_ERROR);
@@ -434,7 +434,7 @@ bool CreateInteractionChoiceSetRequest::Init() {
 }
 
 void CreateInteractionChoiceSetRequest::DeleteChoices() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr application =
       application_manager_.application(connection_key());
@@ -464,7 +464,7 @@ void CreateInteractionChoiceSetRequest::DeleteChoices() {
 }
 
 void CreateInteractionChoiceSetRequest::OnAllHMIResponsesReceived() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!error_from_hmi_ && should_send_warnings_) {
     SendResponse(true, mobile_apis::Result::WARNINGS, kInvalidImageWarningInfo);

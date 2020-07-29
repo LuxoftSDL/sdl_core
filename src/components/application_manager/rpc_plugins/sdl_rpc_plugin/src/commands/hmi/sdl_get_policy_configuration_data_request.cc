@@ -54,7 +54,7 @@ SDLGetPolicyConfigurationDataRequest::SDLGetPolicyConfigurationDataRequest(
 SDLGetPolicyConfigurationDataRequest::~SDLGetPolicyConfigurationDataRequest() {}
 
 void SDLGetPolicyConfigurationDataRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   smart_objects::SmartObject response_value(
       smart_objects::SmartType::SmartType_Array);
@@ -87,7 +87,7 @@ void SDLGetPolicyConfigurationDataRequest::Run() {
 hmi_apis::Common_Result::eType
 SDLGetPolicyConfigurationDataRequest::PrepareResponseParams(
     smart_objects::SmartObject& response_out) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const auto policy_type =
       (*message_)[strings::msg_params][strings::policy_type].asString();
 
@@ -126,7 +126,7 @@ void clear_new_line_symbol(std::string& str_to_clear) {
 
 smart_objects::SmartObject SDLGetPolicyConfigurationDataRequest::GetValueParam(
     const Json::Value& policy_property) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   smart_objects::SmartObject value(smart_objects::SmartType_Array);
 
   auto put_element_in_value_array = [&value](const Json::Value& element,

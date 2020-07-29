@@ -68,7 +68,7 @@ AddCommandRequest::AddCommandRequest(
 AddCommandRequest::~AddCommandRequest() {}
 
 void AddCommandRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   RemoveCommand();
   CommandRequestImpl::onTimeOut();
 }
@@ -79,7 +79,7 @@ bool AddCommandRequest::Init() {
 }
 
 void AddCommandRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   ApplicationSharedPtr app = application_manager_.application(
       (*message_)[strings::params][strings::connection_key].asUInt());
@@ -312,7 +312,7 @@ bool AddCommandRequest::CheckCommandParentId(ApplicationConstSharedPtr app) {
 
 // TODO(AKUTSAN) APPLINK-26973: Refactor AddCommandRequest
 void AddCommandRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
 
   const smart_objects::SmartObject& message = event.smart_object();
@@ -524,7 +524,7 @@ bool AddCommandRequest::IsPendingResponseExist() {
 }
 
 bool AddCommandRequest::IsWhiteSpaceExist() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   const char* str = NULL;
 
   if ((*message_)[strings::msg_params].keyExists(strings::menu_params)) {
@@ -596,7 +596,7 @@ const std::string AddCommandRequest::GenerateMobileResponseInfo() {
 }
 
 void AddCommandRequest::RemoveCommand() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   ApplicationSharedPtr app = application_manager_.application(connection_key());
   if (app.use_count() == 0) {
     LOG4CXX_ERROR(logger_, "No application associated with session key");

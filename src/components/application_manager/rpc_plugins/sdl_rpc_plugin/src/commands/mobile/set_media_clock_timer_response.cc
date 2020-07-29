@@ -54,7 +54,7 @@ SetMediaClockTimerResponse::SetMediaClockTimerResponse(
 SetMediaClockTimerResponse::~SetMediaClockTimerResponse() {}
 
 void SetMediaClockTimerResponse::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   rpc_service_.SendMessageToMobile(message_);
 }

@@ -53,7 +53,7 @@ ASAppServiceActivationRequest::ASAppServiceActivationRequest(
 ASAppServiceActivationRequest::~ASAppServiceActivationRequest() {}
 
 void ASAppServiceActivationRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   AppServiceManager& service_manager =
       application_manager_.GetAppServiceManager();
   smart_objects::SmartObject params = (*message_)[strings::msg_params];

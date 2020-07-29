@@ -49,13 +49,13 @@ VIGetVehicleTypeRequest::VIGetVehicleTypeRequest(
 VIGetVehicleTypeRequest::~VIGetVehicleTypeRequest() {}
 
 void VIGetVehicleTypeRequest::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   SendRequest();
 }
 
 void VIGetVehicleTypeRequest::onTimeOut() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   hmi_capabilities_.UpdateRequestsRequiredForCapabilities(
       hmi_apis::FunctionID::VehicleInfo_GetVehicleType);
 }

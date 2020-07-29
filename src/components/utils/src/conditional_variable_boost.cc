@@ -46,7 +46,7 @@ const long kNanosecondsPerMillisecond = 1000000;
 
 namespace sync_primitives {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "Utils")
+SDL_CREATE_LOGGERPTR( "Utils")
 
 ConditionalVariable::ConditionalVariable() {}
 

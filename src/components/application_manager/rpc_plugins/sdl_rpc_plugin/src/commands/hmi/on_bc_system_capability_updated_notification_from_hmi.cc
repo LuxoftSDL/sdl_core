@@ -63,7 +63,7 @@ OnBCSystemCapabilityUpdatedNotificationFromHMI::
     OnBCSystemCapabilityUpdatedNotificationFromHMI::
         ProcessSystemDisplayCapabilities(
             const smart_objects::SmartObject& display_capabilities) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!(*message_)[strings::msg_params].keyExists(strings::app_id)) {
     LOG4CXX_DEBUG(logger_, "Updating general display capabilities");
@@ -98,7 +98,7 @@ OnBCSystemCapabilityUpdatedNotificationFromHMI::
 }
 
 void OnBCSystemCapabilityUpdatedNotificationFromHMI::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // Prepare SmartObject for mobile factory
   (*message_)[strings::params][strings::function_id] = static_cast<int32_t>(

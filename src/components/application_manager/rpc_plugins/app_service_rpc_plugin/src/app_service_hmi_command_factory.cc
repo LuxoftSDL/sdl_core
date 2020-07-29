@@ -55,7 +55,7 @@
 #include "app_service_rpc_plugin/commands/hmi/on_as_app_service_data_notification.h"
 #include "app_service_rpc_plugin/commands/hmi/on_as_app_service_data_notification_from_hmi.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "AppServiceRpcPlugin")
+SDL_CREATE_LOGGERPTR( "AppServiceRpcPlugin")
 
 namespace app_service_rpc_plugin {
 namespace strings = app_mngr::strings;
@@ -69,7 +69,7 @@ AppServiceHmiCommandFactory::AppServiceHmiCommandFactory(
     , rpc_service_(rpc_service)
     , hmi_capabilities_(hmi_capabilities)
     , policy_handler_(policy_handler) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 }
 
 app_mngr::CommandSharedPtr AppServiceHmiCommandFactory::CreateCommand(

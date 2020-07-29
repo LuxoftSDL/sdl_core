@@ -50,7 +50,7 @@ RCOnInteriorVehicleDataNotification::RCOnInteriorVehicleDataNotification(
 RCOnInteriorVehicleDataNotification::~RCOnInteriorVehicleDataNotification() {}
 
 void RCOnInteriorVehicleDataNotification::Run() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   (*message_)[app_mngr::strings::params][app_mngr::strings::function_id] =
       static_cast<int>(mobile_apis::FunctionID::eType::OnInteriorVehicleDataID);
 

@@ -143,7 +143,7 @@ void RequestFromHMI::FillCommonParametersOfSO(
 
 bool RequestFromHMI::IsMobileResultSuccess(
     mobile_apis::Result::eType result_code) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
   return Compare<mobile_apis::Result::eType, EQ, ONE>(
       result_code,
@@ -157,7 +157,7 @@ bool RequestFromHMI::IsMobileResultSuccess(
 bool RequestFromHMI::IsHMIResultSuccess(
     hmi_apis::Common_Result::eType result_code,
     HmiInterfaces::InterfaceID interface) const {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   using namespace helpers;
   if (Compare<hmi_apis::Common_Result::eType, EQ, ONE>(
           result_code,
@@ -183,7 +183,7 @@ void RequestFromHMI::SendProviderRequest(
     const hmi_apis::FunctionID::eType& hmi_function_id,
     const smart_objects::SmartObject* msg,
     bool use_events) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   bool hmi_destination = false;
   ApplicationSharedPtr app;
   // Default error code and error message
@@ -314,7 +314,7 @@ void RequestFromHMI::SendHMIRequest(
 bool RequestFromHMI::ProcessHMIInterfacesAvailability(
     const uint32_t hmi_correlation_id,
     const hmi_apis::FunctionID::eType& function_id) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   HmiInterfaces& hmi_interfaces = application_manager_.hmi_interfaces();
   HmiInterfaces::InterfaceID interface =
       hmi_interfaces.GetInterfaceFromFunction(function_id);

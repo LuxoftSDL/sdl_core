@@ -21,7 +21,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TransportManager")
+SDL_CREATE_LOGGERPTR( "TransportManager")
 
 static bool SetNonblocking(int s);
 
@@ -93,7 +93,7 @@ PlatformSpecificNetworkInterfaceListener::
 
 PlatformSpecificNetworkInterfaceListener::
     ~PlatformSpecificNetworkInterfaceListener() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   Stop();
   Deinit();
@@ -103,7 +103,7 @@ PlatformSpecificNetworkInterfaceListener::
 }
 
 bool PlatformSpecificNetworkInterfaceListener::Init() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Init socket: " << socket_);
   if (socket_ >= 0) {
     LOG4CXX_WARN(logger_, "Network interface listener is already initialized");
@@ -149,7 +149,7 @@ bool PlatformSpecificNetworkInterfaceListener::Init() {
 }
 
 void PlatformSpecificNetworkInterfaceListener::Deinit() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   LOG4CXX_DEBUG(logger_, "Deinit socket: " << socket_);
   if (socket_ >= 0) {
     close(socket_);
@@ -166,7 +166,7 @@ void PlatformSpecificNetworkInterfaceListener::Deinit() {
 }
 
 bool PlatformSpecificNetworkInterfaceListener::Start() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (socket_ < 0) {
     LOG4CXX_WARN(logger_, "Interface listener is not initialized");
@@ -188,7 +188,7 @@ bool PlatformSpecificNetworkInterfaceListener::Start() {
 }
 
 bool PlatformSpecificNetworkInterfaceListener::Stop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!thread_->is_running()) {
     LOG4CXX_DEBUG(logger_, "interface listener is not running");
@@ -202,7 +202,7 @@ bool PlatformSpecificNetworkInterfaceListener::Stop() {
 }
 
 void PlatformSpecificNetworkInterfaceListener::Loop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   // Initialize status_table_ by acquiring a list of interfaces and their
   // current statuses. Also we will notify an event to the listener if IP
@@ -325,7 +325,7 @@ void PlatformSpecificNetworkInterfaceListener::Loop() {
 }
 
 bool PlatformSpecificNetworkInterfaceListener::StopLoop() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   LOG4CXX_INFO(logger_, "Stopping network interface listener");
 
@@ -346,7 +346,7 @@ bool PlatformSpecificNetworkInterfaceListener::StopLoop() {
 }
 
 bool PlatformSpecificNetworkInterfaceListener::InitializeStatus() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
 #ifdef BUILD_TESTS
   if (testing_) {
@@ -412,7 +412,7 @@ bool PlatformSpecificNetworkInterfaceListener::InitializeStatus() {
 
 bool PlatformSpecificNetworkInterfaceListener::UpdateStatus(
     uint16_t type, std::vector<EventParam>& params) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   for (std::vector<EventParam>::iterator it = params.begin();
        it != params.end();
@@ -477,7 +477,7 @@ bool PlatformSpecificNetworkInterfaceListener::UpdateStatus(
 }
 
 void PlatformSpecificNetworkInterfaceListener::NotifyIPAddresses() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::string ipv4_addr;
   std::string ipv6_addr;
@@ -513,7 +513,7 @@ void PlatformSpecificNetworkInterfaceListener::NotifyIPAddresses() {
 }
 
 const std::string PlatformSpecificNetworkInterfaceListener::SelectInterface() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   if (!designated_interface_.empty()) {
     return designated_interface_;
@@ -560,7 +560,7 @@ const std::string PlatformSpecificNetworkInterfaceListener::SelectInterface() {
 std::vector<PlatformSpecificNetworkInterfaceListener::EventParam>
 PlatformSpecificNetworkInterfaceListener::ParseIFAddrMessage(
     struct ifaddrmsg* message, unsigned int size) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
 
   std::vector<EventParam> params;
 

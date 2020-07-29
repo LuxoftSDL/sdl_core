@@ -37,7 +37,7 @@
 
 namespace telemetry_monitor {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "TelemetryMonitor")
+SDL_CREATE_LOGGERPTR( "TelemetryMonitor")
 
 ProtocolHandlerObserver::ProtocolHandlerObserver(
     TelemetryMonitor* telemetry_monitor)

@@ -36,7 +36,7 @@
 
 namespace media_manager {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "FileStreamerAdapter")
+SDL_CREATE_LOGGERPTR( "FileStreamerAdapter")
 
 FileStreamerAdapter::FileStreamerAdapter(const std::string& file_name,
                                          const std::string& app_storage_folder)
@@ -56,7 +56,7 @@ FileStreamerAdapter::FileStreamer::FileStreamer(
 FileStreamerAdapter::FileStreamer::~FileStreamer() {}
 
 bool FileStreamerAdapter::FileStreamer::Connect() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!file_system::CreateDirectoryRecursively(app_storage_folder_)) {
     LOG4CXX_ERROR(logger_, "Cannot create app folder");
     return false;
@@ -73,7 +73,7 @@ bool FileStreamerAdapter::FileStreamer::Connect() {
 }
 
 void FileStreamerAdapter::FileStreamer::Disconnect() {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (file_stream_) {
     file_system::Close(file_stream_);
     delete file_stream_;
@@ -84,7 +84,7 @@ void FileStreamerAdapter::FileStreamer::Disconnect() {
 
 bool FileStreamerAdapter::FileStreamer::Send(
     protocol_handler::RawMessagePtr msg) {
-  LOG4CXX_AUTO_TRACE(logger_);
+  SDL_AUTO_TRACE();
   if (!file_stream_) {
     LOG4CXX_ERROR(logger_, "File stream not found " << file_name_);
     return false;
