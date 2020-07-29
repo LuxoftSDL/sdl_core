@@ -40,7 +40,7 @@
 
 namespace media_manager {
 
-SDL_CREATE_LOGGERPTR( "PipeStreamerAdapter")
+SDL_CREATE_LOGGERPTR("PipeStreamerAdapter")
 
 PipeStreamerAdapter::PipeStreamerAdapter(const std::string& named_pipe_path,
                                          const std::string& app_storage_folder)
@@ -58,24 +58,24 @@ PipeStreamerAdapter::PipeStreamer::PipeStreamer(
     , app_storage_folder_(app_storage_folder)
     , pipe_fd_(0) {
   if (!file_system::CreateDirectoryRecursively(app_storage_folder_)) {
-    LOG4CXX_ERROR(logger_,
-                  "Cannot create app storage folder " << app_storage_folder_);
+    SDL_ERROR(logger_,
+              "Cannot create app storage folder " << app_storage_folder_);
     return;
   }
   if ((mkfifo(named_pipe_path_.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) <
        0) &&
       (errno != EEXIST)) {
-    LOG4CXX_ERROR(logger_, "Cannot create pipe " << named_pipe_path_);
+    SDL_ERROR(logger_, "Cannot create pipe " << named_pipe_path_);
   } else {
-    LOG4CXX_INFO(logger_,
-                 "Pipe " << named_pipe_path_ << " was successfully created");
+    SDL_INFO(logger_,
+             "Pipe " << named_pipe_path_ << " was successfully created");
   }
 }
 PipeStreamerAdapter::PipeStreamer::~PipeStreamer() {
   if (0 == unlink(named_pipe_path_.c_str())) {
-    LOG4CXX_INFO(logger_, "Pipe " << named_pipe_path_ << " was removed");
+    SDL_INFO(logger_, "Pipe " << named_pipe_path_ << " was removed");
   } else {
-    LOG4CXX_ERROR(logger_, "Error removing pipe " << named_pipe_path_);
+    SDL_ERROR(logger_, "Error removing pipe " << named_pipe_path_);
   }
 }
 
@@ -84,11 +84,11 @@ bool PipeStreamerAdapter::PipeStreamer::Connect() {
 
   pipe_fd_ = open(named_pipe_path_.c_str(), O_RDWR | O_NONBLOCK, 0);
   if (-1 == pipe_fd_) {
-    LOG4CXX_ERROR(logger_, "Cannot open pipe for writing " << named_pipe_path_);
+    SDL_ERROR(logger_, "Cannot open pipe for writing " << named_pipe_path_);
     return false;
   }
 
-  LOG4CXX_INFO(
+  SDL_INFO(
       logger_,
       "Pipe " << named_pipe_path_ << " was successfuly opened for writing");
   return true;
@@ -97,9 +97,9 @@ bool PipeStreamerAdapter::PipeStreamer::Connect() {
 void PipeStreamerAdapter::PipeStreamer::Disconnect() {
   SDL_AUTO_TRACE();
   if (0 == close(pipe_fd_)) {
-    LOG4CXX_INFO(logger_, "Pipe " << named_pipe_path_ << " was closed");
+    SDL_INFO(logger_, "Pipe " << named_pipe_path_ << " was closed");
   } else {
-    LOG4CXX_ERROR(logger_, "Error closing pipe " << named_pipe_path_);
+    SDL_ERROR(logger_, "Error closing pipe " << named_pipe_path_);
   }
 }
 
@@ -118,41 +118,40 @@ bool PipeStreamerAdapter::PipeStreamer::Send(
     int select_ret = select(pipe_fd_ + 1, NULL, &wfds, NULL, &tv);
     // Most likely pipe closed, fail stream
     if (select_ret == -1) {
-      LOG4CXX_ERROR(logger_,
-                    "Failed writing data to pipe "
-                        << named_pipe_path_ << ". Errno: " << strerror(errno));
+      SDL_ERROR(logger_,
+                "Failed writing data to pipe "
+                    << named_pipe_path_ << ". Errno: " << strerror(errno));
       return false;
       // Select success, attempt to write
     } else if (select_ret) {
       ssize_t temp_ret = write(
           pipe_fd_, msg->data() + write_ret, msg->data_size() - write_ret);
       if (-1 == temp_ret) {
-        LOG4CXX_ERROR(logger_,
-                      "Failed writing data to pipe "
-                          << named_pipe_path_
-                          << ". Errno: " << strerror(errno));
+        SDL_ERROR(logger_,
+                  "Failed writing data to pipe "
+                      << named_pipe_path_ << ". Errno: " << strerror(errno));
         return false;
       }
       write_ret += temp_ret;
       // Select timed out, fail stream.
     } else {
-      LOG4CXX_ERROR(logger_,
-                    "Failed writing data to pipe " << named_pipe_path_
-                                                   << ". Error: TIMEOUT");
+      SDL_ERROR(logger_,
+                "Failed writing data to pipe " << named_pipe_path_
+                                               << ". Error: TIMEOUT");
       return false;
     }
     // Check that all data was written to the pipe.
     data_remaining = static_cast<uint32_t>(write_ret) != msg->data_size();
     if (data_remaining) {
-      LOG4CXX_WARN(logger_,
-                   "Couldn't write all the data to pipe "
-                       << named_pipe_path_ << ". "
-                       << msg->data_size() - write_ret << " bytes remaining");
+      SDL_WARN(logger_,
+               "Couldn't write all the data to pipe "
+                   << named_pipe_path_ << ". " << msg->data_size() - write_ret
+                   << " bytes remaining");
     }
     // Loop to send remaining data if there is any.
   } while (data_remaining);
 
-  LOG4CXX_INFO(logger_, "Streamer::sent " << msg->data_size());
+  SDL_INFO(logger_, "Streamer::sent " << msg->data_size());
   return true;
 }
 

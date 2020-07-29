@@ -36,7 +36,7 @@
 
 namespace policy {
 
-SDL_CREATE_LOGGERPTR( "Policy")
+SDL_CREATE_LOGGERPTR("Policy")
 
 UpdateStatusManager::UpdateStatusManager()
     : listener_(NULL)
@@ -182,7 +182,7 @@ void UpdateStatusManager::DoTransition() {
 
   current_status_ = next_status_;
   next_status_.reset();
-  LOG4CXX_DEBUG(logger_, "last_processed_event_ = " << last_processed_event_);
+  SDL_DEBUG(logger_, "last_processed_event_ = " << last_processed_event_);
   const bool is_update_pending =
       policy::StatusProcessingSnapshot == current_status_->get_status();
 

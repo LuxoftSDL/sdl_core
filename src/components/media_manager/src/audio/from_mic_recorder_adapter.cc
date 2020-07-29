@@ -39,7 +39,7 @@
 
 namespace media_manager {
 
-SDL_CREATE_LOGGERPTR( "MediaManager")
+SDL_CREATE_LOGGERPTR("MediaManager")
 
 FromMicRecorderAdapter::FromMicRecorderAdapter()
     : recorder_thread_(NULL)
@@ -60,10 +60,10 @@ FromMicRecorderAdapter::~FromMicRecorderAdapter() {
 }
 
 void FromMicRecorderAdapter::StartActivity(int32_t application_key) {
-  LOG4CXX_DEBUG(logger_, "Start with app " << application_key);
+  SDL_DEBUG(logger_, "Start with app " << application_key);
   if (application_key == current_application_) {
-    LOG4CXX_WARN(logger_,
-                 "Running recording from mic for " << current_application_);
+    SDL_WARN(logger_,
+             "Running recording from mic for " << current_application_);
     return;
   }
 
@@ -85,11 +85,10 @@ void FromMicRecorderAdapter::StartActivity(int32_t application_key) {
 }
 
 void FromMicRecorderAdapter::StopActivity(int32_t application_key) {
-  LOG4CXX_INFO(logger_,
-               "FromMicRecorderAdapter::StopActivity " << application_key);
+  SDL_INFO(logger_, "FromMicRecorderAdapter::StopActivity " << application_key);
   if (application_key != current_application_) {
-    LOG4CXX_WARN(logger_,
-                 "Running activity on other app key " << current_application_);
+    SDL_WARN(logger_,
+             "Running activity on other app key " << current_application_);
     return;
   }
 

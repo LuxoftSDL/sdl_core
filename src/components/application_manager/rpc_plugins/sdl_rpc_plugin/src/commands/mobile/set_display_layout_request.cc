@@ -60,7 +60,7 @@ void SetDisplayLayoutRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(logger_, "Application is not registered");
+    SDL_ERROR(logger_, "Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -77,11 +77,10 @@ void SetDisplayLayoutRequest::Run() {
 
   if (new_layout != old_layout && !new_layout.empty()) {
     // Template switched, hence allow any color change
-    LOG4CXX_DEBUG(logger_,
-                  "SetDisplayLayoutRequest New Layout: " << new_layout);
+    SDL_DEBUG(logger_, "SetDisplayLayoutRequest New Layout: " << new_layout);
     app->set_display_layout(new_layout);
   } else {
-    LOG4CXX_DEBUG(logger_, "SetDisplayLayoutRequest No Layout Change");
+    SDL_DEBUG(logger_, "SetDisplayLayoutRequest No Layout Change");
     // Template layout is the same as previous layout
     // Reject message if colors are set
     if (msg_params.keyExists(strings::day_color_scheme) &&
@@ -89,7 +88,7 @@ void SetDisplayLayoutRequest::Run() {
         msg_params[strings::day_color_scheme] != app->day_color_scheme()) {
       // Color scheme param exists and has been previously set,
       // hence do not allow color change
-      LOG4CXX_DEBUG(logger_, "Reject Day Color Scheme Change");
+      SDL_DEBUG(logger_, "Reject Day Color Scheme Change");
       SendResponse(false, mobile_apis::Result::REJECTED);
       return;
     }
@@ -99,19 +98,19 @@ void SetDisplayLayoutRequest::Run() {
         msg_params[strings::night_color_scheme] != app->night_color_scheme()) {
       // Color scheme param exists and has been previously set,
       // hence do not allow color change
-      LOG4CXX_DEBUG(logger_, "Reject Night Color Scheme Change");
+      SDL_DEBUG(logger_, "Reject Night Color Scheme Change");
       SendResponse(false, mobile_apis::Result::REJECTED);
       return;
     }
   }
 
   if (msg_params.keyExists(strings::day_color_scheme)) {
-    LOG4CXX_DEBUG(logger_, "Allow Day Color Scheme Change");
+    SDL_DEBUG(logger_, "Allow Day Color Scheme Change");
     app->set_day_color_scheme(msg_params[strings::day_color_scheme]);
   }
 
   if (msg_params.keyExists(strings::night_color_scheme)) {
-    LOG4CXX_DEBUG(logger_, "Allow Night Color Scheme Change");
+    SDL_DEBUG(logger_, "Allow Night Color Scheme Change");
     app->set_night_color_scheme(msg_params[strings::night_color_scheme]);
   }
 
@@ -128,7 +127,7 @@ void SetDisplayLayoutRequest::on_event(const event_engine::Event& event) {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(logger_, "Application is not registered");
+    SDL_ERROR(logger_, "Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -136,7 +135,7 @@ void SetDisplayLayoutRequest::on_event(const event_engine::Event& event) {
   const smart_objects::SmartObject& message = event.smart_object();
   switch (event.id()) {
     case hmi_apis::FunctionID::UI_SetDisplayLayout: {
-      LOG4CXX_INFO(logger_, "Received UI_SetDisplayLayout event");
+      SDL_INFO(logger_, "Received UI_SetDisplayLayout event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_UI);
       hmi_apis::Common_Result::eType result_code =
           static_cast<hmi_apis::Common_Result::eType>(
@@ -182,7 +181,7 @@ void SetDisplayLayoutRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR(logger_, "Received unknown event" << event.id());
       return;
     }
   }

@@ -50,7 +50,7 @@ static const auto out_signals_channel = "iap_signals_out";
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "IAP2Emulation");
+SDL_CREATE_LOGGERPTR("IAP2Emulation");
 
 IAP2BluetoothEmulationTransportAdapter::IAP2BluetoothEmulationTransportAdapter(
     const uint16_t port,
@@ -84,7 +84,7 @@ IAP2USBEmulationTransportAdapter::IAP2USBEmulationTransportAdapter(
   signal_handler_->start();
   const auto result = mkfifo(out_signals_channel, mode);
   UNUSED(result);
-  LOG4CXX_DEBUG(logger_, "Out signals channel creation result: " << result);
+  SDL_DEBUG(logger_, "Out signals channel creation result: " << result);
 }
 
 IAP2USBEmulationTransportAdapter::~IAP2USBEmulationTransportAdapter() {
@@ -93,8 +93,8 @@ IAP2USBEmulationTransportAdapter::~IAP2USBEmulationTransportAdapter() {
   signal_handler_->set_delegate(NULL);
   delete delegate;
   threads::DeleteThread(signal_handler_);
-  LOG4CXX_DEBUG(logger_, "Out close result: " << close(out_));
-  LOG4CXX_DEBUG(logger_, "Out unlink result: " << unlink(out_signals_channel));
+  SDL_DEBUG(logger_, "Out close result: " << close(out_));
+  SDL_DEBUG(logger_, "Out unlink result: " << unlink(out_signals_channel));
 }
 
 void IAP2USBEmulationTransportAdapter::DeviceSwitched(
@@ -104,20 +104,20 @@ void IAP2USBEmulationTransportAdapter::DeviceSwitched(
   const auto switch_signal_ack = std::string("SDL_TRANSPORT_SWITCH_ACK\n");
 
   auto out_ = open(out_signals_channel, O_WRONLY);
-  LOG4CXX_DEBUG(logger_, "Out channel descriptor: " << out_);
+  SDL_DEBUG(logger_, "Out channel descriptor: " << out_);
 
   if (out_ < 0) {
-    LOG4CXX_ERROR(logger_, "Failed to open out signals channel");
+    SDL_ERROR(logger_, "Failed to open out signals channel");
     return;
   }
 
   const auto bytes =
       write(out_, switch_signal_ack.c_str(), switch_signal_ack.size());
   UNUSED(bytes);
-  LOG4CXX_DEBUG(logger_, "Written bytes to out: " << bytes);
+  SDL_DEBUG(logger_, "Written bytes to out: " << bytes);
 
-  LOG4CXX_DEBUG(logger_, "Switching signal ACK is sent");
-  LOG4CXX_DEBUG(logger_, "iAP2 USB device is switched with iAP2 Bluetooth");
+  SDL_DEBUG(logger_, "Switching signal ACK is sent");
+  SDL_DEBUG(logger_, "iAP2 USB device is switched with iAP2 Bluetooth");
   close(out_);
 }
 
@@ -135,19 +135,19 @@ IAP2USBEmulationTransportAdapter::IAPSignalHandlerDelegate::
     : adapter_(adapter), run_flag_(true), in_(0) {
   const auto result = mkfifo(in_signals_channel, mode);
   UNUSED(result);
-  LOG4CXX_DEBUG(logger_, "In signals channel creation result: " << result);
+  SDL_DEBUG(logger_, "In signals channel creation result: " << result);
 }
 
 void IAP2USBEmulationTransportAdapter::IAPSignalHandlerDelegate::threadMain() {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "Signal handling is started");
+  SDL_DEBUG(logger_, "Signal handling is started");
   const auto switch_signal = "SDL_TRANSPORT_SWITCH";
-  LOG4CXX_DEBUG(logger_, "Waiting for signal: " << switch_signal);
+  SDL_DEBUG(logger_, "Waiting for signal: " << switch_signal);
 
   in_ = open(in_signals_channel, O_RDONLY);
-  LOG4CXX_DEBUG(logger_, "In channel descriptor: " << in_);
+  SDL_DEBUG(logger_, "In channel descriptor: " << in_);
   if (in_ < 0) {
-    LOG4CXX_ERROR(logger_, "Failed to open in signals channel");
+    SDL_ERROR(logger_, "Failed to open in signals channel");
     return;
   }
 
@@ -159,26 +159,26 @@ void IAP2USBEmulationTransportAdapter::IAPSignalHandlerDelegate::threadMain() {
       continue;
     }
     if (-1 == bytes) {
-      LOG4CXX_DEBUG(logger_, "Error during input pipe read");
+      SDL_DEBUG(logger_, "Error during input pipe read");
       break;
     }
-    LOG4CXX_DEBUG(logger_, "Read in bytes: " << bytes);
+    SDL_DEBUG(logger_, "Read in bytes: " << bytes);
     buffer[bytes] = '\0';
     std::string str(buffer);
     if (std::string::npos != str.find(switch_signal)) {
-      LOG4CXX_DEBUG(logger_, "Switch signal received.");
+      SDL_DEBUG(logger_, "Switch signal received.");
       adapter_.DoTransportSwitch();
     }
   }
 
-  LOG4CXX_DEBUG(logger_, "In close result: " << close(in_));
-  LOG4CXX_DEBUG(logger_, "In unlink result: " << unlink(in_signals_channel));
+  SDL_DEBUG(logger_, "In close result: " << close(in_));
+  SDL_DEBUG(logger_, "In unlink result: " << unlink(in_signals_channel));
 }
 
 void IAP2USBEmulationTransportAdapter::IAPSignalHandlerDelegate::
     exitThreadMain() {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "Stopping signal handling.");
+  SDL_DEBUG(logger_, "Stopping signal handling.");
   run_flag_ = false;
   ThreadDelegate::exitThreadMain();
 }

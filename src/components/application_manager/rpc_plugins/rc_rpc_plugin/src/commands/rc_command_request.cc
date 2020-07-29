@@ -41,7 +41,7 @@
 #include "rc_rpc_plugin/rc_module_constants.h"
 #include "smart_objects/enum_schema_item.h"
 
-SDL_CREATE_LOGGERPTR( "RemoteControlModule")
+SDL_CREATE_LOGGERPTR("RemoteControlModule")
 
 namespace rc_rpc_plugin {
 namespace commands {
@@ -124,7 +124,7 @@ void RCCommandRequest::SendDisallowed(rc_rpc_plugin::TypeAccess access) {
   } else {
     return;
   }
-  LOG4CXX_ERROR(logger_, info);
+  SDL_ERROR(logger_, info);
   SendResponse(false, mobile_apis::Result::DISALLOWED, info.c_str());
 }
 
@@ -134,23 +134,23 @@ void RCCommandRequest::Run() {
       application_manager_.application(CommandRequestImpl::connection_key());
 
   if (!IsInterfaceAvailable(app_mngr::HmiInterfaces::HMI_INTERFACE_RC)) {
-    LOG4CXX_WARN(logger_, "HMI interface RC is not available");
+    SDL_WARN(logger_, "HMI interface RC is not available");
     SendResponse(false,
                  mobile_apis::Result::UNSUPPORTED_RESOURCE,
                  "Remote control is not supported by system");
     return;
   }
-  LOG4CXX_TRACE(logger_, "RC interface is available!");
+  SDL_TRACE(logger_, "RC interface is available!");
   if (!policy_handler_.CheckHMIType(
           app->policy_app_id(),
           mobile_apis::AppHMIType::eType::REMOTE_CONTROL,
           app->app_types())) {
-    LOG4CXX_WARN(logger_, "Application has no remote control functions");
+    SDL_WARN(logger_, "Application has no remote control functions");
     SendResponse(false, mobile_apis::Result::DISALLOWED, "");
     return;
   }
   if (!resource_allocation_manager_.is_rc_enabled()) {
-    LOG4CXX_WARN(logger_, "Remote control is disabled by user");
+    SDL_WARN(logger_, "Remote control is disabled by user");
     SetResourceState(ModuleType(), ResourceState::FREE);
     SendResponse(false,
                  mobile_apis::Result::USER_DISALLOWED,
@@ -159,7 +159,7 @@ void RCCommandRequest::Run() {
   }
   auto rc_capability = hmi_capabilities_.rc_capability();
   if (!rc_capability || rc_capability->empty()) {
-    LOG4CXX_WARN(logger_, "Accessing not supported module: " << ModuleType());
+    SDL_WARN(logger_, "Accessing not supported module: " << ModuleType());
     SetResourceState(ModuleType(), ResourceState::FREE);
     SendResponse(false,
                  mobile_apis::Result::UNSUPPORTED_RESOURCE,
@@ -183,7 +183,7 @@ bool RCCommandRequest::AcquireResources() {
   const std::string module_id = ModuleId();
 
   if (!IsResourceFree(module_type, module_id)) {
-    LOG4CXX_WARN(logger_, "Resource is busy.");
+    SDL_WARN(logger_, "Resource is busy.");
     SendResponse(false, mobile_apis::Result::IN_USE, "");
     return false;
   }
@@ -229,7 +229,7 @@ void RCCommandRequest::ProcessAccessResponse(
   const std::string module_type = ModuleType();
   const std::string module_id = ModuleId();
   if (!app) {
-    LOG4CXX_ERROR(logger_, "NULL pointer.");
+    SDL_ERROR(logger_, "NULL pointer.");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED, "");
     return;
   }

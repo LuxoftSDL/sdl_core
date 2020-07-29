@@ -70,15 +70,14 @@ void OnKeyBoardInputNotification::Run() {
     if (app->is_perform_interaction_active() &&
         (*it)->perform_interaction_layout() ==
             mobile_apis::LayoutMode::KEYBOARD) {
-      LOG4CXX_INFO(logger_,
-                   "There is application with active PerformInteraction");
+      SDL_INFO(logger_, "There is application with active PerformInteraction");
       app_to_notify = app;
       break;
     }
 
     if (mobile_apis::HMILevel::eType::HMI_FULL ==
         app->hmi_level(mobile_apis::PredefinedWindows::DEFAULT_WINDOW)) {
-      LOG4CXX_INFO(logger_, "There is application in HMI_FULL level");
+      SDL_INFO(logger_, "There is application in HMI_FULL level");
       app_to_notify = app;
     }
   }

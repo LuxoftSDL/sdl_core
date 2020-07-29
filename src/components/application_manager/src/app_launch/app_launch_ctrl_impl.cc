@@ -40,7 +40,7 @@
 #include "utils/timer_task_impl.h"
 
 namespace app_launch {
-SDL_CREATE_LOGGERPTR( "AppLaunch")
+SDL_CREATE_LOGGERPTR("AppLaunch")
 
 AppLaunchCtrlImpl::AppLaunchCtrlImpl(
     AppLaunchData& data,
@@ -104,7 +104,7 @@ void AppLaunchCtrlImpl::OnDeviceConnected(const std::string& device_mac) {
   if (apps_on_device.size() > 0) {
     device_apps_launcher_.LaunchAppsOnDevice(device_mac, apps_on_device);
   } else {
-    LOG4CXX_DEBUG(logger_, "No apps in saved for device " << device_mac);
+    SDL_DEBUG(logger_, "No apps in saved for device " << device_mac);
   }
 }
 

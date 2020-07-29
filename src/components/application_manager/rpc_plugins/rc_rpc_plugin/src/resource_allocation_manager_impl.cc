@@ -45,7 +45,7 @@
 
 namespace rc_rpc_plugin {
 
-SDL_CREATE_LOGGERPTR( "RemoteControlModule")
+SDL_CREATE_LOGGERPTR("RemoteControlModule")
 
 ResourceAllocationManagerImpl::ResourceAllocationManagerImpl(
     application_manager::ApplicationManager& app_mngr,
@@ -67,7 +67,7 @@ AcquireResult::eType ResourceAllocationManagerImpl::AcquireResource(
   const application_manager::ApplicationSharedPtr acquiring_app =
       app_mngr_.application(app_id);
   if (!acquiring_app) {
-    LOG4CXX_WARN(logger_, "App with app_id: " << app_id << "does not exist!");
+    SDL_WARN(logger_, "App with app_id: " << app_id << "does not exist!");
     return AcquireResult::IN_USE;
   }
 
@@ -75,9 +75,9 @@ AcquireResult::eType ResourceAllocationManagerImpl::AcquireResource(
 
   if (rc_capabilities_manager_.IsSeatLocationCapabilityProvided() &&
       !IsUserLocationValid(module, acquiring_app)) {
-    LOG4CXX_WARN(logger_,
-                 "Resource acquisition is not allowed "
-                 "according to location verification.");
+    SDL_WARN(logger_,
+             "Resource acquisition is not allowed "
+             "according to location verification.");
     return AcquireResult::REJECTED;
   }
 
@@ -85,24 +85,24 @@ AcquireResult::eType ResourceAllocationManagerImpl::AcquireResource(
   const AllocatedResources::const_iterator allocated_it =
       allocated_resources_.find(module);
   if (allocated_resources_.end() == allocated_it) {
-    LOG4CXX_DEBUG(logger_,
-                  "Resource is not acquired yet. "
-                      << "App: " << app_id << " is allowed to acquire "
-                      << module_type << " " << module_id);
+    SDL_DEBUG(logger_,
+              "Resource is not acquired yet. "
+                  << "App: " << app_id << " is allowed to acquire "
+                  << module_type << " " << module_id);
     return AcquireResult::ALLOWED;
   }
 
   if (app_id == allocated_resources_[module]) {
-    LOG4CXX_DEBUG(logger_,
-                  "App: " << app_id << " is already acquired resource "
-                          << module_type << " " << module_id);
+    SDL_DEBUG(logger_,
+              "App: " << app_id << " is already acquired resource "
+                      << module_type << " " << module_id);
     return AcquireResult::ALLOWED;
   }
 
   if (IsModuleTypeRejected(module_type, module_id, app_id)) {
-    LOG4CXX_DEBUG(logger_,
-                  "Driver disallowed app: " << app_id << " to acquire "
-                                            << module_type << " " << module_id);
+    SDL_DEBUG(logger_,
+              "Driver disallowed app: " << app_id << " to acquire "
+                                        << module_type << " " << module_id);
     return AcquireResult::REJECTED;
   }
 
@@ -110,42 +110,42 @@ AcquireResult::eType ResourceAllocationManagerImpl::AcquireResource(
       acquiring_app->hmi_level(mobile_apis::PredefinedWindows::DEFAULT_WINDOW);
 
   if (mobile_apis::HMILevel::HMI_FULL != acquiring_app_hmi_level) {
-    LOG4CXX_DEBUG(logger_,
-                  "Aquiring resources is not allowed in HMI level: "
-                      << acquiring_app_hmi_level << ". App: " << app_id
-                      << " is disallowed to acquire " << module_type << " "
-                      << module_id);
+    SDL_DEBUG(logger_,
+              "Aquiring resources is not allowed in HMI level: "
+                  << acquiring_app_hmi_level << ". App: " << app_id
+                  << " is disallowed to acquire " << module_type << " "
+                  << module_id);
     return AcquireResult::REJECTED;
   }
 
   if (!rc_capabilities_manager_.IsMultipleAccessAllowed(module)) {
-    LOG4CXX_DEBUG(logger_,
-                  "Multiple access for the: " << module_type << " " << module_id
-                                              << " isn't allowed");
+    SDL_DEBUG(logger_,
+              "Multiple access for the: " << module_type << " " << module_id
+                                          << " isn't allowed");
     return AcquireResult::REJECTED;
   }
 
   switch (current_access_mode_) {
     case hmi_apis::Common_RCAccessMode::AUTO_DENY: {
-      LOG4CXX_DEBUG(logger_,
-                    "Current access_mode is AUTO_DENY. "
-                        << "App: " << app_id << " is disallowed to acquire "
-                        << module_type << " " << module_id);
+      SDL_DEBUG(logger_,
+                "Current access_mode is AUTO_DENY. "
+                    << "App: " << app_id << " is disallowed to acquire "
+                    << module_type << " " << module_id);
       return AcquireResult::IN_USE;
     }
     case hmi_apis::Common_RCAccessMode::ASK_DRIVER: {
-      LOG4CXX_DEBUG(logger_,
-                    "Current access_mode is ASK_DRIVER. "
-                    "Driver confirmation is required for app: "
-                        << app_id << " to acquire " << module_type << " "
-                        << module_id);
+      SDL_DEBUG(logger_,
+                "Current access_mode is ASK_DRIVER. "
+                "Driver confirmation is required for app: "
+                    << app_id << " to acquire " << module_type << " "
+                    << module_id);
       return AcquireResult::ASK_DRIVER;
     }
     case hmi_apis::Common_RCAccessMode::AUTO_ALLOW: {
-      LOG4CXX_DEBUG(logger_,
-                    "Current access_mode is AUTO_ALLOW. "
-                        << "App: " << app_id << " is allowed to acquire "
-                        << module_type << " " << module_id);
+      SDL_DEBUG(logger_,
+                "Current access_mode is AUTO_ALLOW. "
+                    << "App: " << app_id << " is allowed to acquire "
+                    << module_type << " " << module_id);
       return AcquireResult::ALLOWED;
     }
     default: { DCHECK_OR_RETURN(false, AcquireResult::IN_USE); }
@@ -166,16 +166,16 @@ bool ResourceAllocationManagerImpl::IsUserLocationValid(
   if (is_driver || user_location.IntersectionExists(module_service_area)) {
     return true;
   }
-  LOG4CXX_DEBUG(logger_, "User location is not valid");
+  SDL_DEBUG(logger_, "User location is not valid");
   return false;
 }
 
 void ResourceAllocationManagerImpl::ReleaseModuleType(
     const std::string& module_type, const uint32_t application_id) {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_,
-                "Release " << module_type << " "
-                           << " by " << application_id);
+  SDL_DEBUG(logger_,
+            "Release " << module_type << " "
+                       << " by " << application_id);
   Resources allocated_resources = GetAcquiredResources(application_id);
   for (const auto& resource : allocated_resources) {
     if (module_type == resource.first) {
@@ -200,10 +200,10 @@ void ResourceAllocationManagerImpl::ProcessApplicationPolicyUpdate() {
                                                 &allowed_modules);
     std::sort(allowed_modules.begin(), allowed_modules.end());
 
-    LOG4CXX_DEBUG(logger_,
-                  "Acquired modules: " << acquired_modules.size()
-                                       << " , allowed modules: "
-                                       << allowed_modules.size());
+    SDL_DEBUG(logger_,
+              "Acquired modules: " << acquired_modules.size()
+                                   << " , allowed modules: "
+                                   << allowed_modules.size());
 
     std::vector<std::string> disallowed_modules;
     std::set_difference(acquired_modules.begin(),
@@ -352,9 +352,9 @@ ResourceReleasedState::eType ResourceAllocationManagerImpl::ReleaseResource(
     const std::string& module_id,
     const uint32_t application_id) {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_,
-                "Release " << module_type << " " << module_id << " by "
-                           << application_id);
+  SDL_DEBUG(logger_,
+            "Release " << module_type << " " << module_id << " by "
+                       << application_id);
   return SetResourceFree(module_type, module_id, application_id);
 }
 
@@ -374,24 +374,23 @@ bool ResourceAllocationManagerImpl::IsResourceAlreadyAcquiredByApp(
   auto allocation = allocated_resources_.find(moduleUid);
 
   if (allocated_resources_.end() == allocation) {
-    LOG4CXX_DEBUG(logger_,
-                  "Resource " << moduleUid.first
-                              << " is not allocated for any application.");
+    SDL_DEBUG(logger_,
+              "Resource " << moduleUid.first
+                          << " is not allocated for any application.");
     return false;
   }
 
   if (allocation->second != app_id) {
-    LOG4CXX_DEBUG(logger_,
-                  "Resource "
-                      << moduleUid.first
-                      << " is already allocated by app:" << allocation->second
-                      << ". Asquire has been asked for app:" << app_id);
+    SDL_DEBUG(logger_,
+              "Resource " << moduleUid.first << " is already allocated by app:"
+                          << allocation->second
+                          << ". Asquire has been asked for app:" << app_id);
     return false;
   }
 
-  LOG4CXX_DEBUG(logger_,
-                "Resource " << moduleUid.first
-                            << " is allocated by app:" << allocation->second);
+  SDL_DEBUG(logger_,
+            "Resource " << moduleUid.first
+                        << " is allocated by app:" << allocation->second);
 
   return true;
 }
@@ -404,20 +403,19 @@ ResourceReleasedState::eType ResourceAllocationManagerImpl::SetResourceFree(
   AllocatedResources::const_iterator allocation =
       allocated_resources_.find(module);
   if (allocated_resources_.end() == allocation) {
-    LOG4CXX_DEBUG(logger_, "Resource " << module_type << " is not allocated.");
+    SDL_DEBUG(logger_, "Resource " << module_type << " is not allocated.");
     return ResourceReleasedState::NOT_ALLOCATED;
   }
   if (app_id != allocation->second) {
-    LOG4CXX_ERROR(logger_,
-                  "Resource " << module_type
-                              << " is allocated by different application "
-                              << allocation->second);
+    SDL_ERROR(logger_,
+              "Resource " << module_type
+                          << " is allocated by different application "
+                          << allocation->second);
     return ResourceReleasedState::IS_ALLOCATED;
   }
   allocated_resources_.erase(allocation);
-  LOG4CXX_DEBUG(
-      logger_,
-      "Resource " << module_type << ":" << module_id << " is released.");
+  SDL_DEBUG(logger_,
+            "Resource " << module_type << ":" << module_id << " is released.");
   return ResourceReleasedState::IS_RELEASED;
 }
 
@@ -432,10 +430,9 @@ std::vector<ModuleUid> ResourceAllocationManagerImpl::GetAcquiredResources(
     }
   }
 
-  LOG4CXX_DEBUG(logger_,
-                "Application " << application_id << " acquired "
-                               << allocated_resources.size()
-                               << " resource(s).");
+  SDL_DEBUG(logger_,
+            "Application " << application_id << " acquired "
+                           << allocated_resources.size() << " resource(s).");
 
   return allocated_resources;
 }
@@ -449,10 +446,10 @@ std::set<std::string> ResourceAllocationManagerImpl::GetAcquiredModuleTypes(
     acquired_module_types.insert(resource.first);
   }
 
-  LOG4CXX_DEBUG(logger_,
-                "Application " << application_id << " acquired "
-                               << acquired_module_types.size()
-                               << " module type(s).");
+  SDL_DEBUG(logger_,
+            "Application " << application_id << " acquired "
+                           << acquired_module_types.size()
+                           << " module type(s).");
 
   return acquired_module_types;
 }
@@ -463,9 +460,9 @@ void ResourceAllocationManagerImpl::SetResourceState(
     const uint32_t app_id,
     const ResourceState::eType state) {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_,
-                "Setting state for " << module_type << " by app_id " << app_id
-                                     << " to state " << state);
+  SDL_DEBUG(logger_,
+            "Setting state for " << module_type << " by app_id " << app_id
+                                 << " to state " << state);
   ModuleUid module(module_type, module_id);
   {
     sync_primitives::AutoLock lock(allocated_resources_lock_);
@@ -474,20 +471,19 @@ void ResourceAllocationManagerImpl::SetResourceState(
 
     const bool acquired = allocated_resources_.end() != allocated_it;
     if (acquired) {
-      LOG4CXX_DEBUG(logger_,
-                    "Resource " << module_type << " is already acquired."
-                                << " Owner application id is "
-                                << allocated_it->second
-                                << " Changing application id is " << app_id);
+      SDL_DEBUG(logger_,
+                "Resource " << module_type << " is already acquired."
+                            << " Owner application id is "
+                            << allocated_it->second
+                            << " Changing application id is " << app_id);
     } else {
-      LOG4CXX_DEBUG(logger_,
-                    "Resource " << module_type << " is not acquired yet");
+      SDL_DEBUG(logger_, "Resource " << module_type << " is not acquired yet");
     }
   }
 
   sync_primitives::AutoLock lock(resources_state_lock_);
   resources_state_[module] = state;
-  LOG4CXX_DEBUG(logger_, "Resource " << module_type << " got state " << state);
+  SDL_DEBUG(logger_, "Resource " << module_type << " got state " << state);
 }
 
 bool ResourceAllocationManagerImpl::IsResourceFree(
@@ -498,12 +494,12 @@ bool ResourceAllocationManagerImpl::IsResourceFree(
   const ResourcesState::const_iterator resource = resources_state_.find(module);
 
   if (resources_state_.end() == resource) {
-    LOG4CXX_DEBUG(logger_, "Resource " << module_type << " is free.");
+    SDL_DEBUG(logger_, "Resource " << module_type << " is free.");
     return true;
   }
 
-  LOG4CXX_DEBUG(logger_,
-                "Resource " << module_type << " state is " << resource->second);
+  SDL_DEBUG(logger_,
+            "Resource " << module_type << " state is " << resource->second);
 
   return ResourceState::FREE == resource->second;
 }
@@ -526,7 +522,7 @@ void ResourceAllocationManagerImpl::ForceAcquireResource(
     const std::string& module_type,
     const std::string& module_id,
     const uint32_t app_id) {
-  LOG4CXX_DEBUG(logger_, "Force " << app_id << " acquiring " << module_type);
+  SDL_DEBUG(logger_, "Force " << app_id << " acquiring " << module_type);
   sync_primitives::AutoLock lock(allocated_resources_lock_);
   SetResourceAcquired(module_type, module_id, app_id);
 }
@@ -573,8 +569,8 @@ void ResourceAllocationManagerImpl::OnApplicationEvent(
     application_manager::ApplicationSharedPtr application) {
   using application_manager::plugin_manager::ApplicationEvent;
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_,
-                "Event " << event << " came for " << application->app_id());
+  SDL_DEBUG(logger_,
+            "Event " << event << " came for " << application->app_id());
 
   if (ApplicationEvent::kApplicationExit == event ||
       ApplicationEvent::kApplicationUnregistered == event) {
@@ -595,7 +591,7 @@ void ResourceAllocationManagerImpl::OnPolicyEvent(
     application_manager::plugin_manager::PolicyEvent event) {
   using application_manager::plugin_manager::PolicyEvent;
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "Event " << event);
+  SDL_DEBUG(logger_, "Event " << event);
 
   if (PolicyEvent::kApplicationPolicyUpdated == event) {
     ProcessApplicationPolicyUpdate();

@@ -68,7 +68,7 @@ void ResetGlobalPropertiesRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(app_id);
 
   if (!app) {
-    LOG4CXX_ERROR(logger_, "No application associated with session key");
+    SDL_ERROR(logger_, "No application associated with session key");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -77,7 +77,7 @@ void ResetGlobalPropertiesRequest::Run() {
       (*message_)[strings::msg_params][strings::properties].length();
   // if application waits for sending ttsGlobalProperties need to remove this
   // application from tts_global_properties_app_list_
-  LOG4CXX_INFO(logger_, "RemoveAppFromTTSGlobalPropertiesList");
+  SDL_INFO(logger_, "RemoveAppFromTTSGlobalPropertiesList");
   application_manager_.RemoveAppFromTTSGlobalPropertiesList(app_id);
 
   bool helpt_promt = false;
@@ -194,7 +194,7 @@ void ResetGlobalPropertiesRequest::Run() {
 bool ResetGlobalPropertiesRequest::ResetHelpPromt(
     application_manager::ApplicationSharedPtr app) {
   if (!app) {
-    LOG4CXX_ERROR(logger_, "Null pointer");
+    SDL_ERROR(logger_, "Null pointer");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return false;
   }
@@ -220,7 +220,7 @@ bool ResetGlobalPropertiesRequest::ResetHelpPromt(
 bool ResetGlobalPropertiesRequest::ResetTimeoutPromt(
     application_manager::ApplicationSharedPtr const app) {
   if (!app) {
-    LOG4CXX_ERROR(logger_, "Null pointer");
+    SDL_ERROR(logger_, "Null pointer");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return false;
   }
@@ -247,7 +247,7 @@ bool ResetGlobalPropertiesRequest::ResetTimeoutPromt(
 bool ResetGlobalPropertiesRequest::ResetVrHelpTitleItems(
     application_manager::ApplicationSharedPtr const app) {
   if (!app) {
-    LOG4CXX_ERROR(logger_, "Null pointer");
+    SDL_ERROR(logger_, "Null pointer");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return false;
   }
@@ -271,7 +271,7 @@ void ResetGlobalPropertiesRequest::on_event(const event_engine::Event& event) {
 
   switch (event.id()) {
     case hmi_apis::FunctionID::UI_SetGlobalProperties: {
-      LOG4CXX_INFO(logger_, "Received UI_SetGlobalProperties event");
+      SDL_INFO(logger_, "Received UI_SetGlobalProperties event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_UI);
       ui_result_ = static_cast<hmi_apis::Common_Result::eType>(
           message[strings::params][hmi_response::code].asInt());
@@ -279,7 +279,7 @@ void ResetGlobalPropertiesRequest::on_event(const event_engine::Event& event) {
       break;
     }
     case hmi_apis::FunctionID::TTS_SetGlobalProperties: {
-      LOG4CXX_INFO(logger_, "Received TTS_SetGlobalProperties event");
+      SDL_INFO(logger_, "Received TTS_SetGlobalProperties event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_TTS);
       tts_result_ = static_cast<hmi_apis::Common_Result::eType>(
           message[strings::params][hmi_response::code].asInt());
@@ -287,13 +287,13 @@ void ResetGlobalPropertiesRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR(logger_, "Received unknown event" << event.id());
       return;
     }
   }
 
   if (IsPendingResponseExist()) {
-    LOG4CXX_DEBUG(logger_, "Waiting for remaining responses");
+    SDL_DEBUG(logger_, "Waiting for remaining responses");
     return;
   }
 

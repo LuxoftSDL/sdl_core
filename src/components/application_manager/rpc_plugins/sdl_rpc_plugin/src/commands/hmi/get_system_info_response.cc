@@ -59,7 +59,7 @@ void GetSystemInfoResponse::Run() {
   hmi_capabilities_.set_ccpu_version(policy_handler_.GetCCPUVersionFromPT());
 
   if (hmi_apis::Common_Result::SUCCESS != code) {
-    LOG4CXX_WARN(logger_, "GetSystemError returns an error code " << code);
+    SDL_WARN(logger_, "GetSystemError returns an error code " << code);
     hmi_capabilities_.UpdateCachedCapabilities();
     policy_handler_.SetPreloadedPtFlag(false);
     return;

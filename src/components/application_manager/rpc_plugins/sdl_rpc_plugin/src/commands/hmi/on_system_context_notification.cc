@@ -93,7 +93,7 @@ void OnSystemContextNotification::Run() {
     application_manager_.state_controller().SetRegularState(
         app, window_id, system_context);
   } else {
-    LOG4CXX_ERROR(logger_, "Application does not exist");
+    SDL_ERROR(logger_, "Application does not exist");
   }
 }
 

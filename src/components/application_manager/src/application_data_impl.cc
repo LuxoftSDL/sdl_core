@@ -37,7 +37,7 @@
 #include "utils/logger.h"
 
 namespace application_manager {
-SDL_CREATE_LOGGERPTR( "ApplicationManager")
+SDL_CREATE_LOGGERPTR("ApplicationManager")
 
 namespace {
 struct CommandIdComparator {
@@ -407,7 +407,7 @@ smart_objects::SmartObjectSPtr DynamicApplicationDataImpl::display_capabilities(
   const auto window_caps =
       (*display_capabilities_)[0][strings::window_capabilities].asArray();
   if (!window_caps) {
-    LOG4CXX_WARN(logger_, "Current window capabilities are empty");
+    SDL_WARN(logger_, "Current window capabilities are empty");
     // SDL still needs to retreive display capabilities
     return display_capabilities_;
   }
@@ -645,9 +645,8 @@ void DynamicApplicationDataImpl::remove_window_capability(
     }
   }
 
-  LOG4CXX_WARN(
-      logger_,
-      "No window id " << window_id << " found in display capabilities");
+  SDL_WARN(logger_,
+           "No window id " << window_id << " found in display capabilities");
 }
 
 bool DynamicApplicationDataImpl::menu_layout_supported(
@@ -765,7 +764,7 @@ void DynamicApplicationDataImpl::SetGlobalProperties(
       (this->*callback)(param);
     }
   } else {
-    LOG4CXX_WARN(logger_, "Invalid or Null smart object");
+    SDL_WARN(logger_, "Invalid or Null smart object");
   }
 }
 
@@ -776,11 +775,11 @@ void DynamicApplicationDataImpl::AddCommand(
   CommandsMap::const_iterator it = commands_.find(internal_id);
   if (commands_.end() == it) {
     commands_[internal_id] = new smart_objects::SmartObject(command);
-    LOG4CXX_DEBUG(logger_,
-                  "Command with internal number "
-                      << internal_id << " and id "
-                      << (*commands_[internal_id])[strings::cmd_id].asUInt()
-                      << " is added.");
+    SDL_DEBUG(logger_,
+              "Command with internal number "
+                  << internal_id << " and id "
+                  << (*commands_[internal_id])[strings::cmd_id].asUInt()
+                  << " is added.");
   }
 }
 
@@ -793,16 +792,15 @@ void DynamicApplicationDataImpl::RemoveCommand(const uint32_t cmd_id) {
 
   if (it != commands_.end()) {
     delete it->second;
-    LOG4CXX_DEBUG(logger_,
-                  "Command with internal number " << (it->first) << " and id "
-                                                  << cmd_id << " is removed.");
+    SDL_DEBUG(logger_,
+              "Command with internal number " << (it->first) << " and id "
+                                              << cmd_id << " is removed.");
     commands_.erase(it);
 
     return;
   }
-  LOG4CXX_WARN(
-      logger_,
-      "Command with id " << cmd_id << " is not found. Removal skipped.");
+  SDL_WARN(logger_,
+           "Command with id " << cmd_id << " is not found. Removal skipped.");
 }
 
 smart_objects::SmartObject* DynamicApplicationDataImpl::FindCommand(
@@ -814,9 +812,9 @@ smart_objects::SmartObject* DynamicApplicationDataImpl::FindCommand(
       find_if(commands_.begin(), commands_.end(), is_id_equal);
 
   if (it != commands_.end()) {
-    LOG4CXX_DEBUG(logger_,
-                  "Command with internal number " << (it->first) << " and id "
-                                                  << cmd_id << " is found.");
+    SDL_DEBUG(logger_,
+              "Command with internal number " << (it->first) << " and id "
+                                              << cmd_id << " is found.");
     return it->second;
   }
 

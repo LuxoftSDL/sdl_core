@@ -58,7 +58,7 @@ void CloseApplicationRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (app.use_count() == 0) {
-    LOG4CXX_ERROR(logger_, "Application does not exist");
+    SDL_ERROR(logger_, "Application does not exist");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -89,7 +89,7 @@ void CloseApplicationRequest::on_event(const event_engine::Event& event) {
         application_manager_.application(connection_key());
 
     if (app.use_count() == 0) {
-      LOG4CXX_ERROR(logger_, "Application does not exist");
+      SDL_ERROR(logger_, "Application does not exist");
       SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
       return;
     }

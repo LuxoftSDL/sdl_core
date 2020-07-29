@@ -36,7 +36,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "TransportManager")
+SDL_CREATE_LOGGERPTR("TransportManager")
 
 TcpDevice::TcpDevice(const in_addr_t& in_addr, const std::string& name)
     : Device(name, name)
@@ -55,9 +55,8 @@ TcpDevice::TcpDevice(const in_addr_t& in_addr,
     , in_addr_(in_addr)
     , last_handle_(0) {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_,
-                "Device created with transport switch emulation support.");
-  LOG4CXX_DEBUG(
+  SDL_DEBUG(logger_, "Device created with transport switch emulation support.");
+  SDL_DEBUG(
       logger_,
       "Device parameters: " << device_uid << " / " << transport_switch_id);
 }
@@ -65,16 +64,16 @@ TcpDevice::TcpDevice(const in_addr_t& in_addr,
 
 bool TcpDevice::IsSameAs(const Device* other) const {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "Device: " << other);
+  SDL_DEBUG(logger_, "Device: " << other);
   const TcpDevice* other_tcp_device = dynamic_cast<const TcpDevice*>(other);
 
   if (other_tcp_device && other_tcp_device->in_addr_ == in_addr_) {
-    LOG4CXX_TRACE(
+    SDL_TRACE(
         logger_,
         "exit with TRUE. Condition: other_tcp_device->in_addr_ == in_addr_");
     return true;
   } else {
-    LOG4CXX_TRACE(logger_, "exit with FALSE");
+    SDL_TRACE(logger_, "exit with FALSE");
     return false;
   }
 }
@@ -94,7 +93,7 @@ ApplicationList TcpDevice::GetApplicationList() const {
 
 ApplicationHandle TcpDevice::AddIncomingApplication(int socket_fd) {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "Socket_fd: " << socket_fd);
+  SDL_DEBUG(logger_, "Socket_fd: " << socket_fd);
   Application app;
   app.incoming = true;
   app.socket = socket_fd;
@@ -102,13 +101,13 @@ ApplicationHandle TcpDevice::AddIncomingApplication(int socket_fd) {
   sync_primitives::AutoLock locker(applications_mutex_);
   const ApplicationHandle app_handle = ++last_handle_;
   applications_[app_handle] = app;
-  LOG4CXX_DEBUG(logger_, "App_handle " << app_handle);
+  SDL_DEBUG(logger_, "App_handle " << app_handle);
   return app_handle;
 }
 
 ApplicationHandle TcpDevice::AddDiscoveredApplication(int port) {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "Port " << port);
+  SDL_DEBUG(logger_, "Port " << port);
   Application app;
   app.incoming = false;
   app.socket = 0;  // this line removes compiler warning
@@ -116,13 +115,13 @@ ApplicationHandle TcpDevice::AddDiscoveredApplication(int port) {
   sync_primitives::AutoLock locker(applications_mutex_);
   const ApplicationHandle app_handle = ++last_handle_;
   applications_[app_handle] = app;
-  LOG4CXX_DEBUG(logger_, "App_handle " << app_handle);
+  SDL_DEBUG(logger_, "App_handle " << app_handle);
   return app_handle;
 }
 
 void TcpDevice::RemoveApplication(const ApplicationHandle app_handle) {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "ApplicationHandle: " << app_handle);
+  SDL_DEBUG(logger_, "ApplicationHandle: " << app_handle);
   sync_primitives::AutoLock locker(applications_mutex_);
   applications_.erase(app_handle);
 }
@@ -133,35 +132,35 @@ TcpDevice::~TcpDevice() {
 
 int TcpDevice::GetApplicationSocket(const ApplicationHandle app_handle) const {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "ApplicationHandle: " << app_handle);
+  SDL_DEBUG(logger_, "ApplicationHandle: " << app_handle);
   std::map<ApplicationHandle, Application>::const_iterator it =
       applications_.find(app_handle);
   if (applications_.end() == it) {
-    LOG4CXX_WARN(logger_, "Application was not found");
+    SDL_WARN(logger_, "Application was not found");
     return -1;
   }
   if (!it->second.incoming) {
-    LOG4CXX_WARN(logger_, "Application is not incoming");
+    SDL_WARN(logger_, "Application is not incoming");
     return -1;
   }
-  LOG4CXX_DEBUG(logger_, "socket " << it->second.socket);
+  SDL_DEBUG(logger_, "socket " << it->second.socket);
   return it->second.socket;
 }
 
 int TcpDevice::GetApplicationPort(const ApplicationHandle app_handle) const {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "ApplicationHandle: " << app_handle);
+  SDL_DEBUG(logger_, "ApplicationHandle: " << app_handle);
   std::map<ApplicationHandle, Application>::const_iterator it =
       applications_.find(app_handle);
   if (applications_.end() == it) {
-    LOG4CXX_WARN(logger_, "Application was not found");
+    SDL_WARN(logger_, "Application was not found");
     return -1;
   }
   if (it->second.incoming) {
-    LOG4CXX_DEBUG(logger_, "Application is incoming");
+    SDL_DEBUG(logger_, "Application is incoming");
     return -1;
   }
-  LOG4CXX_DEBUG(logger_, "port " << it->second.port);
+  SDL_DEBUG(logger_, "port " << it->second.port);
   return it->second.port;
 }
 

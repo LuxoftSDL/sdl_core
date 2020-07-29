@@ -38,8 +38,7 @@
 #include "utils/date_time.h"
 #include "utils/file_system.h"
 #include "utils/helpers.h"
-#include "utils/log_message_loop_thread.h"
-#include "utils/logger.h"
+include "utils/logger.h"
 #include "utils/logger_status.h"
 #include "utils/threads/message_loop_thread.h"
 #include "utils/threads/thread.h"
@@ -50,7 +49,7 @@ namespace utils_test {
 
 using namespace ::logger;
 
-SDL_CREATE_LOGGERPTR( "AutoTraceTestLog")
+SDL_CREATE_LOGGERPTR("AutoTraceTestLog")
 
 namespace {
 const std::string kFileName =
@@ -61,7 +60,7 @@ void Preconditions() {
   // Delete file with previous logs
   if (file_system::FileExists(kFileName)) {
     // If logger is active now deleting log file cause undefined befaviour.
-    SDL_DEINIT_LOGGER()();
+    SDL_DEINIT_LOGGER();
     ASSERT_TRUE(file_system::DeleteFile(kFileName))
         << "Can't delete AutoTraceTestLogFile.log";
   }
@@ -75,7 +74,7 @@ void InitLogger() {
 
 void CreateDeleteAutoTrace(const std::string& testlog) {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, testlog);
+  SDL_DEBUG(logger_, testlog);
 }
 
 /**

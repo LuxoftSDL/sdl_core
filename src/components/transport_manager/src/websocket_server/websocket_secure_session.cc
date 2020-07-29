@@ -48,7 +48,7 @@ WebSocketSecureSession<ExecutorType>::WebSocketSecureSession(
 
 template <typename ExecutorType>
 void WebSocketSecureSession<ExecutorType>::AsyncAccept() {
- SDL_AUTO_TRACE();
+  SDL_AUTO_TRACE();
   // Perform the SSL handshake
   WebSocketSecureSession<ExecutorType>::ws_.next_layer().async_handshake(
       ssl::stream_base::server,
@@ -62,10 +62,10 @@ void WebSocketSecureSession<ExecutorType>::AsyncAccept() {
 template <typename ExecutorType>
 void WebSocketSecureSession<ExecutorType>::AsyncHandshake(
     boost::system::error_code ec) {
- SDL_AUTO_TRACE();
+  SDL_AUTO_TRACE();
   if (ec) {
     auto str_err = "ErrorMessage: " + ec.message();
-    LOG4CXX_ERROR(ws_logger_, str_err);
+    SDL_ERROR(ws_logger_, str_err);
     WebSocketSession<ExecutorType>::on_io_error_();
     return;
   }

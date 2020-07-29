@@ -44,7 +44,7 @@ static const std::string UIKey = "UI";
 static const std::string VRKey = "VR";
 static const std::string TTSKey = "TTS";
 
-SDL_CREATE_LOGGERPTR( "ApplicationManager")
+SDL_CREATE_LOGGERPTR("ApplicationManager")
 namespace application_manager {
 
 HMILanguageHandler::HMILanguageHandler(ApplicationManager& application_manager)
@@ -75,12 +75,11 @@ void HMILanguageHandler::set_language_for(
       key = TTSKey;
       break;
     default:
-      LOG4CXX_WARN(logger_, "Unknown interface has been passed " << interface);
+      SDL_WARN(logger_, "Unknown interface has been passed " << interface);
       return;
   }
-  LOG4CXX_DEBUG(
-      logger_,
-      "Setting language " << language << " for interface " << interface);
+  SDL_DEBUG(logger_,
+            "Setting language " << language << " for interface " << interface);
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
   dictionary[LanguagesKey][key] = static_cast<int32_t>(language);
@@ -104,7 +103,7 @@ hmi_apis::Common_Language::eType HMILanguageHandler::get_language_for(
       key = TTSKey;
       break;
     default:
-      LOG4CXX_WARN(logger_, "Unknown interfcase has been passed " << interface);
+      SDL_WARN(logger_, "Unknown interfcase has been passed " << interface);
       return Common_Language::INVALID_ENUM;
   }
 
@@ -125,20 +124,20 @@ void HMILanguageHandler::on_event(const event_engine::Event& event) {
   smart_objects::SmartObject msg = event.smart_object();
   switch (event.id()) {
     case hmi_apis::FunctionID::UI_GetLanguage:
-      LOG4CXX_DEBUG(logger_, "Got UI language response.");
+      SDL_DEBUG(logger_, "Got UI language response.");
       is_ui_language_received_ = true;
       break;
     case hmi_apis::FunctionID::VR_GetLanguage:
-      LOG4CXX_DEBUG(logger_, "Got VR language response.");
+      SDL_DEBUG(logger_, "Got VR language response.");
       is_vr_language_received_ = true;
       break;
     case hmi_apis::FunctionID::TTS_GetLanguage:
-      LOG4CXX_DEBUG(logger_, "Got TTS language response.");
+      SDL_DEBUG(logger_, "Got TTS language response.");
       is_tts_language_received_ = true;
       break;
     case hmi_apis::FunctionID::BasicCommunication_OnAppRegistered:
       if (!(msg[strings::params].keyExists(strings::app_id))) {
-        LOG4CXX_ERROR(logger_, "Message doesn't contain parameter app_id");
+        SDL_ERROR(logger_, "Message doesn't contain parameter app_id");
         return;
       }
       CheckApplication(
@@ -150,7 +149,7 @@ void HMILanguageHandler::on_event(const event_engine::Event& event) {
 
   if (is_ui_language_received_ && is_vr_language_received_ &&
       is_tts_language_received_) {
-    LOG4CXX_DEBUG(logger_, "All GetLanguages responses gotten.");
+    SDL_DEBUG(logger_, "All GetLanguages responses gotten.");
     VerifyWithPersistedLanguages();
   }
 }
@@ -160,20 +159,19 @@ void HMILanguageHandler::set_handle_response_for(
   SDL_AUTO_TRACE();
   using namespace helpers;
   if (!request.keyExists(strings::params)) {
-    LOG4CXX_ERROR(logger_,
-                  "Object does not have " << strings::params << " key.");
+    SDL_ERROR(logger_, "Object does not have " << strings::params << " key.");
     return;
   }
 
   if (!request[strings::params].keyExists(strings::function_id)) {
-    LOG4CXX_ERROR(logger_,
-                  "Object does not have " << strings::function_id << " key.");
+    SDL_ERROR(logger_,
+              "Object does not have " << strings::function_id << " key.");
     return;
   }
 
   if (!request[strings::params].keyExists(strings::correlation_id)) {
-    LOG4CXX_ERROR(
-        logger_, "Object does not have " << strings::correlation_id << " key.");
+    SDL_ERROR(logger_,
+              "Object does not have " << strings::correlation_id << " key.");
     return;
   }
 
@@ -186,8 +184,8 @@ void HMILanguageHandler::set_handle_response_for(
           hmi_apis::FunctionID::UI_GetLanguage,
           hmi_apis::FunctionID::VR_GetLanguage,
           hmi_apis::FunctionID::TTS_GetLanguage)) {
-    LOG4CXX_ERROR(logger_,
-                  "Only *GetLanguage request are allowed to be subscribed.");
+    SDL_ERROR(logger_,
+              "Only *GetLanguage request are allowed to be subscribed.");
     return;
   }
 
@@ -196,9 +194,9 @@ void HMILanguageHandler::set_handle_response_for(
 
   subscribe_on_event(function_id, correlation_id);
 
-  LOG4CXX_DEBUG(logger_,
-                "Subscribed for function_id "
-                    << function_id << " and correlation_id " << correlation_id);
+  SDL_DEBUG(logger_,
+            "Subscribed for function_id "
+                << function_id << " and correlation_id " << correlation_id);
 }
 
 void HMILanguageHandler::set_default_capabilities_languages(
@@ -242,9 +240,9 @@ void HMILanguageHandler::SendOnLanguageChangeToMobile(
       hmi_capabilities.active_vr_language();
   if (application_manager_.GetRPCService().ManageMobileCommand(
           notification, commands::Command::SOURCE_SDL)) {
-    LOG4CXX_INFO(logger_, "Mobile command sent");
+    SDL_INFO(logger_, "Mobile command sent");
   } else {
-    LOG4CXX_WARN(logger_, "Cannot send mobile command");
+    SDL_WARN(logger_, "Cannot send mobile command");
   }
 }
 
@@ -258,14 +256,14 @@ void HMILanguageHandler::VerifyWithPersistedLanguages() {
   if (hmi_capabilities.active_ui_language() == persisted_ui_language_ &&
       hmi_capabilities.active_vr_language() == persisted_vr_language_ &&
       hmi_capabilities.active_tts_language() == persisted_tts_language_) {
-    LOG4CXX_INFO(logger_,
-                 "All languages gotten from HMI match to persisted values.");
+    SDL_INFO(logger_,
+             "All languages gotten from HMI match to persisted values.");
     return;
   }
 
-  LOG4CXX_INFO(logger_,
-               "Some languages gotten from HMI have "
-               "mismatch with persisted values.");
+  SDL_INFO(logger_,
+           "Some languages gotten from HMI have "
+           "mismatch with persisted values.");
 
   const ApplicationSet& accessor =
       application_manager_.applications().GetData();
@@ -273,20 +271,19 @@ void HMILanguageHandler::VerifyWithPersistedLanguages() {
   for (; accessor.end() != it;) {
     ApplicationConstSharedPtr app = *it++;
 
-    LOG4CXX_INFO(logger_,
-                 "Application with app_id "
-                     << app->app_id()
-                     << " will be unregistered because of "
-                        "HMI language(s) mismatch.");
+    SDL_INFO(logger_,
+             "Application with app_id " << app->app_id()
+                                        << " will be unregistered because of "
+                                           "HMI language(s) mismatch.");
 
     CheckApplication(std::make_pair(app->app_id(), false));
   }
 
   sync_primitives::AutoLock lock(apps_lock_);
   if (0 == apps_.size()) {
-    LOG4CXX_DEBUG(logger_,
-                  "No registered apps found. HMILanguageHandler unsubscribed "
-                  "from all events.");
+    SDL_DEBUG(logger_,
+              "No registered apps found. HMILanguageHandler unsubscribed "
+              "from all events.");
     unsubscribe_from_all_hmi_events();
   }
 }
@@ -297,16 +294,15 @@ void HMILanguageHandler::HandleWrongLanguageApp(const Apps::value_type& app) {
     sync_primitives::AutoLock lock(apps_lock_);
     Apps::iterator it = apps_.find(app.first);
     if (apps_.end() == it) {
-      LOG4CXX_DEBUG(logger_,
-                    "Application id "
-                        << app.first
-                        << " is not found within apps with wrong language.");
+      SDL_DEBUG(logger_,
+                "Application id "
+                    << app.first
+                    << " is not found within apps with wrong language.");
       return;
     }
     apps_.erase(it);
     if (0 == apps_.size()) {
-      LOG4CXX_DEBUG(logger_,
-                    "HMILanguageHandler unsubscribed from all events.");
+      SDL_DEBUG(logger_, "HMILanguageHandler unsubscribed from all events.");
       unsubscribe_from_all_hmi_events();
     }
   }
@@ -318,9 +314,9 @@ void HMILanguageHandler::HandleWrongLanguageApp(const Apps::value_type& app) {
       commands::Command::SOURCE_SDL);
   application_manager_.UnregisterApplication(
       app.first, mobile_apis::Result::SUCCESS, false);
-  LOG4CXX_INFO(logger_,
-               "Unregistering application with app_id "
-                   << app.first << " because of HMI language(s) mismatch.");
+  SDL_INFO(logger_,
+           "Unregistering application with app_id "
+               << app.first << " because of HMI language(s) mismatch.");
 }
 
 void HMILanguageHandler::CheckApplication(const Apps::value_type app) {
@@ -330,10 +326,9 @@ void HMILanguageHandler::CheckApplication(const Apps::value_type app) {
     sync_primitives::AutoLock lock(apps_lock_);
     Apps::iterator it = apps_.find(app.first);
     if (apps_.end() == it) {
-      LOG4CXX_INFO(logger_,
-                   "Adding application id "
-                       << app.first
-                       << " Application registered: " << app.second);
+      SDL_INFO(logger_,
+               "Adding application id "
+                   << app.first << " Application registered: " << app.second);
       apps_.insert(app);
       return;
     }

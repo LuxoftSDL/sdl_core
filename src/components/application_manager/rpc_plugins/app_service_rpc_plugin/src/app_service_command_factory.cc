@@ -32,7 +32,7 @@
 
 #include "app_service_rpc_plugin/app_service_command_factory.h"
 
-SDL_CREATE_LOGGERPTR( "AppServiceRpcPlugin")
+SDL_CREATE_LOGGERPTR("AppServiceRpcPlugin")
 
 namespace app_service_rpc_plugin {
 
@@ -66,9 +66,9 @@ app_mngr::CommandSharedPtr AppServiceCommandFactory::CreateCommand(
 bool AppServiceCommandFactory::IsAbleToProcess(
     const int32_t function_id,
     const commands::Command::CommandSource source) const {
-  LOG4CXX_DEBUG(logger_,
-                "AppServiceCommandFactory::IsAbleToProcess" << function_id
-                                                            << " " << source);
+  SDL_DEBUG(logger_,
+            "AppServiceCommandFactory::IsAbleToProcess" << function_id << " "
+                                                        << source);
   return (commands::Command::SOURCE_HMI == source ||
           commands::Command::SOURCE_SDL_TO_HMI == source)
              ? hmi_command_factory_->IsAbleToProcess(function_id, source)

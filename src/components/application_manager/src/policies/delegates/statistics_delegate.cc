@@ -33,7 +33,7 @@
 #include "application_manager/policies/delegates/statistics_delegate.h"
 #include "application_manager/policies/policy_handler.h"
 
-SDL_CREATE_LOGGERPTR( "PolicyHandler")
+SDL_CREATE_LOGGERPTR("PolicyHandler")
 namespace policy {
 StatisticsDelegate::StatisticsDelegate(PolicyHandler& policy_handler,
                                        usage_statistics::GlobalCounterId type)
@@ -104,7 +104,7 @@ void StatisticsDelegate::threadMain() {
       policy_handler_.Add(app_id_, stop_watch_, timespan_seconds_);
       break;
     default:
-      LOG4CXX_ERROR(logger_, "Unknown statistics operator");
+      SDL_ERROR(logger_, "Unknown statistics operator");
       break;
   }
 }

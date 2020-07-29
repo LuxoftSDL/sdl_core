@@ -147,7 +147,7 @@ void OnDriverDistractionNotification::Run() {
 
   auto on_driver_distraction = std::make_shared<smart_objects::SmartObject>();
   if (!on_driver_distraction) {
-    LOG4CXX_ERROR(logger_, "NULL pointer");
+    SDL_ERROR(logger_, "NULL pointer");
     return;
   }
   (*on_driver_distraction)[strings::params][strings::function_id] =

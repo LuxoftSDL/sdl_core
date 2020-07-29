@@ -46,7 +46,7 @@
 
 namespace security_manager {
 
-SDL_CREATE_LOGGERPTR( "SecurityManager")
+SDL_CREATE_LOGGERPTR("SecurityManager")
 
 CryptoManagerImpl::SSLContextImpl::SSLContextImpl(SSL* conn,
                                                   Mode mode,
@@ -184,33 +184,32 @@ void CryptoManagerImpl::SSLContextImpl::PrintCertData(
     X509* cert, const std::string& cert_owner) {
   SDL_AUTO_TRACE();
   if (!cert) {
-    LOG4CXX_DEBUG(logger_, "Empty certificate data");
+    SDL_DEBUG(logger_, "Empty certificate data");
     return;
   }
 
   std::string subj = RemoveDisallowedInfo(X509_get_subject_name(cert));
   if (!subj.empty()) {
     std::replace(subj.begin(), subj.end(), '/', ' ');
-    LOG4CXX_DEBUG(logger_, cert_owner << " subject:" << subj);
+    SDL_DEBUG(logger_, cert_owner << " subject:" << subj);
   }
 
   std::string issuer = RemoveDisallowedInfo(X509_get_issuer_name(cert));
   if (!issuer.empty()) {
     std::replace(issuer.begin(), issuer.end(), '/', ' ');
-    LOG4CXX_DEBUG(logger_, cert_owner << " issuer:" << issuer);
+    SDL_DEBUG(logger_, cert_owner << " issuer:" << issuer);
   }
 
   ASN1_TIME* not_before = X509_get_notBefore(cert);
   if (not_before) {
-    LOG4CXX_DEBUG(
-        logger_,
-        "Start date: " << static_cast<unsigned char*>(not_before->data));
+    SDL_DEBUG(logger_,
+              "Start date: " << static_cast<unsigned char*>(not_before->data));
   }
 
   ASN1_TIME* not_after = X509_get_notAfter(cert);
   if (not_after) {
-    LOG4CXX_DEBUG(logger_,
-                  "End date: " << static_cast<unsigned char*>(not_after->data));
+    SDL_DEBUG(logger_,
+              "End date: " << static_cast<unsigned char*>(not_after->data));
   }
 }
 
@@ -244,24 +243,22 @@ CryptoManagerImpl::SSLContextImpl::CheckCertContext() {
   const double end_seconds = difftime(end, hsh_context_.system_time);
 
   if (start_seconds < 0) {
-    LOG4CXX_ERROR(logger_,
-                  "Certificate is not yet valid. Time before validity "
-                      << start_seconds << " seconds");
+    SDL_ERROR(logger_,
+              "Certificate is not yet valid. Time before validity "
+                  << start_seconds << " seconds");
     return Handshake_Result_NotYetValid;
   } else {
-    LOG4CXX_DEBUG(
-        logger_,
-        "Time since certificate validity " << start_seconds << "seconds");
+    SDL_DEBUG(logger_,
+              "Time since certificate validity " << start_seconds << "seconds");
   }
 
   if (end_seconds < 0) {
-    LOG4CXX_ERROR(logger_,
-                  "Certificate already expired. Time after expiration "
-                      << end_seconds << " seconds");
+    SDL_ERROR(logger_,
+              "Certificate already expired. Time after expiration "
+                  << end_seconds << " seconds");
     return Handshake_Result_CertExpired;
   } else {
-    LOG4CXX_DEBUG(logger_,
-                  "Time until expiration " << end_seconds << "seconds");
+    SDL_DEBUG(logger_, "Time until expiration " << end_seconds << "seconds");
   }
 
   X509_NAME* subj_name = X509_get_subject_name(cert);
@@ -269,10 +266,10 @@ CryptoManagerImpl::SSLContextImpl::CheckCertContext() {
   const std::string& sn = GetTextBy(subj_name, NID_serialNumber);
 
   if (!(hsh_context_.expected_sn.CompareIgnoreCase(sn.c_str()))) {
-    LOG4CXX_ERROR(logger_,
-                  "Trying to run handshake with wrong app id: "
-                      << sn << ". Expected app id: "
-                      << hsh_context_.expected_sn.AsMBString());
+    SDL_ERROR(logger_,
+              "Trying to run handshake with wrong app id: "
+                  << sn << ". Expected app id: "
+                  << hsh_context_.expected_sn.AsMBString());
     return Handshake_Result_AppIDMismatch;
   }
   return Handshake_Result_Success;
@@ -336,10 +333,10 @@ bool CryptoManagerImpl::SSLContextImpl::ReadHandshakeData(
     const uint8_t** const out_data, size_t* out_data_size) {
   SDL_AUTO_TRACE();
   const size_t pend = BIO_ctrl_pending(bioOut_);
-  LOG4CXX_DEBUG(logger_, "Available " << pend << " bytes for handshake");
+  SDL_DEBUG(logger_, "Available " << pend << " bytes for handshake");
 
   if (pend > 0) {
-    LOG4CXX_DEBUG(logger_, "Reading handshake data");
+    SDL_DEBUG(logger_, "Reading handshake data");
     EnsureBufferSizeEnough(pend);
 
     const int read_count = BIO_read(bioOut_, buffer_, pend);
@@ -347,7 +344,7 @@ bool CryptoManagerImpl::SSLContextImpl::ReadHandshakeData(
       *out_data_size = read_count;
       *out_data = buffer_;
     } else {
-      LOG4CXX_WARN(logger_, "BIO read fail");
+      SDL_WARN(logger_, "BIO read fail");
       is_handshake_pending_ = false;
       ResetConnection();
       return false;
@@ -375,7 +372,7 @@ SSLContext::HandshakeResult
 CryptoManagerImpl::SSLContextImpl::PerformHandshake() {
   SDL_AUTO_TRACE();
   const int handshake_result = SSL_do_handshake(connection_);
-  LOG4CXX_TRACE(logger_, "Handshake result: " << handshake_result);
+  SDL_TRACE(logger_, "Handshake result: " << handshake_result);
   if (handshake_result == 1) {
     const HandshakeResult result = CheckCertContext();
     if (result != Handshake_Result_Success) {
@@ -384,7 +381,7 @@ CryptoManagerImpl::SSLContextImpl::PerformHandshake() {
       return result;
     }
 
-    LOG4CXX_DEBUG(logger_, "SSL handshake successfully finished");
+    SDL_DEBUG(logger_, "SSL handshake successfully finished");
     // Handshake is successful
     bioFilter_ = BIO_new(BIO_f_ssl());
     BIO_set_ssl(bioFilter_, connection_, BIO_NOCLOSE);
@@ -394,7 +391,7 @@ CryptoManagerImpl::SSLContextImpl::PerformHandshake() {
     is_handshake_pending_ = false;
 
   } else if (handshake_result == 0) {
-    LOG4CXX_DEBUG(logger_, "SSL handshake failed");
+    SDL_DEBUG(logger_, "SSL handshake failed");
     SSL_clear(connection_);
     is_handshake_pending_ = false;
     return Handshake_Result_Fail;
@@ -403,10 +400,10 @@ CryptoManagerImpl::SSLContextImpl::PerformHandshake() {
     if (error != SSL_ERROR_WANT_READ) {
       const long error = SSL_get_verify_result(connection_);
       SetHandshakeError(error);
-      LOG4CXX_WARN(logger_,
-                   "Handshake failed with error "
-                       << " -> " << SSL_get_error(connection_, error) << " \""
-                       << LastError() << '"');
+      SDL_WARN(logger_,
+               "Handshake failed with error "
+                   << " -> " << SSL_get_error(connection_, error) << " \""
+                   << LastError() << '"');
       ResetConnection();
       is_handshake_pending_ = false;
 
@@ -437,7 +434,7 @@ SSLContext::HandshakeResult CryptoManagerImpl::SSLContextImpl::DoHandshakeStep(
     sync_primitives::AutoLock locker(bio_locker);
 
     if (SSL_is_init_finished(connection_)) {
-      LOG4CXX_DEBUG(logger_, "SSL initilization is finished");
+      SDL_DEBUG(logger_, "SSL initilization is finished");
       is_handshake_pending_ = false;
       return Handshake_Result_Success;
     }
@@ -494,12 +491,12 @@ bool CryptoManagerImpl::SSLContextImpl::Decrypt(const uint8_t* const in_data,
   SDL_AUTO_TRACE();
   sync_primitives::AutoLock locker(bio_locker);
   if (!SSL_is_init_finished(connection_)) {
-    LOG4CXX_ERROR(logger_, "SSL initilization is not finished");
+    SDL_ERROR(logger_, "SSL initilization is not finished");
     return false;
   }
 
   if (!in_data || (0 == in_data_size)) {
-    LOG4CXX_ERROR(logger_, "IN data ptr or IN data size is 0");
+    SDL_ERROR(logger_, "IN data ptr or IN data size is 0");
     return false;
   }
 
@@ -516,7 +513,7 @@ bool CryptoManagerImpl::SSLContextImpl::Decrypt(const uint8_t* const in_data,
     // TODO(EZamakhov): investigate BIO_read return 0, -1 and -2 meanings
     if (len <= 0) {
       // Reset filter and connection deinitilization instead
-      LOG4CXX_ERROR(logger_, "Read error occured. Read data lenght : " << len);
+      SDL_ERROR(logger_, "Read error occured. Read data lenght : " << len);
       BIO_ctrl(bioFilter_, BIO_CTRL_RESET, 0, NULL);
       return false;
     }
@@ -553,7 +550,7 @@ bool CryptoManagerImpl::SSLContextImpl::GetCertificateDueDate(
 
   X509* cert = SSL_get_certificate(connection_);
   if (!cert) {
-    LOG4CXX_DEBUG(logger_, "Get certificate failed.");
+    SDL_DEBUG(logger_, "Get certificate failed.");
     return false;
   }
 
@@ -587,15 +584,15 @@ void CryptoManagerImpl::SSLContextImpl::ResetConnection() {
   const int shutdown_result = SSL_shutdown(connection_);
   if (shutdown_result != 1) {
     const size_t pend = BIO_ctrl_pending(bioOut_);
-    LOG4CXX_DEBUG(logger_, "Available " << pend << " bytes for shutdown");
+    SDL_DEBUG(logger_, "Available " << pend << " bytes for shutdown");
     if (pend > 0) {
-      LOG4CXX_DEBUG(logger_, "Reading shutdown data");
+      SDL_DEBUG(logger_, "Reading shutdown data");
       EnsureBufferSizeEnough(pend);
       BIO_read(bioOut_, buffer_, pend);
     }
     SSL_shutdown(connection_);
   }
-  LOG4CXX_DEBUG(logger_, "SSL connection recreation");
+  SDL_DEBUG(logger_, "SSL connection recreation");
   SSL_CTX* ssl_context = connection_->ctx;
   SSL_free(connection_);
   connection_ = SSL_new(ssl_context);
@@ -647,8 +644,8 @@ std::string CryptoManagerImpl::SSLContextImpl::GetTextBy(X509_NAME* name,
   const int req_len = X509_NAME_get_text_by_NID(name, object, NULL, 0);
 
   if (-1 == req_len) {
-    LOG4CXX_WARN(logger_,
-                 "Unable to obtain object: " << object << " from certificate");
+    SDL_WARN(logger_,
+             "Unable to obtain object: " << object << " from certificate");
     return std::string();
   }
 

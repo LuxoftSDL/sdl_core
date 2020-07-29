@@ -71,8 +71,8 @@ void VRGetSupportedLanguagesResponse::Run() {
     std::vector<std::string> sections_to_update{hmi_response::languages};
     if (!hmi_capabilities_.SaveCachedCapabilitiesToFile(
             hmi_interface::vr, sections_to_update, message_->getSchema())) {
-      LOG4CXX_ERROR(
-          logger_, "Failed to save VR.GetSupportedLanguages response to cache");
+      SDL_ERROR(logger_,
+                "Failed to save VR.GetSupportedLanguages response to cache");
     }
   }
 }

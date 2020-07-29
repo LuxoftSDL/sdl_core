@@ -39,7 +39,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "TransportManager")
+SDL_CREATE_LOGGERPTR("TransportManager")
 
 TcpSocketConnection::TcpSocketConnection(const DeviceUID& device_uid,
                                          const ApplicationHandle& app_handle,

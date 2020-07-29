@@ -42,7 +42,7 @@
 
 namespace media_manager {
 
-SDL_CREATE_LOGGERPTR( "SocketStreamerAdapter")
+SDL_CREATE_LOGGERPTR("SocketStreamerAdapter")
 
 SocketStreamerAdapter::SocketStreamerAdapter(const std::string& ip,
                                              const uint16_t port,
@@ -70,14 +70,14 @@ bool SocketStreamerAdapter::SocketStreamer::Connect() {
   SDL_AUTO_TRACE();
   socket_fd_ = socket(AF_INET, SOCK_STREAM, 0);
   if (0 >= socket_fd_) {
-    LOG4CXX_ERROR(logger, "Unable to create socket");
+    SDL_ERROR(logger, "Unable to create socket");
     return false;
   }
 
   int32_t optval = 1;
   if (-1 == setsockopt(
                 socket_fd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval)) {
-    LOG4CXX_ERROR(logger, "Unable to set sockopt");
+    SDL_ERROR(logger, "Unable to set sockopt");
     return false;
   }
 
@@ -88,23 +88,23 @@ bool SocketStreamerAdapter::SocketStreamer::Connect() {
   if (-1 == bind(socket_fd_,
                  reinterpret_cast<struct sockaddr*>(&serv_addr_),
                  sizeof(serv_addr_))) {
-    LOG4CXX_ERROR(logger, "Unable to bind");
+    SDL_ERROR(logger, "Unable to bind");
     return false;
   }
 
   if (-1 == listen(socket_fd_, 5)) {
-    LOG4CXX_ERROR(logger, "Unable to listen");
+    SDL_ERROR(logger, "Unable to listen");
     return false;
   }
 
   send_socket_fd_ = accept(socket_fd_, NULL, NULL);
   if (0 >= send_socket_fd_) {
-    LOG4CXX_ERROR(logger, "Unable to accept");
+    SDL_ERROR(logger, "Unable to accept");
     return false;
   }
 
   is_first_frame_ = true;
-  LOG4CXX_INFO(logger, "Client connected: " << send_socket_fd_);
+  SDL_INFO(logger, "Client connected: " << send_socket_fd_);
   return true;
 }
 
@@ -133,7 +133,7 @@ bool SocketStreamerAdapter::SocketStreamer::Send(
   if (is_first_frame_) {
     ret = send(send_socket_fd_, header_.c_str(), header_.size(), MSG_NOSIGNAL);
     if (static_cast<uint32_t>(ret) != header_.size()) {
-      LOG4CXX_ERROR(logger, "Unable to send data to socket");
+      SDL_ERROR(logger, "Unable to send data to socket");
       return false;
     }
     is_first_frame_ = false;
@@ -141,16 +141,16 @@ bool SocketStreamerAdapter::SocketStreamer::Send(
 
   ret = send(send_socket_fd_, msg->data(), msg->data_size(), MSG_NOSIGNAL);
   if (-1 == ret) {
-    LOG4CXX_ERROR(logger, "Unable to send data to socket");
+    SDL_ERROR(logger, "Unable to send data to socket");
     return false;
   }
 
   if (static_cast<uint32_t>(ret) != msg->data_size()) {
-    LOG4CXX_WARN(logger,
-                 "Couldn't send all the data to socket " << send_socket_fd_);
+    SDL_WARN(logger,
+             "Couldn't send all the data to socket " << send_socket_fd_);
   }
 
-  LOG4CXX_INFO(logger, "Streamer::sent " << msg->data_size());
+  SDL_INFO(logger, "Streamer::sent " << msg->data_size());
   return true;
 }
 

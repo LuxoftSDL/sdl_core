@@ -83,9 +83,9 @@ void ShowRequest::HandleMetadata(const char* field_id,
                   [hmi_request::field_types][i] = current_tag;
       }
     } else {
-      LOG4CXX_INFO(logger_,
-                   "metadata tag provided with no item for "
-                       << field_id << ", ignoring with warning");
+      SDL_INFO(logger_,
+               "metadata tag provided with no item for "
+                   << field_id << ", ignoring with warning");
       // tag provided with no item, ignore with warning
       if (mobile_apis::Result::INVALID_ENUM == core_result_code_) {
         core_result_code_ = mobile_apis::Result::WARNINGS;
@@ -94,8 +94,7 @@ void ShowRequest::HandleMetadata(const char* field_id,
       }
     }
   } else {
-    LOG4CXX_INFO(logger_,
-                 "No metadata tagging provided for field: " << field_id);
+    SDL_INFO(logger_, "No metadata tagging provided for field: " << field_id);
   }
 }
 
@@ -112,21 +111,21 @@ bool ShowRequest::CheckTemplateConfigurationForApp(
     const auto new_template_layout =
         template_config_[strings::template_layout].asString();
     const auto old_template_layout = app.window_layout(current_window_id_);
-    LOG4CXX_DEBUG(logger_, "New layout: " << new_template_layout);
-    LOG4CXX_DEBUG(logger_, "Old layout: " << old_template_layout);
+    SDL_DEBUG(logger_, "New layout: " << new_template_layout);
+    SDL_DEBUG(logger_, "Old layout: " << old_template_layout);
 
     const bool layouts_equal = (new_template_layout == old_template_layout);
 
     if (!new_template_layout.empty() && !layouts_equal) {
       // Template switched, hence allow any color change
-      LOG4CXX_DEBUG(logger_,
-                    "Show Request: Setting new Layout: " << new_template_layout
-                                                         << " for window ID: "
-                                                         << current_window_id_);
+      SDL_DEBUG(logger_,
+                "Show Request: Setting new Layout: " << new_template_layout
+                                                     << " for window ID: "
+                                                     << current_window_id_);
       layout_change_required_ = true;
       return true;
     }
-    LOG4CXX_DEBUG(logger_, "Show Request: No Layout Change");
+    SDL_DEBUG(logger_, "Show Request: No Layout Change");
     return false;
   };
 
@@ -140,10 +139,10 @@ bool ShowRequest::CheckTemplateConfigurationForApp(
             app.day_color_scheme(current_window_id_)) {
       // Color scheme param exists and has been previously set,
       // hence do not allow color change
-      LOG4CXX_DEBUG(logger_, "Day Color Scheme change is rejected");
+      SDL_DEBUG(logger_, "Day Color Scheme change is rejected");
       return false;
     }
-    LOG4CXX_DEBUG(logger_, "Day Color Scheme change is allowed");
+    SDL_DEBUG(logger_, "Day Color Scheme change is allowed");
     dcs_change_required_ = true;
 
     return true;
@@ -159,10 +158,10 @@ bool ShowRequest::CheckTemplateConfigurationForApp(
             app.night_color_scheme(current_window_id_)) {
       // Color scheme param exists and has been previously set,
       // hence do not allow color change
-      LOG4CXX_DEBUG(logger_, "Night Color Scheme change is rejected");
+      SDL_DEBUG(logger_, "Night Color Scheme change is rejected");
       return false;
     }
-    LOG4CXX_DEBUG(logger_, "Night Color Scheme Change is allowed");
+    SDL_DEBUG(logger_, "Night Color Scheme Change is allowed");
     ncs_change_required_ = true;
 
     return true;
@@ -200,7 +199,7 @@ void ShowRequest::ApplyTemplateConfigurationForApp(
     if (layout_change_required_) {
       const std::string new_layout =
           template_config_[strings::template_layout].asString();
-      LOG4CXX_DEBUG(logger_, "New layout : " << new_layout << " is applied");
+      SDL_DEBUG(logger_, "New layout : " << new_layout << " is applied");
       app.set_window_layout(current_window_id_, new_layout);
 
       if (template_config_.keyExists(strings::day_color_scheme)) {
@@ -217,13 +216,13 @@ void ShowRequest::ApplyTemplateConfigurationForApp(
     }
 
     if (dcs_change_required_) {
-      LOG4CXX_DEBUG(logger_, "New day color scheme is applied");
+      SDL_DEBUG(logger_, "New day color scheme is applied");
       app.set_day_color_scheme(current_window_id_,
                                template_config_[strings::day_color_scheme]);
     }
 
     if (ncs_change_required_) {
-      LOG4CXX_DEBUG(logger_, "New night color scheme is applied");
+      SDL_DEBUG(logger_, "New night color scheme is applied");
       app.set_night_color_scheme(current_window_id_,
                                  template_config_[strings::night_color_scheme]);
     }
@@ -236,19 +235,19 @@ void ShowRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(logger_, "Application is not registered");
+    SDL_ERROR(logger_, "Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
   // SDLAQ-CRS-494, VC3.1
   if ((*message_)[strings::msg_params].empty()) {
-    LOG4CXX_ERROR(logger_, strings::msg_params << " is empty.");
+    SDL_ERROR(logger_, strings::msg_params << " is empty.");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
 
   if (!CheckStringsOfShowRequest()) {
-    LOG4CXX_ERROR(logger_, "Incorrect characters in string");
+    SDL_ERROR(logger_, "Incorrect characters in string");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -266,7 +265,7 @@ void ShowRequest::Run() {
   }
 
   if (mobile_apis::Result::SUCCESS != processing_result) {
-    LOG4CXX_ERROR(logger_, "Processing of soft buttons failed.");
+    SDL_ERROR(logger_, "Processing of soft buttons failed.");
     SendResponse(false, processing_result);
     return;
   }
@@ -281,7 +280,7 @@ void ShowRequest::Run() {
         app,
         application_manager_);
     if (mobile_apis::Result::INVALID_DATA == verification_result) {
-      LOG4CXX_ERROR(logger_, "Image verification failed.");
+      SDL_ERROR(logger_, "Image verification failed.");
       SendResponse(false, verification_result);
       return;
     }
@@ -293,7 +292,7 @@ void ShowRequest::Run() {
         app,
         application_manager_);
     if (mobile_apis::Result::INVALID_DATA == verification_result) {
-      LOG4CXX_ERROR(logger_, "Image verification failed.");
+      SDL_ERROR(logger_, "Image verification failed.");
       SendResponse(false, verification_result);
       return;
     }
@@ -421,8 +420,7 @@ void ShowRequest::Run() {
     const auto window_id =
         (*message_)[strings::msg_params][strings::window_id].asInt();
     if (!app->WindowIdExists(window_id)) {
-      LOG4CXX_ERROR(logger_,
-                    "Window with id #" << window_id << " does not exist");
+      SDL_ERROR(logger_, "Window with id #" << window_id << " does not exist");
       SendResponse(false, mobile_apis::Result::INVALID_ID);
       return;
     }
@@ -460,14 +458,14 @@ void ShowRequest::on_event(const event_engine::Event& event) {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(logger_, "Application is not registered");
+    SDL_ERROR(logger_, "Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
 
   switch (event.id()) {
     case hmi_apis::FunctionID::UI_Show: {
-      LOG4CXX_DEBUG(logger_, "Received UI_Show event.");
+      SDL_DEBUG(logger_, "Received UI_Show event.");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_UI);
       std::string response_info;
       hmi_apis::Common_Result::eType result_code =
@@ -498,7 +496,7 @@ void ShowRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event " << event.id());
+      SDL_ERROR(logger_, "Received unknown event " << event.id());
       break;
     }
   }
@@ -511,28 +509,28 @@ bool ShowRequest::CheckStringsOfShowRequest() {
   if ((*message_)[strings::msg_params].keyExists(strings::main_field_4)) {
     str = (*message_)[strings::msg_params][strings::main_field_4].asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid main_field_4 syntax check failed");
+      SDL_ERROR(logger_, "Invalid main_field_4 syntax check failed");
       return false;
     }
   }
   if ((*message_)[strings::msg_params].keyExists(strings::main_field_3)) {
     str = (*message_)[strings::msg_params][strings::main_field_3].asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid main_field_3 syntax check failed");
+      SDL_ERROR(logger_, "Invalid main_field_3 syntax check failed");
       return false;
     }
   }
   if ((*message_)[strings::msg_params].keyExists(strings::main_field_2)) {
     str = (*message_)[strings::msg_params][strings::main_field_2].asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid main_field_2 syntax check failed");
+      SDL_ERROR(logger_, "Invalid main_field_2 syntax check failed");
       return false;
     }
   }
   if ((*message_)[strings::msg_params].keyExists(strings::main_field_1)) {
     str = (*message_)[strings::msg_params][strings::main_field_1].asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid main_field_1 syntax check failed");
+      SDL_ERROR(logger_, "Invalid main_field_1 syntax check failed");
       return false;
     }
   }
@@ -540,28 +538,28 @@ bool ShowRequest::CheckStringsOfShowRequest() {
     str =
         (*message_)[strings::msg_params][strings::template_title].asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid templateTitle syntax check failed");
+      SDL_ERROR(logger_, "Invalid templateTitle syntax check failed");
       return false;
     }
   }
   if ((*message_)[strings::msg_params].keyExists(strings::status_bar)) {
     str = (*message_)[strings::msg_params][strings::status_bar].asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid status_bar syntax check failed");
+      SDL_ERROR(logger_, "Invalid status_bar syntax check failed");
       return false;
     }
   }
   if ((*message_)[strings::msg_params].keyExists(strings::media_clock)) {
     str = (*message_)[strings::msg_params][strings::media_clock].asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid media_clock syntax check failed");
+      SDL_ERROR(logger_, "Invalid media_clock syntax check failed");
       return false;
     }
   }
   if ((*message_)[strings::msg_params].keyExists(strings::media_track)) {
     str = (*message_)[strings::msg_params][strings::media_track].asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid media_track syntax check failed");
+      SDL_ERROR(logger_, "Invalid media_track syntax check failed");
       return false;
     }
   }
@@ -571,7 +569,7 @@ bool ShowRequest::CheckStringsOfShowRequest() {
     for (size_t i = 0; i < custom_presets_array.length(); ++i) {
       str = custom_presets_array[i].asCharArray();
       if (!CheckSyntax(str)) {
-        LOG4CXX_ERROR(logger_, "Invalid custom_presets syntax check failed");
+        SDL_ERROR(logger_, "Invalid custom_presets syntax check failed");
         return false;
       }
     }
@@ -581,7 +579,7 @@ bool ShowRequest::CheckStringsOfShowRequest() {
     str = (*message_)[strings::msg_params][strings::graphic][strings::value]
               .asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid graphic value syntax check failed");
+      SDL_ERROR(logger_, "Invalid graphic value syntax check failed");
       return false;
     }
   }
@@ -591,8 +589,7 @@ bool ShowRequest::CheckStringsOfShowRequest() {
                      [strings::value]
                          .asCharArray();
     if (!CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_,
-                    "Invalid secondary_graphic value syntax check failed");
+      SDL_ERROR(logger_, "Invalid secondary_graphic value syntax check failed");
       return false;
     }
   }

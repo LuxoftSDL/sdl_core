@@ -49,7 +49,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "TransportManager")
+SDL_CREATE_LOGGERPTR("TransportManager")
 
 TcpTransportAdapter::TcpTransportAdapter(
     const uint16_t port,
@@ -166,7 +166,7 @@ bool TcpTransportAdapter::Restore() {
     }
   }
   bool result = !errors_occurred;
-  LOG4CXX_DEBUG(logger_, "result " << std::boolalpha << result);
+  SDL_DEBUG(logger_, "result " << std::boolalpha << result);
   return result;
 }
 

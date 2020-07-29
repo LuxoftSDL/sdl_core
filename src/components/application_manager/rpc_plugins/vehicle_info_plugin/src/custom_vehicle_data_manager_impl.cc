@@ -45,7 +45,7 @@
 #include "utils/helpers.h"
 #include "utils/optional.h"
 
-SDL_CREATE_LOGGERPTR( "VehicleInfoPlugin")
+SDL_CREATE_LOGGERPTR("VehicleInfoPlugin")
 
 namespace vehicle_info_plugin {
 
@@ -105,7 +105,7 @@ void CustomVehicleDataManagerImpl::CreateMobileMessageParams(
                         ? FindSchemaByKeyRecursive(key)
                         : FindSchemaByKeyNonRecursive(key);
       if (!schema.is_initialized()) {
-        LOG4CXX_DEBUG(logger_, "Schema for: " << key << " cannot be found");
+        SDL_DEBUG(logger_, "Schema for: " << key << " cannot be found");
         continue;
       }
 

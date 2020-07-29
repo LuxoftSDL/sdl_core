@@ -40,7 +40,7 @@
 namespace rc_rpc_plugin {
 namespace commands {
 
-SDL_CREATE_LOGGERPTR( "RemoteControlModule")
+SDL_CREATE_LOGGERPTR("RemoteControlModule")
 
 OnInteriorVehicleDataNotification::OnInteriorVehicleDataNotification(
     const app_mngr::commands::MessageSharedPtr& message,
@@ -87,10 +87,9 @@ void OnInteriorVehicleDataNotification::Run() {
 
     const auto extension = RCHelpers::GetRCExtension(app);
     DCHECK(extension);
-    LOG4CXX_TRACE(logger_,
-                  "Check subscription for " << app.app_id()
-                                            << "and module type " << module_type
-                                            << " " << module_id);
+    SDL_TRACE(logger_,
+              "Check subscription for " << app.app_id() << "and module type "
+                                        << module_type << " " << module_id);
 
     if (extension->IsSubscribedToInteriorVehicleData(module)) {
       (*message_)[app_mngr::strings::params]

@@ -95,7 +95,7 @@ void SetGlobalPropertiesRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(
+    SDL_ERROR(
         logger_,
         "No application associated with connection key " << connection_key());
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
@@ -115,8 +115,8 @@ void SetGlobalPropertiesRequest::Run() {
     verification_result = MessageHelper::VerifyImage(
         msg_params[strings::menu_icon], app, application_manager_);
     if (mobile_apis::Result::INVALID_DATA == verification_result) {
-      LOG4CXX_ERROR(
-          logger_, "MessageHelper::VerifyImage return " << verification_result);
+      SDL_ERROR(logger_,
+                "MessageHelper::VerifyImage return " << verification_result);
       SendResponse(false, verification_result);
       return;
     }
@@ -126,7 +126,7 @@ void SetGlobalPropertiesRequest::Run() {
     if (mobile_apis::Result::INVALID_DATA ==
         MessageHelper::VerifyImageVrHelpItems(
             msg_params[strings::vr_help], app, application_manager_)) {
-      LOG4CXX_ERROR(logger_, "MessageHelper::VerifyImage return INVALID_DATA!");
+      SDL_ERROR(logger_, "MessageHelper::VerifyImage return INVALID_DATA!");
       SendResponse(false, mobile_apis::Result::INVALID_DATA);
       return;
     }
@@ -137,7 +137,7 @@ void SetGlobalPropertiesRequest::Run() {
             strings::auto_complete_list) &&
         msg_params[strings::keyboard_properties].keyExists(
             strings::auto_complete_text)) {
-      LOG4CXX_ERROR(logger_, "Replacing deprecated autoCompleteText property");
+      SDL_ERROR(logger_, "Replacing deprecated autoCompleteText property");
       msg_params[strings::keyboard_properties][strings::auto_complete_list][0] =
           msg_params[strings::keyboard_properties][strings::auto_complete_text]
               .asString();
@@ -146,7 +146,7 @@ void SetGlobalPropertiesRequest::Run() {
   }
 
   if (IsWhiteSpaceExist()) {
-    LOG4CXX_ERROR(logger_, "White spaces found");
+    SDL_ERROR(logger_, "White spaces found");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -162,8 +162,8 @@ void SetGlobalPropertiesRequest::Run() {
 
   // check VR params
   if (is_vr_help_title_present ^ is_vr_help_present) {
-    LOG4CXX_ERROR(logger_,
-                  "Reject because of vr_help or vr_help_title only provided");
+    SDL_ERROR(logger_,
+              "Reject because of vr_help or vr_help_title only provided");
     SendResponse(false, mobile_apis::Result::REJECTED);
     return;
   }
@@ -187,12 +187,12 @@ void SetGlobalPropertiesRequest::Run() {
     is_tts_send_ = true;
   }
   if (is_vr_help_title_present && is_vr_help_present) {
-    LOG4CXX_DEBUG(logger_, "VRHelp params presents");
+    SDL_DEBUG(logger_, "VRHelp params presents");
 
     if (!CheckVrHelpItemsOrder(msg_params[strings::vr_help])) {
-      LOG4CXX_ERROR(logger_,
-                    "VR Help Items contains nonsequential positions"
-                        << " (e.g. [1,2,4]) or not started from 1");
+      SDL_ERROR(logger_,
+                "VR Help Items contains nonsequential positions"
+                    << " (e.g. [1,2,4]) or not started from 1");
       SendResponse(false, mobile_apis::Result::REJECTED);
       return;
     }
@@ -206,14 +206,14 @@ void SetGlobalPropertiesRequest::Run() {
     auto& help_prompt_manager = app->help_prompt_manager();
     help_prompt_manager.OnSetGlobalPropertiesReceived(params, false);
   } else {
-    LOG4CXX_DEBUG(logger_, "VRHelp params does not present");
+    SDL_DEBUG(logger_, "VRHelp params does not present");
     DCHECK_OR_RETURN_VOID(!is_vr_help_title_present && !is_vr_help_present);
 
     PrepareUIRequestMenuAndKeyboardData(app, msg_params, params);
 
     // Preparing data
     if (params.empty()) {
-      LOG4CXX_DEBUG(logger_, "No UI info provided");
+      SDL_DEBUG(logger_, "No UI info provided");
     } else {
       params[strings::app_id] = app->app_id();
       SendUIRequest(params, true);
@@ -229,7 +229,7 @@ void SetGlobalPropertiesRequest::Run() {
           false, mobile_apis::Result::INVALID_DATA, "UserLocation is empty");
       return;
     }
-    LOG4CXX_DEBUG(logger_, "Userlocation params presents");
+    SDL_DEBUG(logger_, "Userlocation params presents");
     const auto& user_location = msg_params[strings::user_location];
     app->set_user_location(user_location);
 
@@ -250,7 +250,7 @@ void SetGlobalPropertiesRequest::Run() {
 
   // check TTS params
   if (is_help_prompt_present || is_timeout_prompt_present) {
-    LOG4CXX_DEBUG(logger_, "TTS params presents");
+    SDL_DEBUG(logger_, "TTS params presents");
     auto tts_params = smart_objects::SmartObject(smart_objects::SmartType_Map);
 
     std::vector<std::string> invalid_params;
@@ -261,7 +261,7 @@ void SetGlobalPropertiesRequest::Run() {
           MessageHelper::VerifyTtsFiles(help_prompt, app, application_manager_);
 
       if (mobile_apis::Result::FILE_NOT_FOUND == verification_result) {
-        LOG4CXX_ERROR(
+        SDL_ERROR(
             logger_,
             "MessageHelper::VerifyTtsFiles return " << verification_result);
         invalid_params.push_back("help_prompt");
@@ -278,7 +278,7 @@ void SetGlobalPropertiesRequest::Run() {
           timeout_prompt, app, application_manager_);
 
       if (mobile_apis::Result::FILE_NOT_FOUND == verification_result) {
-        LOG4CXX_ERROR(
+        SDL_ERROR(
             logger_,
             "MessageHelper::VerifyTtsFiles return " << verification_result);
         invalid_params.push_back("timeout_prompt");
@@ -329,9 +329,9 @@ bool SetGlobalPropertiesRequest::CheckVrHelpItemsOrder(
         vr_help.getElement(j).getElement(strings::position).asUInt();
     // Elements shall start from 1 and increment one by one
     if (position != (j + 1)) {
-      LOG4CXX_ERROR(logger_,
-                    "VR help items order is wrong"
-                        << " at " << j << ", position value:" << position);
+      SDL_ERROR(logger_,
+                "VR help items order is wrong"
+                    << " at " << j << ", position value:" << position);
       return false;
     }
   }
@@ -348,7 +348,7 @@ void SetGlobalPropertiesRequest::on_event(const event_engine::Event& event) {
 
   switch (event.id()) {
     case hmi_apis::FunctionID::UI_SetGlobalProperties: {
-      LOG4CXX_DEBUG(logger_, "Received UI_SetGlobalProperties event");
+      SDL_DEBUG(logger_, "Received UI_SetGlobalProperties event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_UI);
       is_ui_received_ = true;
       ui_result_ = static_cast<hmi_apis::Common_Result::eType>(
@@ -361,7 +361,7 @@ void SetGlobalPropertiesRequest::on_event(const event_engine::Event& event) {
       break;
     }
     case hmi_apis::FunctionID::TTS_SetGlobalProperties: {
-      LOG4CXX_DEBUG(logger_, "Received TTS_SetGlobalProperties event");
+      SDL_DEBUG(logger_, "Received TTS_SetGlobalProperties event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_TTS);
       is_tts_received_ = true;
       tts_result_ = static_cast<hmi_apis::Common_Result::eType>(
@@ -374,7 +374,7 @@ void SetGlobalPropertiesRequest::on_event(const event_engine::Event& event) {
       break;
     }
     case hmi_apis::FunctionID::RC_SetGlobalProperties: {
-      LOG4CXX_DEBUG(logger_, "Received RC_SetGlobalProperties event");
+      SDL_DEBUG(logger_, "Received RC_SetGlobalProperties event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_RC);
       is_rc_received_ = true;
       rc_result_ = static_cast<hmi_apis::Common_Result::eType>(
@@ -383,13 +383,13 @@ void SetGlobalPropertiesRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR(logger_, "Received unknown event" << event.id());
       return;
     }
   }
 
   if (IsPendingResponseExist()) {
-    LOG4CXX_DEBUG(logger_, "Continue waiting for response");
+    SDL_DEBUG(logger_, "Continue waiting for response");
     return;
   }
   mobile_apis::Result::eType result_code = mobile_apis::Result::INVALID_ENUM;
@@ -703,7 +703,7 @@ bool SetGlobalPropertiesRequest::IsWhiteSpaceExist() {
     for (; it_hp != it_hp_end; ++it_hp) {
       str = (*it_hp)[strings::text].asCharArray();
       if (strlen(str) && !CheckSyntax(str)) {
-        LOG4CXX_ERROR(logger_, "Invalid help_prompt syntax check failed");
+        SDL_ERROR(logger_, "Invalid help_prompt syntax check failed");
         return true;
       }
     }
@@ -719,7 +719,7 @@ bool SetGlobalPropertiesRequest::IsWhiteSpaceExist() {
     for (; it_tp != it_tp_end; ++it_tp) {
       str = (*it_tp)[strings::text].asCharArray();
       if (strlen(str) && !CheckSyntax(str)) {
-        LOG4CXX_ERROR(logger_, "Invalid timeout_prompt syntax check failed");
+        SDL_ERROR(logger_, "Invalid timeout_prompt syntax check failed");
         return true;
       }
     }
@@ -735,15 +735,14 @@ bool SetGlobalPropertiesRequest::IsWhiteSpaceExist() {
     for (; it_vh != it_vh_end; ++it_vh) {
       str = (*it_vh)[strings::text].asCharArray();
       if (!CheckSyntax(str)) {
-        LOG4CXX_ERROR(logger_, "Invalid vr_help text syntax check failed");
+        SDL_ERROR(logger_, "Invalid vr_help text syntax check failed");
         return true;
       }
 
       if ((*it_vh).keyExists(strings::image)) {
         str = (*it_vh)[strings::image][strings::value].asCharArray();
         if (!CheckSyntax(str)) {
-          LOG4CXX_ERROR(logger_,
-                        "Invalid vr_help image value syntax check failed");
+          SDL_ERROR(logger_, "Invalid vr_help image value syntax check failed");
           return true;
         }
       }  // if image exists
@@ -753,7 +752,7 @@ bool SetGlobalPropertiesRequest::IsWhiteSpaceExist() {
   if (msg_params.keyExists(strings::menu_icon)) {
     str = msg_params[strings::menu_icon][strings::value].asCharArray();
     if (!CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid menu_icon value syntax check failed");
+      SDL_ERROR(logger_, "Invalid menu_icon value syntax check failed");
       return true;
     }
   }
@@ -761,7 +760,7 @@ bool SetGlobalPropertiesRequest::IsWhiteSpaceExist() {
   if (msg_params.keyExists(strings::vr_help_title)) {
     str = msg_params[strings::vr_help_title].asCharArray();
     if (!CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid vr_help_title value syntax check failed");
+      SDL_ERROR(logger_, "Invalid vr_help_title value syntax check failed");
       return true;
     }
   }
@@ -769,7 +768,7 @@ bool SetGlobalPropertiesRequest::IsWhiteSpaceExist() {
   if (msg_params.keyExists(strings::menu_title)) {
     str = msg_params[strings::menu_title].asCharArray();
     if (!CheckSyntax(str)) {
-      LOG4CXX_ERROR(logger_, "Invalid menu_title value syntax check failed");
+      SDL_ERROR(logger_, "Invalid menu_title value syntax check failed");
       return true;
     }
   }
@@ -788,9 +787,9 @@ bool SetGlobalPropertiesRequest::IsWhiteSpaceExist() {
       for (; it_lcl != it_lcl_end; ++it_lcl) {
         str = (*it_lcl).asCharArray();
         if (!CheckSyntax(str)) {
-          LOG4CXX_ERROR(logger_,
-                        "Invalid keyboard_properties "
-                        "limited_character_list syntax check failed");
+          SDL_ERROR(logger_,
+                    "Invalid keyboard_properties "
+                    "limited_character_list syntax check failed");
           return true;
         }
       }
@@ -807,9 +806,9 @@ bool SetGlobalPropertiesRequest::IsWhiteSpaceExist() {
       for (; it != acl_array->end(); ++it) {
         str = it->asCharArray();
         if (!CheckSyntax(str)) {
-          LOG4CXX_ERROR(logger_,
-                        "Invalid keyboard_properties "
-                        "auto_complete_list syntax check failed");
+          SDL_ERROR(logger_,
+                    "Invalid keyboard_properties "
+                    "auto_complete_list syntax check failed");
           return true;
         }
       }

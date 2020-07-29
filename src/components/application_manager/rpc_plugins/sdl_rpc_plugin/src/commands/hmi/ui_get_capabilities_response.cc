@@ -60,8 +60,8 @@ void UIGetCapabilitiesResponse::Run() {
       hmi_apis::FunctionID::UI_GetCapabilities);
 
   if (hmi_apis::Common_Result::SUCCESS != result_code) {
-    LOG4CXX_DEBUG(logger_,
-                  "Request was not successful. Don't change HMI capabilities");
+    SDL_DEBUG(logger_,
+              "Request was not successful. Don't change HMI capabilities");
     return;
   }
 
@@ -156,8 +156,7 @@ void UIGetCapabilitiesResponse::Run() {
 
   if (!hmi_capabilities_.SaveCachedCapabilitiesToFile(
           hmi_interface::ui, sections_to_update, message_->getSchema())) {
-    LOG4CXX_ERROR(logger_,
-                  "Failed to save UI.GetCapabilities response to cache");
+    SDL_ERROR(logger_, "Failed to save UI.GetCapabilities response to cache");
   }
 }
 

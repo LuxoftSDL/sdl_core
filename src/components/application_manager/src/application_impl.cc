@@ -73,7 +73,7 @@ mobile_apis::FileType::eType StringToFileType(const char* str) {
 }
 }  // namespace
 
-SDL_CREATE_LOGGERPTR( "ApplicationManager")
+SDL_CREATE_LOGGERPTR("ApplicationManager")
 
 namespace application_manager {
 
@@ -248,23 +248,23 @@ void ApplicationImpl::set_voice_communication_supported(
 bool ApplicationImpl::IsAudioApplication() const {
   const bool is_audio_app =
       is_media_application() || is_voice_communication_supported() || is_navi();
-  LOG4CXX_DEBUG(logger_,
-                std::boolalpha << "is audio app --> ((is_media_app: "
-                               << is_media_application() << ")"
-                               << " || (is_voice_communication_app: "
-                               << is_voice_communication_supported() << ")"
-                               << " || (is_navi: " << is_navi() << ")) --> "
-                               << is_audio_app);
+  SDL_DEBUG(logger_,
+            std::boolalpha << "is audio app --> ((is_media_app: "
+                           << is_media_application() << ")"
+                           << " || (is_voice_communication_app: "
+                           << is_voice_communication_supported() << ")"
+                           << " || (is_navi: " << is_navi() << ")) --> "
+                           << is_audio_app);
   return is_audio_app;
 }
 
 bool ApplicationImpl::IsVideoApplication() const {
   const bool is_video_app = is_navi() || mobile_projection_enabled();
-  LOG4CXX_DEBUG(logger_,
-                std::boolalpha
-                    << "is video app --> ((is_navi: " << is_navi() << ")"
-                    << " || (mobile_projection: " << mobile_projection_enabled()
-                    << ")) --> " << is_video_app);
+  SDL_DEBUG(logger_,
+            std::boolalpha << "is video app --> ((is_navi: " << is_navi() << ")"
+                           << " || (mobile_projection: "
+                           << mobile_projection_enabled() << ")) --> "
+                           << is_video_app);
   return is_video_app;
 }
 
@@ -324,8 +324,7 @@ const HmiStatePtr ApplicationImpl::RegularHmiState(
 }
 
 WindowNames ApplicationImpl::GetWindowNames() const {
-  LOG4CXX_DEBUG(logger_,
-                "Collecting window names for application " << app_id());
+  SDL_DEBUG(logger_, "Collecting window names for application " << app_id());
 
   WindowNames window_names;
   std::string stringified_window_names;
@@ -339,13 +338,13 @@ WindowNames ApplicationImpl::GetWindowNames() const {
         (stringified_window_names.empty() ? "" : ",") + window_name;
   }
 
-  LOG4CXX_DEBUG(logger_,
-                "Existing window names: [" + stringified_window_names + "]");
+  SDL_DEBUG(logger_,
+            "Existing window names: [" + stringified_window_names + "]");
   return window_names;
 }
 
 WindowIds ApplicationImpl::GetWindowIds() const {
-  LOG4CXX_DEBUG(logger_, "Collecting window IDs for application " << app_id());
+  SDL_DEBUG(logger_, "Collecting window IDs for application " << app_id());
   return state_.GetWindowIds();
 }
 
@@ -530,7 +529,7 @@ bool ApplicationImpl::SetVideoConfig(protocol_handler::ServiceType service_type,
     // See StartStreaming(). We issue SetVideoConfig and StartStream
     // only when streaming is not approved yet
     if (!video_streaming_approved()) {
-      LOG4CXX_TRACE(logger_, "Video streaming not approved");
+      SDL_TRACE(logger_, "Video streaming not approved");
       MessageHelper::SendNaviSetVideoConfig(
           app_id(), application_manager_, params);
       return true;
@@ -545,16 +544,16 @@ void ApplicationImpl::StartStreaming(
   SDL_AUTO_TRACE();
 
   if (ServiceType::kMobileNav == service_type) {
-    LOG4CXX_TRACE(logger_, "ServiceType = Video");
+    SDL_TRACE(logger_, "ServiceType = Video");
     if (!video_streaming_approved()) {
-      LOG4CXX_TRACE(logger_, "Video streaming not approved");
+      SDL_TRACE(logger_, "Video streaming not approved");
       MessageHelper::SendNaviStartStream(app_id(), application_manager_);
       set_video_stream_retry_number(0);
     }
   } else if (ServiceType::kAudio == service_type) {
-    LOG4CXX_TRACE(logger_, "ServiceType = Audio");
+    SDL_TRACE(logger_, "ServiceType = Audio");
     if (!audio_streaming_approved()) {
-      LOG4CXX_TRACE(logger_, "Audio streaming not approved");
+      SDL_TRACE(logger_, "Audio streaming not approved");
       MessageHelper::SendAudioStartStream(app_id(), application_manager_);
       set_audio_stream_retry_number(0);
     }
@@ -676,14 +675,14 @@ void ApplicationImpl::WakeUpStreaming(
 void ApplicationImpl::OnVideoStreamSuspend() {
   using namespace protocol_handler;
   SDL_AUTO_TRACE();
-  LOG4CXX_INFO(logger_, "Suspend video streaming by timer");
+  SDL_INFO(logger_, "Suspend video streaming by timer");
   SuspendStreaming(ServiceType::kMobileNav);
 }
 
 void ApplicationImpl::OnAudioStreamSuspend() {
   using namespace protocol_handler;
   SDL_AUTO_TRACE();
-  LOG4CXX_INFO(logger_, "Suspend audio streaming by timer");
+  SDL_INFO(logger_, "Suspend audio streaming by timer");
   SuspendStreaming(ServiceType::kAudio);
 }
 
@@ -799,9 +798,9 @@ mobile_api::HMILevel::eType ApplicationImpl::deferred_resumption_hmi_level()
 
 bool ApplicationImpl::AddFile(const AppFile& file) {
   if (app_files_.count(file.file_name) == 0) {
-    LOG4CXX_INFO(logger_,
-                 "AddFile file " << file.file_name << " File type is "
-                                 << file.file_type);
+    SDL_INFO(logger_,
+             "AddFile file " << file.file_name << " File type is "
+                             << file.file_type);
     app_files_[file.file_name] = file;
     return true;
   }
@@ -810,9 +809,9 @@ bool ApplicationImpl::AddFile(const AppFile& file) {
 
 bool ApplicationImpl::UpdateFile(const AppFile& file) {
   if (app_files_.count(file.file_name) != 0) {
-    LOG4CXX_INFO(logger_,
-                 "UpdateFile file " << file.file_name << " File type is "
-                                    << file.file_type);
+    SDL_INFO(logger_,
+             "UpdateFile file " << file.file_name << " File type is "
+                                << file.file_type);
     app_files_[file.file_name] = file;
     return true;
   }
@@ -822,9 +821,9 @@ bool ApplicationImpl::UpdateFile(const AppFile& file) {
 bool ApplicationImpl::DeleteFile(const std::string& file_name) {
   AppFilesMap::iterator it = app_files_.find(file_name);
   if (it != app_files_.end()) {
-    LOG4CXX_INFO(logger_,
-                 "DeleteFile file " << it->second.file_name << " File type is "
-                                    << it->second.file_type);
+    SDL_INFO(logger_,
+             "DeleteFile file " << it->second.file_name << " File type is "
+                                << it->second.file_type);
     app_files_.erase(it);
     return true;
   }
@@ -881,8 +880,8 @@ bool ApplicationImpl::AreCommandLimitsExceeded(
       CommandNumberTimeLimit::iterator it =
           cmd_number_to_time_limits_.find(cmd_id);
       if (cmd_number_to_time_limits_.end() == it) {
-        LOG4CXX_WARN(logger_,
-                     "Limits for command id " << cmd_id << "had not been set.");
+        SDL_WARN(logger_,
+                 "Limits for command id " << cmd_id << "had not been set.");
         return true;
       }
 
@@ -898,19 +897,19 @@ bool ApplicationImpl::AreCommandLimitsExceeded(
         frequency_restrictions =
             application_manager_.get_settings().get_vehicle_data_frequency();
       } else {
-        LOG4CXX_INFO(logger_, "No restrictions for request");
+        SDL_INFO(logger_, "No restrictions for request");
         return false;
       }
 
-      LOG4CXX_INFO(logger_,
-                   "Time Info: "
-                       << "\n Current: " << date_time::getSecs(current)
-                       << "\n Limit: (" << date_time::getSecs(limit.first)
-                       << "," << limit.second
-                       << ")"
-                          "\n frequency_restrictions: ("
-                       << frequency_restrictions.first << ","
-                       << frequency_restrictions.second << ")");
+      SDL_INFO(logger_,
+               "Time Info: "
+                   << "\n Current: " << date_time::getSecs(current)
+                   << "\n Limit: (" << date_time::getSecs(limit.first) << ","
+                   << limit.second
+                   << ")"
+                      "\n frequency_restrictions: ("
+                   << frequency_restrictions.first << ","
+                   << frequency_restrictions.second << ")");
       if (date_time::getSecs(current) <
           date_time::getSecs(limit.first) + frequency_restrictions.second) {
         if (limit.second < frequency_restrictions.first) {
@@ -966,7 +965,7 @@ bool ApplicationImpl::AreCommandLimitsExceeded(
       break;
     }
     default: {
-      LOG4CXX_WARN(logger_, "Limit source is not implemented.");
+      SDL_WARN(logger_, "Limit source is not implemented.");
       break;
     }
   }
@@ -1036,7 +1035,7 @@ void ApplicationImpl::CleanupFiles() {
       app_files_it = app_files_.find(file_name);
       if ((app_files_it == app_files_.end()) ||
           (!app_files_it->second.is_persistent)) {
-        LOG4CXX_INFO(logger_, "DeleteFile file " << file_name);
+        SDL_INFO(logger_, "DeleteFile file " << file_name);
         file_system::DeleteFile(file_name);
       }
     }
@@ -1088,9 +1087,9 @@ void ApplicationImpl::LoadPersistentFiles() {
         file.file_type = StringToFileType(file_type.c_str());
       }
 
-      LOG4CXX_INFO(logger_,
-                   "Loaded persistent file "
-                       << file.file_name << " File type is " << file.file_type);
+      SDL_INFO(logger_,
+               "Loaded persistent file " << file.file_name << " File type is "
+                                         << file.file_type);
       AddFile(file);
     }
   }
@@ -1204,9 +1203,9 @@ void ApplicationImpl::set_audio_streaming_state(
     const mobile_api::AudioStreamingState::eType& state) {
   if (!(is_media_application() || is_navi()) &&
       state != mobile_api::AudioStreamingState::NOT_AUDIBLE) {
-    LOG4CXX_WARN(logger_,
-                 "Trying to set audio streaming state"
-                 " for non-media application to different from NOT_AUDIBLE");
+    SDL_WARN(logger_,
+             "Trying to set audio streaming state"
+             " for non-media application to different from NOT_AUDIBLE");
     return;
   }
 
@@ -1233,7 +1232,7 @@ void ApplicationImpl::set_hmi_level(
   DCHECK_OR_RETURN_VOID(app)
   application_manager_.state_controller().SetRegularState(
       app, window_id, new_hmi_level);
-  LOG4CXX_INFO(logger_, "hmi_level = " << new_hmi_level);
+  SDL_INFO(logger_, "hmi_level = " << new_hmi_level);
   usage_report_.RecordHmiStateChanged(new_hmi_level);
 }
 

@@ -38,7 +38,7 @@
 
 namespace app_launch {
 
-SDL_CREATE_LOGGERPTR( "AppLaunch")
+SDL_CREATE_LOGGERPTR("AppLaunch")
 
 AppLaunchDataJson::AppLaunchDataJson(
     const AppLaunchSettings& settings,
@@ -55,11 +55,11 @@ Json::Value& AppLaunchDataJson::GetSavedApplicationDataList(
   Json::Value& app_launch = GetApplicationData(dictionary);
   if (!app_launch.isMember(strings::app_launch_list)) {
     app_launch[strings::app_launch_list] = Json::Value(Json::arrayValue);
-    LOG4CXX_WARN(logger_, "app_list section is missed");
+    SDL_WARN(logger_, "app_list section is missed");
   }
   Json::Value& app_launch_list = app_launch[strings::app_launch_list];
   if (!app_launch_list.isArray()) {
-    LOG4CXX_ERROR(logger_, "app_launch_list type INVALID rewrite");
+    SDL_ERROR(logger_, "app_launch_list type INVALID rewrite");
     app_launch_list = Json::Value(Json::arrayValue);
   }
   return app_launch_list;
@@ -72,11 +72,11 @@ Json::Value& AppLaunchDataJson::GetApplicationData(
   sync_primitives::AutoLock autolock(app_launch_json_lock_);
   if (!dictionary.isMember(strings::app_launch)) {
     dictionary[strings::app_launch] = Json::Value(Json::objectValue);
-    LOG4CXX_WARN(logger_, "app_launch section is missed");
+    SDL_WARN(logger_, "app_launch section is missed");
   }
   Json::Value& app_launch = dictionary[strings::app_launch];
   if (!app_launch.isObject()) {
-    LOG4CXX_ERROR(logger_, "resumption type INVALID rewrite");
+    SDL_ERROR(logger_, "resumption type INVALID rewrite");
     app_launch = Json::Value(Json::objectValue);
   }
   return app_launch;
@@ -166,11 +166,11 @@ bool AppLaunchDataJson::AddNewAppData(const ApplicationData& app_data) {
       static_cast<Json::Value::UInt64>(getSecs(getCurrentTime()));
   accessor.GetMutableData().set_dictionary(dictionary);
 
-  LOG4CXX_DEBUG(logger_,
-                "New application data saved. Detatils device_id: "
-                    << app_data.device_mac_
-                    << ", app_id: " << app_data.mobile_app_id_
-                    << ", bundle_id: " << app_data.bundle_id_ << ".");
+  SDL_DEBUG(logger_,
+            "New application data saved. Detatils device_id: "
+                << app_data.device_mac_
+                << ", app_id: " << app_data.mobile_app_id_
+                << ", bundle_id: " << app_data.bundle_id_ << ".");
   return true;
 }
 
@@ -212,8 +212,7 @@ bool AppLaunchDataJson::Clear() {
   Json::Value dictionary = accessor.GetData().dictionary();
   GetSavedApplicationDataList(dictionary).clear();
   accessor.GetMutableData().set_dictionary(dictionary);
-  LOG4CXX_DEBUG(logger_,
-                "Application launch JSON section successfully cleared.");
+  SDL_DEBUG(logger_, "Application launch JSON section successfully cleared.");
 
   return true;
 }
@@ -224,8 +223,8 @@ uint32_t AppLaunchDataJson::GetCurentNumberOfAppData() const {
   Json::Value dictionary = accessor.GetData().dictionary();
   const uint32_t list_size = GetSavedApplicationDataList(dictionary).size();
   accessor.GetMutableData().set_dictionary(dictionary);
-  LOG4CXX_DEBUG(logger_,
-                "Successfully was gotten app_launch list. Size: " << list_size);
+  SDL_DEBUG(logger_,
+            "Successfully was gotten app_launch list. Size: " << list_size);
 
   return list_size;
 }
@@ -279,8 +278,8 @@ bool AppLaunchDataJson::DeleteOldestAppData() {
     GetSavedApplicationDataList(dictionary).append(item);
   }
   accessor.GetMutableData().set_dictionary(dictionary);
-  LOG4CXX_DEBUG(
-      logger_, "Oldest application launch data had been successfully deleted.");
+  SDL_DEBUG(logger_,
+            "Oldest application launch data had been successfully deleted.");
 
   return true;
 }

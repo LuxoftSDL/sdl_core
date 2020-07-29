@@ -36,7 +36,7 @@
 
 namespace media_manager {
 
-SDL_CREATE_LOGGERPTR( "FileStreamerAdapter")
+SDL_CREATE_LOGGERPTR("FileStreamerAdapter")
 
 FileStreamerAdapter::FileStreamerAdapter(const std::string& file_name,
                                          const std::string& app_storage_folder)
@@ -58,17 +58,17 @@ FileStreamerAdapter::FileStreamer::~FileStreamer() {}
 bool FileStreamerAdapter::FileStreamer::Connect() {
   SDL_AUTO_TRACE();
   if (!file_system::CreateDirectoryRecursively(app_storage_folder_)) {
-    LOG4CXX_ERROR(logger_, "Cannot create app folder");
+    SDL_ERROR(logger_, "Cannot create app folder");
     return false;
   }
 
   file_stream_ = file_system::Open(file_name_);
   if (!file_stream_) {
-    LOG4CXX_ERROR(logger_, "Cannot open file stream " << file_name_);
+    SDL_ERROR(logger_, "Cannot open file stream " << file_name_);
     return false;
   }
 
-  LOG4CXX_INFO(logger_, "File " << file_name_ << " was successfuly opened");
+  SDL_INFO(logger_, "File " << file_name_ << " was successfuly opened");
   return true;
 }
 
@@ -86,16 +86,16 @@ bool FileStreamerAdapter::FileStreamer::Send(
     protocol_handler::RawMessagePtr msg) {
   SDL_AUTO_TRACE();
   if (!file_stream_) {
-    LOG4CXX_ERROR(logger_, "File stream not found " << file_name_);
+    SDL_ERROR(logger_, "File stream not found " << file_name_);
     return false;
   }
 
   if (!file_system::Write(file_stream_, msg->data(), msg->data_size())) {
-    LOG4CXX_ERROR(logger_, "Failed writing data to file " << file_name_);
+    SDL_ERROR(logger_, "Failed writing data to file " << file_name_);
     return false;
   }
 
-  LOG4CXX_INFO(logger_, "Streamer::sent " << msg->data_size());
+  SDL_INFO(logger_, "Streamer::sent " << msg->data_size());
   return true;
 }
 

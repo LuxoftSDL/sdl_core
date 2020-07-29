@@ -73,7 +73,7 @@ void CommandNotificationFromMobileImpl::SendNotification() {
   (*message_)[strings::params][strings::message_type] =
       static_cast<int32_t>(application_manager::MessageType::kNotification);
 
-  LOG4CXX_INFO(logger_, "SendNotification");
+  SDL_INFO(logger_, "SendNotification");
   MessageHelper::PrintSmartObject(*message_);
 
   rpc_service_.SendMessageToMobile(message_);

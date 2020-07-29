@@ -63,7 +63,7 @@ void SDLGetPolicyConfigurationDataRequest::Run() {
       PrepareResponseParams(response_value);
 
   if (hmi_apis::Common_Result::SUCCESS != result_code) {
-    LOG4CXX_ERROR(logger_, "Unable to PrepareResponseParams");
+    SDL_ERROR(logger_, "Unable to PrepareResponseParams");
     SendErrorResponse(
         correlation_id(),
         hmi_apis::FunctionID::SDL_GetPolicyConfigurationData,
@@ -96,7 +96,7 @@ SDLGetPolicyConfigurationDataRequest::PrepareResponseParams(
 
   auto policy_table_data = policy_handler_.GetPolicyTableData();
   if (!policy_table_data.isMember(policy_type)) {
-    LOG4CXX_ERROR(
+    SDL_ERROR(
         logger_,
         "policy_type " << policy_type << " doesn't exist in policy table.");
     return hmi_apis::Common_Result::DATA_NOT_AVAILABLE;
@@ -104,9 +104,8 @@ SDLGetPolicyConfigurationDataRequest::PrepareResponseParams(
 
   auto& policy_section_table_data = policy_table_data[policy_type];
   if (!policy_section_table_data.isMember(property)) {
-    LOG4CXX_ERROR(
-        logger_,
-        "property " << property << " doesn't exist in " << policy_type);
+    SDL_ERROR(logger_,
+              "property " << property << " doesn't exist in " << policy_type);
     return hmi_apis::Common_Result::DATA_NOT_AVAILABLE;
   }
 

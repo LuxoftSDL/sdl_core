@@ -78,7 +78,7 @@ void ScrollableMessageRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(logger_, "Application is not registered");
+    SDL_ERROR(logger_, "Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -92,7 +92,7 @@ void ScrollableMessageRequest::Run() {
                                         application_manager_);
 
   if (mobile_apis::Result::SUCCESS != processing_result) {
-    LOG4CXX_ERROR(logger_, "Wrong soft buttons parameters!");
+    SDL_ERROR(logger_, "Wrong soft buttons parameters!");
     SendResponse(false, processing_result);
     return;
   }
@@ -130,13 +130,13 @@ void ScrollableMessageRequest::on_event(const event_engine::Event& event) {
 
   switch (event.id()) {
     case hmi_apis::FunctionID::UI_OnResetTimeout: {
-      LOG4CXX_INFO(logger_, "Received UI_OnResetTimeout event");
+      SDL_INFO(logger_, "Received UI_OnResetTimeout event");
       application_manager_.updateRequestTimeout(
           connection_key(), correlation_id(), default_timeout());
       break;
     }
     case hmi_apis::FunctionID::UI_ScrollableMessage: {
-      LOG4CXX_INFO(logger_, "Received UI_ScrollableMessage event");
+      SDL_INFO(logger_, "Received UI_ScrollableMessage event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_UI);
 
       hmi_apis::Common_Result::eType result_code =
@@ -155,7 +155,7 @@ void ScrollableMessageRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR(logger_, "Received unknown event" << event.id());
       break;
     }
   }

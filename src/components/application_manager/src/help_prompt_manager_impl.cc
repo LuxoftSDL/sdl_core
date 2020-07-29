@@ -43,7 +43,7 @@
 #include "smart_objects/smart_object.h"
 #include "utils/logger.h"
 
-SDL_CREATE_LOGGERPTR( "HelpPromptManagerImpl")
+SDL_CREATE_LOGGERPTR("HelpPromptManagerImpl")
 
 namespace {
 const size_t kLimitCommand = 30;
@@ -66,13 +66,13 @@ HelpPromptManagerImpl::~HelpPromptManagerImpl() {
 bool HelpPromptManagerImpl::AddCommand(
     const uint32_t cmd_id, const smart_objects::SmartObject& command) {
   if (!command.keyExists(strings::vr_commands)) {
-    LOG4CXX_DEBUG(logger_, "vr_commands does`t present");
+    SDL_DEBUG(logger_, "vr_commands does`t present");
     return false;
   }
 
   const smart_objects::SmartObject& commands = command[strings::vr_commands];
   if (commands.empty()) {
-    LOG4CXX_DEBUG(logger_, "vr_commands array is empty");
+    SDL_DEBUG(logger_, "vr_commands array is empty");
     return false;
   }
 
@@ -83,25 +83,24 @@ bool HelpPromptManagerImpl::AddCommand(
       [cmd_id](const VRCommandPair& pair) { return pair.first == cmd_id; });
 
   if (vr_commands_.end() != it) {
-    LOG4CXX_DEBUG(logger_, "Command with id:" << cmd_id << " already exists");
+    SDL_DEBUG(logger_, "Command with id:" << cmd_id << " already exists");
     return false;
   }
 
   const bool limit_exceeded =
       kLimitCommand <= GetCommandsCount(vr_commands_.end());
 
-  LOG4CXX_DEBUG(
-      logger_,
-      "Will be added first command from array " << strings::vr_commands);
+  SDL_DEBUG(logger_,
+            "Will be added first command from array " << strings::vr_commands);
 
   smart_objects::SmartObjectSPtr vr_item =
       std::make_shared<smart_objects::SmartObject>(commands.asArray()->front());
   vr_commands_.push_back(std::make_pair(cmd_id, vr_item));
 
-  LOG4CXX_DEBUG(logger_,
-                "VR command with id: " << cmd_id << " added for appID: "
-                                       << app_.app_id() << ". Total "
-                                       << vr_commands_.size() << " in cache");
+  SDL_DEBUG(logger_,
+            "VR command with id: " << cmd_id << " added for appID: "
+                                   << app_.app_id() << ". Total "
+                                   << vr_commands_.size() << " in cache");
 
   return !limit_exceeded;
 }
@@ -117,17 +116,17 @@ bool HelpPromptManagerImpl::DeleteCommand(const uint32_t cmd_id) {
       [cmd_id](const VRCommandPair& pair) { return pair.first == cmd_id; });
 
   if (vr_commands_.end() == it) {
-    LOG4CXX_WARN(logger_, "VR command with id: " << cmd_id << " not found");
+    SDL_WARN(logger_, "VR command with id: " << cmd_id << " not found");
     return false;
   }
 
   const size_t commands_before_current = GetCommandsCount(it);
   vr_commands_.erase(it);
-  LOG4CXX_DEBUG(logger_,
-                "VR command with id: "
-                    << cmd_id << " found after " << commands_before_current
-                    << " commands was deleted for appID: " << app_.app_id()
-                    << " Cache size after deleting: " << vr_commands_.size());
+  SDL_DEBUG(logger_,
+            "VR command with id: "
+                << cmd_id << " found after " << commands_before_current
+                << " commands was deleted for appID: " << app_.app_id()
+                << " Cache size after deleting: " << vr_commands_.size());
 
   return commands_before_current < kLimitCommand;
 }
@@ -138,10 +137,9 @@ void HelpPromptManagerImpl::OnVrCommandAdded(
     const bool is_resumption) {
   SDL_AUTO_TRACE();
   if (SendingType::kNoneSend == sending_type_) {
-    LOG4CXX_DEBUG(logger_,
-                  "SendingType::kNoneSend"
-                      << " commands with id:" << cmd_id
-                      << " will not be added");
+    SDL_DEBUG(logger_,
+              "SendingType::kNoneSend"
+                  << " commands with id:" << cmd_id << " will not be added");
     return;
   }
   if (AddCommand(cmd_id, command) && !is_resumption) {
@@ -153,10 +151,9 @@ void HelpPromptManagerImpl::OnVrCommandDeleted(const uint32_t cmd_id,
                                                const bool is_resumption) {
   SDL_AUTO_TRACE();
   if (SendingType::kNoneSend == sending_type_) {
-    LOG4CXX_DEBUG(logger_,
-                  "SendingType::kNoneSend"
-                      << " commands with id:" << cmd_id
-                      << " will not be deleted");
+    SDL_DEBUG(logger_,
+              "SendingType::kNoneSend"
+                  << " commands with id:" << cmd_id << " will not be deleted");
     return;
   }
   if (DeleteCommand(cmd_id) && !is_resumption) {
@@ -168,9 +165,9 @@ void HelpPromptManagerImpl::OnSetGlobalPropertiesReceived(
     const smart_objects::SmartObject& msg, const bool is_response) {
   SDL_AUTO_TRACE();
   if (SendingType::kNoneSend == sending_type_) {
-    LOG4CXX_DEBUG(logger_,
-                  "SendingType::kNoneSend"
-                  " do not track SetGlobalProperties");
+    SDL_DEBUG(logger_,
+              "SendingType::kNoneSend"
+              " do not track SetGlobalProperties");
     return;
   }
 
@@ -182,8 +179,8 @@ void HelpPromptManagerImpl::OnSetGlobalPropertiesReceived(
       is_ui_send_ = true;
     }
 
-    LOG4CXX_DEBUG(logger_, "is_tts_send_:" << is_tts_send_);
-    LOG4CXX_DEBUG(logger_, "is_ui_send_:" << is_ui_send_);
+    SDL_DEBUG(logger_, "is_tts_send_:" << is_tts_send_);
+    SDL_DEBUG(logger_, "is_ui_send_:" << is_ui_send_);
     return;
   }
 
@@ -223,7 +220,7 @@ void HelpPromptManagerImpl::GenerateVrItems(
 
 void HelpPromptManagerImpl::SendTTSRequest() {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "TTS request for appID:" << app_.app_id());
+  SDL_DEBUG(logger_, "TTS request for appID:" << app_.app_id());
   smart_objects::SmartObjectSPtr tts_global_properties =
       std::make_shared<smart_objects::SmartObject>(
           smart_objects::SmartType_Map);
@@ -257,7 +254,7 @@ void HelpPromptManagerImpl::SendTTSRequest() {
 
 void HelpPromptManagerImpl::SendUIRequest() {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "UI request for appID:" << app_.app_id());
+  SDL_DEBUG(logger_, "UI request for appID:" << app_.app_id());
   smart_objects::SmartObjectSPtr ui_global_properties =
       std::make_shared<smart_objects::SmartObject>(
           smart_objects::SmartType_Map);
@@ -312,9 +309,9 @@ void HelpPromptManagerImpl::SendRequests() {
     case SendingType::kNoneSend:
       break;
   }
-  LOG4CXX_DEBUG(logger_,
-                "SendingType:" << static_cast<uint32_t>(sending_type_)
-                               << " request not sending");
+  SDL_DEBUG(logger_,
+            "SendingType:" << static_cast<uint32_t>(sending_type_)
+                           << " request not sending");
 }
 
 void HelpPromptManagerImpl::CreatePromptMsg(
@@ -352,12 +349,12 @@ void HelpPromptManagerImpl::SetSendingType(
   hmi_apis::Common_Result::eType result =
       static_cast<hmi_apis::Common_Result::eType>(
           msg[strings::params][hmi_response::code].asInt());
-  LOG4CXX_DEBUG(logger_, "HMI response result:" << result);
+  SDL_DEBUG(logger_, "HMI response result:" << result);
   if (hmi_apis::Common_Result::eType::SUCCESS == result) {
     hmi_apis::FunctionID::eType function_id =
         static_cast<hmi_apis::FunctionID::eType>(
             msg[strings::params][strings::function_id].asUInt());
-    LOG4CXX_DEBUG(logger_, "Function id:" << function_id);
+    SDL_DEBUG(logger_, "Function id:" << function_id);
     switch (function_id) {
       case hmi_apis::FunctionID::TTS_SetGlobalProperties: {
         if (is_tts_send_) {
@@ -379,9 +376,8 @@ void HelpPromptManagerImpl::SetSendingType(
       }
       default: { break; }
     }
-    LOG4CXX_DEBUG(
-        logger_,
-        "Sending type set to:" << static_cast<uint32_t>(sending_type_));
+    SDL_DEBUG(logger_,
+              "Sending type set to:" << static_cast<uint32_t>(sending_type_));
   }
 }
 

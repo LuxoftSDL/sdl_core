@@ -46,7 +46,7 @@
 
 namespace main_namespace {
 
-SDL_CREATE_LOGGERPTR( "LowVoltageSignalsHandler")
+SDL_CREATE_LOGGERPTR("LowVoltageSignalsHandler")
 
 LowVoltageSignalsHandler::LowVoltageSignalsHandler(
     LifeCycle& life_cycle, const LowVoltageSignalsOffset& offset_data)
@@ -93,22 +93,21 @@ LowVoltageSignalsHandler::~LowVoltageSignalsHandler() {
 
 void LowVoltageSignalsHandler::HandleSignal(const int signo) {
   if (SIGLOWVOLTAGE_ == signo) {
-    LOG4CXX_DEBUG(logger_, "Received LOW_VOLTAGE signal");
+    SDL_DEBUG(logger_, "Received LOW_VOLTAGE signal");
 
     life_cycle_.LowVoltage();
     cpid_ = utils::Signals::Fork();
 
     if (0 > cpid_) {
-      LOG4CXX_FATAL(logger_,
-                    "Error due fork() call. Error: " << strerror(errno));
+      SDL_FATAL(logger_, "Error due fork() call. Error: " << strerror(errno));
       utils::Signals::ExitProcess(EXIT_FAILURE);
     }
 
     if (0 != cpid_) {
       // In Parent process
-      LOG4CXX_DEBUG(logger_, "Child PID: " << cpid_);
+      SDL_DEBUG(logger_, "Child PID: " << cpid_);
       utils::Signals::WaitPid(cpid_, nullptr, 0);
-      LOG4CXX_DEBUG(logger_, "Child process: " << cpid_ << " is stopped");
+      SDL_DEBUG(logger_, "Child process: " << cpid_ << " is stopped");
       life_cycle_.WakeUp();
     } else {
       // In Child process

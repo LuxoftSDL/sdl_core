@@ -76,20 +76,20 @@ void OnButtonPressNotification::Run() {
   if (static_cast<uint32_t>(mobile_apis::ButtonName::CUSTOM_BUTTON) == btn_id) {
     // app_id is mandatory for CUSTOM_BUTTON notification
     if (!is_app_id_exists) {
-      LOG4CXX_ERROR(logger_, "CUSTOM_BUTTON OnButtonPress without app_id.");
+      SDL_ERROR(logger_, "CUSTOM_BUTTON OnButtonPress without app_id.");
       return;
     }
 
     // custom_button_id is mandatory for CUSTOM_BUTTON notification
     if (false == (*message_)[strings::msg_params].keyExists(
                      hmi_response::custom_button_id)) {
-      LOG4CXX_ERROR(logger_,
-                    "CUSTOM_BUTTON OnButtonPress without custom_button_id.");
+      SDL_ERROR(logger_,
+                "CUSTOM_BUTTON OnButtonPress without custom_button_id.");
       return;
     }
 
     if (!app) {
-      LOG4CXX_ERROR(logger_, "Application doesn't exist.");
+      SDL_ERROR(logger_, "Application doesn't exist.");
       return;
     }
 
@@ -99,8 +99,8 @@ void OnButtonPressNotification::Run() {
             .asUInt();
 
     if (false == app->IsSubscribedToSoftButton(custom_btn_id)) {
-      LOG4CXX_ERROR(logger_,
-                    "Application doesn't subscribed to this custom_button_id.");
+      SDL_ERROR(logger_,
+                "Application doesn't subscribed to this custom_button_id.");
       return;
     }
 
@@ -110,9 +110,9 @@ void OnButtonPressNotification::Run() {
     (*message_)[strings::msg_params][strings::window_id] = window_id;
     const auto window_hmi_level = app->hmi_level(window_id);
     if ((mobile_api::HMILevel::HMI_NONE == window_hmi_level)) {
-      LOG4CXX_WARN(logger_,
-                   "CUSTOM_BUTTON OnButtonPress notification is not allowed in "
-                   "NONE hmi level");
+      SDL_WARN(logger_,
+               "CUSTOM_BUTTON OnButtonPress notification is not allowed in "
+               "NONE hmi level");
       return;
     }
 
@@ -128,7 +128,7 @@ void OnButtonPressNotification::Run() {
   for (; subscribed_apps.end() != it; ++it) {
     ApplicationSharedPtr subscribed_app = *it;
     if (!subscribed_app) {
-      LOG4CXX_WARN(logger_, "Null pointer to subscribed app.");
+      SDL_WARN(logger_, "Null pointer to subscribed app.");
       continue;
     }
 
@@ -138,9 +138,9 @@ void OnButtonPressNotification::Run() {
             mobile_apis::PredefinedWindows::DEFAULT_WINDOW);
     if ((mobile_api::HMILevel::HMI_FULL != app_hmi_level) &&
         (mobile_api::HMILevel::HMI_LIMITED != app_hmi_level)) {
-      LOG4CXX_WARN(logger_,
-                   "OnButtonPress notification is allowed only"
-                       << "in FULL or LIMITED hmi level");
+      SDL_WARN(logger_,
+               "OnButtonPress notification is allowed only"
+                   << "in FULL or LIMITED hmi level");
       continue;
     }
     // if "appID" is present, send it to named app only if its FULL or
@@ -160,7 +160,7 @@ void OnButtonPressNotification::Run() {
 
 void OnButtonPressNotification::SendButtonPress(ApplicationConstSharedPtr app) {
   if (!app) {
-    LOG4CXX_ERROR(logger_, "OnButtonPress NULL pointer");
+    SDL_ERROR(logger_, "OnButtonPress NULL pointer");
     return;
   }
 
@@ -168,7 +168,7 @@ void OnButtonPressNotification::SendButtonPress(ApplicationConstSharedPtr app) {
       std::make_shared<smart_objects::SmartObject>();
 
   if (!on_btn_press) {
-    LOG4CXX_ERROR(logger_, "OnButtonPress NULL pointer");
+    SDL_ERROR(logger_, "OnButtonPress NULL pointer");
     return;
   }
 

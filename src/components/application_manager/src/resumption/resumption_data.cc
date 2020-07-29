@@ -37,7 +37,7 @@
 
 namespace resumption {
 
-SDL_CREATE_LOGGERPTR( "Resumption")
+SDL_CREATE_LOGGERPTR("Resumption")
 
 ResumptionData::ResumptionData(
     const application_manager::ApplicationManager& application_manager)
@@ -50,7 +50,7 @@ smart_objects::SmartObject ResumptionData::GetApplicationCommands(
   smart_objects::SmartObject commands_array(smart_objects::SmartType_Array);
   DCHECK_OR_RETURN(application, commands_array);
   if (!application) {
-    LOG4CXX_ERROR(logger_, "NULL Pointer App");
+    SDL_ERROR(logger_, "NULL Pointer App");
     return commands_array;
   }
   const DataAccessor<CommandsMap> accessor = application->commands_map();
@@ -72,7 +72,7 @@ smart_objects::SmartObject ResumptionData::GetApplicationSubMenus(
       smart_objects::SmartObject(smart_objects::SmartType_Array);
 
   if (!application) {
-    LOG4CXX_ERROR(logger_, "NULL Pointer App");
+    SDL_ERROR(logger_, "NULL Pointer App");
     return submenues_array;
   }
   const DataAccessor<SubMenuMap> accessor = application->sub_menu_map();
@@ -93,7 +93,7 @@ smart_objects::SmartObject ResumptionData::GetApplicationInteractionChoiseSets(
   smart_objects::SmartObject interaction_choice_set_array =
       smart_objects::SmartObject(smart_objects::SmartType_Array);
   if (!application) {
-    LOG4CXX_ERROR(logger_, "NULL Pointer App");
+    SDL_ERROR(logger_, "NULL Pointer App");
     return interaction_choice_set_array;
   }
   const DataAccessor<ChoiceSetMap> accessor = application->choice_set_map();
@@ -114,7 +114,7 @@ smart_objects::SmartObject ResumptionData::GetApplicationGlobalProperties(
   smart_objects::SmartObject global_properties =
       smart_objects::SmartObject(smart_objects::SmartType_Map);
   if (!application) {
-    LOG4CXX_ERROR(logger_, "NULL Pointer App");
+    SDL_ERROR(logger_, "NULL Pointer App");
     return global_properties;
   }
 
@@ -143,17 +143,17 @@ smart_objects::SmartObject ResumptionData::GetApplicationSubscriptions(
   smart_objects::SmartObject subscriptions =
       smart_objects::SmartObject(smart_objects::SmartType_Map);
   if (!application) {
-    LOG4CXX_ERROR(logger_, "NULL Pointer App");
+    SDL_ERROR(logger_, "NULL Pointer App");
     return subscriptions;
   }
-  LOG4CXX_DEBUG(logger_, "app_id:" << application->app_id());
+  SDL_DEBUG(logger_, "app_id:" << application->app_id());
 
   DataAccessor<ButtonSubscriptions> button_accessor =
       application->SubscribedButtons();
 
   const ButtonSubscriptions& button_subscriptions = button_accessor.GetData();
 
-  LOG4CXX_DEBUG(logger_, "SubscribedButtons:" << button_subscriptions.size());
+  SDL_DEBUG(logger_, "SubscribedButtons:" << button_subscriptions.size());
   Append(button_subscriptions.begin(),
          button_subscriptions.end(),
          strings::application_buttons,
@@ -170,12 +170,12 @@ smart_objects::SmartObject ResumptionData::GetApplicationFiles(
   using namespace app_mngr;
   SDL_AUTO_TRACE();
   DCHECK(application.get());
-  LOG4CXX_TRACE(logger_, "ENTER app_id:" << application->app_id());
+  SDL_TRACE(logger_, "ENTER app_id:" << application->app_id());
 
   smart_objects::SmartObject files =
       smart_objects::SmartObject(smart_objects::SmartType_Array);
   if (!application) {
-    LOG4CXX_ERROR(logger_, "NULL Pointer App");
+    SDL_ERROR(logger_, "NULL Pointer App");
     return files;
   }
 

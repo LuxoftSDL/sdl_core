@@ -39,7 +39,7 @@
 
 namespace media_manager {
 
-SDL_CREATE_LOGGERPTR( "MediaManager")
+SDL_CREATE_LOGGERPTR("MediaManager")
 
 GMainLoop* FromMicToFileRecorderThread::loop = NULL;
 
@@ -186,9 +186,9 @@ void FromMicToFileRecorderThread::threadMain() {
     g_error("Must supply destination (-d FILE)\n");
   }
 
-  LOG4CXX_TRACE(logger_, "Reading from device: " << device);
-  LOG4CXX_TRACE(logger_, "Saving pipeline output to: " << outfile);
-  LOG4CXX_TRACE(logger_, "Duration set to: " << duration);
+  SDL_TRACE(logger_, "Reading from device: " << device);
+  SDL_TRACE(logger_, "Saving pipeline output to: " << outfile);
+  SDL_TRACE(logger_, "Duration set to: " << duration);
 
   // Initialize gstreamer and setup the main loop information
   gst_init(&argc, &argv);
@@ -216,7 +216,7 @@ void FromMicToFileRecorderThread::threadMain() {
   // Create a capability to specify audio format. It also downmixes the recorded
   // audio to monaural.
   std::string caps_string = create_caps_string();
-  LOG4CXX_DEBUG(logger_, "Using audio caps: " << caps_string);
+  SDL_DEBUG(logger_, "Using audio caps: " << caps_string);
   audiocaps = gst_caps_from_string(caps_string.c_str());
 
   // Assert that all the elements were created
@@ -248,7 +248,7 @@ void FromMicToFileRecorderThread::threadMain() {
 
   gst_element_set_state(pipeline, GST_STATE_PLAYING);
 
-  LOG4CXX_TRACE(logger_, "Initializing pipeline ...");
+  SDL_TRACE(logger_, "Initializing pipeline ...");
   while (GST_STATE(pipeline) != GST_STATE_PLAYING) {
     bool shouldBeStoped;
     {
@@ -266,7 +266,7 @@ void FromMicToFileRecorderThread::threadMain() {
       return;
     }
   }
-  LOG4CXX_TRACE(logger_, "Pipeline started ...\n");
+  SDL_TRACE(logger_, "Pipeline started ...\n");
 
   // Start up a timer for the pipeline
   if (duration > 0) {
@@ -285,7 +285,7 @@ void FromMicToFileRecorderThread::threadMain() {
 
   gst_element_set_state(pipeline, GST_STATE_NULL);
 
-  LOG4CXX_TRACE(logger_, "Deleting pipeline\n");
+  SDL_TRACE(logger_, "Deleting pipeline\n");
   gst_object_unref(GST_OBJECT(pipeline));
   g_main_loop_unref(loop);
   g_option_context_free(context);
@@ -343,7 +343,7 @@ FromMicToFileRecorderThread::SleepThreadDelegate::SleepThreadDelegate(
     : threads::ThreadDelegate(), timeout_(timeout) {}
 
 void FromMicToFileRecorderThread::SleepThreadDelegate::threadMain() {
-  LOG4CXX_TRACE(logger_, "Sleep for " << timeout_.duration << " seconds");
+  SDL_TRACE(logger_, "Sleep for " << timeout_.duration << " seconds");
 
   sleep(timeout_.duration);
 
@@ -359,17 +359,17 @@ void FromMicToFileRecorderThread::exitThreadMain() {
 
   if (NULL != loop) {
     if (g_main_loop_is_running(loop)) {
-      LOG4CXX_TRACE(logger_, "Quit loop\n");
+      SDL_TRACE(logger_, "Quit loop\n");
       g_main_loop_quit(loop);
     }
   }
 
   if (sleepThread_) {
-    LOG4CXX_DEBUG(logger_, "Stop sleep thread\n");
+    SDL_DEBUG(logger_, "Stop sleep thread\n");
     sleepThread_->stop();
   }
 
-  LOG4CXX_TRACE(logger_, "Set should be stopped flag\n");
+  SDL_TRACE(logger_, "Set should be stopped flag\n");
   sync_primitives::AutoLock auto_lock(stopFlagLock_);
   shouldBeStoped_ = true;
 }

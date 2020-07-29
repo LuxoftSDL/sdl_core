@@ -43,7 +43,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "TransportManager")
+SDL_CREATE_LOGGERPTR("TransportManager")
 
 CloudWebsocketConnectionFactory::CloudWebsocketConnectionFactory(
     TransportAdapterController* controller)
@@ -66,7 +66,7 @@ TransportAdapter::Error CloudWebsocketConnectionFactory::CreateConnection(
 
   TransportAdapter::Error error = ws_connection->Start();
   if (TransportAdapter::OK != error) {
-    LOG4CXX_ERROR(
+    SDL_ERROR(
         logger_,
         "Cloud Websocket connection::Start() failed with error: " << error);
   }

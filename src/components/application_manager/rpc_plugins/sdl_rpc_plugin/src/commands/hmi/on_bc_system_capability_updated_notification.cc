@@ -60,9 +60,9 @@ OnBCSystemCapabilityUpdatedNotification::
 
 void OnBCSystemCapabilityUpdatedNotification::Run() {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_,
-                "Sending BasicCommunication.OnSystemCapabilityUpdated "
-                "Notification to HMI");
+  SDL_DEBUG(logger_,
+            "Sending BasicCommunication.OnSystemCapabilityUpdated "
+            "Notification to HMI");
 
   smart_objects::SmartObject& msg_params = (*message_)[strings::msg_params];
 
@@ -150,9 +150,8 @@ void OnBCSystemCapabilityUpdatedNotification::Run() {
                                app_services->end(),
                                matching_service_predicate);
         if (it != app_services->end()) {
-          LOG4CXX_DEBUG(
-              logger_,
-              "Replacing updated record with service_id " << service_id);
+          SDL_DEBUG(logger_,
+                    "Replacing updated record with service_id " << service_id);
           app_services->erase(it);
         }
         app_services->push_back(updated_capabilities[i]);
@@ -163,7 +162,7 @@ void OnBCSystemCapabilityUpdatedNotification::Run() {
     }
     case mobile_apis::SystemCapabilityType::DISPLAYS: {
       if (!hmi_capabilities_.system_display_capabilities()) {
-        LOG4CXX_INFO(logger_, "system_display_capabilities are not available");
+        SDL_INFO(logger_, "system_display_capabilities are not available");
         return;
       }
       msg_params[strings::system_capability][strings::display_capabilities] =

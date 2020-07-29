@@ -33,7 +33,7 @@
 #include "sdl_rpc_plugin/commands/hmi/basic_communication_get_system_time_response.h"
 #include "utils/logger.h"
 
-SDL_CREATE_LOGGERPTR( "Commands")
+SDL_CREATE_LOGGERPTR("Commands")
 
 namespace sdl_rpc_plugin {
 using namespace application_manager;

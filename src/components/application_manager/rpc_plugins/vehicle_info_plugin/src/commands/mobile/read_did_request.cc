@@ -61,13 +61,13 @@ void ReadDIDRequest::Run() {
       (*message_)[strings::params][strings::connection_key].asUInt();
 
   ApplicationSharedPtr app = application_manager_.application(app_id);
-  LOG4CXX_INFO(
+  SDL_INFO(
       logger_,
       "Correlation_id :"
           << (*message_)[strings::params][strings::correlation_id].asUInt());
 
   if (!app) {
-    LOG4CXX_ERROR(logger_, "An application is not registered.");
+    SDL_ERROR(logger_, "An application is not registered.");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -75,13 +75,13 @@ void ReadDIDRequest::Run() {
   if (app->AreCommandLimitsExceeded(
           static_cast<mobile_apis::FunctionID::eType>(function_id()),
           application_manager::TLimitSource::CONFIG_FILE)) {
-    LOG4CXX_ERROR(logger_, "ReadDID frequency is too high.");
+    SDL_ERROR(logger_, "ReadDID frequency is too high.");
     SendResponse(false, mobile_apis::Result::REJECTED);
     return;
   }
 
   if ((*message_)[strings::msg_params][strings::did_location].empty()) {
-    LOG4CXX_ERROR(logger_, "INVALID_DATA");
+    SDL_ERROR(logger_, "INVALID_DATA");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -120,7 +120,7 @@ void ReadDIDRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR(logger_, "Received unknown event" << event.id());
       return;
     }
   }

@@ -105,7 +105,7 @@ void CleanupAppFiles(ApplicationSharedPtr app) {
 
 namespace application_manager {
 
-SDL_CREATE_LOGGERPTR( "ApplicationManager")
+SDL_CREATE_LOGGERPTR("ApplicationManager")
 
 void DeleteApplicationData(ApplicationSharedPtr app,
                            ApplicationManager& app_manager) {

@@ -1,7 +1,7 @@
 #include "sdl_rpc_plugin/extensions/system_capability_app_extension.h"
 
 namespace sdl_rpc_plugin {
-SDL_CREATE_LOGGERPTR( "GetSystemCapabilitiesAppExtension")
+SDL_CREATE_LOGGERPTR("GetSystemCapabilitiesAppExtension")
 
 namespace app_mngr_ = application_manager;
 const app_mngr_::AppExtensionUID
@@ -18,16 +18,15 @@ SystemCapabilityAppExtension::~SystemCapabilityAppExtension() {}
 
 bool SystemCapabilityAppExtension::SubscribeTo(
     const SystemCapabilityType system_capability_type) {
-  LOG4CXX_INFO(logger_,
-               "Subscribing to System Capability " << system_capability_type);
+  SDL_INFO(logger_,
+           "Subscribing to System Capability " << system_capability_type);
   return subscribed_data_.insert(system_capability_type).second;
 }
 
 bool SystemCapabilityAppExtension::UnsubscribeFrom(
     const SystemCapabilityType system_capability_type) {
-  LOG4CXX_INFO(
-      logger_,
-      "Unsubscribing from System Capability " << system_capability_type);
+  SDL_INFO(logger_,
+           "Unsubscribing from System Capability " << system_capability_type);
   auto it = subscribed_data_.find(system_capability_type);
   if (it != subscribed_data_.end()) {
     subscribed_data_.erase(it);
@@ -37,13 +36,13 @@ bool SystemCapabilityAppExtension::UnsubscribeFrom(
 }
 
 void SystemCapabilityAppExtension::UnsubscribeFromAll() {
-  LOG4CXX_INFO(logger_, "Unsubscribing from ALL System Capabilities");
+  SDL_INFO(logger_, "Unsubscribing from ALL System Capabilities");
   subscribed_data_.clear();
 }
 
 bool SystemCapabilityAppExtension::IsSubscribedTo(
     const SystemCapabilityType system_capability_type) const {
-  LOG4CXX_DEBUG(logger_, system_capability_type);
+  SDL_DEBUG(logger_, system_capability_type);
   return subscribed_data_.find(system_capability_type) !=
          subscribed_data_.end();
 }

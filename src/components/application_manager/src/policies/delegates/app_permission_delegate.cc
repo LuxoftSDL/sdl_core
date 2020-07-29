@@ -34,7 +34,7 @@
 #include "application_manager/application_manager.h"
 
 namespace policy {
-SDL_CREATE_LOGGERPTR( "PolicyHandler")
+SDL_CREATE_LOGGERPTR("PolicyHandler")
 
 #ifdef EXTERNAL_PROPRIETARY_MODE
 AppPermissionDelegate::AppPermissionDelegate(

@@ -35,7 +35,7 @@
 
 namespace media_manager {
 
-SDL_CREATE_LOGGERPTR( "MediaManager")
+SDL_CREATE_LOGGERPTR("MediaManager")
 
 MediaAdapterImpl::MediaAdapterImpl() : current_application_(0) {}
 

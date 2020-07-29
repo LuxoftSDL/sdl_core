@@ -41,7 +41,7 @@
 #include "utils/threads/thread_delegate.h"
 #include "utils/timer_task.h"
 
-SDL_CREATE_LOGGERPTR( "Utils")
+SDL_CREATE_LOGGERPTR("Utils")
 
 timer::Timer::Timer(const std::string& name, TimerTask* task)
     : name_(name)
@@ -55,7 +55,7 @@ timer::Timer::Timer(const std::string& name, TimerTask* task)
   DCHECK(!name_.empty());
   DCHECK(task_);
   DCHECK(thread_);
-  LOG4CXX_DEBUG(logger_, "Timer " << name_ << " has been created");
+  SDL_DEBUG(logger_, "Timer " << name_ << " has been created");
 }
 
 timer::Timer::~Timer() {
@@ -69,7 +69,7 @@ timer::Timer::~Timer() {
   DeleteThread(thread_);
   DCHECK(task_);
   delete task_;
-  LOG4CXX_DEBUG(logger_, "Timer " << name_ << " has been destroyed");
+  SDL_DEBUG(logger_, "Timer " << name_ << " has been destroyed");
 }
 
 void timer::Timer::Start(const Milliseconds timeout,
@@ -91,7 +91,7 @@ void timer::Timer::Start(const Milliseconds timeout,
   };
   StartDelegate(timeout);
   StartThread();
-  LOG4CXX_DEBUG(logger_, "Timer " << name_ << " has been started");
+  SDL_DEBUG(logger_, "Timer " << name_ << " has been started");
 }
 
 void timer::Timer::Stop() {
@@ -100,7 +100,7 @@ void timer::Timer::Stop() {
   StopThread();
   StopDelegate();
   single_shot_ = true;
-  LOG4CXX_DEBUG(logger_, "Timer " << name_ << " has been stopped");
+  SDL_DEBUG(logger_, "Timer " << name_ << " has been stopped");
 }
 
 bool timer::Timer::is_running() const {
@@ -206,17 +206,17 @@ bool timer::Timer::TimerDelegate::finalized_flag() const {
 void timer::Timer::TimerDelegate::threadMain() {
   sync_primitives::AutoLock auto_lock(state_lock_ref_);
   while (!stop_flag_ && !finalized_flag_) {
-    LOG4CXX_DEBUG(logger_, "Milliseconds left to wait: " << timeout_);
+    SDL_DEBUG(logger_, "Milliseconds left to wait: " << timeout_);
     if (sync_primitives::ConditionalVariable::kTimeout ==
         state_condition_.WaitFor(auto_lock, timeout_)) {
-      LOG4CXX_DEBUG(logger_,
-                    "Timer has finished counting. Timeout (ms): " << timeout_);
+      SDL_DEBUG(logger_,
+                "Timer has finished counting. Timeout (ms): " << timeout_);
       if (timer_) {
         sync_primitives::AutoUnlock auto_unlock(auto_lock);
         timer_->OnTimeout();
       }
     } else {
-      LOG4CXX_DEBUG(logger_, "Timer has been force reset");
+      SDL_DEBUG(logger_, "Timer has been force reset");
     }
   }
 }

@@ -59,11 +59,11 @@
   friend utils::deleters::Deleter<TypeName>::~Deleter()
 
 #ifdef DEBUG
-#define ASSERT(condition) \
-  SDL_FLUSH_LOGGER()();         \
-  do {                    \
-    SDL_DEINIT_LOGGER()();      \
-    assert(condition);    \
+#define ASSERT(condition)  \
+  SDL_FLUSH_LOGGER();      \
+  do {                     \
+    SDL_DEINIT_LOGGER(); \
+    assert(condition);     \
   } while (false)
 #else  // RELEASE
 #define ASSERT(condition)                                        \
@@ -76,11 +76,11 @@
 
 #define DCHECK(condition)                                                     \
   if (!(condition)) {                                                         \
-    SDL_CREATE_LOGGERPTR( "Utils");                                 \
-    LOG4CXX_FATAL(logger_,                                                    \
-                  "DCHECK failed with \"" << #condition << "\" ["             \
-                                          << __FUNCTION__ << "][" << __FILE__ \
-                                          << ':' << __LINE__ << ']');         \
+    SDL_CREATE_LOGGERPTR("Utils");                                            \
+    SDL_FATAL(logger_,                                                        \
+              "DCHECK failed with \"" << #condition << "\" [" << __FUNCTION__ \
+                                      << "][" << __FILE__ << ':' << __LINE__  \
+                                      << ']');                                \
     ASSERT((condition));                                                      \
   }
 
@@ -90,11 +90,11 @@
  */
 #define DCHECK_OR_RETURN(condition, return_value)                             \
   if (!(condition)) {                                                         \
-    SDL_CREATE_LOGGERPTR( "Utils");                                 \
-    LOG4CXX_FATAL(logger_,                                                    \
-                  "DCHECK failed with \"" << #condition << "\" ["             \
-                                          << __FUNCTION__ << "][" << __FILE__ \
-                                          << ':' << __LINE__ << ']');         \
+    SDL_CREATE_LOGGERPTR("Utils");                                            \
+    SDL_FATAL(logger_,                                                        \
+              "DCHECK failed with \"" << #condition << "\" [" << __FUNCTION__ \
+                                      << "][" << __FILE__ << ':' << __LINE__  \
+                                      << ']');                                \
     ASSERT((condition));                                                      \
     return (return_value);                                                    \
   }
@@ -104,11 +104,11 @@
  */
 #define DCHECK_OR_RETURN_VOID(condition)                                      \
   if (!(condition)) {                                                         \
-    SDL_CREATE_LOGGERPTR( "Utils");                                 \
-    LOG4CXX_FATAL(logger_,                                                    \
-                  "DCHECK failed with \"" << #condition << "\" ["             \
-                                          << __FUNCTION__ << "][" << __FILE__ \
-                                          << ':' << __LINE__ << ']');         \
+    SDL_CREATE_LOGGERPTR("Utils");                                            \
+    SDL_FATAL(logger_,                                                        \
+              "DCHECK failed with \"" << #condition << "\" [" << __FUNCTION__ \
+                                      << "][" << __FILE__ << ':' << __LINE__  \
+                                      << ']');                                \
     ASSERT((condition));                                                      \
     return;                                                                   \
   }

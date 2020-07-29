@@ -67,7 +67,7 @@ void OnVRCommandNotification::Run() {
 
   // Check if this is one of standard VR commands (i.e. "Help")
   if (cmd_id > max_cmd_id + 1) {
-    LOG4CXX_INFO(logger_, "Switched App");
+    SDL_INFO(logger_, "Switched App");
     const uint32_t app_id = cmd_id - max_cmd_id;
     ApplicationSharedPtr app = application_manager_.application(app_id);
     if (app) {
@@ -77,7 +77,7 @@ void OnVRCommandNotification::Run() {
           mobile_apis::HMILevel::HMI_FULL,
           true);
     } else {
-      LOG4CXX_ERROR(logger_, "Unable to find appication " << app_id);
+      SDL_ERROR(logger_, "Unable to find appication " << app_id);
     }
     return;
   }
@@ -90,7 +90,7 @@ void OnVRCommandNotification::Run() {
       (*message_)[strings::msg_params][strings::app_id].asUInt();
   ApplicationSharedPtr app = application_manager_.application(app_id);
   if (!app) {
-    LOG4CXX_ERROR(logger_, "NULL pointer");
+    SDL_ERROR(logger_, "NULL pointer");
     return;
   }
   /* check if perform interaction is active

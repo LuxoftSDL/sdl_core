@@ -44,7 +44,7 @@ namespace custom_str = utils::custom_string;
 
 namespace {
 
-SDL_CREATE_LOGGERPTR( "Policy")
+SDL_CREATE_LOGGERPTR("Policy")
 
 bool CompareStrings(const StringsValueType& first,
                     const StringsValueType& second) {
@@ -356,7 +356,7 @@ std::vector<FunctionalGroupPermission> policy::CheckAppPolicy::GetRevokedGroups(
 
   FunctionalGroupNames groups_attributes;
   if (!pm_->cache_->GetFunctionalGroupNames(groups_attributes)) {
-    LOG4CXX_WARN(logger_, "Can't get functional group names");
+    SDL_WARN(logger_, "Can't get functional group names");
     return std::vector<FunctionalGroupPermission>();
   }
 
@@ -427,7 +427,7 @@ void CheckAppPolicy::InsertPermission(const std::string& app_id,
   auto result = pm_->app_permissions_diff_.insert(
       std::make_pair(app_id, permissions_diff));
   if (!result.second) {
-    LOG4CXX_ERROR(logger_, "App ID: " << app_id << " already exists in map.");
+    SDL_ERROR(logger_, "App ID: " << app_id << " already exists in map.");
   }
   pm_->app_permissions_diff_lock_.Release();
 }
@@ -443,8 +443,8 @@ bool CheckAppPolicy::operator()(const AppPoliciesValueType& app_policy) {
 
   AppPermissions permissions_diff(app_id);
   if (!IsKnownAppication(app_id)) {
-    LOG4CXX_WARN(logger_,
-                 "Application:" << app_id << " is not present in snapshot.");
+    SDL_WARN(logger_,
+             "Application:" << app_id << " is not present in snapshot.");
     return true;
   }
 
@@ -469,8 +469,8 @@ bool CheckAppPolicy::operator()(const AppPoliciesValueType& app_policy) {
     const bool is_request_type_changed = IsRequestTypeChanged(app_policy);
     const bool is_request_subtype_changed = IsRequestSubTypeChanged(app_policy);
     if (is_request_type_changed) {
-      LOG4CXX_TRACE(logger_,
-                    "Request types were changed for application: " << app_id);
+      SDL_TRACE(logger_,
+                "Request types were changed for application: " << app_id);
       SetPendingPermissions(
           app_policy, RESULT_REQUEST_TYPE_CHANGED, permissions_diff);
       AddResult(app_id, RESULT_REQUEST_TYPE_CHANGED);
@@ -478,8 +478,8 @@ bool CheckAppPolicy::operator()(const AppPoliciesValueType& app_policy) {
           (RESULT_NO_CHANGES == result) ? RESULT_REQUEST_TYPE_CHANGED : result;
     }
     if (is_request_subtype_changed) {
-      LOG4CXX_TRACE(
-          logger_, "Request subtypes were changed for application: " << app_id);
+      SDL_TRACE(logger_,
+                "Request subtypes were changed for application: " << app_id);
       SetPendingPermissions(
           app_policy, RESULT_REQUEST_SUBTYPE_CHANGED, permissions_diff);
       AddResult(app_id, RESULT_REQUEST_SUBTYPE_CHANGED);
@@ -489,16 +489,14 @@ bool CheckAppPolicy::operator()(const AppPoliciesValueType& app_policy) {
   }
 
   if (RESULT_NO_CHANGES == result) {
-    LOG4CXX_INFO(
-        logger_,
-        "Permissions for application:" << app_id << " wasn't changed.");
+    SDL_INFO(logger_,
+             "Permissions for application:" << app_id << " wasn't changed.");
     AddResult(app_id, result);
     return true;
   }
 
-  LOG4CXX_INFO(
-      logger_,
-      "Permissions for application:" << app_id << " have been changed.");
+  SDL_INFO(logger_,
+           "Permissions for application:" << app_id << " have been changed.");
 
   if (!IsPredefinedApp(app_policy)) {
     SetPendingPermissions(app_policy, result, permissions_diff);
@@ -698,7 +696,7 @@ bool CheckAppPolicy::IsAppPropertiesChanged(
   }
 
   if (!IsKnownAppication(app_policy.first)) {
-    LOG4CXX_DEBUG(
+    SDL_DEBUG(
         logger_,
         "AppProperties provided for new application: " << app_policy.first);
     return true;
@@ -710,33 +708,33 @@ bool CheckAppPolicy::IsAppPropertiesChanged(
 
   if (app_policy.second.enabled.is_initialized() &&
       app_policy.second.enabled != snapshot_properties.second.enabled) {
-    LOG4CXX_DEBUG(logger_, "\"enabled\" was changed");
+    SDL_DEBUG(logger_, "\"enabled\" was changed");
     return true;
   }
 
   if (app_policy.second.endpoint.is_initialized() &&
       app_policy.second.endpoint != snapshot_properties.second.endpoint) {
-    LOG4CXX_DEBUG(logger_, "\"endpoint\" was changed");
+    SDL_DEBUG(logger_, "\"endpoint\" was changed");
     return true;
   }
 
   if (app_policy.second.hybrid_app_preference.is_initialized() &&
       app_policy.second.hybrid_app_preference !=
           snapshot_properties.second.hybrid_app_preference) {
-    LOG4CXX_DEBUG(logger_, "\"hybrid_app_preference\" was changed");
+    SDL_DEBUG(logger_, "\"hybrid_app_preference\" was changed");
     return true;
   }
 
   if (app_policy.second.auth_token.is_initialized() &&
       app_policy.second.auth_token != snapshot_properties.second.auth_token) {
-    LOG4CXX_DEBUG(logger_, "\"auth_token\" was changed");
+    SDL_DEBUG(logger_, "\"auth_token\" was changed");
     return true;
   }
 
   if (app_policy.second.cloud_transport_type.is_initialized() &&
       app_policy.second.cloud_transport_type !=
           snapshot_properties.second.cloud_transport_type) {
-    LOG4CXX_DEBUG(logger_, "\"cloud_transport_type\" was changed");
+    SDL_DEBUG(logger_, "\"cloud_transport_type\" was changed");
     return true;
   }
 
@@ -752,7 +750,7 @@ bool CheckAppPolicy::IsEncryptionRequiredFlagChanged(
       -> rpc::Optional<rpc::Boolean> {
     auto it = policies.find(policy_app_id);
     if (policies.end() == it) {
-      LOG4CXX_WARN(logger_, "App is not present in policies" << policy_app_id);
+      SDL_WARN(logger_, "App is not present in policies" << policy_app_id);
       return rpc::Optional<rpc::Boolean>(false);
     }
     return it->second.encryption_required;
@@ -764,7 +762,7 @@ bool CheckAppPolicy::IsEncryptionRequiredFlagChanged(
     policy_table::Strings result;
     auto it = policies.find(policy_app_id);
     if (policies.end() == it) {
-      LOG4CXX_WARN(logger_, "App is not present in policies" << policy_app_id);
+      SDL_WARN(logger_, "App is not present in policies" << policy_app_id);
       return result;
     }
     auto& groups = it->second.groups;
@@ -1257,7 +1255,7 @@ FunctionalGroupIDs Merge(const FunctionalGroupIDs& first,
 
 FunctionalGroupIDs FindSame(const FunctionalGroupIDs& first,
                             const FunctionalGroupIDs& second) {
-  LOG4CXX_INFO(logger_, "Find same groups");
+  SDL_INFO(logger_, "Find same groups");
   FunctionalGroupIDs first_copy(first);
   FunctionalGroupIDs second_copy(second);
 
@@ -1281,7 +1279,7 @@ bool UnwrapAppPolicies(policy_table::ApplicationPolicies& app_policies) {
   policy_table::ApplicationPolicies::iterator it_default =
       app_policies.find(kDefaultId);
   if (app_policies.end() == it_default) {
-    LOG4CXX_ERROR(logger_, "No default application policy found in PTU.");
+    SDL_ERROR(logger_, "No default application policy found in PTU.");
     return false;
   }
 

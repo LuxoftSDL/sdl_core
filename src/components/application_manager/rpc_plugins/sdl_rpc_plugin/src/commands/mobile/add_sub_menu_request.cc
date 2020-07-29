@@ -62,7 +62,7 @@ void AddSubMenuRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(logger_, "NULL pointer");
+    SDL_ERROR(logger_, "NULL pointer");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -77,8 +77,8 @@ void AddSubMenuRequest::Run() {
         received_msg_params[strings::menu_icon], app, application_manager_);
 
     if (mobile_apis::Result::INVALID_DATA == verification_result) {
-      LOG4CXX_ERROR(
-          logger_, "MessageHelper::VerifyImage return " << verification_result);
+      SDL_ERROR(logger_,
+                "MessageHelper::VerifyImage return " << verification_result);
       SendResponse(false, verification_result);
       return;
     }
@@ -86,7 +86,7 @@ void AddSubMenuRequest::Run() {
 
   const int32_t menu_id = received_msg_params[strings::menu_id].asInt();
   if (app->FindSubMenu(menu_id)) {
-    LOG4CXX_ERROR(logger_, "Menu with id " << menu_id << " is not found.");
+    SDL_ERROR(logger_, "Menu with id " << menu_id << " is not found.");
     SendResponse(false, mobile_apis::Result::INVALID_ID);
     return;
   }
@@ -95,13 +95,13 @@ void AddSubMenuRequest::Run() {
       received_msg_params[strings::menu_name].asString();
 
   if (app->IsSubMenuNameAlreadyExist(menu_name)) {
-    LOG4CXX_ERROR(logger_, "Menu name " << menu_name << " is duplicated.");
+    SDL_ERROR(logger_, "Menu name " << menu_name << " is duplicated.");
     SendResponse(false, mobile_apis::Result::DUPLICATE_NAME);
     return;
   }
 
   if (!CheckSubMenuName()) {
-    LOG4CXX_ERROR(logger_, "Sub-menu name is not valid.");
+    SDL_ERROR(logger_, "Sub-menu name is not valid.");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -155,7 +155,7 @@ void AddSubMenuRequest::on_event(const event_engine::Event& event) {
           application_manager_.application(connection_key());
 
       if (!application) {
-        LOG4CXX_ERROR(logger_, "NULL pointer");
+        SDL_ERROR(logger_, "NULL pointer");
         return;
       }
 
@@ -182,7 +182,7 @@ void AddSubMenuRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR(logger_, "Received unknown event" << event.id());
       return;
     }
   }
@@ -199,7 +199,7 @@ bool AddSubMenuRequest::CheckSubMenuName() {
 
   str = (*message_)[strings::msg_params][strings::menu_name].asCharArray();
   if (!CheckSyntax(str)) {
-    LOG4CXX_INFO(logger_, "Invalid subMenu name.");
+    SDL_INFO(logger_, "Invalid subMenu name.");
     return false;
   }
   return true;

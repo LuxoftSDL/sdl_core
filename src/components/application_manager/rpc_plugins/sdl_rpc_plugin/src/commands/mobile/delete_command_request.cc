@@ -71,7 +71,7 @@ void DeleteCommandRequest::Run() {
       application_manager_.application(connection_key());
 
   if (!application) {
-    LOG4CXX_ERROR(logger_, "Application is not registered");
+    SDL_ERROR(logger_, "Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -82,7 +82,7 @@ void DeleteCommandRequest::Run() {
   smart_objects::SmartObject* command = application->FindCommand(cmd_id);
 
   if (!command) {
-    LOG4CXX_ERROR(logger_, "Command with id " << cmd_id << " is not found.");
+    SDL_ERROR(logger_, "Command with id " << cmd_id << " is not found.");
     SendResponse(false, mobile_apis::Result::INVALID_ID);
     return;
   }
@@ -142,12 +142,12 @@ bool DeleteCommandRequest::PrepareResponseParameters(
       ui_delete_info, ui_info_, vr_delete_info, vr_info_);
   if (is_vr_or_ui_warning && !ui_delete_info.is_unsupported_resource &&
       !vr_delete_info.is_unsupported_resource) {
-    LOG4CXX_DEBUG(logger_, "VR or UI result is warning");
+    SDL_DEBUG(logger_, "VR or UI result is warning");
     result_code = mobile_apis::Result::WARNINGS;
     return result;
   }
   result_code = PrepareResultCodeForResponse(ui_delete_info, vr_delete_info);
-  LOG4CXX_DEBUG(logger_, "Result is " << (result ? "true" : "false"));
+  SDL_DEBUG(logger_, "Result is " << (result ? "true" : "false"));
   return result;
 }
 
@@ -161,9 +161,9 @@ void DeleteCommandRequest::on_event(const event_engine::Event& event) {
       is_ui_received_ = true;
       ui_result_ = static_cast<hmi_apis::Common_Result::eType>(
           message[strings::params][hmi_response::code].asInt());
-      LOG4CXX_DEBUG(logger_,
-                    "Received UI_DeleteCommand event with result "
-                        << MessageHelper::HMIResultToString(ui_result_));
+      SDL_DEBUG(logger_,
+                "Received UI_DeleteCommand event with result "
+                    << MessageHelper::HMIResultToString(ui_result_));
       GetInfo(message, ui_info_);
       break;
     }
@@ -172,20 +172,20 @@ void DeleteCommandRequest::on_event(const event_engine::Event& event) {
       is_vr_received_ = true;
       vr_result_ = static_cast<hmi_apis::Common_Result::eType>(
           message[strings::params][hmi_response::code].asInt());
-      LOG4CXX_DEBUG(logger_,
-                    "Received VR_DeleteCommand event with result "
-                        << MessageHelper::HMIResultToString(vr_result_));
+      SDL_DEBUG(logger_,
+                "Received VR_DeleteCommand event with result "
+                    << MessageHelper::HMIResultToString(vr_result_));
       GetInfo(message, vr_info_);
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR(logger_, "Received unknown event" << event.id());
       return;
     }
   }
 
   if (IsPendingResponseExist()) {
-    LOG4CXX_DEBUG(logger_, "Still awaiting for other responses.");
+    SDL_DEBUG(logger_, "Still awaiting for other responses.");
     return;
   }
 
@@ -193,7 +193,7 @@ void DeleteCommandRequest::on_event(const event_engine::Event& event) {
       application_manager_.application(connection_key());
 
   if (!application) {
-    LOG4CXX_ERROR(logger_, "Application is not registered");
+    SDL_ERROR(logger_, "Application is not registered");
     return;
   }
   smart_objects::SmartObject& msg_params = (*message_)[strings::msg_params];
@@ -203,11 +203,11 @@ void DeleteCommandRequest::on_event(const event_engine::Event& event) {
   smart_objects::SmartObject* command = application->FindCommand(cmd_id);
 
   if (!command) {
-    LOG4CXX_ERROR(logger_,
-                  "Command id " << cmd_id
-                                << " not found for "
-                                   "application with connection key "
-                                << connection_key());
+    SDL_ERROR(logger_,
+              "Command id " << cmd_id
+                            << " not found for "
+                               "application with connection key "
+                            << connection_key());
     return;
   }
   mobile_apis::Result::eType result_code = mobile_apis::Result::INVALID_ENUM;

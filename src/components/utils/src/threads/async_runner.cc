@@ -38,7 +38,7 @@
 
 namespace threads {
 
-SDL_CREATE_LOGGERPTR( "Utils")
+SDL_CREATE_LOGGERPTR("Utils")
 
 AsyncRunner::AsyncRunner(const std::string& thread_name)
     : executor_(new AsyncRunnerDelegate) {

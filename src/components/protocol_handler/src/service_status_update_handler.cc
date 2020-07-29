@@ -3,7 +3,7 @@
 
 namespace protocol_handler {
 
-SDL_CREATE_LOGGERPTR( "ServiceStatusUpdateHandler")
+SDL_CREATE_LOGGERPTR("ServiceStatusUpdateHandler")
 
 hmi_apis::Common_ServiceType::eType GetHMIServiceType(
     protocol_handler::ServiceType service_type) {
@@ -107,9 +107,9 @@ void ServiceStatusUpdateHandler::OnServiceUpdate(
           update_reason);
     }
     default: {
-      LOG4CXX_WARN(logger_,
-                   "Received unknown ServiceStatus: "
-                       << static_cast<int32_t>(service_status));
+      SDL_WARN(logger_,
+               "Received unknown ServiceStatus: "
+                   << static_cast<int32_t>(service_status));
       return;
     }
   }

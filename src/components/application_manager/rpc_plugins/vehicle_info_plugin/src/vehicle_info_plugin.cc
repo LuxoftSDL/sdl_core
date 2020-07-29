@@ -40,7 +40,7 @@
 #include "vehicle_info_plugin/vehicle_info_command_factory.h"
 
 namespace vehicle_info_plugin {
-SDL_CREATE_LOGGERPTR( "VehicleInfoPlugin")
+SDL_CREATE_LOGGERPTR("VehicleInfoPlugin")
 
 namespace strings = application_manager::strings;
 namespace plugins = application_manager::plugin_manager;
@@ -131,10 +131,9 @@ void VehicleInfoPlugin::UnsubscribeFromRemovedVDItems() {
                 subscription_name)) {
           ext.unsubscribeFromVehicleInfo(subscription_name);
           if (!helpers::in_range(output_items_list, subscription_name)) {
-            LOG4CXX_DEBUG(logger_,
-                          "Vehicle data item "
-                              << subscription_name
-                              << " has been removed by policy");
+            SDL_DEBUG(logger_,
+                      "Vehicle data item " << subscription_name
+                                           << " has been removed by policy");
             output_items_list.push_back(subscription_name);
           }
         }
@@ -146,7 +145,7 @@ void VehicleInfoPlugin::UnsubscribeFromRemovedVDItems() {
   const StringsVector items_to_unsubscribe = get_items_to_unsubscribe();
 
   if (items_to_unsubscribe.empty()) {
-    LOG4CXX_DEBUG(logger_, "There is no data to unsubscribe");
+    SDL_DEBUG(logger_, "There is no data to unsubscribe");
     return;
   }
 
@@ -179,7 +178,7 @@ void VehicleInfoPlugin::ProcessResumptionSubscription(
   const auto& subscriptions = ext.Subscriptions();
 
   if (subscriptions.empty()) {
-    LOG4CXX_DEBUG(logger_, "No vehicle data to subscribe. Exiting");
+    SDL_DEBUG(logger_, "No vehicle data to subscribe. Exiting");
     return;
   }
 

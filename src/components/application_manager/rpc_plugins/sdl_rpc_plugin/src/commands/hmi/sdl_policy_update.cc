@@ -56,9 +56,9 @@ void SDLPolicyUpdate::Run() {
 #if defined(PROPRIETARY_MODE) || defined(EXTERNAL_PROPRIETARY_MODE)
   SendRequest();
 #else
-  LOG4CXX_WARN(logger_,
-               "This RPC is part of extended policy flow."
-               "Please re-build with extended policy mode enabled.");
+  SDL_WARN(logger_,
+           "This RPC is part of extended policy flow."
+           "Please re-build with extended policy mode enabled.");
 #endif
 }
 

@@ -72,8 +72,8 @@ void OnHashChangeNotification::Run() {
     (*message_)[strings::msg_params][strings::hash_id] = app->curHash();
     SendNotification();
   } else {
-    LOG4CXX_WARN(logger_,
-                 "Application with app_id " << app_id << " does not exist");
+    SDL_WARN(logger_,
+             "Application with app_id " << app_id << " does not exist");
   }
 }
 

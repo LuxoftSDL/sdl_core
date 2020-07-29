@@ -55,7 +55,7 @@ OnASAppServiceDataNotificationFromHMI::
 
 void OnASAppServiceDataNotificationFromHMI::Run() {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "Received an OnAppServiceData from HMI");
+  SDL_DEBUG(logger_, "Received an OnAppServiceData from HMI");
 
   std::string service_id =
       (*message_)[strings::msg_params][strings::service_data]
@@ -64,14 +64,14 @@ void OnASAppServiceDataNotificationFromHMI::Run() {
   AppService* service =
       application_manager_.GetAppServiceManager().FindServiceByID(service_id);
   if (!service) {
-    LOG4CXX_ERROR(
-        logger_, "No published services exist with service ID: " << service_id);
+    SDL_ERROR(logger_,
+              "No published services exist with service ID: " << service_id);
     return;
   } else if (service->mobile_service) {
-    LOG4CXX_ERROR(logger_, "Service was not published by the HMI");
+    SDL_ERROR(logger_, "Service was not published by the HMI");
     return;
   } else if (!service->record[strings::service_active].asBool()) {
-    LOG4CXX_ERROR(logger_, "Service is not active");
+    SDL_ERROR(logger_, "Service is not active");
     return;
   }
 
@@ -83,11 +83,10 @@ void OnASAppServiceDataNotificationFromHMI::Run() {
       service->record[strings::service_manifest][strings::service_type]
           .asString();
   if (published_service_type != service_type) {
-    LOG4CXX_ERROR(logger_,
-                  "Service type mismatch, expected "
-                      << service_type
-                      << ", but service was published with type "
-                      << published_service_type);
+    SDL_ERROR(logger_,
+              "Service type mismatch, expected "
+                  << service_type << ", but service was published with type "
+                  << published_service_type);
     return;
   }
 

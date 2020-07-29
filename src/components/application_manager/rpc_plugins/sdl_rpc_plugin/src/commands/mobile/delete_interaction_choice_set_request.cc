@@ -63,7 +63,7 @@ void DeleteInteractionChoiceSetRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(
+    SDL_ERROR(
         logger_,
         "No application associated with connection key " << connection_key());
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
@@ -75,14 +75,14 @@ void DeleteInteractionChoiceSetRequest::Run() {
           .asInt();
 
   if (!app->FindChoiceSet(choice_set_id)) {
-    LOG4CXX_ERROR(logger_,
-                  "Choice set with id " << choice_set_id << " is not found.");
+    SDL_ERROR(logger_,
+              "Choice set with id " << choice_set_id << " is not found.");
     SendResponse(false, mobile_apis::Result::INVALID_ID);
     return;
   }
 
   if (ChoiceSetInUse(app)) {
-    LOG4CXX_ERROR(logger_, "Choice set currently in use.");
+    SDL_ERROR(logger_, "Choice set currently in use.");
     SendResponse(false, mobile_apis::Result::IN_USE);
     return;
   }
@@ -126,8 +126,8 @@ bool DeleteInteractionChoiceSetRequest::ChoiceSetInUse(
     PerformChoice::const_iterator choice_it = choice.begin();
     for (; choice.end() != choice_it; ++choice_it) {
       if (choice_it->first == choice_set_id) {
-        LOG4CXX_ERROR(logger_,
-                      "Choice set with id " << choice_set_id << " is in use.");
+        SDL_ERROR(logger_,
+                  "Choice set with id " << choice_set_id << " is in use.");
         return true;
       }
     }
@@ -146,8 +146,8 @@ void DeleteInteractionChoiceSetRequest::SendVrDeleteCommand(
   smart_objects::SmartObject* choice_set = app->FindChoiceSet(choice_set_id);
 
   if (!choice_set) {
-    LOG4CXX_ERROR(logger_,
-                  "Choice set with id " << choice_set_id << " is not found.");
+    SDL_ERROR(logger_,
+              "Choice set with id " << choice_set_id << " is not found.");
     return;
   }
 

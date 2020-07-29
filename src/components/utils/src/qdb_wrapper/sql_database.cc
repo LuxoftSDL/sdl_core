@@ -37,7 +37,7 @@
 namespace utils {
 namespace dbms {
 
-SDL_CREATE_LOGGERPTR( "Utils")
+SDL_CREATE_LOGGERPTR("Utils")
 
 SQLDatabase::SQLDatabase(const std::string& db_name)
     : conn_(NULL), db_name_(db_name), error_(Error::OK) {}
@@ -101,10 +101,10 @@ qdb_hdl_t* SQLDatabase::conn() const {
 bool SQLDatabase::Backup() {
   if (qdb_backup(conn_, QDB_ATTACH_DEFAULT) == -1) {
     error_ = Error::ERROR;
-    LOG4CXX_ERROR(logger_, "Backup returned error: " << std::strerror(errno));
+    SDL_ERROR(logger_, "Backup returned error: " << std::strerror(errno));
     return false;
   }
-  LOG4CXX_INFO(logger_, "Backup was successful.");
+  SDL_INFO(logger_, "Backup was successful.");
   return true;
 }
 

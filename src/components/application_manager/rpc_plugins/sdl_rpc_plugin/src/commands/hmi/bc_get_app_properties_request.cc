@@ -61,7 +61,7 @@ void BCGetAppPropertiesRequest::FillAppProperties(
       policy_handler_.GetAppProperties(policy_app_id, app_properties);
 
   if (!result) {
-    LOG4CXX_DEBUG(
+    SDL_DEBUG(
         logger_,
         "Failed to get app parameters for policy_app_id: " << policy_app_id);
     return;
@@ -111,9 +111,9 @@ void BCGetAppPropertiesRequest::Run() {
       response_params[strings::properties][0] = properties;
     }
   } else {
-    LOG4CXX_DEBUG(logger_,
-                  "policyAppID was absent in request, all apps properties "
-                  "will be returned.");
+    SDL_DEBUG(logger_,
+              "policyAppID was absent in request, all apps properties "
+              "will be returned.");
     const auto app_ids = policy_handler_.GetApplicationPolicyIDs();
     int i = 0;
     for (auto& app_id : app_ids) {

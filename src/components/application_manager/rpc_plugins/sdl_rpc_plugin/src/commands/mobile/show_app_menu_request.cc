@@ -61,7 +61,7 @@ void ShowAppMenuRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(
+    SDL_ERROR(
         logger_,
         "Application with id " << connection_key() << " is not registered.");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
@@ -76,7 +76,7 @@ void ShowAppMenuRequest::Run() {
           app->system_context(mobile_apis::PredefinedWindows::DEFAULT_WINDOW),
           mobile_apis::SystemContext::SYSCTXT_MAIN,
           mobile_apis::SystemContext::SYSCTXT_MENU)) {
-    LOG4CXX_ERROR(
+    SDL_ERROR(
         logger_,
         "Application with id " << connection_key() << " is not activated.");
     SendResponse(false, mobile_apis::Result::REJECTED);
@@ -90,7 +90,7 @@ void ShowAppMenuRequest::Run() {
   if (received_msg_params.keyExists(strings::menu_id)) {
     const int32_t menu_id = received_msg_params[strings::menu_id].asInt();
     if (!app->FindSubMenu(menu_id)) {
-      LOG4CXX_ERROR(logger_, "Menu with id " << menu_id << " is not found.");
+      SDL_ERROR(logger_, "Menu with id " << menu_id << " is not found.");
       SendResponse(false, mobile_apis::Result::INVALID_ID);
       return;
     }
@@ -120,9 +120,9 @@ void ShowAppMenuRequest::on_event(const app_mngr::event_engine::Event& event) {
           application_manager_.application(connection_key());
 
       if (!app) {
-        LOG4CXX_ERROR(logger_,
-                      "Application with id " << connection_key()
-                                             << " is not registered.");
+        SDL_ERROR(logger_,
+                  "Application with id " << connection_key()
+                                         << " is not registered.");
         return;
       }
 
@@ -133,7 +133,7 @@ void ShowAppMenuRequest::on_event(const app_mngr::event_engine::Event& event) {
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event: " << event.id());
+      SDL_ERROR(logger_, "Received unknown event: " << event.id());
       return;
     }
   }

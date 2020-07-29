@@ -6,7 +6,7 @@
 #include "rc_rpc_plugin/rc_rpc_plugin.h"
 
 namespace rc_rpc_plugin {
-SDL_CREATE_LOGGERPTR( "RemoteControlModule");
+SDL_CREATE_LOGGERPTR("RemoteControlModule");
 
 const std::vector<std::string> RCHelpers::buttons_climate() {
   std::vector<std::string> data;
@@ -138,7 +138,7 @@ RCHelpers::GetModuleTypeToDataMapping() {
         {enums_value::kHmiSettings, message_params::kHmiSettingsControlData}};
     auto it = mapping.find(module_type);
     if (mapping.end() == it) {
-      LOG4CXX_ERROR(logger_, "Unknown module type" << module_type);
+      SDL_ERROR(logger_, "Unknown module type" << module_type);
       return std::string();
     }
     return it->second;
@@ -159,7 +159,7 @@ RCHelpers::GetModuleTypeToCapabilitiesMapping() {
         {enums_value::kHmiSettings, strings::khmiSettingsControlCapabilities}};
     auto it = mapping.find(module_type);
     if (mapping.end() == it) {
-      LOG4CXX_ERROR(logger_, "Unknown module type" << module_type);
+      SDL_ERROR(logger_, "Unknown module type" << module_type);
       return std::string();
     }
     return it->second;

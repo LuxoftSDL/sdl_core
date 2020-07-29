@@ -83,7 +83,7 @@ typedef std::shared_ptr<std::string> Message;
 
 namespace hmi_message_handler {
 
-SDL_CREATE_LOGGERPTR( "HMIMessageHandler")
+SDL_CREATE_LOGGERPTR("HMIMessageHandler")
 
 class CMessageBrokerController;
 

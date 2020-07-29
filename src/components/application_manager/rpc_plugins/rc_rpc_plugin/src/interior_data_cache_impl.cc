@@ -41,7 +41,7 @@
 
 namespace rc_rpc_plugin {
 
-SDL_CREATE_LOGGERPTR( "RemoteControlModule");
+SDL_CREATE_LOGGERPTR("RemoteControlModule");
 
 InteriorDataCacheImpl::InteriorDataCacheImpl() {}
 
@@ -49,7 +49,7 @@ InteriorDataCacheImpl::~InteriorDataCacheImpl() {}
 
 void InteriorDataCacheImpl::Add(const ModuleUid& module,
                                 const smart_objects::SmartObject& module_data) {
-  LOG4CXX_TRACE(
+  SDL_TRACE(
       logger_,
       "module_type : " << module.first << " module_id : " << module.second);
   sync_primitives::AutoLock autolock(cached_data_lock_);
@@ -67,13 +67,13 @@ smart_objects::SmartObject InteriorDataCacheImpl::Retrieve(
   sync_primitives::AutoLock autolock(cached_data_lock_);
   auto it = cached_data_.find(module);
   if (it == cached_data_.end()) {
-    LOG4CXX_WARN(logger_,
-                 "Module with type: " << module.first
-                                      << " and id: " << module.second
-                                      << " was not found in cache");
+    SDL_WARN(logger_,
+             "Module with type: " << module.first
+                                  << " and id: " << module.second
+                                  << " was not found in cache");
     return smart_objects::SmartObject(smart_objects::SmartType_Null);
   }
-  LOG4CXX_TRACE(
+  SDL_TRACE(
       logger_,
       "module_type : " << module.first << " module_id : " << module.second);
   return it->second;
@@ -96,23 +96,21 @@ bool InteriorDataCacheImpl::Contains(const ModuleUid& module) const {
   sync_primitives::AutoLock autolock(cached_data_lock_);
   auto it = cached_data_.find(module);
   const bool contains = it != cached_data_.end();
-  LOG4CXX_TRACE(logger_,
-                "module_type : " << module.first
-                                 << " module_id : " << module.second << " "
-                                 << (contains ? "true" : "false"));
+  SDL_TRACE(logger_,
+            "module_type : " << module.first << " module_id : " << module.second
+                             << " " << (contains ? "true" : "false"));
   return contains;
 }
 
 void InteriorDataCacheImpl::Remove(const ModuleUid& module) {
-  LOG4CXX_TRACE(
+  SDL_TRACE(
       logger_,
       "module_type : " << module.first << " module_id : " << module.second);
   sync_primitives::AutoLock autolock(cached_data_lock_);
   auto it = cached_data_.find(module);
   if (cached_data_.end() == it) {
-    LOG4CXX_TRACE(
-        logger_,
-        "Not existing module : " << module.first << " " << module.second);
+    SDL_TRACE(logger_,
+              "Not existing module : " << module.first << " " << module.second);
     return;
   }
   cached_data_.erase(it);

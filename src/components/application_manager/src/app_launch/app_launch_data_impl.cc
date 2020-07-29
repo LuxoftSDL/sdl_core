@@ -34,7 +34,7 @@
 
 namespace app_launch {
 
-SDL_CREATE_LOGGERPTR( "AppLaunch")
+SDL_CREATE_LOGGERPTR("AppLaunch")
 
 AppLaunchDataImpl::AppLaunchDataImpl(const AppLaunchSettings& settings)
     : settings_(settings)
@@ -50,17 +50,17 @@ bool AppLaunchDataImpl::AddApplicationData(const ApplicationData& app_data) {
       app_data.mobile_app_id_.empty() == false &&
       app_data.bundle_id_.empty() == false) {
     if (IsAppDataAlreadyExisted(app_data)) {
-      LOG4CXX_INFO(logger_, "This application data already existed");
+      SDL_INFO(logger_, "This application data already existed");
       retVal &= RefreshAppSessionTime(app_data);
     } else {
       if (GetCurentNumberOfAppData() >= get_max_number_iOS_devs()) {
-        LOG4CXX_INFO(logger_,
-                     "Max number of application data have. It will be deleted "
-                     "the oldest one");
+        SDL_INFO(logger_,
+                 "Max number of application data have. It will be deleted "
+                 "the oldest one");
         retVal &= DeleteOldestAppData();
       }
       retVal &= AddNewAppData(app_data);
-      LOG4CXX_INFO(logger_, "Added new application data to DB");
+      SDL_INFO(logger_, "Added new application data to DB");
     }
   } else {
     retVal = false;
@@ -74,7 +74,7 @@ std::vector<ApplicationDataPtr> AppLaunchDataImpl::GetApplicationDataByDevice(
   std::vector<ApplicationDataPtr> apps = GetAppDataByDevMac(dev_mac);
 
   if (apps.empty()) {
-    LOG4CXX_DEBUG(logger_, "No application founded by mac" << dev_mac);
+    SDL_DEBUG(logger_, "No application founded by mac" << dev_mac);
   }
 
   return apps;

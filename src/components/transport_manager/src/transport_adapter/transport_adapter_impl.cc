@@ -51,7 +51,7 @@ const char* tc_enabled = "enabled";
 const char* tc_tcp_port = "tcp_port";
 const char* tc_tcp_ip_address = "tcp_ip_address";
 
-SDL_CREATE_LOGGERPTR( "TransportManager")
+SDL_CREATE_LOGGERPTR("TransportManager")
 namespace {
 DeviceTypes devicesType = {
     std::make_pair(DeviceType::AOA, std::string("USB_AOA")),
@@ -99,43 +99,42 @@ TransportAdapterImpl::~TransportAdapterImpl() {
   Terminate();
 
   if (device_scanner_) {
-    LOG4CXX_DEBUG(logger_, "Deleting device_scanner_ " << device_scanner_);
+    SDL_DEBUG(logger_, "Deleting device_scanner_ " << device_scanner_);
     delete device_scanner_;
-    LOG4CXX_DEBUG(logger_, "device_scanner_ deleted.");
+    SDL_DEBUG(logger_, "device_scanner_ deleted.");
   }
   if (server_connection_factory_) {
-    LOG4CXX_DEBUG(
+    SDL_DEBUG(
         logger_,
         "Deleting server_connection_factory " << server_connection_factory_);
     delete server_connection_factory_;
-    LOG4CXX_DEBUG(logger_, "server_connection_factory deleted.");
+    SDL_DEBUG(logger_, "server_connection_factory deleted.");
   }
   if (client_connection_listener_) {
-    LOG4CXX_DEBUG(
+    SDL_DEBUG(
         logger_,
         "Deleting client_connection_listener_ " << client_connection_listener_);
     delete client_connection_listener_;
-    LOG4CXX_DEBUG(logger_, "client_connection_listener_ deleted.");
+    SDL_DEBUG(logger_, "client_connection_listener_ deleted.");
   }
 }
 
 void TransportAdapterImpl::Terminate() {
   if (device_scanner_) {
     device_scanner_->Terminate();
-    LOG4CXX_DEBUG(logger_,
-                  "device_scanner_ " << device_scanner_ << " terminated.");
+    SDL_DEBUG(logger_, "device_scanner_ " << device_scanner_ << " terminated.");
   }
   if (server_connection_factory_) {
     server_connection_factory_->Terminate();
-    LOG4CXX_DEBUG(logger_,
-                  "server_connection_factory " << server_connection_factory_
-                                               << " terminated.");
+    SDL_DEBUG(logger_,
+              "server_connection_factory " << server_connection_factory_
+                                           << " terminated.");
   }
   if (client_connection_listener_) {
     client_connection_listener_->Terminate();
-    LOG4CXX_DEBUG(logger_,
-                  "client_connection_listener_ " << client_connection_listener_
-                                                 << " terminated.");
+    SDL_DEBUG(logger_,
+              "client_connection_listener_ " << client_connection_listener_
+                                             << " terminated.");
   }
 
   ConnectionMap connections;
@@ -150,7 +149,7 @@ void TransportAdapterImpl::Terminate() {
   }
   connections.clear();
 
-  LOG4CXX_DEBUG(logger_, "Connections deleted");
+  SDL_DEBUG(logger_, "Connections deleted");
 
   DeviceMap devices;
   devices_mutex_.Acquire();
@@ -158,11 +157,11 @@ void TransportAdapterImpl::Terminate() {
   devices_mutex_.Release();
   devices.clear();
 
-  LOG4CXX_DEBUG(logger_, "Devices deleted");
+  SDL_DEBUG(logger_, "Devices deleted");
 }
 
 TransportAdapter::Error TransportAdapterImpl::Init() {
-  LOG4CXX_TRACE(logger_, "enter");
+  SDL_TRACE(logger_, "enter");
 
   Error error = OK;
 
@@ -180,42 +179,42 @@ TransportAdapter::Error TransportAdapterImpl::Init() {
 
   if (get_settings().use_last_state() && initialised_) {
     if (!Restore()) {
-      LOG4CXX_WARN(logger_, "could not restore transport adapter state");
+      SDL_WARN(logger_, "could not restore transport adapter state");
     }
   }
-  LOG4CXX_TRACE(logger_, "exit with error: " << error);
+  SDL_TRACE(logger_, "exit with error: " << error);
   return error;
 }
 
 TransportAdapter::Error TransportAdapterImpl::SearchDevices() {
-  LOG4CXX_TRACE(logger_, "enter");
+  SDL_TRACE(logger_, "enter");
   if (device_scanner_ == NULL) {
-    LOG4CXX_TRACE(logger_, "exit with NOT_SUPPORTED");
+    SDL_TRACE(logger_, "exit with NOT_SUPPORTED");
     return NOT_SUPPORTED;
   } else if (!device_scanner_->IsInitialised()) {
-    LOG4CXX_TRACE(logger_, "exit with BAD_STATE");
+    SDL_TRACE(logger_, "exit with BAD_STATE");
     return BAD_STATE;
   }
   TransportAdapter::Error er = device_scanner_->Scan();
-  LOG4CXX_TRACE(logger_, "exit with error: " << er);
+  SDL_TRACE(logger_, "exit with error: " << er);
   return er;
 }
 
 TransportAdapter::Error TransportAdapterImpl::Connect(
     const DeviceUID& device_id, const ApplicationHandle& app_handle) {
-  LOG4CXX_TRACE(
+  SDL_TRACE(
       logger_,
       "enter. DeviceUID " << device_id << " ApplicationHandle " << app_handle);
   if (server_connection_factory_ == 0) {
-    LOG4CXX_TRACE(logger_, "exit with NOT_SUPPORTED");
+    SDL_TRACE(logger_, "exit with NOT_SUPPORTED");
     return NOT_SUPPORTED;
   }
   if (!server_connection_factory_->IsInitialised()) {
-    LOG4CXX_TRACE(logger_, "exit with BAD_STATE");
+    SDL_TRACE(logger_, "exit with BAD_STATE");
     return BAD_STATE;
   }
   if (!initialised_) {
-    LOG4CXX_TRACE(logger_, "exit with BAD_STATE");
+    SDL_TRACE(logger_, "exit with BAD_STATE");
     return BAD_STATE;
   }
 
@@ -235,7 +234,7 @@ TransportAdapter::Error TransportAdapterImpl::Connect(
   connections_lock_.Release();
 
   if (already_exists && !pending_app) {
-    LOG4CXX_TRACE(logger_, "exit with ALREADY_EXISTS");
+    SDL_TRACE(logger_, "exit with ALREADY_EXISTS");
     return ALREADY_EXISTS;
   }
 
@@ -246,19 +245,18 @@ TransportAdapter::Error TransportAdapterImpl::Connect(
       RemoveConnection(device_id, app_handle);
     }
   }
-  LOG4CXX_TRACE(logger_, "exit with error: " << err);
+  SDL_TRACE(logger_, "exit with error: " << err);
   return err;
 }
 
 TransportAdapter::Error TransportAdapterImpl::ConnectDevice(
     const DeviceUID& device_handle) {
-  LOG4CXX_TRACE(logger_, "enter with device_handle: " << &device_handle);
+  SDL_TRACE(logger_, "enter with device_handle: " << &device_handle);
   DeviceSptr device = FindDevice(device_handle);
   if (device) {
     TransportAdapter::Error err = ConnectDevice(device);
     if (FAIL == err && GetDeviceType() == DeviceType::CLOUD_WEBSOCKET) {
-      LOG4CXX_TRACE(logger_,
-                    "Error occurred while connecting cloud app: " << err);
+      SDL_TRACE(logger_, "Error occurred while connecting cloud app: " << err);
       // Update retry count
       if (device->retry_count() >=
           get_settings().cloud_app_max_retry_attempts()) {
@@ -283,10 +281,10 @@ TransportAdapter::Error TransportAdapterImpl::ConnectDevice(
     } else if (OK == err) {
       ConnectionStatusUpdated(device, ConnectionStatus::CONNECTED);
     }
-    LOG4CXX_TRACE(logger_, "exit with error: " << err);
+    SDL_TRACE(logger_, "exit with error: " << err);
     return err;
   } else {
-    LOG4CXX_TRACE(logger_, "exit with BAD_PARAM");
+    SDL_TRACE(logger_, "exit with BAD_PARAM");
     return BAD_PARAM;
   }
 }
@@ -295,8 +293,8 @@ void TransportAdapterImpl::RetryConnection() {
   ClearCompletedTimers();
   const DeviceUID device_id = GetNextRetryDevice();
   if (device_id.empty()) {
-    LOG4CXX_ERROR(logger_,
-                  "Unable to find timer, ignoring RetryConnection request");
+    SDL_ERROR(logger_,
+              "Unable to find timer, ignoring RetryConnection request");
     return;
   }
   ConnectDevice(device_id);
@@ -347,36 +345,36 @@ void TransportAdapterImpl::ConnectionStatusUpdated(DeviceSptr device,
 
 TransportAdapter::Error TransportAdapterImpl::Disconnect(
     const DeviceUID& device_id, const ApplicationHandle& app_handle) {
-  LOG4CXX_TRACE(
+  SDL_TRACE(
       logger_,
       "enter. device_id: " << &device_id << ", device_id: " << &device_id);
   if (!initialised_) {
-    LOG4CXX_TRACE(logger_, "exit with BAD_STATE");
+    SDL_TRACE(logger_, "exit with BAD_STATE");
     return BAD_STATE;
   }
   ConnectionSPtr connection = FindEstablishedConnection(device_id, app_handle);
   if (connection) {
     TransportAdapter::Error err = connection->Disconnect();
-    LOG4CXX_TRACE(logger_, "exit with error: " << err);
+    SDL_TRACE(logger_, "exit with error: " << err);
     return err;
   } else {
-    LOG4CXX_TRACE(logger_, "exit with BAD_PARAM");
+    SDL_TRACE(logger_, "exit with BAD_PARAM");
     return BAD_PARAM;
   }
 }
 
 TransportAdapter::Error TransportAdapterImpl::DisconnectDevice(
     const DeviceUID& device_id) {
-  LOG4CXX_TRACE(logger_, "enter. device_id: " << &device_id);
+  SDL_TRACE(logger_, "enter. device_id: " << &device_id);
   if (!initialised_) {
-    LOG4CXX_TRACE(logger_, "exit with BAD_STATE");
+    SDL_TRACE(logger_, "exit with BAD_STATE");
     return BAD_STATE;
   }
 
   Error error = OK;
   DeviceSptr device = FindDevice(device_id);
   if (!device) {
-    LOG4CXX_WARN(logger_, "Device with id: " << device_id << " Not found");
+    SDL_WARN(logger_, "Device with id: " << device_id << " Not found");
     return BAD_PARAM;
   }
   ConnectionStatusUpdated(device, ConnectionStatus::CLOSING);
@@ -400,7 +398,7 @@ TransportAdapter::Error TransportAdapterImpl::DisconnectDevice(
     ConnectionInfo info = *j;
     if (OK != info.connection->Disconnect()) {
       error = FAIL;
-      LOG4CXX_ERROR(logger_, "Error on disconnect " << error);
+      SDL_ERROR(logger_, "Error on disconnect " << error);
     }
   }
 
@@ -411,21 +409,21 @@ TransportAdapter::Error TransportAdapterImpl::SendData(
     const DeviceUID& device_id,
     const ApplicationHandle& app_handle,
     const ::protocol_handler::RawMessagePtr data) {
-  LOG4CXX_TRACE(logger_,
-                "enter. device_id: " << &device_id << ", app_handle: "
-                                     << &app_handle << ", data: " << data);
+  SDL_TRACE(logger_,
+            "enter. device_id: " << &device_id << ", app_handle: "
+                                 << &app_handle << ", data: " << data);
   if (!initialised_) {
-    LOG4CXX_TRACE(logger_, "exit with BAD_STATE");
+    SDL_TRACE(logger_, "exit with BAD_STATE");
     return BAD_STATE;
   }
 
   ConnectionSPtr connection = FindEstablishedConnection(device_id, app_handle);
   if (connection) {
     TransportAdapter::Error err = connection->SendData(data);
-    LOG4CXX_TRACE(logger_, "exit with error: " << err);
+    SDL_TRACE(logger_, "exit with error: " << err);
     return err;
   } else {
-    LOG4CXX_TRACE(logger_, "exit with BAD_PARAM");
+    SDL_TRACE(logger_, "exit with BAD_PARAM");
     return BAD_PARAM;
   }
 }
@@ -434,11 +432,11 @@ TransportAdapter::Error TransportAdapterImpl::ChangeClientListening(
     TransportAction required_change) {
   SDL_AUTO_TRACE();
   if (client_connection_listener_ == 0) {
-    LOG4CXX_TRACE(logger_, "exit with NOT_SUPPORTED");
+    SDL_TRACE(logger_, "exit with NOT_SUPPORTED");
     return NOT_SUPPORTED;
   }
   if (!client_connection_listener_->IsInitialised()) {
-    LOG4CXX_TRACE(logger_, "exit with BAD_STATE");
+    SDL_TRACE(logger_, "exit with BAD_STATE");
     return BAD_STATE;
   }
 
@@ -477,7 +475,7 @@ TransportAdapter::Error TransportAdapterImpl::ChangeClientListening(
     default:
       NOTREACHED();
   }
-  LOG4CXX_TRACE(logger_, "Exit with error: " << err);
+  SDL_TRACE(logger_, "Exit with error: " << err);
   return err;
 }
 
@@ -489,15 +487,13 @@ DeviceList TransportAdapterImpl::GetDeviceList() const {
        ++it) {
     devices.push_back(it->first);
   }
-  LOG4CXX_TRACE(logger_,
-                "exit with DeviceList. It's' size = " << devices.size());
+  SDL_TRACE(logger_, "exit with DeviceList. It's' size = " << devices.size());
   return devices;
 }
 
 DeviceSptr TransportAdapterImpl::GetWebEngineDevice() const {
 #ifndef WEBSOCKET_SERVER_TRANSPORT_SUPPORT
-  LOG4CXX_TRACE(logger_,
-                "Web engine support is disabled. Device does not exist");
+  SDL_TRACE(logger_, "Web engine support is disabled. Device does not exist");
   return DeviceSptr();
 #else
   SDL_AUTO_TRACE();
@@ -515,13 +511,13 @@ DeviceSptr TransportAdapterImpl::GetWebEngineDevice() const {
     return web_engine_device->second;
   }
 
-  LOG4CXX_ERROR(logger_, "WebEngine device not found!");
+  SDL_ERROR(logger_, "WebEngine device not found!");
   return std::make_shared<transport_adapter::WebSocketDevice>("", "");
 #endif
 }
 
 DeviceSptr TransportAdapterImpl::AddDevice(DeviceSptr device) {
-  LOG4CXX_TRACE(logger_, "enter. device: " << device);
+  SDL_TRACE(logger_, "enter. device: " << device);
   DeviceSptr existing_device;
   bool same_device_found = false;
   devices_mutex_.Acquire();
@@ -530,7 +526,7 @@ DeviceSptr TransportAdapterImpl::AddDevice(DeviceSptr device) {
     existing_device = i->second;
     if (device->IsSameAs(existing_device.get())) {
       same_device_found = true;
-      LOG4CXX_DEBUG(logger_, "device " << device << "already exists");
+      SDL_DEBUG(logger_, "device " << device << "already exists");
       break;
     }
   }
@@ -539,7 +535,7 @@ DeviceSptr TransportAdapterImpl::AddDevice(DeviceSptr device) {
   }
   devices_mutex_.Release();
   if (same_device_found) {
-    LOG4CXX_TRACE(logger_, "exit with TRUE. Condition: same_device_found");
+    SDL_TRACE(logger_, "exit with TRUE. Condition: same_device_found");
     return existing_device;
   } else {
     device->set_connection_status(ConnectionStatus::PENDING);
@@ -551,13 +547,13 @@ DeviceSptr TransportAdapterImpl::AddDevice(DeviceSptr device) {
     if (ToBeAutoConnected(device)) {
       ConnectDevice(device);
     }
-    LOG4CXX_TRACE(logger_, "exit with DeviceSptr " << device);
+    SDL_TRACE(logger_, "exit with DeviceSptr " << device);
     return device;
   }
 }
 
 void TransportAdapterImpl::SearchDeviceDone(const DeviceVector& devices) {
-  LOG4CXX_TRACE(logger_, "enter. devices: " << &devices);
+  SDL_TRACE(logger_, "enter. devices: " << &devices);
   DeviceMap new_devices;
   for (DeviceVector::const_iterator it = devices.begin(); it != devices.end();
        ++it) {
@@ -571,16 +567,16 @@ void TransportAdapterImpl::SearchDeviceDone(const DeviceVector& devices) {
       if (device->IsSameAs(existing_device.get())) {
         existing_device->set_keep_on_disconnect(true);
         device_found = true;
-        LOG4CXX_DEBUG(logger_, "device found. DeviceSptr" << it->second);
+        SDL_DEBUG(logger_, "device found. DeviceSptr" << it->second);
         break;
       }
     }
     devices_mutex_.Release();
 
     if (!device_found) {
-      LOG4CXX_INFO(logger_,
-                   "Adding new device " << device->unique_device_id() << " (\""
-                                        << device->name() << "\")");
+      SDL_INFO(logger_,
+               "Adding new device " << device->unique_device_id() << " (\""
+                                    << device->name() << "\")");
     }
 
     device->set_keep_on_disconnect(true);
@@ -628,7 +624,7 @@ void TransportAdapterImpl::SearchDeviceDone(const DeviceVector& devices) {
       ConnectDevice(device);
     }
   }
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 void TransportAdapterImpl::ApplicationListUpdated(
@@ -638,24 +634,24 @@ void TransportAdapterImpl::ApplicationListUpdated(
 }
 
 void TransportAdapterImpl::FindNewApplicationsRequest() {
-  LOG4CXX_TRACE(logger_, "enter");
+  SDL_TRACE(logger_, "enter");
   for (TransportAdapterListenerList::iterator i = listeners_.begin();
        i != listeners_.end();
        ++i) {
     TransportAdapterListener* listener = *i;
     listener->OnFindNewApplicationsRequest(this);
   }
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 void TransportAdapterImpl::SearchDeviceFailed(const SearchDeviceError& error) {
-  LOG4CXX_TRACE(logger_, "enter");
+  SDL_TRACE(logger_, "enter");
   for (TransportAdapterListenerList::iterator it = listeners_.begin();
        it != listeners_.end();
        ++it) {
     (*it)->OnSearchDeviceFailed(this, error);
   }
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 bool TransportAdapterImpl::IsSearchDevicesSupported() const {
@@ -677,10 +673,9 @@ void TransportAdapterImpl::ConnectionCreated(
     ConnectionSPtr connection,
     const DeviceUID& device_id,
     const ApplicationHandle& app_handle) {
-  LOG4CXX_TRACE(logger_,
-                "enter connection:" << connection
-                                    << ", device_id: " << &device_id
-                                    << ", app_handle: " << &app_handle);
+  SDL_TRACE(logger_,
+            "enter connection:" << connection << ", device_id: " << &device_id
+                                << ", app_handle: " << &app_handle);
   connections_lock_.AcquireForReading();
   ConnectionInfo& info = connections_[std::make_pair(device_id, app_handle)];
   info.app_handle = app_handle;
@@ -693,9 +688,8 @@ void TransportAdapterImpl::ConnectionCreated(
 void TransportAdapterImpl::DeviceDisconnected(
     const DeviceUID& device_handle, const DisconnectDeviceError& error) {
   const DeviceUID device_uid = device_handle;
-  LOG4CXX_TRACE(
-      logger_,
-      "enter. device_handle: " << &device_uid << ", error: " << &error);
+  SDL_TRACE(logger_,
+            "enter. device_handle: " << &device_uid << ", error: " << &error);
   ApplicationList app_list = GetApplicationList(device_uid);
   for (ApplicationList::const_iterator i = app_list.begin();
        i != app_list.end();
@@ -725,7 +719,7 @@ void TransportAdapterImpl::DeviceDisconnected(
   }
 
   RemoveDevice(device_uid);
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 bool TransportAdapterImpl::IsSingleApplication(
@@ -737,9 +731,9 @@ bool TransportAdapterImpl::IsSingleApplication(
     const DeviceUID& current_device_id = it->first.first;
     const ApplicationHandle& current_app_handle = it->first.second;
     if (current_device_id == device_uid && current_app_handle != app_uid) {
-      LOG4CXX_DEBUG(logger_,
-                    "break. Condition: current_device_id == device_id && "
-                    "current_app_handle != app_handle");
+      SDL_DEBUG(logger_,
+                "break. Condition: current_device_id == device_id && "
+                "current_app_handle != app_handle");
 
       return false;
     }
@@ -751,12 +745,12 @@ void TransportAdapterImpl::DisconnectDone(const DeviceUID& device_handle,
                                           const ApplicationHandle& app_handle) {
   const DeviceUID device_uid = device_handle;
   const ApplicationHandle app_uid = app_handle;
-  LOG4CXX_TRACE(
+  SDL_TRACE(
       logger_,
       "enter. device_id: " << &device_uid << ", app_handle: " << &app_uid);
   DeviceSptr device = FindDevice(device_handle);
   if (!device) {
-    LOG4CXX_WARN(logger_, "Device: uid " << &device_uid << " not found");
+    SDL_WARN(logger_, "Device: uid " << &device_uid << " not found");
     return;
   }
 
@@ -779,17 +773,16 @@ void TransportAdapterImpl::DisconnectDone(const DeviceUID& device_handle,
   }
 
   Store();
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 void TransportAdapterImpl::DataReceiveDone(
     const DeviceUID& device_id,
     const ApplicationHandle& app_handle,
     ::protocol_handler::RawMessagePtr message) {
-  LOG4CXX_TRACE(logger_,
-                "enter. device_id: " << &device_id
-                                     << ", app_handle: " << &app_handle
-                                     << ", message: " << message);
+  SDL_TRACE(logger_,
+            "enter. device_id: " << &device_id << ", app_handle: "
+                                 << &app_handle << ", message: " << message);
 
 #ifdef TELEMETRY_MONITOR
   if (metric_observer_) {
@@ -802,33 +795,33 @@ void TransportAdapterImpl::DataReceiveDone(
        ++it) {
     (*it)->OnDataReceiveDone(this, device_id, app_handle, message);
   }
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 void TransportAdapterImpl::DataReceiveFailed(
     const DeviceUID& device_id,
     const ApplicationHandle& app_handle,
     const DataReceiveError& error) {
-  LOG4CXX_TRACE(logger_, "enter");
+  SDL_TRACE(logger_, "enter");
   for (TransportAdapterListenerList::iterator it = listeners_.begin();
        it != listeners_.end();
        ++it) {
     (*it)->OnDataReceiveFailed(this, device_id, app_handle, error);
   }
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 void TransportAdapterImpl::DataSendDone(
     const DeviceUID& device_id,
     const ApplicationHandle& app_handle,
     ::protocol_handler::RawMessagePtr message) {
-  LOG4CXX_TRACE(logger_, "enter");
+  SDL_TRACE(logger_, "enter");
   for (TransportAdapterListenerList::iterator it = listeners_.begin();
        it != listeners_.end();
        ++it) {
     (*it)->OnDataSendDone(this, device_id, app_handle, message);
   }
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 void TransportAdapterImpl::DataSendFailed(
@@ -836,13 +829,13 @@ void TransportAdapterImpl::DataSendFailed(
     const ApplicationHandle& app_handle,
     ::protocol_handler::RawMessagePtr message,
     const DataSendError& error) {
-  LOG4CXX_TRACE(logger_, "enter");
+  SDL_TRACE(logger_, "enter");
   for (TransportAdapterListenerList::iterator it = listeners_.begin();
        it != listeners_.end();
        ++it) {
     (*it)->OnDataSendFailed(this, device_id, app_handle, message, error);
   }
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 void TransportAdapterImpl::TransportConfigUpdated(
@@ -866,15 +859,15 @@ void TransportAdapterImpl::DoTransportSwitch() const {
 }
 
 void TransportAdapterImpl::DeviceSwitched(const DeviceUID& device_handle) {
-  LOG4CXX_DEBUG(logger_,
-                "Switching is not implemented for that adapter type "
-                    << GetConnectionType().c_str());
+  SDL_DEBUG(logger_,
+            "Switching is not implemented for that adapter type "
+                << GetConnectionType().c_str());
   UNUSED(device_handle);
 }
 
 ConnectionSPtr TransportAdapterImpl::FindPendingConnection(
     const DeviceUID& device_id, const ApplicationHandle& app_handle) const {
-  LOG4CXX_TRACE(
+  SDL_TRACE(
       logger_,
       "enter. device_id: " << &device_id << ", app_handle: " << &app_handle);
   ConnectionSPtr connection;
@@ -888,22 +881,22 @@ ConnectionSPtr TransportAdapterImpl::FindPendingConnection(
     }
   }
   connections_lock_.Release();
-  LOG4CXX_TRACE(logger_, "exit with Connection: " << connection);
+  SDL_TRACE(logger_, "exit with Connection: " << connection);
   return connection;
 }
 
 DeviceSptr TransportAdapterImpl::FindDevice(const DeviceUID& device_id) const {
-  LOG4CXX_TRACE(logger_, "enter. device_id: " << &device_id);
+  SDL_TRACE(logger_, "enter. device_id: " << &device_id);
   DeviceSptr ret;
   sync_primitives::AutoLock locker(devices_mutex_);
-  LOG4CXX_DEBUG(logger_, "devices_.size() = " << devices_.size());
+  SDL_DEBUG(logger_, "devices_.size() = " << devices_.size());
   DeviceMap::const_iterator it = devices_.find(device_id);
   if (it != devices_.end()) {
     ret = it->second;
   } else {
-    LOG4CXX_WARN(logger_, "Device " << device_id << " not found.");
+    SDL_WARN(logger_, "Device " << device_id << " not found.");
   }
-  LOG4CXX_TRACE(logger_, "exit with DeviceSptr: " << ret);
+  SDL_TRACE(logger_, "exit with DeviceSptr: " << ret);
   return ret;
 }
 
@@ -921,8 +914,8 @@ void TransportAdapterImpl::ConnectPending(const DeviceUID& device_id,
 
   DeviceSptr device = FindDevice(device_id);
   if (device.use_count() == 0) {
-    LOG4CXX_ERROR(
-        logger_, "Unable to find device, cannot set connection pending status");
+    SDL_ERROR(logger_,
+              "Unable to find device, cannot set connection pending status");
     return;
   } else {
     device->set_connection_status(ConnectionStatus::PENDING);
@@ -937,7 +930,7 @@ void TransportAdapterImpl::ConnectPending(const DeviceUID& device_id,
 
 void TransportAdapterImpl::ConnectDone(const DeviceUID& device_id,
                                        const ApplicationHandle& app_handle) {
-  LOG4CXX_TRACE(
+  SDL_TRACE(
       logger_,
       "enter. device_id: " << &device_id << ", app_handle: " << &app_handle);
   connections_lock_.AcquireForReading();
@@ -956,7 +949,7 @@ void TransportAdapterImpl::ConnectDone(const DeviceUID& device_id,
   }
 
   Store();
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 void TransportAdapterImpl::ConnectFailed(const DeviceUID& device_handle,
@@ -964,16 +957,16 @@ void TransportAdapterImpl::ConnectFailed(const DeviceUID& device_handle,
                                          const ConnectError& error) {
   const DeviceUID device_uid = device_handle;
   const ApplicationHandle app_uid = app_handle;
-  LOG4CXX_TRACE(logger_,
-                "enter. device_id: " << &device_uid << ", app_handle: "
-                                     << &app_uid << ", error: " << &error);
+  SDL_TRACE(logger_,
+            "enter. device_id: " << &device_uid << ", app_handle: " << &app_uid
+                                 << ", error: " << &error);
   RemoveConnection(device_uid, app_uid);
   for (TransportAdapterListenerList::iterator it = listeners_.begin();
        it != listeners_.end();
        ++it) {
     (*it)->OnConnectFailed(this, device_uid, app_uid, error);
   }
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 void TransportAdapterImpl::RemoveFinalizedConnection(
@@ -984,37 +977,35 @@ void TransportAdapterImpl::RemoveFinalizedConnection(
     connections_lock_.AcquireForWriting();
     auto it_conn = connections_.find(std::make_pair(device_uid, app_handle));
     if (connections_.end() == it_conn) {
-      LOG4CXX_WARN(logger_,
-                   "Device_id: " << &device_uid << ", app_handle: "
-                                 << &app_handle << " connection not found");
+      SDL_WARN(logger_,
+               "Device_id: " << &device_uid << ", app_handle: " << &app_handle
+                             << " connection not found");
       connections_lock_.Release();
       return;
     }
     const ConnectionInfo& info = it_conn->second;
     if (ConnectionInfo::FINALISING != info.state) {
-      LOG4CXX_WARN(logger_,
-                   "Device_id: " << &device_uid << ", app_handle: "
-                                 << &app_handle << " connection not finalized");
+      SDL_WARN(logger_,
+               "Device_id: " << &device_uid << ", app_handle: " << &app_handle
+                             << " connection not finalized");
       connections_lock_.Release();
       return;
     }
     // By copying the info.connection shared pointer into this local variable,
     // we can delay the connection's destructor until after
     // connections_lock_.Release.
-    LOG4CXX_DEBUG(
-        logger_,
-        "RemoveFinalizedConnection copying connection with Device_id: "
-            << &device_uid << ", app_handle: " << &app_handle);
+    SDL_DEBUG(logger_,
+              "RemoveFinalizedConnection copying connection with Device_id: "
+                  << &device_uid << ", app_handle: " << &app_handle);
     ConnectionSPtr connection = info.connection;
     connections_.erase(it_conn);
     connections_lock_.Release();
-    LOG4CXX_DEBUG(logger_,
-                  "RemoveFinalizedConnection Connections Lock Released");
+    SDL_DEBUG(logger_, "RemoveFinalizedConnection Connections Lock Released");
   }
 
   DeviceSptr device = FindDevice(device_handle);
   if (!device) {
-    LOG4CXX_WARN(logger_, "Device: uid " << &device_uid << " not found");
+    SDL_WARN(logger_, "Device: uid " << &device_uid << " not found");
     return;
   }
 
@@ -1033,45 +1024,45 @@ void TransportAdapterImpl::RemoveConnection(
   if (it != connections_.end()) {
     // By copying the connection from the map to this shared pointer,
     // we can erase the object from the map without triggering the destructor
-    LOG4CXX_DEBUG(logger_,
-                  "Copying connection with Device_id: "
-                      << &device_id << ", app_handle: " << &app_handle);
+    SDL_DEBUG(logger_,
+              "Copying connection with Device_id: "
+                  << &device_id << ", app_handle: " << &app_handle);
     connection = it->second.connection;
     connections_.erase(it);
   }
   connections_lock_.Release();
-  LOG4CXX_DEBUG(logger_, "Connections Lock Released");
+  SDL_DEBUG(logger_, "Connections Lock Released");
 
   // And now, "connection" goes out of scope, triggering the destructor outside
   // of the "connections_lock_"
 }
 
 void TransportAdapterImpl::AddListener(TransportAdapterListener* listener) {
-  LOG4CXX_TRACE(logger_, "enter");
+  SDL_TRACE(logger_, "enter");
   listeners_.push_back(listener);
-  LOG4CXX_TRACE(logger_, "exit");
+  SDL_TRACE(logger_, "exit");
 }
 
 ApplicationList TransportAdapterImpl::GetApplicationList(
     const DeviceUID& device_id) const {
-  LOG4CXX_TRACE(logger_, "enter. device_id: " << &device_id);
+  SDL_TRACE(logger_, "enter. device_id: " << &device_id);
   DeviceSptr device = FindDevice(device_id);
   if (device.use_count() != 0) {
     ApplicationList lst = device->GetApplicationList();
-    LOG4CXX_TRACE(logger_,
-                  "exit with ApplicationList. It's size = "
-                      << lst.size() << " Condition: device.use_count() != 0");
+    SDL_TRACE(logger_,
+              "exit with ApplicationList. It's size = "
+                  << lst.size() << " Condition: device.use_count() != 0");
     return lst;
   }
-  LOG4CXX_TRACE(logger_,
-                "exit with empty ApplicationList. Condition: NOT "
-                "device.use_count() != 0");
+  SDL_TRACE(logger_,
+            "exit with empty ApplicationList. Condition: NOT "
+            "device.use_count() != 0");
   return ApplicationList();
 }
 
 void TransportAdapterImpl::ConnectionFinished(
     const DeviceUID& device_id, const ApplicationHandle& app_handle) {
-  LOG4CXX_TRACE(
+  SDL_TRACE(
       logger_,
       "enter. device_id: " << &device_id << ", app_handle: " << &app_handle);
   connections_lock_.AcquireForReading();
@@ -1097,32 +1088,32 @@ void TransportAdapterImpl::ConnectionAborted(
 }
 
 bool TransportAdapterImpl::IsInitialised() const {
-  LOG4CXX_TRACE(logger_, "enter");
+  SDL_TRACE(logger_, "enter");
   if (!initialised_) {
-    LOG4CXX_TRACE(logger_, "exit with FALSE. Condition: !initialised_");
+    SDL_TRACE(logger_, "exit with FALSE. Condition: !initialised_");
     return false;
   }
   if (device_scanner_ && !device_scanner_->IsInitialised()) {
-    LOG4CXX_TRACE(logger_,
-                  "exit with FALSE. Condition: device_scanner_ && "
-                  "!device_scanner_->IsInitialised()");
+    SDL_TRACE(logger_,
+              "exit with FALSE. Condition: device_scanner_ && "
+              "!device_scanner_->IsInitialised()");
     return false;
   }
   if (server_connection_factory_ &&
       !server_connection_factory_->IsInitialised()) {
-    LOG4CXX_TRACE(logger_,
-                  "exit with FALSE. Condition: server_connection_factory_ && "
-                  "!server_connection_factory_->IsInitialised()");
+    SDL_TRACE(logger_,
+              "exit with FALSE. Condition: server_connection_factory_ && "
+              "!server_connection_factory_->IsInitialised()");
     return false;
   }
   if (client_connection_listener_ &&
       !client_connection_listener_->IsInitialised()) {
-    LOG4CXX_TRACE(logger_,
-                  "exit with FALSE. Condition: client_connection_listener_ && "
-                  "!client_connection_listener_->IsInitialised()");
+    SDL_TRACE(logger_,
+              "exit with FALSE. Condition: client_connection_listener_ && "
+              "!client_connection_listener_->IsInitialised()");
     return false;
   }
-  LOG4CXX_TRACE(logger_, "exit with TRUE");
+  SDL_TRACE(logger_, "exit with TRUE");
   return true;
 }
 
@@ -1157,15 +1148,14 @@ SwitchableDevices TransportAdapterImpl::GetSwitchableDevices() const {
     const auto device = it->second;
     const auto transport_switch_id = device->transport_switch_id();
     if (transport_switch_id.empty()) {
-      LOG4CXX_DEBUG(logger_,
-                    "Device is not suitable for switching: " << device_uid);
+      SDL_DEBUG(logger_,
+                "Device is not suitable for switching: " << device_uid);
       continue;
     }
-    LOG4CXX_DEBUG(logger_, "Device is suitable for switching: " << device_uid);
+    SDL_DEBUG(logger_, "Device is suitable for switching: " << device_uid);
     devices.insert(std::make_pair(device_uid, transport_switch_id));
   }
-  LOG4CXX_INFO(logger_,
-               "Found number of switchable devices: " << devices.size());
+  SDL_INFO(logger_, "Found number of switchable devices: " << devices.size());
   return devices;
 }
 
@@ -1197,7 +1187,7 @@ bool TransportAdapterImpl::ToBeAutoDisconnected(DeviceSptr device) const {
 
 ConnectionSPtr TransportAdapterImpl::FindEstablishedConnection(
     const DeviceUID& device_id, const ApplicationHandle& app_handle) const {
-  LOG4CXX_TRACE(
+  SDL_TRACE(
       logger_,
       "enter. device_id: " << &device_id << ", app_handle: " << &app_handle);
   ConnectionSPtr connection;
@@ -1211,47 +1201,47 @@ ConnectionSPtr TransportAdapterImpl::FindEstablishedConnection(
     }
   }
   connections_lock_.Release();
-  LOG4CXX_TRACE(logger_, "exit with Connection: " << connection);
+  SDL_TRACE(logger_, "exit with Connection: " << connection);
   return connection;
 }
 
 TransportAdapter::Error TransportAdapterImpl::ConnectDevice(DeviceSptr device) {
-  LOG4CXX_TRACE(logger_, "enter. device: " << device);
+  SDL_TRACE(logger_, "enter. device: " << device);
   DeviceUID device_id = device->unique_device_id();
   ApplicationList app_list = device->GetApplicationList();
-  LOG4CXX_INFO(logger_,
-               "Device " << device->name() << " has " << app_list.size()
-                         << " applications.");
+  SDL_INFO(logger_,
+           "Device " << device->name() << " has " << app_list.size()
+                     << " applications.");
   bool errors_occurred = false;
   for (ApplicationList::iterator it = app_list.begin(); it != app_list.end();
        ++it) {
     const ApplicationHandle app_handle = *it;
-    LOG4CXX_DEBUG(logger_,
-                  "Attempt to connect device " << device_id << ", channel "
-                                               << app_handle);
+    SDL_DEBUG(logger_,
+              "Attempt to connect device " << device_id << ", channel "
+                                           << app_handle);
     const Error error = Connect(device_id, app_handle);
     switch (error) {
       case OK:
-        LOG4CXX_DEBUG(logger_, "error = OK");
+        SDL_DEBUG(logger_, "error = OK");
         break;
       case ALREADY_EXISTS:
-        LOG4CXX_DEBUG(logger_, "error = ALREADY_EXISTS");
+        SDL_DEBUG(logger_, "error = ALREADY_EXISTS");
         break;
       default:
-        LOG4CXX_ERROR(logger_,
-                      "Connect to device " << device_id << ", channel "
-                                           << app_handle
-                                           << " failed with error " << error);
+        SDL_ERROR(logger_,
+                  "Connect to device " << device_id << ", channel "
+                                       << app_handle << " failed with error "
+                                       << error);
         errors_occurred = true;
-        LOG4CXX_DEBUG(logger_, "switch (error), default case");
+        SDL_DEBUG(logger_, "switch (error), default case");
         break;
     }
   }
   if (errors_occurred) {
-    LOG4CXX_TRACE(logger_, "exit with error:FAIL");
+    SDL_TRACE(logger_, "exit with error:FAIL");
     return FAIL;
   } else {
-    LOG4CXX_TRACE(logger_, "exit with error:OK");
+    SDL_TRACE(logger_, "exit with error:OK");
     return OK;
   }
 }
@@ -1262,9 +1252,9 @@ void TransportAdapterImpl::RunAppOnDevice(const DeviceUID& device_uid,
 
   DeviceSptr device = FindDevice(device_uid);
   if (!device) {
-    LOG4CXX_WARN(logger_,
-                 "Device with id: " << device_uid << " Not found"
-                                    << "withing list of connected deviced");
+    SDL_WARN(logger_,
+             "Device with id: " << device_uid << " Not found"
+                                << "withing list of connected deviced");
     return;
   }
 
@@ -1273,7 +1263,7 @@ void TransportAdapterImpl::RunAppOnDevice(const DeviceUID& device_uid,
 
 void TransportAdapterImpl::RemoveDevice(const DeviceUID& device_handle) {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "Remove Device_handle: " << &device_handle);
+  SDL_DEBUG(logger_, "Remove Device_handle: " << &device_handle);
   sync_primitives::AutoLock locker(devices_mutex_);
   DeviceMap::iterator i = devices_.find(device_handle);
   if (i != devices_.end()) {

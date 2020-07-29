@@ -65,7 +65,7 @@ void TTSIsReadyRequest::on_event(const event_engine::Event& event) {
   const smart_objects::SmartObject& message = event.smart_object();
   switch (event.id()) {
     case hmi_apis::FunctionID::TTS_IsReady: {
-      LOG4CXX_DEBUG(logger_, "Received TTS_IsReady event");
+      SDL_DEBUG(logger_, "Received TTS_IsReady event");
       unsubscribe_from_event(hmi_apis::FunctionID::TTS_IsReady);
       const bool is_available = app_mngr::commands::ChangeInterfaceState(
           application_manager_, message, HmiInterfaces::HMI_INTERFACE_TTS);
@@ -74,8 +74,7 @@ void TTSIsReadyRequest::on_event(const event_engine::Event& event) {
       if (!app_mngr::commands::CheckAvailabilityHMIInterfaces(
               application_manager_, HmiInterfaces::HMI_INTERFACE_TTS)) {
         UpdateRequiredInterfaceCapabilitiesRequests(hmi_interface::tts);
-        LOG4CXX_INFO(logger_,
-                     "HmiInterfaces::HMI_INTERFACE_TTS isn't available");
+        SDL_INFO(logger_, "HmiInterfaces::HMI_INTERFACE_TTS isn't available");
         return;
       }
 
@@ -83,7 +82,7 @@ void TTSIsReadyRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR(logger_, "Received unknown event" << event.id());
       return;
     }
   }

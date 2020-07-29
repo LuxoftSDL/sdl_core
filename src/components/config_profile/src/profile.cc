@@ -51,19 +51,18 @@
 #endif  // ENABLE_SECURITY
 
 namespace {
-#define LOG_UPDATED_VALUE(value, key, section)                              \
-  {                                                                         \
-    LOG4CXX_INFO(logger_,                                                   \
-                 "Setting value '" << value << "' for key '" << key         \
-                                   << "' in section '" << section << "'."); \
+#define LOG_UPDATED_VALUE(value, key, section)                          \
+  {                                                                     \
+    SDL_INFO(logger_,                                                   \
+             "Setting value '" << value << "' for key '" << key         \
+                               << "' in section '" << section << "'."); \
   }
 
 #define LOG_UPDATED_BOOL_VALUE(value, key, section)                            \
   {                                                                            \
-    LOG4CXX_INFO(logger_,                                                      \
-                 "Setting value '" << std::boolalpha << value << "' for key '" \
-                                   << key << "' in section '" << section       \
-                                   << "'.");                                   \
+    SDL_INFO(logger_,                                                          \
+             "Setting value '" << std::boolalpha << value << "' for key '"     \
+                               << key << "' in section '" << section << "'."); \
   }
 
 const char* kDefaultConfigFileName = "smartDeviceLink.ini";
@@ -445,7 +444,7 @@ const char* kDefaultAOAFilterSerialNumber = "N000000";
 
 namespace profile {
 
-SDL_CREATE_LOGGERPTR( "Profile")
+SDL_CREATE_LOGGERPTR("Profile")
 
 Profile::Profile()
     : sdl_version_(kDefaultSDLVersion)
@@ -2849,7 +2848,7 @@ bool Profile::StringToNumber(const std::string& input, uint64_t& output) const {
 
 bool Profile::IsRelativePath(const std::string& path) {
   if (path.empty()) {
-    LOG4CXX_ERROR(logger_, "Empty path passed.");
+    SDL_ERROR(logger_, "Empty path passed.");
     return false;
   }
   return '/' != path[0];

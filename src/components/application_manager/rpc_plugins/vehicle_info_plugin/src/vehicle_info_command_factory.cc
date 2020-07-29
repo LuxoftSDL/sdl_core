@@ -32,7 +32,7 @@
 
 #include "vehicle_info_plugin/vehicle_info_command_factory.h"
 
-SDL_CREATE_LOGGERPTR( "VehicleInfoPlugin")
+SDL_CREATE_LOGGERPTR("VehicleInfoPlugin")
 
 namespace vehicle_info_plugin {
 

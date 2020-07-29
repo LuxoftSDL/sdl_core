@@ -140,8 +140,8 @@ MessageLoopThread<Q>::MessageLoopThread(const std::string& name,
     , thread_(threads::CreateThread(name.c_str(), thread_delegate_)) {
   const bool started = thread_->start(thread_opts);
   if (!started) {
-    SDL_CREATE_LOGGERPTR( "Utils")
-    LOG4CXX_ERROR(logger_, "Failed to start thread " << name);
+    SDL_CREATE_LOGGERPTR("Utils")
+    SDL_ERROR(logger_, "Failed to start thread " << name);
   }
 }
 
@@ -178,7 +178,7 @@ MessageLoopThread<Q>::LoopThreadDelegate::LoopThreadDelegate(
 
 template <class Q>
 void MessageLoopThread<Q>::LoopThreadDelegate::threadMain() {
-  SDL_CREATE_LOGGERPTR( "Utils")
+  SDL_CREATE_LOGGERPTR("Utils")
   SDL_AUTO_TRACE();
   while (!message_queue_.IsShuttingDown()) {
     DrainQue();

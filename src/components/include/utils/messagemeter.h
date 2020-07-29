@@ -41,7 +41,7 @@
 
 namespace utils {
 
-SDL_CREATE_LOGGERPTR( "MessageMeter")
+SDL_CREATE_LOGGERPTR("MessageMeter")
 /**
     @brief The MessageMeter class need to count message frequency
     Default time range value is 1 second

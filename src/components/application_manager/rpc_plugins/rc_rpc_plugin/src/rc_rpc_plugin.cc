@@ -43,7 +43,7 @@
 #include "utils/helpers.h"
 
 namespace rc_rpc_plugin {
-SDL_CREATE_LOGGERPTR( "RemoteControlModule");
+SDL_CREATE_LOGGERPTR("RemoteControlModule");
 
 namespace plugins = application_manager::plugin_manager;
 
@@ -117,10 +117,9 @@ void RCRPCPlugin::OnApplicationEvent(
     application_manager::ApplicationSharedPtr application) {
   SDL_AUTO_TRACE();
   if (!application->is_remote_control_supported()) {
-    LOG4CXX_DEBUG(
-        logger_,
-        "Remote control is not supported for application with app_id: "
-            << application->app_id());
+    SDL_DEBUG(logger_,
+              "Remote control is not supported for application with app_id: "
+                  << application->app_id());
     return;
   }
   switch (event) {

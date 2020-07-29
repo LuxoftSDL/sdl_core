@@ -35,7 +35,7 @@
 #include "application_manager/message_helper.h"
 #include "utils/helpers.h"
 
-SDL_CREATE_LOGGERPTR( "RPCProtectionManagerImpl");
+SDL_CREATE_LOGGERPTR("RPCProtectionManagerImpl");
 
 namespace application_manager {
 
@@ -62,22 +62,22 @@ bool RPCProtectionManagerImpl::CheckPolicyEncryptionFlag(
   const auto& policy_encryption_flag_getter =
       policy_handler_.PolicyEncryptionFlagGetter();
   if (!policy_encryption_flag_getter) {
-    LOG4CXX_ERROR(logger_, "Policy Encryption Flag getter is not inited");
+    SDL_ERROR(logger_, "Policy Encryption Flag getter is not inited");
     return false;
   }
   const std::string function_name =
       policy_encryption_flag_getter->GetPolicyFunctionName(function_id);
-  LOG4CXX_DEBUG(logger_, "Function for check is " << function_name);
+  SDL_DEBUG(logger_, "Function for check is " << function_name);
 
   if (!is_rpc_service_secure && IsExceptionRPC(function_id)) {
-    LOG4CXX_WARN(logger_,
-                 "Exception RPC can be sent in an non secure service despite "
-                 "encryption required flag");
+    SDL_WARN(logger_,
+             "Exception RPC can be sent in an non secure service despite "
+             "encryption required flag");
     return false;
   }
 
   if (!app) {
-    LOG4CXX_WARN(logger_, "Received app nullptr");
+    SDL_WARN(logger_, "Received app nullptr");
     return false;
   }
 
@@ -93,7 +93,7 @@ bool RPCProtectionManagerImpl::IsEncryptionRequiredByPolicy(
   auto it = encrypted_rpcs_.find(policy_app_id);
 
   if (encrypted_rpcs_.end() == it) {
-    LOG4CXX_WARN(
+    SDL_WARN(
         logger_,
         "App specific policies for app: " << policy_app_id << " not found");
     it = encrypted_rpcs_.find(policy_table::kDefaultApp);
@@ -108,7 +108,7 @@ bool RPCProtectionManagerImpl::IsEncryptionRequiredByPolicy(
 bool RPCProtectionManagerImpl::IsInEncryptionNeededCache(
     const uint32_t app_id, const uint32_t correlation_id) const {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "correlation_id is " << correlation_id);
+  SDL_DEBUG(logger_, "correlation_id is " << correlation_id);
 
   return encryption_needed_cache_.find(std::make_pair(
              app_id, correlation_id)) != encryption_needed_cache_.end();
@@ -127,7 +127,7 @@ void RPCProtectionManagerImpl::AddToEncryptionNeededCache(
   SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(message_needed_encryption_lock_);
 
-  LOG4CXX_DEBUG(logger_, "Adding rpc with correlation id: " << correlation_id);
+  SDL_DEBUG(logger_, "Adding rpc with correlation id: " << correlation_id);
 
   encryption_needed_cache_.insert(std::make_pair(app_id, correlation_id));
 }
@@ -137,8 +137,7 @@ void RPCProtectionManagerImpl::RemoveFromEncryptionNeededCache(
   SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(message_needed_encryption_lock_);
 
-  LOG4CXX_DEBUG(logger_,
-                "Removing rpc with correlation id: " << correlation_id);
+  SDL_DEBUG(logger_, "Removing rpc with correlation id: " << correlation_id);
 
   encryption_needed_cache_.erase(std::make_pair(app_id, correlation_id));
 }
@@ -148,15 +147,15 @@ void RPCProtectionManagerImpl::OnPTUFinished(const bool ptu_result) {
   sync_primitives::AutoLock lock(encrypted_rpcs_lock_);
 
   if (ptu_result) {
-    LOG4CXX_TRACE(logger_,
-                  "PTU finished successfully, commencing internal encrypted "
-                  "RPC cache update");
+    SDL_TRACE(logger_,
+              "PTU finished successfully, commencing internal encrypted "
+              "RPC cache update");
     encrypted_rpcs_.clear();
     SaveEncryptedRPC();
   } else {
-    LOG4CXX_WARN(logger_,
-                 "PTU was unsuccessful. Keeping internal RPC cache from "
-                 "current snapshot");
+    SDL_WARN(logger_,
+             "PTU was unsuccessful. Keeping internal RPC cache from "
+             "current snapshot");
   }
 }
 
@@ -170,7 +169,7 @@ void RPCProtectionManagerImpl::SaveEncryptedRPC() {
       policy_encryption_flag_getter->GetApplicationPolicyIDs();
 
   for (const auto& app : policy_policy_app_ids) {
-    LOG4CXX_DEBUG(logger_, "Processing app name: " << app);
+    SDL_DEBUG(logger_, "Processing app name: " << app);
 
     encrypted_rpcs_[app] = GetEncryptedRPCsForApp(app);
   }
@@ -200,11 +199,11 @@ RPCProtectionManagerImpl::GetEncryptedRPCsForApp(
   const auto function_groups =
       policy_encryption_flag_getter->GetFunctionalGroupsForApp(policy_app_id);
 
-  auto fill_encrypted_rpcs = [&encrypted_rpcs](
-                                 const std::string& function_name) {
-    LOG4CXX_DEBUG(logger_, "Adding required encryprion rpc: " << function_name);
-    encrypted_rpcs.insert(function_name);
-  };
+  auto fill_encrypted_rpcs =
+      [&encrypted_rpcs](const std::string& function_name) {
+        SDL_DEBUG(logger_, "Adding required encryprion rpc: " << function_name);
+        encrypted_rpcs.insert(function_name);
+      };
 
   for (const auto& function_group : function_groups) {
     if (policy_encryption_flag_getter->FunctionGroupNeedEncryption(

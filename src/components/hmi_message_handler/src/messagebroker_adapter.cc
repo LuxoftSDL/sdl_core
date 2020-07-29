@@ -38,7 +38,7 @@
 
 namespace hmi_message_handler {
 
-SDL_CREATE_LOGGERPTR( "HMIMessageHandler")
+SDL_CREATE_LOGGERPTR("HMIMessageHandler")
 
 typedef hmi_message_handler::CMessageBrokerController MessageBrokerController;
 
@@ -47,7 +47,7 @@ MessageBrokerAdapter::MessageBrokerAdapter(HMIMessageHandler* handler_param,
                                            uint16_t port)
     : HMIMessageAdapterImpl(handler_param)
     , MessageBrokerController(server_address, port, "SDL", 8) {
-  LOG4CXX_TRACE(logger_, "Created MessageBrokerAdapter");
+  SDL_TRACE(logger_, "Created MessageBrokerAdapter");
 }
 
 MessageBrokerAdapter::~MessageBrokerAdapter() {}
@@ -57,7 +57,7 @@ void MessageBrokerAdapter::SendMessageToHMI(
   SDL_AUTO_TRACE();
 
   if (message.use_count() == 0) {
-    LOG4CXX_ERROR(logger_, "Can`t send not valid message");
+    SDL_ERROR(logger_, "Can`t send not valid message");
     return;
   }
 
@@ -66,7 +66,7 @@ void MessageBrokerAdapter::SendMessageToHMI(
   const std::string str = message->json_message();
 
   if (!reader.parse(str, &json_value)) {
-    LOG4CXX_ERROR(logger_, "Received invalid json string. ");
+    SDL_ERROR(logger_, "Received invalid json string. ");
     return;
   }
 
@@ -90,7 +90,7 @@ void MessageBrokerAdapter::processNotification(Json::Value& root) {
 }
 
 void MessageBrokerAdapter::SubscribeTo() {
-  LOG4CXX_INFO(logger_, "MessageBrokerAdapter::subscribeTo");
+  SDL_INFO(logger_, "MessageBrokerAdapter::subscribeTo");
   MessageBrokerController::subscribeTo("Buttons.OnButtonEvent");
   MessageBrokerController::subscribeTo("Buttons.OnButtonPress");
   MessageBrokerController::subscribeTo("UI.OnCommand");
@@ -144,7 +144,7 @@ void MessageBrokerAdapter::SubscribeTo() {
   MessageBrokerController::subscribeTo(
       "BasicCommunication.OnSystemCapabilityUpdated");
 
-  LOG4CXX_INFO(logger_, "Subscribed to notifications.");
+  SDL_INFO(logger_, "Subscribed to notifications.");
 }
 
 void* MessageBrokerAdapter::SubscribeAndBeginReceiverThread(void* param) {
@@ -158,7 +158,7 @@ void* MessageBrokerAdapter::SubscribeAndBeginReceiverThread(void* param) {
 
 void MessageBrokerAdapter::ProcessRecievedFromMB(Json::Value& root) {
   SDL_AUTO_TRACE();
-  LOG4CXX_INFO(logger_, "MB_Adapter: " << root);
+  SDL_INFO(logger_, "MB_Adapter: " << root);
   if (root.isNull()) {
     // LOG
     return;
@@ -184,12 +184,12 @@ void MessageBrokerAdapter::ProcessRecievedFromMB(Json::Value& root) {
       protocol_handler::MajorProtocolVersion::PROTOCOL_VERSION_HMI);
 
   if (!handler()) {
-    LOG4CXX_WARN(logger_, "handler is NULL");
+    SDL_WARN(logger_, "handler is NULL");
     return;
   }
 
   handler()->OnMessageReceived(message);
-  LOG4CXX_INFO(logger_, "Successfully sent to observer");
+  SDL_INFO(logger_, "Successfully sent to observer");
 }
 
 }  // namespace hmi_message_handler

@@ -48,7 +48,7 @@
 
 namespace transport_manager {
 namespace transport_adapter {
-SDL_CREATE_LOGGERPTR( "TransportManager")
+SDL_CREATE_LOGGERPTR("TransportManager")
 
 BluetoothSocketConnection::BluetoothSocketConnection(
     const DeviceUID& device_uid,
@@ -62,7 +62,7 @@ BluetoothSocketConnection::~BluetoothSocketConnection() {
 
 bool BluetoothSocketConnection::Establish(ConnectError** error) {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "error: " << error);
+  SDL_DEBUG(logger_, "error: " << error);
   DeviceSptr device = controller()->FindDevice(device_handle());
 
   BluetoothDevice* bluetooth_device =
@@ -71,10 +71,9 @@ bool BluetoothSocketConnection::Establish(ConnectError** error) {
   uint8_t rfcomm_channel;
   if (!bluetooth_device->GetRfcommChannel(application_handle(),
                                           &rfcomm_channel)) {
-    LOG4CXX_DEBUG(logger_,
-                  "Application " << application_handle() << " not found");
+    SDL_DEBUG(logger_, "Application " << application_handle() << " not found");
     *error = new ConnectError();
-    LOG4CXX_TRACE(logger_, "exit with FALSE");
+    SDL_TRACE(logger_, "exit with FALSE");
     return false;
   }
 
@@ -89,25 +88,25 @@ bool BluetoothSocketConnection::Establish(ConnectError** error) {
 
   int attempts = 4;
   int connect_status = 0;
-  LOG4CXX_DEBUG(logger_, "start rfcomm Connect attempts");
+  SDL_DEBUG(logger_, "start rfcomm Connect attempts");
   do {
     rfcomm_socket = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
     if (-1 == rfcomm_socket) {
-      LOG4CXX_ERROR_WITH_ERRNO(
+      SDL_ERROR_WITH_ERRNO(
           logger_,
           "Failed to create RFCOMM socket for device " << device_handle());
       *error = new ConnectError();
-      LOG4CXX_TRACE(logger_, "exit with FALSE");
+      SDL_TRACE(logger_, "exit with FALSE");
       return false;
     }
     connect_status = ::connect(rfcomm_socket,
                                (struct sockaddr*)&remoteSocketAddress,
                                sizeof(remoteSocketAddress));
     if (0 == connect_status) {
-      LOG4CXX_DEBUG(logger_, "rfcomm Connect ok");
+      SDL_DEBUG(logger_, "rfcomm Connect ok");
       break;
     } else {  // If connect_status is not 0, an errno is returned
-      LOG4CXX_WARN_WITH_ERRNO(logger_, "rfcomm Connect failed");
+      SDL_WARN_WITH_ERRNO(logger_, "rfcomm Connect failed");
       close(rfcomm_socket);  // Always close the socket upon error
       if (errno != ECONNREFUSED && errno != ECONNRESET) {
         break;
@@ -115,20 +114,20 @@ bool BluetoothSocketConnection::Establish(ConnectError** error) {
     }
     sleep(2);
   } while (--attempts > 0);
-  LOG4CXX_INFO(logger_, "rfcomm Connect attempts finished");
+  SDL_INFO(logger_, "rfcomm Connect attempts finished");
   if (0 != connect_status) {
-    LOG4CXX_DEBUG(
+    SDL_DEBUG(
         logger_,
         "Failed to Connect to remote device "
             << BluetoothDevice::GetUniqueDeviceId(remoteSocketAddress.rc_bdaddr)
             << " for session " << this);
     *error = new ConnectError();
-    LOG4CXX_TRACE(logger_, "exit with FALSE");
+    SDL_TRACE(logger_, "exit with FALSE");
     return false;
   }
 
   set_socket(rfcomm_socket);
-  LOG4CXX_TRACE(logger_, "exit with TRUE");
+  SDL_TRACE(logger_, "exit with TRUE");
   return true;
 }
 

@@ -62,7 +62,7 @@ void SDLPolicyUpdateResponse::Run() {
                        helpers::ALL>(code,
                                      hmi_apis::Common_Result::SUCCESS,
                                      hmi_apis::Common_Result::WARNINGS)) {
-    LOG4CXX_ERROR(logger_, "Error is returned. PTU won't be started.");
+    SDL_ERROR(logger_, "Error is returned. PTU won't be started.");
     return;
   }
 

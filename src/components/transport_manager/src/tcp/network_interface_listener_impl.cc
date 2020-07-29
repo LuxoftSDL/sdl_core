@@ -4,7 +4,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "TransportManager")
+SDL_CREATE_LOGGERPTR("TransportManager")
 
 NetworkInterfaceListenerImpl::NetworkInterfaceListenerImpl(
     TcpClientListener* tcp_client_listener,

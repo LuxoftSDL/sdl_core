@@ -66,7 +66,7 @@ void OnExitAllApplicationsNotification::Run() {
   const hmi_apis::Common_ApplicationsCloseReason::eType reason =
       static_cast<hmi_apis::Common_ApplicationsCloseReason::eType>(
           (*message_)[strings::msg_params][hmi_request::reason].asInt());
-  LOG4CXX_DEBUG(logger_, "Reason " << reason);
+  SDL_DEBUG(logger_, "Reason " << reason);
 
   mobile_api::AppInterfaceUnregisteredReason::eType mob_reason =
       mobile_api::AppInterfaceUnregisteredReason::INVALID_ENUM;
@@ -90,7 +90,7 @@ void OnExitAllApplicationsNotification::Run() {
       return;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Unknown Application close reason" << reason);
+      SDL_ERROR(logger_, "Unknown Application close reason" << reason);
       return;
     }
   }

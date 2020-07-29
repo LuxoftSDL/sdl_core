@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "WebSocketConnection")
+SDL_CREATE_LOGGERPTR("WebSocketConnection")
 
 using namespace boost::beast::websocket;
 
@@ -113,7 +113,7 @@ void WebSocketConnection<Session>::OnError() {
 
 template <typename Session>
 TransportAdapter::Error WebSocketConnection<Session>::Disconnect() {
-   SDL_AUTO_TRACE();
+  SDL_AUTO_TRACE();
   if (!IsShuttingDown()) {
     Shutdown();
     controller_->DisconnectDone(device_uid_, app_handle_);
@@ -142,13 +142,13 @@ void WebSocketConnection<Session>::DataReceive(
 
 template <typename Session>
 void WebSocketConnection<Session>::Run() {
-   SDL_AUTO_TRACE();
+  SDL_AUTO_TRACE();
   session_->AsyncAccept();
 }
 
 template <typename Session>
 void WebSocketConnection<Session>::Shutdown() {
-   SDL_AUTO_TRACE();
+  SDL_AUTO_TRACE();
   shutdown_ = true;
   if (thread_delegate_) {
     session_->Shutdown();
@@ -197,9 +197,9 @@ void WebSocketConnection<Session>::LoopThreadDelegate::DrainQueue() {
   while (!message_queue_.IsShuttingDown() && message_queue_.pop(message_ptr)) {
     auto res = data_write_(message_ptr);
     if (TransportAdapter::FAIL == res) {
-      LOG4CXX_WARN(wsc_logger_,
-                   "Writing to websocket stream failed. Will now close "
-                   "websocket connection.");
+      SDL_WARN(wsc_logger_,
+               "Writing to websocket stream failed. Will now close "
+               "websocket connection.");
       on_io_error_();
     }
   }

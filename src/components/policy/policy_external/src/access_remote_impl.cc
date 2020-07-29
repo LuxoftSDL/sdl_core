@@ -36,7 +36,7 @@
 #include "policy/cache_manager.h"
 #include "utils/logger.h"
 
-SDL_CREATE_LOGGERPTR( "PolicyManagerImpl")
+SDL_CREATE_LOGGERPTR("PolicyManagerImpl")
 
 using policy_table::DeviceData;
 using policy_table::FunctionalGroupings;
@@ -48,11 +48,10 @@ struct ToHMIType {
   policy_table::AppHMITypes::value_type operator()(int item) const {
     policy_table::AppHMIType type = static_cast<policy_table::AppHMIType>(item);
     if (!IsValidEnum(type)) {
-      LOG4CXX_WARN(logger_, "HMI type isn't known " << item);
+      SDL_WARN(logger_, "HMI type isn't known " << item);
       type = policy_table::AHT_DEFAULT;
     }
-    LOG4CXX_DEBUG(logger_,
-                  "HMI type: " << item << " - " << EnumToJsonString(type));
+    SDL_DEBUG(logger_, "HMI type: " << item << " - " << EnumToJsonString(type));
     return policy_table::AppHMITypes::value_type(type);
   }
 };
@@ -120,7 +119,7 @@ bool AccessRemoteImpl::IsAllowed(const policy_table::AccessModules& modules,
   SDL_AUTO_TRACE();
   policy_table::AccessModules::const_iterator i = modules.find(module_name);
   if (i == modules.end()) {
-    LOG4CXX_DEBUG(logger_, "Module " << module_name << " wasn't found");
+    SDL_DEBUG(logger_, "Module " << module_name << " wasn't found");
     return false;
   }
 
@@ -133,7 +132,7 @@ bool AccessRemoteImpl::IsAllowed(const policy_table::AccessModules& modules,
     const policy_table::Strings& parameters = j->second;
     return CompareParameters(parameters, input);
   }
-  LOG4CXX_DEBUG(logger_, "RPC " << rpc_name << " wasn't found");
+  SDL_DEBUG(logger_, "RPC " << rpc_name << " wasn't found");
   return false;
 }
 
@@ -145,7 +144,7 @@ bool AccessRemoteImpl::CompareParameters(
   }
 
   if (input->empty()) {
-    LOG4CXX_DEBUG(logger_, "Input is empty");
+    SDL_DEBUG(logger_, "Input is empty");
     return false;
   }
 
@@ -229,13 +228,13 @@ void AccessRemoteImpl::GetGroupsIds(const std::string& device_id,
                                     FunctionalGroupIDs& groups_ids) {
   ApplicationOnDevice who = {device_id, app_id};
   const policy_table::Strings& groups = GetGroups(who);
-  LOG4CXX_DEBUG(logger_, "Groups Names: " << groups);
+  SDL_DEBUG(logger_, "Groups Names: " << groups);
   groups_ids.resize(groups.size());
   std::transform(groups.begin(),
                  groups.end(),
                  groups_ids.begin(),
                  &CacheManager::GenerateHash);
-  LOG4CXX_DEBUG(logger_, "Groups Ids: " << groups_ids);
+  SDL_DEBUG(logger_, "Groups Ids: " << groups_ids);
 }
 
 bool AccessRemoteImpl::GetModuleTypes(const std::string& application_id,

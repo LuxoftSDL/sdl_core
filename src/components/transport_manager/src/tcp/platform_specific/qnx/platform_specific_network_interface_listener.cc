@@ -3,7 +3,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "TransportManager")
+SDL_CREATE_LOGGERPTR("TransportManager")
 
 PlatformSpecificNetworkInterfaceListener::
     PlatformSpecificNetworkInterfaceListener(

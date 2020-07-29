@@ -62,13 +62,13 @@ void GetSystemCapabilityRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(logger_, "Application is not registered");
+    SDL_ERROR(logger_, "Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
 
   if ((*message_)[strings::msg_params].empty()) {
-    LOG4CXX_ERROR(logger_, strings::msg_params << " is empty.");
+    SDL_ERROR(logger_, strings::msg_params << " is empty.");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -171,7 +171,7 @@ void GetSystemCapabilityRequest::Run() {
 
       if (!capabilities) {
         SendResponse(false, mobile_apis::Result::DATA_NOT_AVAILABLE);
-        LOG4CXX_INFO(logger_, "system_display_capabilities are not available");
+        SDL_INFO(logger_, "system_display_capabilities are not available");
         return;
       }
 
@@ -192,12 +192,11 @@ void GetSystemCapabilityRequest::Run() {
       auto& ext = SystemCapabilityAppExtension::ExtractExtension(*app);
       if ((*message_)[app_mngr::strings::msg_params][strings::subscribe]
               .asBool() == true) {
-        LOG4CXX_DEBUG(logger_,
-                      "Subscribe to system capability: " << response_type);
+        SDL_DEBUG(logger_, "Subscribe to system capability: " << response_type);
         ext.SubscribeTo(response_type);
       } else {
-        LOG4CXX_DEBUG(logger_,
-                      "Unsubscribe from system capability: " << response_type);
+        SDL_DEBUG(logger_,
+                  "Unsubscribe from system capability: " << response_type);
         ext.UnsubscribeFrom(response_type);
       }
     }
@@ -214,7 +213,7 @@ void GetSystemCapabilityRequest::Run() {
 }
 
 void GetSystemCapabilityRequest::on_event(const event_engine::Event& event) {
-  LOG4CXX_INFO(logger_, "GetSystemCapabilityRequest on_event");
+  SDL_INFO(logger_, "GetSystemCapabilityRequest on_event");
 }
 
 }  // namespace commands

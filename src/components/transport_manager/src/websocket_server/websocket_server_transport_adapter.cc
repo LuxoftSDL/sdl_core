@@ -48,7 +48,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "WebSocketTransportAdapter")
+SDL_CREATE_LOGGERPTR("WebSocketTransportAdapter")
 
 WebSocketServerTransportAdapter::WebSocketServerTransportAdapter(
     resumption::LastStateWrapperPtr last_state_wrapper,
@@ -102,8 +102,8 @@ void WebSocketServerTransportAdapter::Store() const {
   if (webengine_device_) {
     Json::Value& dictionary = last_state().get_dictionary();
     if (dictionary["TransportManager"].isMember("WebsocketServerAdapter")) {
-      LOG4CXX_DEBUG(
-          logger_, "WebsocketServerAdapter already exists. Storing is skipped");
+      SDL_DEBUG(logger_,
+                "WebsocketServerAdapter already exists. Storing is skipped");
       return;
     }
 

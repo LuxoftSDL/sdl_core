@@ -64,17 +64,16 @@ bool CreateWindowRequest::CheckWindowName(
     const app_mngr::WindowID window_id,
     const std::string& window_name) const {
   if (mobile_apis::PredefinedWindows::PRIMARY_WIDGET == window_id) {
-    LOG4CXX_DEBUG(logger_,
-                  "Window name check is ignored for the primary widgets");
+    SDL_DEBUG(logger_, "Window name check is ignored for the primary widgets");
     return true;
   }
 
   const bool names_are_equal = window_name == app->name().c_str();
   if (names_are_equal &&
       mobile_apis::PredefinedWindows::DEFAULT_WINDOW != window_id) {
-    LOG4CXX_ERROR(logger_,
-                  "Regular widget can't have the same name as application: "
-                      << window_name);
+    SDL_ERROR(logger_,
+              "Regular widget can't have the same name as application: "
+                  << window_name);
     return false;
   }
 
@@ -137,7 +136,7 @@ void CreateWindowRequest::Run() {
   const auto application = application_manager_.application(connection_key());
 
   if (!application) {
-    LOG4CXX_ERROR(logger_, "Application is not registered");
+    SDL_ERROR(logger_, "Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -145,8 +144,8 @@ void CreateWindowRequest::Run() {
   const auto window_id =
       (*message_)[strings::msg_params][strings::window_id].asInt();
   if (application->WindowIdExists(window_id)) {
-    LOG4CXX_ERROR(logger_,
-                  "Window with id #" << window_id << " does already exist");
+    SDL_ERROR(logger_,
+              "Window with id #" << window_id << " does already exist");
     SendResponse(false, mobile_apis::Result::INVALID_ID);
     return;
   }
@@ -155,7 +154,7 @@ void CreateWindowRequest::Run() {
       (*message_)[strings::msg_params][strings::window_type].asInt();
 
   if (mobile_apis::WindowType::eType::MAIN == window_type) {
-    LOG4CXX_ERROR(logger_, "MAIN application window already exists");
+    SDL_ERROR(logger_, "MAIN application window already exists");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -167,9 +166,9 @@ void CreateWindowRequest::Run() {
                    [strings::duplicate_updates_from_window_id]
                        .asInt();
     if (!application->WindowIdExists(duplicate_updates_from_window_id)) {
-      LOG4CXX_ERROR(logger_,
-                    "Window with id #" << duplicate_updates_from_window_id
-                                       << " does not exist");
+      SDL_ERROR(logger_,
+                "Window with id #" << duplicate_updates_from_window_id
+                                   << " does not exist");
       SendResponse(false, mobile_apis::Result::INVALID_DATA);
       return;
     }
@@ -178,10 +177,9 @@ void CreateWindowRequest::Run() {
   const std::string window_name =
       (*message_)[strings::msg_params][strings::window_name].asString();
   if (!CheckWindowName(application, window_id, window_name)) {
-    LOG4CXX_ERROR(logger_,
-                  "Window name \"" << window_name
-                                   << "\" is disallowed for window #"
-                                   << window_id);
+    SDL_ERROR(logger_,
+              "Window name \"" << window_name << "\" is disallowed for window #"
+                               << window_id);
     SendResponse(false, mobile_apis::Result::DUPLICATE_NAME);
     return;
   }
@@ -201,19 +199,19 @@ void CreateWindowRequest::on_event(const event_engine::Event& event) {
   SDL_AUTO_TRACE();
 
   if (hmi_apis::FunctionID::UI_CreateWindow != event.id()) {
-    LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
+    SDL_ERROR(logger_, "Received unknown event" << event.id());
     return;
   }
 
   auto application = application_manager_.application(connection_key());
 
   if (!application) {
-    LOG4CXX_ERROR(logger_, "Application is not registered");
+    SDL_ERROR(logger_, "Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
 
-  LOG4CXX_INFO(logger_, "Received CreateWindow event");
+  SDL_INFO(logger_, "Received CreateWindow event");
   EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_UI);
 
   const smart_objects::SmartObject& response_message = event.smart_object();
@@ -226,7 +224,7 @@ void CreateWindowRequest::on_event(const event_engine::Event& event) {
   GetInfo(response_message, response_info);
 
   if (!is_success) {
-    LOG4CXX_ERROR(logger_, "CreateWindow request has failed on HMI side");
+    SDL_ERROR(logger_, "CreateWindow request has failed on HMI side");
     SendResponse(is_success,
                  result_code,
                  response_info.empty() ? nullptr : response_info.c_str());
@@ -266,10 +264,10 @@ bool CreateWindowRequest::IsWindowForAssociatedServiceCreated(
       window_optional_params_map.end(),
       [&associated_service_type](
           const std::pair<WindowID, smart_objects::SmartObjectSPtr>& element) {
-        LOG4CXX_DEBUG(logger_,
-                      "Searching for " << associated_service_type
-                                       << " in window info for id "
-                                       << element.first);
+        SDL_DEBUG(logger_,
+                  "Searching for " << associated_service_type
+                                   << " in window info for id "
+                                   << element.first);
         if (element.second->keyExists(strings::associated_service_type) &&
             associated_service_type ==
                 (*element.second)[strings::associated_service_type]
@@ -298,7 +296,7 @@ bool CreateWindowRequest::DoesExceedMaxAllowedWindows(
       }
 
       default: {
-        LOG4CXX_WARN(logger_, "Unknown window type");
+        SDL_WARN(logger_, "Unknown window type");
         return 0u;
       }
     }
@@ -313,7 +311,7 @@ bool CreateWindowRequest::DoesExceedMaxAllowedWindows(
   }
 
   if (!display_capabilities) {
-    LOG4CXX_WARN(logger_, "Application has no capabilities");
+    SDL_WARN(logger_, "Application has no capabilities");
     return false;
   }
 
@@ -337,7 +335,7 @@ bool CreateWindowRequest::DoesExceedMaxAllowedWindows(
       });
 
   if (find_res == windowTypeSupported->end()) {
-    LOG4CXX_WARN(logger_, "Requested Window Type is not supported by the HMI");
+    SDL_WARN(logger_, "Requested Window Type is not supported by the HMI");
     return true;
   }
 
@@ -355,7 +353,7 @@ bool CreateWindowRequest::ValidateWindowCreation(
 
   if (DoesExceedMaxAllowedWindows(app)) {
     std::string info("Maximum allowed amount of windows is exceeded");
-    LOG4CXX_WARN(logger_, info);
+    SDL_WARN(logger_, info);
     SendResponse(false, mobile_apis::Result::REJECTED, info.c_str());
     return false;
   }
@@ -363,7 +361,7 @@ bool CreateWindowRequest::ValidateWindowCreation(
   if (IsWindowForAssociatedServiceCreated(app)) {
     std::string info(
         "Window for this associated service type is already created");
-    LOG4CXX_WARN(logger_, info);
+    SDL_WARN(logger_, info);
     SendResponse(false, mobile_apis::Result::REJECTED, info.c_str());
     return false;
   }

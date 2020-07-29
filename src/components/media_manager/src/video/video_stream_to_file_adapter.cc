@@ -37,7 +37,7 @@
 
 namespace media_manager {
 
-SDL_CREATE_LOGGERPTR( "VideoStreamToFileAdapter")
+SDL_CREATE_LOGGERPTR("VideoStreamToFileAdapter")
 
 VideoStreamToFileAdapter::VideoStreamToFileAdapter(const std::string& file_name)
     : file_name_(file_name)
@@ -58,21 +58,20 @@ VideoStreamToFileAdapter::~VideoStreamToFileAdapter() {
 
 void VideoStreamToFileAdapter::Init() {
   if (thread_->is_running()) {
-    LOG4CXX_DEBUG(logger, "Start sending thread");
+    SDL_DEBUG(logger, "Start sending thread");
     const size_t kStackSize = 16384;
     thread_->start(threads::ThreadOptions(kStackSize));
   } else {
-    LOG4CXX_WARN(logger, "thread is already running");
+    SDL_WARN(logger, "thread is already running");
   }
 }
 
 void VideoStreamToFileAdapter::SendData(
     int32_t application_key, const ::protocol_handler::RawMessagePtr message) {
-  LOG4CXX_INFO(logger,
-               "VideoStreamToFileAdapter::SendData " << application_key);
+  SDL_INFO(logger, "VideoStreamToFileAdapter::SendData " << application_key);
 
   if (application_key != current_application_) {
-    LOG4CXX_WARN(logger, "Wrong application " << application_key);
+    SDL_WARN(logger, "Wrong application " << application_key);
     return;
   }
 
@@ -82,11 +81,11 @@ void VideoStreamToFileAdapter::SendData(
 }
 
 void VideoStreamToFileAdapter::StartActivity(int32_t application_key) {
-  LOG4CXX_INFO(logger,
-               "VideoStreamToFileAdapter::StartActivity " << application_key);
+  SDL_INFO(logger,
+           "VideoStreamToFileAdapter::StartActivity " << application_key);
   if (application_key == current_application_) {
-    LOG4CXX_WARN(
-        logger, "Already running video stream to file for " << application_key);
+    SDL_WARN(logger,
+             "Already running video stream to file for " << application_key);
     return;
   }
 
@@ -101,11 +100,11 @@ void VideoStreamToFileAdapter::StartActivity(int32_t application_key) {
 }
 
 void VideoStreamToFileAdapter::StopActivity(int32_t application_key) {
-  LOG4CXX_INFO(logger,
-               "VideoStreamToFileAdapter::StopActivity " << application_key);
+  SDL_INFO(logger,
+           "VideoStreamToFileAdapter::StopActivity " << application_key);
   if (application_key != current_application_) {
-    LOG4CXX_WARN(
-        logger, "Performing activity for another key " << current_application_);
+    SDL_WARN(logger,
+             "Performing activity for another key " << current_application_);
     return;
   }
 
@@ -141,7 +140,7 @@ void VideoStreamToFileAdapter::Streamer::threadMain() {
     while (!server_->messages_.empty()) {
       ::protocol_handler::RawMessagePtr msg = server_->messages_.pop();
       if (!msg) {
-        LOG4CXX_ERROR(logger, "Null pointer message");
+        SDL_ERROR(logger, "Null pointer message");
         continue;
       }
 
@@ -157,7 +156,7 @@ void VideoStreamToFileAdapter::Streamer::threadMain() {
                                 messsages_for_session);
         }
       } else {
-        LOG4CXX_WARN(logger, "Can't open File stream! " << server_->file_name_);
+        SDL_WARN(logger, "Can't open File stream! " << server_->file_name_);
       }
     }
     server_->messages_.wait();
@@ -173,16 +172,16 @@ void VideoStreamToFileAdapter::Streamer::exitThreadMain() {
 }
 
 void VideoStreamToFileAdapter::Streamer::open() {
-  LOG4CXX_INFO(logger, "Streamer::open()" << server_->file_name_.c_str());
+  SDL_INFO(logger, "Streamer::open()" << server_->file_name_.c_str());
 
   DCHECK(file_system::CreateDirectoryRecursively(
       profile::Profile::instance()->app_storage_folder()));
 
   file_stream_ = file_system::Open(server_->file_name_);
   if (!file_stream_) {
-    LOG4CXX_WARN(logger, "Can't open file stream! " << server_->file_name_);
+    SDL_WARN(logger, "Can't open file stream! " << server_->file_name_);
   } else {
-    LOG4CXX_INFO(logger, "file_stream_ opened :" << file_stream_);
+    SDL_INFO(logger, "file_stream_ opened :" << file_stream_);
   }
 }
 

@@ -34,7 +34,7 @@
 
 namespace resumption {
 
-SDL_CREATE_LOGGERPTR( "Resumption")
+SDL_CREATE_LOGGERPTR("Resumption")
 
 LastStateWrapperImpl::LastStateWrapperImpl(
     std::shared_ptr<LastState> last_state)

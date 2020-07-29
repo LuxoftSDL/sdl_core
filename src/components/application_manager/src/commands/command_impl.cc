@@ -49,7 +49,7 @@ struct AppExtensionPredicate {
 
 namespace commands {
 
-SDL_CREATE_LOGGERPTR( "Commands")
+SDL_CREATE_LOGGERPTR("Commands")
 
 const int32_t CommandImpl::hmi_protocol_type_ = 1;
 const int32_t CommandImpl::mobile_protocol_type_ = 0;
@@ -135,10 +135,10 @@ bool CommandImpl::CheckAllowedParameters(const Command::CommandSource source) {
   const ApplicationSharedPtr app =
       application_manager_.application(connection_key());
   if (!app) {
-    LOG4CXX_ERROR(logger_,
-                  "There is no registered application with "
-                  "connection key '"
-                      << connection_key() << "'");
+    SDL_ERROR(logger_,
+              "There is no registered application with "
+              "connection key '"
+                  << connection_key() << "'");
     return false;
   }
 
@@ -149,7 +149,7 @@ bool CommandImpl::CheckAllowedParameters(const Command::CommandSource source) {
   smart_objects::SmartMap::const_iterator iter_end = s_map.map_end();
 
   for (; iter != iter_end; ++iter) {
-    LOG4CXX_DEBUG(logger_, "Request's param: " << iter->first);
+    SDL_DEBUG(logger_, "Request's param: " << iter->first);
     params.insert(iter->first);
   }
 
@@ -209,8 +209,7 @@ void CommandImpl::RemoveDisallowedParameters() {
       // Remove from request all disallowed parameters
       params.erase(key);
       removed_parameters_permissions_.disallowed_params.insert(key);
-      LOG4CXX_INFO(logger_,
-                   "Following parameter is disallowed by user: " << key);
+      SDL_INFO(logger_, "Following parameter is disallowed by user: " << key);
     }
 
     else if (removed_parameters_permissions_.undefined_params.end() !=
@@ -218,8 +217,7 @@ void CommandImpl::RemoveDisallowedParameters() {
       // Remove from request all undefined yet parameters
       params.erase(key);
       removed_parameters_permissions_.undefined_params.insert(key);
-      LOG4CXX_INFO(logger_,
-                   "Following parameter is disallowed by policy: " << key);
+      SDL_INFO(logger_, "Following parameter is disallowed by policy: " << key);
     }
 
     else if (parameters_permissions_.allowed_params.end() ==
@@ -227,9 +225,9 @@ void CommandImpl::RemoveDisallowedParameters() {
       // Remove from request all parameters missed in allowed
       params.erase(key);
       removed_parameters_permissions_.undefined_params.insert(key);
-      LOG4CXX_INFO(logger_,
-                   "Following parameter is not found among allowed parameters '"
-                       << key << "' and will be treated as disallowed.");
+      SDL_INFO(logger_,
+               "Following parameter is not found among allowed parameters '"
+                   << key << "' and will be treated as disallowed.");
     }
   }
 }
@@ -241,13 +239,13 @@ bool CommandImpl::ReplaceMobileWithHMIAppId(
     ApplicationSharedPtr application =
         application_manager_.application(message[strings::app_id].asUInt());
     if (!application) {
-      LOG4CXX_ERROR(logger_, "Substitution mobile --> HMI id is failed.");
+      SDL_ERROR(logger_, "Substitution mobile --> HMI id is failed.");
       return false;
     }
-    LOG4CXX_DEBUG(logger_,
-                  "ReplaceMobileWithHMIAppId from "
-                      << message[strings::app_id].asInt() << " to "
-                      << application->hmi_app_id());
+    SDL_DEBUG(logger_,
+              "ReplaceMobileWithHMIAppId from "
+                  << message[strings::app_id].asInt() << " to "
+                  << application->hmi_app_id());
     message[strings::app_id] = application->hmi_app_id();
   } else {
     switch (message.getType()) {
@@ -287,13 +285,13 @@ bool CommandImpl::ReplaceHMIWithMobileAppId(
             message[strings::app_id].asUInt());
 
     if (!application) {
-      LOG4CXX_ERROR(logger_, "Substitution HMI --> mobile id is failed.");
+      SDL_ERROR(logger_, "Substitution HMI --> mobile id is failed.");
       return false;
     }
-    LOG4CXX_DEBUG(logger_,
-                  "ReplaceHMIWithMobileAppId from "
-                      << message[strings::app_id].asInt() << " to "
-                      << application->app_id());
+    SDL_DEBUG(logger_,
+              "ReplaceHMIWithMobileAppId from "
+                  << message[strings::app_id].asInt() << " to "
+                  << application->app_id());
     message[strings::app_id] = application->app_id();
   } else {
     switch (message.getType()) {
@@ -341,12 +339,12 @@ uint32_t CommandImpl::CalcCommandInternalConsecutiveNumber(
 bool CommandImpl::CheckSyntax(const std::string& str,
                               bool allow_empty_line) const {
   if (std::string::npos != str.find_first_of("\t\n")) {
-    LOG4CXX_ERROR(logger_, "CheckSyntax failed! :" << str);
+    SDL_ERROR(logger_, "CheckSyntax failed! :" << str);
     return false;
   }
   if (std::string::npos != str.find("\\n") ||
       std::string::npos != str.find("\\t")) {
-    LOG4CXX_ERROR(logger_, "CheckSyntax failed! :" << str);
+    SDL_ERROR(logger_, "CheckSyntax failed! :" << str);
     return false;
   }
   if (!allow_empty_line) {

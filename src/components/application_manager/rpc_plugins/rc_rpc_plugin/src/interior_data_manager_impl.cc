@@ -5,7 +5,7 @@
 #include "rc_rpc_plugin/rc_rpc_plugin.h"
 
 namespace rc_rpc_plugin {
-SDL_CREATE_LOGGERPTR( "RemoteControlModule");
+SDL_CREATE_LOGGERPTR("RemoteControlModule");
 
 InteriorDataManagerImpl::InteriorDataManagerImpl(
     RCRPCPlugin& rc_plugin,
@@ -43,9 +43,9 @@ void InteriorDataManagerImpl::OnDisablingRC() {
     }
   }
   for (auto& module : subscribed_modules) {
-    LOG4CXX_TRACE(logger_,
-                  "unsubscribe from module type: " << module.first
-                                                   << " id: " << module.second);
+    SDL_TRACE(logger_,
+              "unsubscribe from module type: " << module.first
+                                               << " id: " << module.second);
     UnsubscribeFromInteriorVehicleData(module);
   }
 }
@@ -128,9 +128,9 @@ void InteriorDataManagerImpl::UnsubscribeFromInteriorVehicleData(
   cache_.Remove(module);
   auto unsubscribe_request = RCHelpers::CreateUnsubscribeRequestToHMI(
       module, app_mngr_.GetNextHMICorrelationID());
-  LOG4CXX_DEBUG(logger_,
-                "Send Unsubscribe from module type: " << module.first << " id: "
-                                                      << module.second);
+  SDL_DEBUG(logger_,
+            "Send Unsubscribe from module type: " << module.first
+                                                  << " id: " << module.second);
   rpc_service_.ManageHMICommand(unsubscribe_request);
 }
 
@@ -142,9 +142,9 @@ void InteriorDataManagerImpl::UnsubscribeFromInteriorVehicleDataOfType(
     cache_.Remove(module);
     auto unsubscribe_request = RCHelpers::CreateUnsubscribeRequestToHMI(
         module, app_mngr_.GetNextHMICorrelationID());
-    LOG4CXX_DEBUG(logger_,
-                  "Send Unsubscribe from module type: "
-                      << module.first << " id: " << module.second);
+    SDL_DEBUG(logger_,
+              "Send Unsubscribe from module type: " << module.first << " id: "
+                                                    << module.second);
     rpc_service_.ManageHMICommand(unsubscribe_request);
   }
 }

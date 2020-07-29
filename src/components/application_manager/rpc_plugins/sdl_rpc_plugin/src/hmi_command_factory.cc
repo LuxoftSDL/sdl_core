@@ -265,7 +265,7 @@
 namespace sdl_rpc_plugin {
 using namespace application_manager;
 
-SDL_CREATE_LOGGERPTR( "HMICommandFactory")
+SDL_CREATE_LOGGERPTR("HMICommandFactory")
 
 HMICommandFactory::HMICommandFactory(
     ApplicationManager& application_manager,
@@ -283,20 +283,20 @@ CommandSharedPtr HMICommandFactory::CreateCommand(
   const hmi_apis::FunctionID::eType function_id =
       static_cast<hmi_apis::FunctionID::eType>(
           (*message)[strings::params][strings::function_id].asInt());
-  LOG4CXX_DEBUG(
-      logger_, "HMICommandFactory::CreateCommand function_id: " << function_id);
+  SDL_DEBUG(logger_,
+            "HMICommandFactory::CreateCommand function_id: " << function_id);
 
   const hmi_apis::messageType::eType message_type =
       static_cast<hmi_apis::messageType::eType>(
           (*message)[strings::params][strings::message_type].asInt());
 
   if (hmi_apis::messageType::response == message_type) {
-    LOG4CXX_DEBUG(logger_, "HMICommandFactory::CreateCommand response");
+    SDL_DEBUG(logger_, "HMICommandFactory::CreateCommand response");
   } else if ((*message)[strings::params][strings::message_type] ==
              hmi_apis::messageType::error_response) {
-    LOG4CXX_DEBUG(logger_, "HMICommandFactory::CreateCommand error response");
+    SDL_DEBUG(logger_, "HMICommandFactory::CreateCommand error response");
   } else {
-    LOG4CXX_DEBUG(logger_, "HMICommandFactory::CreateCommand request");
+    SDL_DEBUG(logger_, "HMICommandFactory::CreateCommand request");
   }
 
   return get_creator_factory(function_id, message_type, source).create(message);

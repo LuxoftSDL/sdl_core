@@ -38,7 +38,7 @@
 
 namespace policy {
 
-SDL_CREATE_LOGGERPTR( "PolicyHandler")
+SDL_CREATE_LOGGERPTR("PolicyHandler")
 
 RetrySequence::RetrySequence(PolicyHandler* const policy_handler)
     // TODO (Risk copy of PolicyHandler Pointer)
@@ -49,7 +49,7 @@ void RetrySequence::threadMain() {
 }
 
 void RetrySequence::StartNextRetry() {
-  LOG4CXX_TRACE(logger_, "Start next retry of exchanging PT");
+  SDL_TRACE(logger_, "Start next retry of exchanging PT");
   DCHECK(policy_handler_);
   // TODO(Ezamakhov): inverstigate StartNextRetry on unload policy lib
 
@@ -59,8 +59,8 @@ void RetrySequence::StartNextRetry() {
 
     const uint32_t timeout = policy_handler_->TimeoutExchangeSec();
     const int seconds = policy_handler_->NextRetryTimeout();
-    LOG4CXX_DEBUG(logger_,
-                  "Timeout response: " << timeout << " Next try: " << seconds);
+    SDL_DEBUG(logger_,
+              "Timeout response: " << timeout << " Next try: " << seconds);
     if (timeout > 0) {
       sleep(timeout);
       policy_handler_->OnExceededTimeout();
@@ -69,7 +69,7 @@ void RetrySequence::StartNextRetry() {
       sleep(seconds);
       StartNextRetry();
     } else {
-      LOG4CXX_INFO(logger_, "End retry sequence. Update PT was not received");
+      SDL_INFO(logger_, "End retry sequence. Update PT was not received");
       policy_handler_->OnPTUFinished(false);
     }
   }

@@ -28,7 +28,7 @@ struct LauncherGenerator {
   const uint16_t app_launch_retry_wait_time_;
 };
 
-SDL_CREATE_LOGGERPTR( "AppLaunch")
+SDL_CREATE_LOGGERPTR("AppLaunch")
 AppsLauncher::AppsLauncher(
     connection_handler::ConnectionHandler& connection_handler,
     const uint16_t max_number_of_ios_device,
@@ -75,8 +75,7 @@ void AppsLauncher::StopLaunching(ApplicationDataPtr app_data) {
     free_launchers_.push_back(launcher);
     works_launchers_.erase(it);
   } else {
-    LOG4CXX_DEBUG(logger_,
-                  "Unable to StopLaunching" << app_data->mobile_app_id_);
+    SDL_DEBUG(logger_, "Unable to StopLaunching" << app_data->mobile_app_id_);
   }
 }
 
@@ -110,11 +109,10 @@ void AppsLauncher::Launcher::PosponedLaunch(
   app_data_ = app_data;
   retry_index_ = 0;
   retry_timer_.Start(app_launch_retry_wait_time_, timer::kPeriodic);
-  LOG4CXX_DEBUG(logger_,
-                "Applicaiton " << app_data->mobile_app_id_ << " on device "
-                               << app_data->device_mac_
-                               << " will be launched in "
-                               << app_launch_retry_wait_time_ << " ms");
+  SDL_DEBUG(logger_,
+            "Applicaiton " << app_data->mobile_app_id_ << " on device "
+                           << app_data->device_mac_ << " will be launched in "
+                           << app_launch_retry_wait_time_ << " ms");
 }
 
 void AppsLauncher::Launcher::Clear() {
@@ -125,10 +123,10 @@ void AppsLauncher::Launcher::Clear() {
 
 void AppsLauncher::Launcher::LaunchNow() {
   if (retry_index_++ < app_launch_max_retry_attempt_) {
-    LOG4CXX_DEBUG(logger_,
-                  "Run App " << app_data_->mobile_app_id_ << "with bundle "
-                             << app_data_->bundle_id_ << " On Device "
-                             << app_data_->device_mac_);
+    SDL_DEBUG(logger_,
+              "Run App " << app_data_->mobile_app_id_ << "with bundle "
+                         << app_data_->bundle_id_ << " On Device "
+                         << app_data_->device_mac_);
 
     connection_handler_.RunAppOnDevice(app_data_->device_mac_,
                                        app_data_->bundle_id_);

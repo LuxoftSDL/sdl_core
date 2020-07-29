@@ -30,46 +30,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <apr_time.h>
 #include "utils/auto_trace.h"
+#include "utils/logger.h"
 
 namespace logger {
 
-AutoTrace::AutoTrace(const std::string& logger,
-                     const SDLLocationInfo& location)
+AutoTrace::AutoTrace(const std::string& logger, const SDLLocationInfo& location)
     : logger_(logger), location_(location) {
-
-    if (logger::Logger<ExternalLogger>::instance().Enabled()) {                           \
-      if (logger::logger_status != logger::DeletingLoggerThread) {                        \
-        if (logger::Logger<ExternalLogger>::instance().IsEnabledFor(logger_, logLevel)) { \
-          logger::SDLLogMessage message{                                                  \
-              logger_,                                                                    \
-              LogLevel::TRACE_LEVEL,                                                                   \
-              "Enter",                                                                   \
-              std::chrono::high_resolution_clock::now(),                                  \
-              location,           \
-              std::this_thread::get_id()};                                                \
-          logger::Logger<ExternalLogger>::instance().PushLog(message);                    \
-        }                                                                                 \
-      }                                                                                   \
+  if (logger::Logger<ExternalLogger>::instance().Enabled()) {
+    if (logger::logger_status != logger::DeletingLoggerThread) {
+      if (logger::Logger<ExternalLogger>::instance().IsEnabledFor(logger_,
+                                                                  logger::LogLevel::TRACE_LEVEL)) {
+        logger::SDLLogMessage message{logger_,
+                                      LogLevel::TRACE_LEVEL,
+                                      "Enter",
+                                      std::chrono::high_resolution_clock::now(),
+                                      location_,
+                                      std::this_thread::get_id()};
+        logger::Logger<ExternalLogger>::instance().PushLog(message);
+      }
     }
+  }
 }
 
 AutoTrace::~AutoTrace() {
-    if (logger::Logger<ExternalLogger>::instance().Enabled()) {                           \
-      if (logger::logger_status != logger::DeletingLoggerThread) {                        \
-        if (logger::Logger<ExternalLogger>::instance().IsEnabledFor(logger_, logLevel)) { \
-          logger::SDLLogMessage message{                                                  \
-              logger_,                                                                    \
-              LogLevel::TRACE_LEVEL,                                                                   \
-              "Exit",                                                                   \
-              std::chrono::high_resolution_clock::now(),                                  \
-              location,           \
-              std::this_thread::get_id()};                                                \
-          logger::Logger<ExternalLogger>::instance().PushLog(message);                    \
-        }                                                                                 \
-      }                                                                                   \
+  if (logger::Logger<ExternalLogger>::instance().Enabled()) {
+    if (logger::logger_status != logger::DeletingLoggerThread) {
+      if (logger::Logger<ExternalLogger>::instance().IsEnabledFor(logger_,
+                                                                  logger::LogLevel::TRACE_LEVEL)) {
+        logger::SDLLogMessage message{logger_,
+                                      LogLevel::TRACE_LEVEL,
+                                      "Exit",
+                                      std::chrono::high_resolution_clock::now(),
+                                      location_,
+                                      std::this_thread::get_id()};
+        logger::Logger<ExternalLogger>::instance().PushLog(message);
+      }
     }
+  }
 }
 
 }  // namespace logger

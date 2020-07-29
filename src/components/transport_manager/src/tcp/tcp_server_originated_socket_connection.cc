@@ -39,7 +39,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "TransportManager")
+SDL_CREATE_LOGGERPTR("TransportManager")
 
 TcpServerOriginatedSocketConnection::TcpServerOriginatedSocketConnection(
     const DeviceUID& device_uid,
@@ -54,10 +54,10 @@ TcpServerOriginatedSocketConnection::~TcpServerOriginatedSocketConnection() {
 bool TcpServerOriginatedSocketConnection::Establish(ConnectError** error) {
   SDL_AUTO_TRACE();
   DCHECK(error);
-  LOG4CXX_DEBUG(logger_, "error " << error);
+  SDL_DEBUG(logger_, "error " << error);
   DeviceSptr device = controller()->FindDevice(device_handle());
   if (device.use_count() == 0) {
-    LOG4CXX_ERROR(logger_, "Device " << device_handle() << " not found");
+    SDL_ERROR(logger_, "Device " << device_handle() << " not found");
     *error = new ConnectError();
     return false;
   }
@@ -65,24 +65,22 @@ bool TcpServerOriginatedSocketConnection::Establish(ConnectError** error) {
 
   const int port = tcp_device->GetApplicationPort(application_handle());
   if (-1 == port) {
-    LOG4CXX_ERROR(
-        logger_,
-        "Application port for " << application_handle() << " not found");
+    SDL_ERROR(logger_,
+              "Application port for " << application_handle() << " not found");
     *error = new ConnectError();
     return false;
   }
 
   if (IsConnectionTerminated()) {
-    LOG4CXX_ERROR(
-        logger_,
-        "Connection is already terminated. Socket will not be created");
+    SDL_ERROR(logger_,
+              "Connection is already terminated. Socket will not be created");
     *error = new ConnectError();
     return false;
   }
 
   const int socket = ::socket(AF_INET, SOCK_STREAM, 0);
   if (socket < 0) {
-    LOG4CXX_ERROR(logger_, "Failed to create socket");
+    SDL_ERROR(logger_, "Failed to create socket");
     *error = new ConnectError();
     return false;
   }
@@ -92,13 +90,12 @@ bool TcpServerOriginatedSocketConnection::Establish(ConnectError** error) {
   addr.sin_addr.s_addr = tcp_device->in_addr();
   addr.sin_port = htons(port);
 
-  LOG4CXX_DEBUG(logger_,
-                "Connecting " << inet_ntoa(addr.sin_addr) << ":" << port);
+  SDL_DEBUG(logger_, "Connecting " << inet_ntoa(addr.sin_addr) << ":" << port);
   set_socket(socket);
   if (::connect(get_socket(), (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-    LOG4CXX_ERROR(logger_,
-                  "Failed to connect for application " << application_handle()
-                                                       << ", error " << errno);
+    SDL_ERROR(logger_,
+              "Failed to connect for application " << application_handle()
+                                                   << ", error " << errno);
     *error = new ConnectError();
     ShutdownAndCloseSocket();
     return false;

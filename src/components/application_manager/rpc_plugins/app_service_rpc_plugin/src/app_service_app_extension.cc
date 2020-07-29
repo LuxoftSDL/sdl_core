@@ -33,7 +33,7 @@
 #include "app_service_rpc_plugin/app_service_app_extension.h"
 #include "app_service_rpc_plugin/app_service_rpc_plugin.h"
 
-SDL_CREATE_LOGGERPTR( "AppServiceRpcPlugin")
+SDL_CREATE_LOGGERPTR("AppServiceRpcPlugin")
 
 namespace app_service_rpc_plugin {
 
@@ -53,13 +53,13 @@ AppServiceAppExtension::~AppServiceAppExtension() {
 
 bool AppServiceAppExtension::SubscribeToAppService(
     const std::string app_service_type) {
-  LOG4CXX_DEBUG(logger_, "Subscribe to app service: " << app_service_type);
+  SDL_DEBUG(logger_, "Subscribe to app service: " << app_service_type);
   return subscribed_data_.insert(app_service_type).second;
 }
 
 bool AppServiceAppExtension::UnsubscribeFromAppService(
     const std::string app_service_type) {
-  LOG4CXX_DEBUG(logger_, app_service_type);
+  SDL_DEBUG(logger_, app_service_type);
   auto it = subscribed_data_.find(app_service_type);
   if (it != subscribed_data_.end()) {
     subscribed_data_.erase(it);
@@ -75,8 +75,7 @@ void AppServiceAppExtension::UnsubscribeFromAppService() {
 
 bool AppServiceAppExtension::IsSubscribedToAppService(
     const std::string app_service_type) const {
-  LOG4CXX_DEBUG(logger_,
-                "isSubscribedToAppService for type: " << app_service_type);
+  SDL_DEBUG(logger_, "isSubscribedToAppService for type: " << app_service_type);
   return subscribed_data_.find(app_service_type) != subscribed_data_.end();
 }
 

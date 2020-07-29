@@ -65,15 +65,15 @@ void SpeakRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    LOG4CXX_ERROR(logger_, "NULL pointer");
+    SDL_ERROR(logger_, "NULL pointer");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
 
   if (IsWhiteSpaceExist()) {
-    LOG4CXX_ERROR(logger_,
-                  "Incoming speak has contains \\t\\n \\\\t \\\\n "
-                  " text contains only whitespace in ttsChunks");
+    SDL_ERROR(logger_,
+              "Incoming speak has contains \\t\\n \\\\t \\\\n "
+              " text contains only whitespace in ttsChunks");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -84,9 +84,8 @@ void SpeakRequest::Run() {
       MessageHelper::VerifyTtsFiles(tts_chunks, app, application_manager_);
 
   if (mobile_apis::Result::FILE_NOT_FOUND == verification_result) {
-    LOG4CXX_ERROR(
-        logger_,
-        "MessageHelper::VerifyTtsFiles return " << verification_result);
+    SDL_ERROR(logger_,
+              "MessageHelper::VerifyTtsFiles return " << verification_result);
     SendResponse(false,
                  mobile_apis::Result::FILE_NOT_FOUND,
                  "One or more files needed for tts_chunks are not present");
@@ -106,20 +105,20 @@ void SpeakRequest::on_event(const event_engine::Event& event) {
   SDL_AUTO_TRACE();
   switch (event.id()) {
     case hmi_apis::FunctionID::TTS_Speak: {
-      LOG4CXX_INFO(logger_, "Received TTS_Speak event");
+      SDL_INFO(logger_, "Received TTS_Speak event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_TTS);
       ProcessTTSSpeakResponse(event.smart_object());
       break;
     }
     case hmi_apis::FunctionID::TTS_OnResetTimeout: {
-      LOG4CXX_INFO(logger_, "Received TTS_OnResetTimeout event");
+      SDL_INFO(logger_, "Received TTS_OnResetTimeout event");
 
       application_manager_.updateRequestTimeout(
           connection_key(), correlation_id(), default_timeout());
       break;
     }
     default: {
-      LOG4CXX_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR(logger_, "Received unknown event" << event.id());
       break;
     }
   }
@@ -134,7 +133,7 @@ void SpeakRequest::ProcessTTSSpeakResponse(
       application_manager_.application(connection_key());
 
   if (!application) {
-    LOG4CXX_ERROR(logger_, "NULL pointer");
+    SDL_ERROR(logger_, "NULL pointer");
     return;
   }
 
@@ -171,7 +170,7 @@ bool SpeakRequest::IsWhiteSpaceExist() {
     for (; it_tc != it_tc_end; ++it_tc) {
       str = (*it_tc)[strings::text].asCharArray();
       if (strlen(str) && !CheckSyntax(str)) {
-        LOG4CXX_ERROR(logger_, "Invalid tts_chunks syntax check failed");
+        SDL_ERROR(logger_, "Invalid tts_chunks syntax check failed");
         return true;
       }
     }

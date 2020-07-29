@@ -55,7 +55,7 @@ OnAppUnregisteredNotification::~OnAppUnregisteredNotification() {}
 
 bool OnAppUnregisteredNotification::Init() {
   SDL_AUTO_TRACE();
-  LOG4CXX_DEBUG(logger_, "Replacement of hmi id is skipped.");
+  SDL_DEBUG(logger_, "Replacement of hmi id is skipped.");
   return true;
 }
 

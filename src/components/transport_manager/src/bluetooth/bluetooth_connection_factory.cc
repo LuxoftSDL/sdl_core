@@ -41,7 +41,7 @@
 namespace transport_manager {
 namespace transport_adapter {
 
-SDL_CREATE_LOGGERPTR( "TransportManager")
+SDL_CREATE_LOGGERPTR("TransportManager")
 
 BluetoothConnectionFactory::BluetoothConnectionFactory(
     TransportAdapterController* controller)
@@ -60,8 +60,8 @@ TransportAdapter::Error BluetoothConnectionFactory::CreateConnection(
   controller_->ConnectionCreated(connection, device_uid, app_handle);
   TransportAdapter::Error error = connection->Start();
   if (TransportAdapter::OK != error) {
-    LOG4CXX_ERROR(logger_,
-                  "Bluetooth connection::Start() failed with error: " << error);
+    SDL_ERROR(logger_,
+              "Bluetooth connection::Start() failed with error: " << error);
   }
   return error;
 }

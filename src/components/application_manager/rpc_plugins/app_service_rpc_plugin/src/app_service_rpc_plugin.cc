@@ -38,7 +38,7 @@
 #include "application_manager/smart_object_keys.h"
 
 namespace app_service_rpc_plugin {
-SDL_CREATE_LOGGERPTR( "AppServiceRpcPlugin")
+SDL_CREATE_LOGGERPTR("AppServiceRpcPlugin")
 
 namespace strings = application_manager::strings;
 namespace plugins = application_manager::plugin_manager;
