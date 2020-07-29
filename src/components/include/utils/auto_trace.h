@@ -33,20 +33,20 @@
 #ifndef SRC_COMPONENTS_INCLUDE_UTILS_AUTO_TRACE_H_
 #define SRC_COMPONENTS_INCLUDE_UTILS_AUTO_TRACE_H_
 
-#include <log4cxx/logger.h>
+#include "utils/ilogger.h"
 #include <string>
 
 namespace logger {
 
 class AutoTrace {
  public:
-  AutoTrace(log4cxx::LoggerPtr logger,
-            const log4cxx::spi::LocationInfo& location);
+  AutoTrace(const std::string& logger,
+            const SDLLocationInfo& location);
   ~AutoTrace();
 
  private:
-  log4cxx::LoggerPtr logger_;
-  log4cxx::spi::LocationInfo location_;
+  std::string logger_;
+  SDLLocationInfo location_;
 };
 
 }  // namespace logger
