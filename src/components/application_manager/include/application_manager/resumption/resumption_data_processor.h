@@ -158,12 +158,6 @@ class ResumptionDataProcessor : public app_mngr::event_engine::EventObserver {
                   const smart_objects::SmartObject& saved_app);
 
   /**
-   * @brief Deleting files that have been resumed
-   * @param shared ptr to application
-   */
-  void DeleteFiles(app_mngr::ApplicationSharedPtr application);
-
-  /**
    * @brief AddSubmenues allows to add sub-menus for the application
    * which should be resumed
    * @param application application which will be resumed

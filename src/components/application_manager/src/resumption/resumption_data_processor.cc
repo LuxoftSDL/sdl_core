@@ -378,7 +378,6 @@ void ResumptionDataProcessor::RevertRestoredData(
     ApplicationSharedPtr application) {
   LOG4CXX_AUTO_TRACE(logger_);
   LOG4CXX_DEBUG(logger_, "Reverting for app: " << application->app_id());
-  DeleteFiles(application);
   DeleteSubmenues(application);
   DeleteCommands(application);
   DeleteChoicesets(application);
@@ -495,13 +494,6 @@ void ResumptionDataProcessor::AddWindows(
       application, application_manager_, windows_info);
 
   ProcessMessagesToHMI(request_list);
-}
-
-void ResumptionDataProcessor::DeleteFiles(ApplicationSharedPtr application) {
-  LOG4CXX_AUTO_TRACE(logger_);
-  while (!application->getAppFiles().empty()) {
-    application->DeleteFile(application->getAppFiles().begin()->first);
-  }
 }
 
 void ResumptionDataProcessor::AddSubmenues(
@@ -972,12 +964,10 @@ void ResumptionDataProcessor::DeletePluginsSubscriptions(
 
 bool ResumptionDataProcessor::IsResponseSuccessful(
     const smart_objects::SmartObject& response) const {
-  const hmi_apis::Common_Result::eType result_code =
-      static_cast<hmi_apis::Common_Result::eType>(
-          response[strings::params][application_manager::hmi_response::code]
-              .asInt());
-  return result_code == hmi_apis::Common_Result::SUCCESS ||
-         result_code == hmi_apis::Common_Result::WARNINGS;
+  if (!response[strings::params].keyExists(strings::error_msg)) {
+    return true;
+  }
+  return false;
 }
 
 void ResumptionDataProcessor::CheckVehicleDataResponse(
