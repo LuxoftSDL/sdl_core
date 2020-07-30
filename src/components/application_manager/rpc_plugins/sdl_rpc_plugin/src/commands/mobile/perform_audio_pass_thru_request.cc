@@ -43,6 +43,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("PerformAudioPassThruRequest")
+
 namespace str = strings;
 
 PerformAudioPassThruRequest::PerformAudioPassThruRequest(

@@ -114,3 +114,4 @@ extern "C" __attribute__((visibility("default"))) void Delete(
     application_manager::plugin_manager::RPCPlugin* data) {
   delete data;
   SDL_DELETE_THREAD_LOGGER();
+}

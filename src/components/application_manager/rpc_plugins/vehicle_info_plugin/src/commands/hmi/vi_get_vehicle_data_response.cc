@@ -39,6 +39,8 @@ namespace vehicle_info_plugin {
 using namespace application_manager;
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("VIGetVehicleDataResponse")
+
 VIGetVehicleDataResponse::VIGetVehicleDataResponse(
     const application_manager::commands::MessageSharedPtr& message,
     const VehicleInfoCommandParams& params)

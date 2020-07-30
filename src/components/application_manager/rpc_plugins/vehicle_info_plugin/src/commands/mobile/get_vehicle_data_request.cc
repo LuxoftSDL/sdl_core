@@ -47,6 +47,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("GetVehicleDataRequest")
+
 namespace str = strings;
 
 GetVehicleDataRequest::GetVehicleDataRequest(

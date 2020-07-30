@@ -76,7 +76,7 @@
 
 #define DCHECK(condition)                                                     \
   if (!(condition)) {                                                         \
-    SDL_CREATE_LOGGERPTR("Utils");                                            \
+    SDL_CREATE_LOCAL_LOGGERPTR("Utils");                                            \
     SDL_FATAL(logger_,                                                        \
               "DCHECK failed with \"" << #condition << "\" [" << __FUNCTION__ \
                                       << "][" << __FILE__ << ':' << __LINE__  \
@@ -90,7 +90,7 @@
  */
 #define DCHECK_OR_RETURN(condition, return_value)                             \
   if (!(condition)) {                                                         \
-    SDL_CREATE_LOGGERPTR("Utils");                                            \
+    SDL_CREATE_LOCAL_LOGGERPTR("Utils");                                            \
     SDL_FATAL(logger_,                                                        \
               "DCHECK failed with \"" << #condition << "\" [" << __FUNCTION__ \
                                       << "][" << __FILE__ << ':' << __LINE__  \
@@ -104,7 +104,7 @@
  */
 #define DCHECK_OR_RETURN_VOID(condition)                                      \
   if (!(condition)) {                                                         \
-    SDL_CREATE_LOGGERPTR("Utils");                                            \
+    SDL_CREATE_LOCAL_LOGGERPTR("Utils");                                            \
     SDL_FATAL(logger_,                                                        \
               "DCHECK failed with \"" << #condition << "\" [" << __FUNCTION__ \
                                       << "][" << __FILE__ << ':' << __LINE__  \

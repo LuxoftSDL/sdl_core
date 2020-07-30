@@ -44,7 +44,8 @@
 // ----------------------------------------------------------------------------
 
 #ifdef ENABLE_LOG
-#include "utils/log_message_loop_thread.h"
+#include "utils/logger/logger_impl.h"
+#include "utils/logger/log4cxxlogger.h"
 #endif  // ENABLE_LOG
 #include "utils/logger.h"
 
@@ -133,7 +134,9 @@ int32_t main(int32_t argc, char** argv) {
 
   // --------------------------------------------------------------------------
   // Logger initialization
-  INIT_LOGGER("log4cxx.properties", profile_instance.logs_enabled());
+  logger::Log4CXXLogger logger("log4cxx.properties");
+  logger::Logger<logger::Log4CXXLogger>::instance().Init(
+        &logger);  // move logger_ to Logger instance
 
   threads::Thread::SetNameForId(threads::Thread::CurrentId(), "SDLCore");
 

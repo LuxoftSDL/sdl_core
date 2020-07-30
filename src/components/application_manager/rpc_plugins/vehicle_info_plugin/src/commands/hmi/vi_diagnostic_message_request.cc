@@ -37,6 +37,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("VIDiagnosticMessageRequest")
+
 VIDiagnosticMessageRequest::VIDiagnosticMessageRequest(
     const app_mngr::commands::MessageSharedPtr& message,
     const VehicleInfoCommandParams& params)

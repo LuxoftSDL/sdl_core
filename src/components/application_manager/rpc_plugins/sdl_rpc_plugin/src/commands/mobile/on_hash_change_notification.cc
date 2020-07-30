@@ -45,6 +45,8 @@ namespace commands {
 
 namespace mobile {
 
+SDL_CREATE_LOGGERPTR("OnHashChangeNotification")
+
 OnHashChangeNotification::OnHashChangeNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

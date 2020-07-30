@@ -46,6 +46,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("UpdateTurnListRequest")
+
 namespace custom_str = utils::custom_string;
 
 UpdateTurnListRequest::UpdateTurnListRequest(

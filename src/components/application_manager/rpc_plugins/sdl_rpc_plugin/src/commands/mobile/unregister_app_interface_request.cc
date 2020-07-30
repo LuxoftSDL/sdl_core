@@ -40,6 +40,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("UnregisterAppInterfaceRequest")
+
 void UnregisterAppInterfaceRequest::Run() {
   SDL_AUTO_TRACE();
 

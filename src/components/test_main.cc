@@ -2,6 +2,8 @@
 #include "gmock/gmock.h"
 #include "utils/custom_string.h"
 #include "utils/logger.h"
+#include "utils/logger/logger_impl.h"
+#include "utils/logger/log4cxxlogger.h"
 
 SDL_CREATE_LOGGERPTR("SDLMain")
 int main(int argc, char** argv) {

@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2018, Ford Motor Company
  * All rights reserved.
@@ -36,6 +37,8 @@ namespace vehicle_info_plugin {
 using namespace application_manager;
 
 namespace commands {
+
+SDL_CREATE_LOGGERPTR("VIGetVehicleTypeRequest")
 
 VIGetVehicleTypeRequest::VIGetVehicleTypeRequest(
     const application_manager::commands::MessageSharedPtr& message,

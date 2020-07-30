@@ -82,6 +82,10 @@ struct SendLaunchApp
 };
 }  // namespace
 
+
+
+SDL_CREATE_LOGGERPTR("SDLActivateAppRequest")
+
 SDLActivateAppRequest::SDLActivateAppRequest(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

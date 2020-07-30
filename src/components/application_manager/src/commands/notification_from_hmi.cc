@@ -39,6 +39,8 @@ namespace application_manager {
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("NotificationFromHMI")
+
 NotificationFromHMI::NotificationFromHMI(
     const MessageSharedPtr& message,
     ApplicationManager& application_manager,

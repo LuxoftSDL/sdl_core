@@ -48,6 +48,8 @@ namespace commands {
 
 namespace mobile {
 
+SDL_CREATE_LOGGERPTR("OnSystemRequestNotification")
+
 OnSystemRequestNotification::OnSystemRequestNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

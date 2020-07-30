@@ -43,6 +43,8 @@ namespace commands {
 
 namespace mobile {
 
+SDL_CREATE_LOGGERPTR("OnButtonEventNotification")
+
 OnButtonEventNotification::OnButtonEventNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

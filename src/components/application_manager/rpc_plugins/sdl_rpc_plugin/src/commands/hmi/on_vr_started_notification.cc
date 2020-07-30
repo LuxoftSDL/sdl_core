@@ -37,6 +37,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("OnVRStartedNotification")
+
 OnVRStartedNotification::OnVRStartedNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

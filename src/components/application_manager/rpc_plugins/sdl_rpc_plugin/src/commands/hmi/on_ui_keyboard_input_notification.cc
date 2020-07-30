@@ -40,6 +40,8 @@ namespace commands {
 
 namespace hmi {
 
+SDL_CREATE_LOGGERPTR("OnUIKeyBoardInputNotification")
+
 OnUIKeyBoardInputNotification::OnUIKeyBoardInputNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

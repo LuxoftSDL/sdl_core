@@ -37,6 +37,9 @@ using namespace application_manager;
 
 namespace commands {
 
+
+SDL_CREATE_LOGGERPTR("AlertManeuverRequest")
+
 AlertManeuverRequest::AlertManeuverRequest(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

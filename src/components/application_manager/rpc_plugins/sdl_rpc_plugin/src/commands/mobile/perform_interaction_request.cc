@@ -56,6 +56,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("PerformInteractionRequest")
+
 namespace custom_str = utils::custom_string;
 
 uint32_t PerformInteractionRequest::pi_requests_count_ = 0;

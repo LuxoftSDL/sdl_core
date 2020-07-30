@@ -49,6 +49,8 @@ namespace application_manager {
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("CommandRequestImpl");
+
 std::string MergeInfos(const ResponseInfo& first_info,
                        const std::string& first_str,
                        const ResponseInfo& second_info,
@@ -101,13 +103,10 @@ const std::string CreateInfoForUnsupportedResult(
       return "Remote control is not supported by system";
     }
     default:
-#ifdef ENABLE_LOG
-      SDL_CREATE_LOGGERPTR("Commands");
       SDL_WARN(logger,
                "Could not create info because"
                " interface isn't valid. Interface is:"
                    << static_cast<int32_t>(interface));
-#endif  // ENABLE_LOG
       return "";
   }
 }

@@ -70,6 +70,8 @@ static std::map<std::string, std::set<hmi_apis::FunctionID::eType> >
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("RequestToHMI")
+
 bool CheckAvailabilityHMIInterfaces(ApplicationManager& application_manager,
                                     HmiInterfaces::InterfaceID interface) {
   const HmiInterfaces::InterfaceState state =

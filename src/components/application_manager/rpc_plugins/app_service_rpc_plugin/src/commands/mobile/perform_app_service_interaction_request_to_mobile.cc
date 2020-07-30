@@ -37,6 +37,8 @@ namespace app_service_rpc_plugin {
 using namespace application_manager;
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("PerformAppServiceInteractionRequestToMobile")
+
 PerformAppServiceInteractionRequestToMobile::
     PerformAppServiceInteractionRequestToMobile(
         const application_manager::commands::MessageSharedPtr& message,

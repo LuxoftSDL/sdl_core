@@ -38,6 +38,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("OnVIVinNotification")
+
 OnVIVinNotification::OnVIVinNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

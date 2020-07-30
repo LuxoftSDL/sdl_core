@@ -42,6 +42,8 @@ namespace commands {
 
 namespace mobile {
 
+SDL_CREATE_LOGGERPTR("OnTouchEventNotification")
+
 OnTouchEventNotification::OnTouchEventNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

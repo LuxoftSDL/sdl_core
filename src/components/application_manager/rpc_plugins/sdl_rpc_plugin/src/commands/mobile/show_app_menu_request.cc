@@ -40,6 +40,8 @@ namespace app_mngr = application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("ShowAppMenuRequest")
+
 ShowAppMenuRequest::ShowAppMenuRequest(
     const app_mngr::commands::MessageSharedPtr& message,
     app_mngr::ApplicationManager& application_manager,

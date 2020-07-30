@@ -41,6 +41,8 @@ namespace commands {
 
 namespace str = strings;
 
+SDL_CREATE_LOGGERPTR("SubscribeButtonRequest")
+
 SubscribeButtonRequest::SubscribeButtonRequest(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

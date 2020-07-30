@@ -39,6 +39,8 @@ namespace commands {
 
 namespace hmi {
 
+SDL_CREATE_LOGGERPTR("OnServiceUpdateNotification")
+
 OnServiceUpdateNotification::OnServiceUpdateNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

@@ -38,6 +38,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("VIUnsubscribeVehicleDataRequest")
+
 VIUnsubscribeVehicleDataRequest::VIUnsubscribeVehicleDataRequest(
     const application_manager::commands::MessageSharedPtr& message,
     const VehicleInfoCommandParams& params)

@@ -48,7 +48,13 @@ class Log4CXXLogger;
 typedef logger::Log4CXXLogger ExternalLogger;
 
 #define SDL_CREATE_LOGGERPTR(logger_name)  \
-  static std::string logger_(logger_name);
+  namespace {                              \
+  static std::string logger_(logger_name); \
+  }
+
+#define SDL_CREATE_LOCAL_LOGGERPTR(logger_name)  \
+  std::string logger_(logger_name);
+
 
 // Logger deinitilization function and macro, need to stop log4cxx writing
 // without this deinitilization log4cxx threads continue using some instances

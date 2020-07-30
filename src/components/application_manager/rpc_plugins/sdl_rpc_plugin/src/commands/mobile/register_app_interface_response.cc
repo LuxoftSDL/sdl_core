@@ -42,6 +42,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("RegisterAppInterfaceResponse")
+
 void RegisterAppInterfaceResponse::Run() {
   SDL_AUTO_TRACE();
 

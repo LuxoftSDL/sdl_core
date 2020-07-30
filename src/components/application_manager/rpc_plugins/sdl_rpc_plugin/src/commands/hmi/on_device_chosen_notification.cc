@@ -37,6 +37,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("OnDeviceChosenNotification")
+
 OnDeviceChosenNotification::OnDeviceChosenNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

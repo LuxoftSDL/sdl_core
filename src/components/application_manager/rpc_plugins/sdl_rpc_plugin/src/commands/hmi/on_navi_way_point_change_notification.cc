@@ -37,6 +37,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("OnNaviWayPointChangeNotification")
+
 OnNaviWayPointChangeNotification::OnNaviWayPointChangeNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& app_man,

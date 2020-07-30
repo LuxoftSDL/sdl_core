@@ -41,6 +41,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("UnsubscribeButtonRequest")
+
 namespace str = strings;
 
 UnsubscribeButtonRequest::UnsubscribeButtonRequest(

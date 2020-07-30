@@ -38,6 +38,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("UnregisterAppInterfaceResponse")
+
 void UnregisterAppInterfaceResponse::Run() {
   SDL_AUTO_TRACE();
 

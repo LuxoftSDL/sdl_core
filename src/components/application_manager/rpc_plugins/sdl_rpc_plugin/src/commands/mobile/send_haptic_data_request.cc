@@ -38,6 +38,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("SendHapticDataRequest")
+
 namespace custom_str = utils::custom_string;
 
 SendHapticDataRequest::SendHapticDataRequest(

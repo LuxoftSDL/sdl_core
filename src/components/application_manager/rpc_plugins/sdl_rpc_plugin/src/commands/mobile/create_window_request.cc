@@ -45,6 +45,8 @@ using app_mngr::ApplicationSharedPtr;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("CreateWindowRequest")
+
 CreateWindowRequest::CreateWindowRequest(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

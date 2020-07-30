@@ -47,6 +47,8 @@ namespace vehicle_info_plugin {
 using namespace application_manager;
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("UnsubscribeVehicleDataRequest")
+
 UnsubscribeVehicleDataRequest::UnsubscribeVehicleDataRequest(
     const application_manager::commands::MessageSharedPtr& message,
     const VehicleInfoCommandParams& params)

@@ -43,6 +43,9 @@ namespace commands {
 
 namespace mobile {
 
+
+SDL_CREATE_LOGGERPTR("OnDriverDistractionNotification")
+
 OnDriverDistractionNotification::OnDriverDistractionNotification(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

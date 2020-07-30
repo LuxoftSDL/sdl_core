@@ -42,6 +42,8 @@ namespace app_service_rpc_plugin {
 using namespace application_manager;
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("GetAppServiceDataRequest")
+
 GetAppServiceDataRequest::GetAppServiceDataRequest(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

@@ -132,6 +132,8 @@ size_t MessageLoopThread<Q>::GetMessageQueueSize() const {
   return message_queue_.size();
 }
 
+ SDL_CREATE_LOGGERPTR("Utils")
+
 template <class Q>
 MessageLoopThread<Q>::MessageLoopThread(const std::string& name,
                                         Handler* handler,
@@ -139,8 +141,7 @@ MessageLoopThread<Q>::MessageLoopThread(const std::string& name,
     : thread_delegate_(new LoopThreadDelegate(&message_queue_, handler))
     , thread_(threads::CreateThread(name.c_str(), thread_delegate_)) {
   const bool started = thread_->start(thread_opts);
-  if (!started) {
-    SDL_CREATE_LOGGERPTR("Utils")
+  if (!started) {   
     SDL_ERROR(logger_, "Failed to start thread " << name);
   }
 }
@@ -178,7 +179,6 @@ MessageLoopThread<Q>::LoopThreadDelegate::LoopThreadDelegate(
 
 template <class Q>
 void MessageLoopThread<Q>::LoopThreadDelegate::threadMain() {
-  SDL_CREATE_LOGGERPTR("Utils")
   SDL_AUTO_TRACE();
   while (!message_queue_.IsShuttingDown()) {
     DrainQue();

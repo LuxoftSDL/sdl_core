@@ -36,6 +36,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("VIGetVehicleTypeResponse")
+
 VIGetVehicleTypeResponse::VIGetVehicleTypeResponse(
     const application_manager::commands::MessageSharedPtr& message,
     const VehicleInfoCommandParams& params)

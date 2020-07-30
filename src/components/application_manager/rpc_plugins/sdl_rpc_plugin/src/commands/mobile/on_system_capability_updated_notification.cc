@@ -13,6 +13,8 @@ using namespace application_manager;
 namespace commands {
 namespace mobile {
 
+SDL_CREATE_LOGGERPTR("OnSystemCapabilityUpdatedNotification")
+
 OnSystemCapabilityUpdatedNotification::OnSystemCapabilityUpdatedNotification(
     const app_mngr::commands::MessageSharedPtr& message,
     app_mngr::ApplicationManager& application_manager,

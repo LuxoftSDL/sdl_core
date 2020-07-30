@@ -7,6 +7,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("SetCloudAppPropertiesResponse")
+
 SetCloudAppPropertiesResponse::SetCloudAppPropertiesResponse(
     const app_mngr::commands::MessageSharedPtr& message,
     app_mngr::ApplicationManager& application_manager,

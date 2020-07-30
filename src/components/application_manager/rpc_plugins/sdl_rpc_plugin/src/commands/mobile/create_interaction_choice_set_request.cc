@@ -47,6 +47,8 @@ const char* kInvalidImageWarningInfo = "Requested image(s) not found.";
 namespace sdl_rpc_plugin {
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("CreateInteractionChoiceSetRequest")
+
 using namespace application_manager;
 
 CreateInteractionChoiceSetRequest::CreateInteractionChoiceSetRequest(

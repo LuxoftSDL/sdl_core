@@ -40,6 +40,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("GenericResponse")
+
 void GenericResponse::Run() {
   /*ns_smart_device_link::ns_smart_objects::SmartObject response;
 

@@ -108,7 +108,6 @@ const std::string RequestTypeToString(mobile_apis::RequestType::eType type) {
 const policy::DeviceParams GetDeviceParams(
     connection_handler::DeviceHandle device_handle,
     const protocol_handler::SessionObserver& session_observer) {
-  SDL_CREATE_LOGGERPTR("PolicyHandler");
   policy::DeviceParams device_params;
   if (-1 == session_observer.GetDataOnDeviceID(
                 device_handle,

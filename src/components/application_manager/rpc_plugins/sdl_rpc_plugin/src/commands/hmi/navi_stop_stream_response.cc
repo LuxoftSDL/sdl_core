@@ -36,6 +36,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("NaviStopStreamResponse")
+
 NaviStopStreamResponse::NaviStopStreamResponse(
     const application_manager::commands::MessageSharedPtr& message,
     ApplicationManager& application_manager,

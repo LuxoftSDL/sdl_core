@@ -39,6 +39,9 @@ namespace application_manager {
 
 namespace commands {
 
+
+SDL_CREATE_LOGGERPTR("CommandNotificationFromMobileImpl")
+
 CommandNotificationFromMobileImpl::CommandNotificationFromMobileImpl(
     const MessageSharedPtr& message,
     ApplicationManager& application_manager,

@@ -46,6 +46,8 @@ namespace application_manager {
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("RequestFromHMI")
+
 RequestFromHMI::RequestFromHMI(const MessageSharedPtr& message,
                                ApplicationManager& application_manager,
                                rpc_service::RPCService& rpc_service,

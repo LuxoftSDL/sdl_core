@@ -45,6 +45,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("AddCommandRequest")
+
 namespace custom_str = utils::custom_string;
 
 AddCommandRequest::AddCommandRequest(

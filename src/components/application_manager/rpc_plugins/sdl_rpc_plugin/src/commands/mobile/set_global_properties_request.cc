@@ -46,6 +46,8 @@ using namespace application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("SetGlobalPropertiesRequest")
+
 namespace {
 bool IsResultCodeWarning(const app_mngr::commands::ResponseInfo& first,
                          const app_mngr::commands::ResponseInfo& second,
