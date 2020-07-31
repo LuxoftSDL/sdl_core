@@ -59,8 +59,6 @@ namespace websocket =
 namespace ssl = boost::asio::ssl;  // from <boost/asio/ssl.hpp>
 #endif                             // ENABLE_SECURITY
 
-SDL_CREATE_LOGGERPTR("WebSocketSession")
-
 class TransportAdapterController;
 
 template <typename ExecutorType = tcp::socket&>

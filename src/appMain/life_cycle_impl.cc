@@ -43,9 +43,6 @@
 #include "security_manager/security_manager_impl.h"
 #endif  // ENABLE_SECURITY
 
-#ifdef ENABLE_LOG
-#include "utils/log_message_loop_thread.h"
-#endif  // ENABLE_LOG
 
 #include "appMain/low_voltage_signals_handler.h"
 
@@ -242,7 +239,7 @@ void sig_handler(int sig) {
       break;
     case SIGSEGV:
       SDL_DEBUG(logger_, "SIGSEGV signal has been caught");
-      SDL_FLUSH_LOGGER()();
+      SDL_FLUSH_LOGGER();
       // exit need to prevent endless sending SIGSEGV
       // http://stackoverflow.com/questions/2663456/how-to-write-a-signal-handler-to-catch-sigsegv
       abort();

@@ -5,6 +5,12 @@
 #include "utils/jsoncpp_reader_wrapper.h"
 #include "utils/file_system.h"
 
+#ifdef ENABLE_LOG
+#include "utils/logger/logger_impl.h"
+#include "utils/logger/log4cxxlogger.h"
+#endif  // ENABLE_LOG
+#include "utils/logger.h"
+
 namespace policy_table = rpc::policy_table_interface_base;
 
 enum ResultCode {
@@ -43,7 +49,14 @@ int main(int argc, char** argv) {
     help();
     exit(MISSED_FILE_NAME);
   }
-  std::string pt_type_str = argv[1];
+
+  // --------------------------------------------------------------------------
+  // Logger initialization
+  logger::Log4CXXLogger logger("log4cxx.properties");
+  logger::Logger<logger::Log4CXXLogger>::instance().Init(
+        &logger);  // move logger_ to Logger instance
+
+ std::string pt_type_str = argv[1];
   std::string file_name = argv[2];
   std::string json_string;
   rpc::policy_table_interface_base::PolicyTableType pt_type;

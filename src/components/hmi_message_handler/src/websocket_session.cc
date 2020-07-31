@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace boost::beast::websocket;
 namespace hmi_message_handler {
 
+SDL_CREATE_LOGGERPTR("HMIMessageHandler")
+
 WebsocketSession::WebsocketSession(boost::asio::ip::tcp::socket socket,
                                    CMessageBrokerController* controller)
     : ws_(std::move(socket))

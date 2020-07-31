@@ -147,7 +147,7 @@ void NotificationThreadDelegate::threadMain() {
         low_voltage_signals_handler_.LowVoltageSignalsMask();
     const int err = sigwait(&lv_mask, &signo);
     if (0 != err) {
-      LOG4CXX_ERROR(
+      SDL_ERROR(
           logger_,
           "Sigwait() error! Signals set contains an invalid signal number!");
       continue;

@@ -35,6 +35,8 @@
 namespace rc_rpc_plugin {
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("Commands")
+
 GetInteriorVehicleDataConsentResponse::GetInteriorVehicleDataConsentResponse(
     const application_manager::commands::MessageSharedPtr& message,
     const RCCommandParams& params)

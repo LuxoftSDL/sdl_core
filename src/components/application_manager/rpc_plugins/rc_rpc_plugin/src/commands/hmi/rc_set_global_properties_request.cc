@@ -37,6 +37,8 @@ namespace app_mngr = application_manager;
 
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("Commands")
+
 RCSetGlobalPropertiesRequest::RCSetGlobalPropertiesRequest(
     const app_mngr::commands::MessageSharedPtr& message,
     const RCCommandParams& params)

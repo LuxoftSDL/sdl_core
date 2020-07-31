@@ -38,10 +38,12 @@
 #include "utils/date_time.h"
 #include "utils/file_system.h"
 #include "utils/helpers.h"
-include "utils/logger.h"
+#include "utils/logger.h"
 #include "utils/logger_status.h"
 #include "utils/threads/message_loop_thread.h"
 #include "utils/threads/thread.h"
+#include "utils/logger/logger_impl.h"
+#include "utils/logger/log4cxxlogger.h"
 
 namespace test {
 namespace components {
@@ -68,7 +70,13 @@ void Preconditions() {
 
 void InitLogger() {
   // Set enabled logs
-  INIT_LOGGER("log4cxx.properties", true);
+
+  // --------------------------------------------------------------------------
+  // Logger initialization
+  logger::Log4CXXLogger logger("log4cxx.properties");
+    logger::Logger<logger::Log4CXXLogger>::instance().Init(
+          &logger);  // move logger_ to Logger instance
+
   // SDL_DEINIT_LOGGER() will be called in test_main.cc
 }
 
@@ -135,7 +143,7 @@ TEST(AutoTraceTest, DISABLED_AutoTrace_WriteToFile_ReadCorrectString) {
   InitLogger();
   CreateDeleteAutoTrace(testlog);
 
-  SDL_FLUSH_LOGGER()();
+  SDL_FLUSH_LOGGER();
   ASSERT_TRUE(CheckAutoTraceDebugInFile(testlog));
 }
 

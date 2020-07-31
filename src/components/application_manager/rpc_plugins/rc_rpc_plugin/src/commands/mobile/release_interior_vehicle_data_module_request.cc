@@ -41,6 +41,8 @@ namespace rc_rpc_plugin {
 using namespace application_manager;
 namespace commands {
 
+SDL_CREATE_LOGGERPTR("Commands")
+
 namespace {
 struct ResponseParams {
   std::string response_info;

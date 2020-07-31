@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace transport_manager {
 namespace transport_adapter {
 
+SDL_CREATE_LOGGERPTR("WebSocketSession")
+
 using namespace boost::beast::websocket;
 
 template <>

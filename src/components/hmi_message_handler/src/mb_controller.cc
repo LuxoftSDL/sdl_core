@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace boost::beast::websocket;
 namespace hmi_message_handler {
 
+SDL_CREATE_LOGGERPTR("HMIMessageHandler")
+
 CMessageBrokerController::CMessageBrokerController(const std::string& address,
                                                    uint16_t port,
                                                    std::string name,
