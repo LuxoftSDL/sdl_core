@@ -51,15 +51,14 @@ RCCapabilitiesManagerImpl::GetDefaultModuleIdFromCapabilitiesStructure(
     const auto module_id = control_capabilities[message_params::kModuleInfo]
                                                [message_params::kModuleId]
                                                    .asString();
-    SDL_WARN(logger_,
-             "Use default moduleId from hmi capabilities: "
-                 << module_id << " for requested moduleType: " << module_type);
+    SDL_WARN("Use default moduleId from hmi capabilities: "
+             << module_id << " for requested moduleType: " << module_type);
     return module_id;
   }
-  SDL_WARN(logger_,
-           "There are no moduleInfo in hmi capabilities for requested "
-           "moduleType "
-               << module_type);
+  SDL_WARN(
+      "There are no moduleInfo in hmi capabilities for requested "
+      "moduleType "
+      << module_type);
   return "";
 }
 
@@ -74,17 +73,15 @@ RCCapabilitiesManagerImpl::GetDefaultModuleIdFromCapabilitiesArray(
       const auto module_id =
           cap_item[message_params::kModuleInfo][message_params::kModuleId]
               .asString();
-      SDL_WARN(logger_,
-               "Use default moduleId from hmi capabilities: "
-                   << module_id
-                   << " for requested moduleType: " << module_type);
+      SDL_WARN("Use default moduleId from hmi capabilities: "
+               << module_id << " for requested moduleType: " << module_type);
       return module_id;
     }
   }
-  SDL_WARN(logger_,
-           "There are no moduleInfo in hmi capabilities for requested "
-           "moduleType "
-               << module_type);
+  SDL_WARN(
+      "There are no moduleInfo in hmi capabilities for requested "
+      "moduleType "
+      << module_type);
   return "";
 }
 
@@ -93,16 +90,15 @@ const std::string RCCapabilitiesManagerImpl::GetDefaultModuleIdFromCapabilities(
   SDL_AUTO_TRACE();
   auto rc_capabilities_ptr = hmi_capabilities_.rc_capability();
   if (!rc_capabilities_ptr) {
-    SDL_WARN(logger_, "RC capability is not initialized");
+    SDL_WARN("RC capability is not initialized");
     return std::string();
   }
 
   auto rc_capabilities = *rc_capabilities_ptr;
   const auto& mapping = RCHelpers::GetModuleTypeToCapabilitiesMapping();
   if (!rc_capabilities.keyExists(mapping(module_type))) {
-    SDL_WARN(
-        logger_,
-        "There is no RC capability for requested module_type " << module_type);
+    SDL_WARN("There is no RC capability for requested module_type "
+             << module_type);
     return "";
   }
   if (enums_value::kHmiSettings == module_type ||
@@ -124,10 +120,10 @@ const bool RCCapabilitiesManagerImpl::CheckModuleIdWithCapabilitiesStructure(
                                             .asString())) {
     return true;
   }
-  SDL_WARN(logger_,
-           "There are no moduleInfo in hmi capabilities for requested "
-           "moduleId "
-               << module_id);
+  SDL_WARN(
+      "There are no moduleInfo in hmi capabilities for requested "
+      "moduleId "
+      << module_id);
   return false;
 }
 
@@ -143,10 +139,10 @@ const bool RCCapabilitiesManagerImpl::CheckModuleIdWithCapabilitiesArrays(
       return true;
     }
   }
-  SDL_WARN(logger_,
-           "There are no moduleInfo in hmi capabilities for requested "
-           "moduleId "
-               << module_id);
+  SDL_WARN(
+      "There are no moduleInfo in hmi capabilities for requested "
+      "moduleId "
+      << module_id);
   return false;
 }
 
@@ -173,7 +169,7 @@ bool RCCapabilitiesManagerImpl::CheckIfModuleExistsInCapabilities(
 
   auto rc_capabilities_ptr = hmi_capabilities_.rc_capability();
   if (!rc_capabilities_ptr) {
-    SDL_WARN(logger_, "RC capability is not initialized");
+    SDL_WARN("RC capability is not initialized");
     return false;
   }
 
@@ -216,7 +212,7 @@ RCCapabilitiesManagerImpl::GetCapabilitiesToModuleTypeMapping() const {
         {strings::khmiSettingsControlCapabilities, enums_value::kHmiSettings}};
     auto it = mapping.find(control_cap);
     if (mapping.end() == it) {
-      SDL_ERROR(logger_, "Unknown control capability " << control_cap);
+      SDL_ERROR("Unknown control capability " << control_cap);
       return std::string();
     }
     return it->second;
@@ -236,7 +232,7 @@ void RCCapabilitiesManagerImpl::GetResourcesFromCapabilitiesStructure(
                                                     .asString();
     out_resources.push_back(std::make_pair(mapping(capability_key), module_id));
   } else {
-    SDL_WARN(logger_, "There are no moduleId in " << capability_key);
+    SDL_WARN("There are no moduleId in " << capability_key);
     out_resources.push_back(std::make_pair(mapping(capability_key), ""));
   }
 }
@@ -254,8 +250,7 @@ void RCCapabilitiesManagerImpl::GetResourcesFromCapabilitiesArray(
       out_resources.push_back(
           std::make_pair(mapping(capability_key), module_id));
     } else {
-      SDL_WARN(logger_,
-               "There are no moduleId for item from " << capability_key);
+      SDL_WARN("There are no moduleId for item from " << capability_key);
       out_resources.push_back(std::make_pair(mapping(capability_key), ""));
     }
   }
@@ -266,7 +261,7 @@ const std::vector<ModuleUid> RCCapabilitiesManagerImpl::GetResources() const {
   std::vector<ModuleUid> resources;
   auto rc_capabilities_ptr = hmi_capabilities_.rc_capability();
   if (!rc_capabilities_ptr) {
-    SDL_WARN(logger_, "RC capability is not initialized");
+    SDL_WARN("RC capability is not initialized");
     return resources;
   }
 
@@ -293,7 +288,7 @@ const std::string RCCapabilitiesManagerImpl::GetModuleIdForSeatLocation(
 
   auto rc_capabilities_ptr = hmi_capabilities_.rc_capability();
   if (!rc_capabilities_ptr) {
-    SDL_WARN(logger_, "RC capability is not initialized.");
+    SDL_WARN("RC capability is not initialized.");
     return std::string();
   }
 
@@ -313,7 +308,7 @@ const std::string RCCapabilitiesManagerImpl::GetModuleIdForSeatLocation(
                                   .asString();
     }
   }
-  SDL_DEBUG(logger_, "There are no capabitities for requested id: " << id);
+  SDL_DEBUG("There are no capabitities for requested id: " << id);
   return "";
 }
 
@@ -321,7 +316,7 @@ bool RCCapabilitiesManagerImpl::CheckIfButtonExistInRCCaps(
     const mobile_apis::ButtonName::eType button) const {
   auto rc_capabilities_ptr = hmi_capabilities_.rc_capability();
   if (!rc_capabilities_ptr) {
-    SDL_WARN(logger_, "RC capability is not initialized");
+    SDL_WARN("RC capability is not initialized");
     return false;
   }
 
@@ -343,13 +338,12 @@ bool RCCapabilitiesManagerImpl::CheckIfButtonExistInRCCaps(
       const mobile_apis::ButtonName::eType current_button =
           static_cast<mobile_apis::ButtonName::eType>(current_id);
       if (current_button == button) {
-        SDL_TRACE(logger_,
-                  "Button id " << current_button << " exist in capabilities");
+        SDL_TRACE("Button id " << current_button << " exist in capabilities");
         return true;
       }
     }
   }
-  SDL_TRACE(logger_, "Button id " << button << " do not exist in capabilities");
+  SDL_TRACE("Button id " << button << " do not exist in capabilities");
   return false;
 }
 
@@ -365,8 +359,7 @@ RCCapabilitiesManagerImpl::GetCapabilitiesByModuleIdFromArray(
       return cap_item;
     }
   }
-  SDL_WARN(logger_,
-           "Capabilities for moduleId " << module_id
+  SDL_WARN("Capabilities for moduleId " << module_id
                                         << " do not exist in capabilities");
   return smart_objects::SmartObject(smart_objects::SmartType_Null);
 }
@@ -376,22 +369,20 @@ bool RCCapabilitiesManagerImpl::CheckButtonName(
   SDL_AUTO_TRACE();
   auto rc_capabilities = hmi_capabilities_.rc_capability();
   if (!rc_capabilities) {
-    SDL_ERROR(logger_, "No remote controll capabilities available");
+    SDL_ERROR("No remote controll capabilities available");
     return false;
   }
 
   if (enums_value::kRadio == module_type) {
     if (!helpers::in_range(RCHelpers::buttons_radio(), button_name)) {
-      SDL_WARN(logger_,
-               "Trying to acceess climate button with module type radio");
+      SDL_WARN("Trying to acceess climate button with module type radio");
       return false;
     }
   }
 
   if (enums_value::kClimate == module_type) {
     if (!helpers::in_range(RCHelpers::buttons_climate(), button_name)) {
-      SDL_WARN(logger_,
-               "Trying to acceess radio button with module type climate");
+      SDL_WARN("Trying to acceess radio button with module type climate");
       return false;
     }
   }
@@ -484,7 +475,7 @@ ModuleTypeCapability RCCapabilitiesManagerImpl::GetModuleDataCapabilities(
   SDL_AUTO_TRACE();
   auto rc_capabilities_ptr = hmi_capabilities_.rc_capability();
   if (!rc_capabilities_ptr) {
-    SDL_WARN(logger_, "RC capability is not initialized");
+    SDL_WARN("RC capability is not initialized");
     return {std::string(), capabilitiesStatus::kInvalidStatus};
   }
 
@@ -502,7 +493,7 @@ ModuleTypeCapability RCCapabilitiesManagerImpl::GetModuleDataCapabilities(
     const auto capabilities_key = get_capabilities_key(module_type);
     if (module_data.keyExists(module_data_key)) {
       if (!rc_capabilities.keyExists(capabilities_key)) {
-        SDL_DEBUG(logger_, module_data_key << " capabilities not present");
+        SDL_DEBUG(module_data_key << " capabilities not present");
         return module_data_capabilities;
       }
       const auto& caps = rc_capabilities[capabilities_key];
@@ -579,31 +570,26 @@ capabilitiesStatus RCCapabilitiesManagerImpl::GetItemCapability(
   const auto it = mapping.find(request_parameter);
 
   if (it == mapping.end()) {
-    SDL_DEBUG(
-        logger_,
-        "Parameter " << request_parameter << " doesn't exist in capabilities.");
+    SDL_DEBUG("Parameter " << request_parameter
+                           << " doesn't exist in capabilities.");
     return capabilitiesStatus::kMissedParam;
   }
 
   const std::string& caps_key = it->second;
 
-  SDL_DEBUG(logger_,
-            "Checking request parameter "
-                << request_parameter
-                << " with capabilities. Appropriate key is " << caps_key);
+  SDL_DEBUG("Checking request parameter "
+            << request_parameter << " with capabilities. Appropriate key is "
+            << caps_key);
 
   if (!capabilities.keyExists(caps_key)) {
-    SDL_DEBUG(logger_,
-              "Capability " << caps_key
+    SDL_DEBUG("Capability " << caps_key
                             << " is missed in RemoteControl capabilities");
     return capabilitiesStatus::kMissedParam;
   }
 
   if (!capabilities[caps_key].asBool()) {
-    SDL_DEBUG(logger_,
-              "Capability "
-                  << caps_key
-                  << " is switched off in RemoteControl capabilities");
+    SDL_DEBUG("Capability "
+              << caps_key << " is switched off in RemoteControl capabilities");
     capabilitiesStatus status = capabilitiesStatus::kMissedParam;
     if (mobile_apis::Result::READ_ONLY == switched_off_result) {
       status = capabilitiesStatus::kReadOnly;
@@ -652,7 +638,7 @@ ModuleTypeCapability RCCapabilitiesManagerImpl::GetLightNameCapabilities(
       return GetLightDataCapabilities(so, light_data);
     }
   }
-  SDL_DEBUG(logger_, "There is no such light name in capabilities");
+  SDL_DEBUG("There is no such light name in capabilities");
   return std::make_pair(message_params::kLightState,
                         capabilitiesStatus::kMissedLightName);
 }
@@ -664,17 +650,15 @@ ModuleTypeCapability RCCapabilitiesManagerImpl::GetRadioBandByCapabilities(
       static_cast<mobile_apis::RadioBand::eType>(request_parameter.asUInt());
   if (mobile_apis::RadioBand::XM == radio_band) {
     if (!capabilities_status.keyExists(strings::kSiriusxmRadioAvailable)) {
-      SDL_DEBUG(logger_,
-                "Capability " << strings::kSiriusxmRadioAvailable
+      SDL_DEBUG("Capability " << strings::kSiriusxmRadioAvailable
                               << " is missed in RemoteControl capabilities");
       return std::make_pair(strings::kSiriusxmRadioAvailable,
                             capabilitiesStatus::kMissedParam);
     }
     if (!capabilities_status[strings::kSiriusxmRadioAvailable].asBool()) {
-      SDL_DEBUG(logger_,
-                "Capability "
-                    << strings::kSiriusxmRadioAvailable
-                    << " is switched off in RemoteControl capabilities");
+      SDL_DEBUG("Capability "
+                << strings::kSiriusxmRadioAvailable
+                << " is switched off in RemoteControl capabilities");
       return std::make_pair(strings::kSiriusxmRadioAvailable,
                             capabilitiesStatus::kMissedParam);
     }
@@ -704,9 +688,8 @@ bool RCCapabilitiesManagerImpl::CheckReadOnlyParamsForAudio(
 
     for (auto& so : *(equalizer_settings.asArray())) {
       if (so.keyExists(message_params::kChannelName)) {
-        SDL_DEBUG(logger_,
-                  "READ ONLY parameter. ChannelName = "
-                      << so[message_params::kChannelName].asString());
+        SDL_DEBUG("READ ONLY parameter. ChannelName = "
+                  << so[message_params::kChannelName].asString());
         return true;
       }
     }
@@ -733,9 +716,8 @@ bool RCCapabilitiesManagerImpl::CheckReadOnlyParamsForLight(
                                            mobile_apis::LightStatus::RAMP_DOWN,
                                            mobile_apis::LightStatus::UNKNOWN,
                                            mobile_apis::LightStatus::INVALID)) {
-          SDL_DEBUG(logger_,
-                    "READ ONLY parameter. Status = "
-                        << light_data[message_params::kLightStatus].asInt());
+          SDL_DEBUG("READ ONLY parameter. Status = "
+                    << light_data[message_params::kLightStatus].asInt());
           return true;
         }
       }
@@ -794,7 +776,7 @@ bool RCCapabilitiesManagerImpl::AreAllParamsReadOnly(
     }
   }
 
-  SDL_DEBUG(logger_, "All params are ReadOnly");
+  SDL_DEBUG("All params are ReadOnly");
   return true;
 }
 
@@ -802,7 +784,7 @@ bool RCCapabilitiesManagerImpl::IsSeatLocationCapabilityProvided() const {
   SDL_AUTO_TRACE();
   auto seat_location_capability = hmi_capabilities_.seat_location_capability();
   if (!seat_location_capability || seat_location_capability->empty()) {
-    SDL_DEBUG(logger_, "Seat Location capability is not provided by HMI");
+    SDL_DEBUG("Seat Location capability is not provided by HMI");
     return false;
   }
 
@@ -817,7 +799,6 @@ bool RCCapabilitiesManagerImpl::IsSeatLocationCapabilityProvided() const {
   }
 
   SDL_DEBUG(
-      logger_,
       "Seat Location capability doesn't contain all necessary parameters");
   return false;
 }
@@ -840,7 +821,7 @@ RCCapabilitiesManagerImpl::GetDriverLocationFromSeatLocationCapability() const {
                   driver_location[strings::kRowspan].asInt(),
                   driver_location[strings::kLevelspan].asInt());
     } else {
-      SDL_DEBUG(logger_, "Driver's location doesn't provided");
+      SDL_DEBUG("Driver's location doesn't provided");
     }
   }
   return grid;
@@ -904,7 +885,7 @@ Grid RCCapabilitiesManagerImpl::GetModuleServiceArea(
     const ModuleUid& module) const {
   auto rc_capabilities_ptr = hmi_capabilities_.rc_capability();
   if (!rc_capabilities_ptr) {
-    SDL_WARN(logger_, "RC capability is not initialized");
+    SDL_WARN("RC capability is not initialized");
     return Grid();
   }
 
@@ -913,7 +894,7 @@ Grid RCCapabilitiesManagerImpl::GetModuleServiceArea(
   const auto& module_type = module.first;
   const auto& capabilities_key = mapping(module_type);
   if (!rc_capabilities.keyExists(capabilities_key)) {
-    SDL_DEBUG(logger_, module_type << "control capabilities not present");
+    SDL_DEBUG(module_type << "control capabilities not present");
     return Grid();
   }
   const auto& caps = rc_capabilities[capabilities_key];
@@ -944,7 +925,7 @@ bool RCCapabilitiesManagerImpl::IsMultipleAccessAllowed(
     const ModuleUid& module) const {
   auto rc_capabilities_ptr = hmi_capabilities_.rc_capability();
   if (!rc_capabilities_ptr) {
-    SDL_ERROR(logger_, "RC capability is not initialized");
+    SDL_ERROR("RC capability is not initialized");
     return false;
   }
 
@@ -953,7 +934,7 @@ bool RCCapabilitiesManagerImpl::IsMultipleAccessAllowed(
   const auto& module_type = module.first;
   const auto& capabilities_key = mapping(module_type);
   if (!rc_capabilities.keyExists(capabilities_key)) {
-    SDL_DEBUG(logger_, module_type << "control capabilities not present");
+    SDL_DEBUG(module_type << "control capabilities not present");
     return false;
   }
   const auto& caps = rc_capabilities[capabilities_key];

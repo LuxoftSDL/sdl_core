@@ -60,8 +60,7 @@ TransportAdapter::Error BluetoothConnectionFactory::CreateConnection(
   controller_->ConnectionCreated(connection, device_uid, app_handle);
   TransportAdapter::Error error = connection->Start();
   if (TransportAdapter::OK != error) {
-    SDL_ERROR(logger_,
-              "Bluetooth connection::Start() failed with error: " << error);
+    SDL_ERROR("Bluetooth connection::Start() failed with error: " << error);
   }
   return error;
 }

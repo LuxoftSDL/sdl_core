@@ -58,7 +58,7 @@ ServiceType ServiceTypeFromByte(uint8_t byte) {
   ServiceType type = ServiceType(byte);
   const bool valid_type = IsValid(type);
   if (!valid_type) {
-    SDL_INFO(logger_, "Invalid service type: " << int32_t(byte));
+    SDL_INFO("Invalid service type: " << int32_t(byte));
   }
   return valid_type ? type : kInvalidServiceType;
 }

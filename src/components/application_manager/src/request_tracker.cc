@@ -49,9 +49,8 @@ TrackResult RequestTracker::Track(const ApplicationID& app_id,
   SDL_AUTO_TRACE();
   bool track_result = false;
 
-  SDL_DEBUG(logger_,
-            "Tracking request for level: "
-                << MessageHelper::StringifiedHMILevel(level));
+  SDL_DEBUG("Tracking request for level: "
+            << MessageHelper::StringifiedHMILevel(level));
 
   if (mobile_apis::HMILevel::HMI_NONE == level) {
     track_result = Track(app_id,
@@ -80,39 +79,36 @@ bool RequestTracker::Track(const ApplicationID& app_id,
   using namespace date_time;
 
   if (!time_scale || !max_requests) {
-    SDL_INFO(logger_, "Time scale request tracking is disabled.");
+    SDL_INFO("Time scale request tracking is disabled.");
     return true;
   }
 
-  SDL_DEBUG(logger_,
-            "Time scale is: " << time_scale
+  SDL_DEBUG("Time scale is: " << time_scale
                               << ". Max requests number is: " << max_requests);
 
-  SDL_DEBUG(logger_, "Tracking app id: " << app_id);
+  SDL_DEBUG("Tracking app id: " << app_id);
   ApplicationsRequestsTracker::iterator it_app = tracker.find(app_id);
 
   if (tracker.end() == it_app) {
-    SDL_DEBUG(logger_, "Adding new application into tracking.");
+    SDL_DEBUG("Adding new application into tracking.");
     tracker[app_id].push_back(getCurrentTime());
     return true;
   }
 
-  SDL_DEBUG(logger_, "Amount of known requests is: " << it_app->second.size());
+  SDL_DEBUG("Amount of known requests is: " << it_app->second.size());
 
   if (it_app->second.size() < max_requests) {
-    SDL_DEBUG(logger_, "Adding new request into tracking.");
+    SDL_DEBUG("Adding new request into tracking.");
     tracker[app_id].push_back(getCurrentTime());
     return true;
   }
 
-  SDL_DEBUG(logger_,
-            "Oldest request is added at: "
-                << getmSecs(it_app->second.front())
-                << ". Current time is: " << getmSecs(getCurrentTime())
-                << ". Time scale is: " << time_scale);
+  SDL_DEBUG("Oldest request is added at: "
+            << getmSecs(it_app->second.front()) << ". Current time is: "
+            << getmSecs(getCurrentTime()) << ". Time scale is: " << time_scale);
 
   if (calculateTimeSpan(it_app->second.front()) > time_scale) {
-    SDL_DEBUG(logger_, "Dropping oldest request, adding new one.");
+    SDL_DEBUG("Dropping oldest request, adding new one.");
     ApplicationsRequestsTracker::mapped_type& times = tracker[app_id];
 
     DCHECK_OR_RETURN(!times.empty(), false);
@@ -122,7 +118,7 @@ bool RequestTracker::Track(const ApplicationID& app_id,
     return true;
   }
 
-  SDL_DEBUG(logger_, "Requests amount per time scale is exceeded.");
+  SDL_DEBUG("Requests amount per time scale is exceeded.");
 
   return false;
 }

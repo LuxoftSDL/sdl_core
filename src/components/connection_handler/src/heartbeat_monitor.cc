@@ -57,7 +57,7 @@ void HeartBeatMonitor::Process() {
     if (state.HasTimeoutElapsed()) {
       const uint8_t session_id = it->first;
       if (state.IsReadyToClose()) {
-        SDL_WARN(logger_, "Will close session");
+        SDL_WARN("Will close session");
         sessions_list_lock_.Release();
         RemoveSession(session_id);
         connection_->CloseSession(session_id);
@@ -65,9 +65,8 @@ void HeartBeatMonitor::Process() {
         it = sessions_.begin();
         continue;
       } else {
-        SDL_DEBUG(logger_,
-                  "Send heart beat into session with id "
-                      << static_cast<int32_t>(session_id));
+        SDL_DEBUG("Send heart beat into session with id "
+                  << static_cast<int32_t>(session_id));
         state.PrepareToClose();
         connection_->SendHeartBeat(it->first);
       }
@@ -80,7 +79,7 @@ void HeartBeatMonitor::Process() {
 void HeartBeatMonitor::threadMain() {
   AutoLock main_lock(main_thread_lock_);
   SDL_DEBUG(
-      logger_,
+
       "Start heart beat monitor. Timeout is " << default_heartbeat_timeout_);
   while (run_) {
     heartbeat_monitor_.WaitFor(main_lock, kDefaultCycleTimeout);
@@ -91,27 +90,25 @@ void HeartBeatMonitor::threadMain() {
 void HeartBeatMonitor::AddSession(uint8_t session_id) {
   const uint32_t converted_session_id = static_cast<int32_t>(session_id);
   UNUSED(converted_session_id);
-  SDL_DEBUG(logger_, "Add session with id " << converted_session_id);
+  SDL_DEBUG("Add session with id " << converted_session_id);
   AutoLock auto_lock(sessions_list_lock_);
   if (sessions_.end() != sessions_.find(session_id)) {
-    SDL_WARN(logger_,
-             "Session with id: " << converted_session_id << " already exists");
+    SDL_WARN("Session with id: " << converted_session_id << " already exists");
     return;
   }
   sessions_.insert(
       std::make_pair(session_id, SessionState(default_heartbeat_timeout_)));
-  SDL_INFO(logger_, "Start heartbeat for session: " << converted_session_id);
+  SDL_INFO("Start heartbeat for session: " << converted_session_id);
 }
 
 void HeartBeatMonitor::RemoveSession(uint8_t session_id) {
   SDL_AUTO_TRACE();
   AutoLock auto_lock(sessions_list_lock_);
 
-  SDL_DEBUG(logger_, "Remove session with id " << static_cast<int>(session_id));
+  SDL_DEBUG("Remove session with id " << static_cast<int>(session_id));
 
   if (sessions_.erase(session_id) == 0) {
-    SDL_WARN(logger_,
-             "Remove session with id " << static_cast<int>(session_id)
+    SDL_WARN("Remove session with id " << static_cast<int>(session_id)
                                        << " was unsuccessful");
   }
 }
@@ -121,9 +118,8 @@ void HeartBeatMonitor::KeepAlive(uint8_t session_id) {
   AutoLock auto_lock(sessions_list_lock_);
 
   if (sessions_.end() != sessions_.find(session_id)) {
-    SDL_INFO(logger_,
-             "Resetting heart beat timer for session with id "
-                 << static_cast<int32_t>(session_id));
+    SDL_INFO("Resetting heart beat timer for session with id "
+             << static_cast<int32_t>(session_id));
 
     sessions_[session_id].KeepAlive();
   }
@@ -141,8 +137,7 @@ void HeartBeatMonitor::exitThreadMain() {
 
 void HeartBeatMonitor::set_heartbeat_timeout_milliseconds(uint32_t timeout,
                                                           uint8_t session_id) {
-  SDL_DEBUG(logger_,
-            "Set new heart beat timeout " << timeout
+  SDL_DEBUG("Set new heart beat timeout " << timeout
                                           << "For session: " << session_id);
 
   AutoLock session_locker(sessions_list_lock_);
@@ -160,7 +155,7 @@ HeartBeatMonitor::SessionState::SessionState(
 }
 
 void HeartBeatMonitor::SessionState::RefreshExpiration() {
-  SDL_DEBUG(logger_, "Refresh expiration: " << heartbeat_timeout_mseconds_);
+  SDL_DEBUG("Refresh expiration: " << heartbeat_timeout_mseconds_);
   using namespace date_time;
   date_time::TimeDuration time = getCurrentTime();
   AddMilliseconds(time, heartbeat_timeout_mseconds_);
@@ -169,15 +164,14 @@ void HeartBeatMonitor::SessionState::RefreshExpiration() {
 
 void HeartBeatMonitor::SessionState::UpdateTimeout(
     uint32_t heartbeat_timeout_mseconds) {
-  SDL_DEBUG(logger_,
-            "Update timout with value " << heartbeat_timeout_mseconds_);
+  SDL_DEBUG("Update timout with value " << heartbeat_timeout_mseconds_);
   heartbeat_timeout_mseconds_ = heartbeat_timeout_mseconds;
   RefreshExpiration();
 }
 
 void HeartBeatMonitor::SessionState::PrepareToClose() {
   is_heartbeat_sent_ = true;
-  SDL_DEBUG(logger_, "Prepare to close");
+  SDL_DEBUG("Prepare to close");
   RefreshExpiration();
 }
 

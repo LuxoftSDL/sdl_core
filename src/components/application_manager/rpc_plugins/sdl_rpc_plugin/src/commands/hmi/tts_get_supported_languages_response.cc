@@ -65,8 +65,7 @@ void TTSGetSupportedLanguagesResponse::Run() {
       hmi_apis::FunctionID::TTS_GetSupportedLanguages);
 
   if (hmi_apis::Common_Result::SUCCESS != code) {
-    SDL_DEBUG(logger_,
-              "Request was not successful. Don't change HMI capabilities");
+    SDL_DEBUG("Request was not successful. Don't change HMI capabilities");
     return;
   }
 
@@ -76,8 +75,7 @@ void TTSGetSupportedLanguagesResponse::Run() {
   std::vector<std::string> sections_to_update{hmi_response::languages};
   if (!hmi_capabilities_.SaveCachedCapabilitiesToFile(
           hmi_interface::tts, sections_to_update, message_->getSchema())) {
-    SDL_ERROR(logger_,
-              "Failed to save TTS.GetSupportedLanguages response to cache");
+    SDL_ERROR("Failed to save TTS.GetSupportedLanguages response to cache");
   }
 }
 

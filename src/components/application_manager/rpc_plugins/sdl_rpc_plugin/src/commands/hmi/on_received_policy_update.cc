@@ -64,14 +64,14 @@ void OnReceivedPolicyUpdate::Run() {
       (*message_)[strings::msg_params][hmi_notification::policyfile].asString();
   policy::BinaryMessage file_content;
   if (!file_system::ReadBinaryFile(file_path, file_content)) {
-    SDL_ERROR(logger_, "Failed to read Update file.");
+    SDL_ERROR("Failed to read Update file.");
     return;
   }
   policy_handler_.ReceiveMessageFromSDK(file_path, file_content);
 #else
-  SDL_WARN(logger_,
-           "This RPC is part of extended policy flow."
-           "Please re-build with extended policy mode enabled.");
+  SDL_WARN(
+      "This RPC is part of extended policy flow."
+      "Please re-build with extended policy mode enabled.");
 #endif
 }
 

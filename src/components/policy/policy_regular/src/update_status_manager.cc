@@ -182,7 +182,7 @@ void UpdateStatusManager::DoTransition() {
 
   current_status_ = next_status_;
   next_status_.reset();
-  SDL_DEBUG(logger_, "last_processed_event_ = " << last_processed_event_);
+  SDL_DEBUG("last_processed_event_ = " << last_processed_event_);
   const bool is_update_pending =
       policy::StatusProcessingSnapshot == current_status_->get_status();
 

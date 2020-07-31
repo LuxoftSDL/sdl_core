@@ -87,8 +87,7 @@ bool GetFileRequest::GetFilePath(std::string& file_path, bool& forward_to_hmi) {
   if ((*message_)[strings::msg_params].keyExists(strings::app_service_id)) {
     std::string service_id =
         (*message_)[strings::msg_params][strings::app_service_id].asString();
-    SDL_DEBUG(logger_,
-              "Finding storage directory for service id: " << service_id);
+    SDL_DEBUG("Finding storage directory for service id: " << service_id);
 
     AppService* app_service_info =
         application_manager_.GetAppServiceManager().FindServiceByID(service_id);
@@ -103,7 +102,7 @@ bool GetFileRequest::GetFilePath(std::string& file_path, bool& forward_to_hmi) {
       return false;
     }
   } else {
-    SDL_DEBUG(logger_, "Using current storage directory");
+    SDL_DEBUG("Using current storage directory");
   }
 
   ApplicationSharedPtr app = application_manager_.application(connect_key);
@@ -113,14 +112,14 @@ bool GetFileRequest::GetFilePath(std::string& file_path, bool& forward_to_hmi) {
 
 void GetFileRequest::Run() {
   SDL_AUTO_TRACE();
-  SDL_INFO(logger_, "Received GetFile request");
+  SDL_INFO("Received GetFile request");
 
   ApplicationSharedPtr app = application_manager_.application(connection_key());
   smart_objects::SmartObject response_params =
       smart_objects::SmartObject(smart_objects::SmartType_Map);
 
   if (!app) {
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -128,8 +127,7 @@ void GetFileRequest::Run() {
   file_name_ = (*message_)[strings::msg_params][strings::file_name].asString();
 
   if (!file_system::IsFileNameValid(file_name_)) {
-    SDL_ERROR(logger_,
-              "File name " << file_name_ << " contains forbidden symbols.");
+    SDL_ERROR("File name " << file_name_ << " contains forbidden symbols.");
     SendResponse(false,
                  mobile_apis::Result::INVALID_DATA,
                  "File name contains forbidden symbols",
@@ -138,7 +136,7 @@ void GetFileRequest::Run() {
   }
 
   // Initialize other params with default values. If exists overwrite the values
-  SDL_DEBUG(logger_, "Intialize non manadatory params with default values");
+  SDL_DEBUG("Intialize non manadatory params with default values");
 
   if ((*message_)[strings::msg_params].keyExists(strings::file_type)) {
     file_type_ = static_cast<mobile_apis::FileType::eType>(
@@ -147,13 +145,13 @@ void GetFileRequest::Run() {
 
   // Check if file exists on system (may have to use app service id to get the
   // correct app folder)
-  SDL_DEBUG(logger_, "Check if file exists on system");
+  SDL_DEBUG("Check if file exists on system");
   std::string file_path;
   bool forward_to_hmi;
 
   if (GetFilePath(file_path, forward_to_hmi)) {
     if (forward_to_hmi) {
-      SDL_DEBUG(logger_, "Forwarding GetFile request to HMI");
+      SDL_DEBUG("Forwarding GetFile request to HMI");
       application_manager_.IncreaseForwardedRequestTimeout(connection_key(),
                                                            correlation_id());
       SendHMIRequest(hmi_apis::FunctionID::BasicCommunication_GetFilePath,
@@ -162,7 +160,7 @@ void GetFileRequest::Run() {
       return;
     }
   } else {
-    SDL_ERROR(logger_, "Could not get file path");
+    SDL_ERROR("Could not get file path");
     SendResponse(false,
                  mobile_apis::Result::INVALID_DATA,
                  "Could not get file path",
@@ -172,7 +170,7 @@ void GetFileRequest::Run() {
 
   const std::string full_path = file_path + "/" + file_name_;
   if (!file_system::FileExists(full_path)) {
-    SDL_ERROR(logger_, "File " << full_path << " does not exist");
+    SDL_ERROR("File " << full_path << " does not exist");
     SendResponse(false,
                  mobile_apis::Result::FILE_NOT_FOUND,
                  "File does not exist",
@@ -181,7 +179,7 @@ void GetFileRequest::Run() {
   }
 
   // Handle offset
-  SDL_DEBUG(logger_, "Handle offset and length parameters");
+  SDL_DEBUG("Handle offset and length parameters");
   const uint64_t file_size = file_system::FileSize(full_path);
 
   if ((*message_)[strings::msg_params].keyExists(strings::offset)) {
@@ -197,8 +195,7 @@ void GetFileRequest::Run() {
   }
 
   if (offset_ > file_size) {
-    SDL_ERROR(logger_,
-              "Offset " << offset_ << " greater than file size " << file_size);
+    SDL_ERROR("Offset " << offset_ << " greater than file size " << file_size);
     SendResponse(false,
                  mobile_apis::Result::INVALID_DATA,
                  "Offset greater than file size",
@@ -206,8 +203,7 @@ void GetFileRequest::Run() {
     return;
   }
   if (length_ > file_size - offset_) {
-    SDL_ERROR(logger_,
-              "Length " << length_ << " greater than file size - offset"
+    SDL_ERROR("Length " << length_ << " greater than file size - offset"
                         << file_size);
     SendResponse(false,
                  mobile_apis::Result::INVALID_DATA,
@@ -217,10 +213,10 @@ void GetFileRequest::Run() {
   }
 
   // Load data from file as binary data
-  SDL_DEBUG(logger_, "Load binary data from file");
+  SDL_DEBUG("Load binary data from file");
   std::vector<uint8_t> bin_data;
   if (!file_system::ReadBinaryFile(full_path, bin_data, offset_, length_)) {
-    SDL_ERROR(logger_, "Failed to read from file: " << full_path);
+    SDL_ERROR("Failed to read from file: " << full_path);
     SendResponse(false,
                  mobile_apis::Result::GENERIC_ERROR,
                  "Unable to read from file",
@@ -288,7 +284,7 @@ void GetFileRequest::on_event(const app_mngr::event_engine::Event& event) {
         event_message[strings::msg_params][strings::file_path].asString();
 
     if (!file_system::FileExists(full_path)) {
-      SDL_ERROR(logger_, "File " << full_path << " does not exist");
+      SDL_ERROR("File " << full_path << " does not exist");
       SendResponse(false,
                    mobile_apis::Result::FILE_NOT_FOUND,
                    "File does not exist",
@@ -310,9 +306,8 @@ void GetFileRequest::on_event(const app_mngr::event_engine::Event& event) {
     }
 
     if (offset_ > file_size) {
-      SDL_ERROR(
-          logger_,
-          "Offset " << offset_ << " greater than file size " << file_size);
+      SDL_ERROR("Offset " << offset_ << " greater than file size "
+                          << file_size);
       SendResponse(false,
                    mobile_apis::Result::INVALID_DATA,
                    "Offset greater than file size",
@@ -320,8 +315,7 @@ void GetFileRequest::on_event(const app_mngr::event_engine::Event& event) {
       return;
     }
     if (length_ > file_size - offset_) {
-      SDL_ERROR(logger_,
-                "Length " << length_ << " greater than file size - offset"
+      SDL_ERROR("Length " << length_ << " greater than file size - offset"
                           << file_size);
       SendResponse(false,
                    mobile_apis::Result::INVALID_DATA,
@@ -330,7 +324,7 @@ void GetFileRequest::on_event(const app_mngr::event_engine::Event& event) {
       return;
     }
     if (!file_system::ReadBinaryFile(full_path, bin_data, offset_, length_)) {
-      SDL_ERROR(logger_, "Failed to read from file: " << full_path);
+      SDL_ERROR("Failed to read from file: " << full_path);
       SendResponse(false,
                    mobile_apis::Result::GENERIC_ERROR,
                    "Failed to read from file",
@@ -342,7 +336,7 @@ void GetFileRequest::on_event(const app_mngr::event_engine::Event& event) {
     response_params[strings::crc32_check_sum] = crc_calculated;
 
   } else {
-    SDL_ERROR(logger_, "HMI did not return a file path: ");
+    SDL_ERROR("HMI did not return a file path: ");
     SendResponse(false,
                  mobile_apis::Result::INVALID_DATA,
                  "HMI did not return a file path",

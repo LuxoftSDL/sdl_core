@@ -70,7 +70,7 @@ void OnExitApplicationNotification::Run() {
   ApplicationSharedPtr app_impl = application_manager_.application(app_id);
 
   if (app_impl.use_count() == 0) {
-    SDL_ERROR(logger_, "Application does not exist");
+    SDL_ERROR("Application does not exist");
     return;
   }
 
@@ -116,7 +116,7 @@ void OnExitApplicationNotification::Run() {
 #endif  // CLOUD_APP_WEBSOCKET_TRANSPORT_SUPPORT
 
     default: {
-      SDL_WARN(logger_, "Unhandled reason");
+      SDL_WARN("Unhandled reason");
       return;
     }
   }

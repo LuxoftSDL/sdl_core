@@ -53,7 +53,7 @@ void DisplayCapabilitiesBuilder::InitBuilder(
   window_ids_to_resume_.insert(kDefaultWindowID);
   for (size_t i = 0; i < windows_info.length(); ++i) {
     auto window_id = windows_info[i][strings::window_id].asInt();
-    SDL_DEBUG(logger_, "Inserting " << window_id << " to waiting container");
+    SDL_DEBUG("Inserting " << window_id << " to waiting container");
     window_ids_to_resume_.insert(window_id);
   }
 }
@@ -82,7 +82,7 @@ void DisplayCapabilitiesBuilder::UpdateDisplayCapabilities(
             : kDefaultWindowID;
     if (window_ids_to_resume_.end() != window_ids_to_resume_.find(window_id)) {
       cur_window_caps[cur_window_caps.length()] = inc_window_caps[i];
-      SDL_DEBUG(logger_, "Stop waiting for: " << window_id);
+      SDL_DEBUG("Stop waiting for: " << window_id);
       window_ids_to_resume_.erase(window_id);
     }
   }
@@ -91,7 +91,7 @@ void DisplayCapabilitiesBuilder::UpdateDisplayCapabilities(
   (*display_capabilities_)[0][strings::window_capabilities] = cur_window_caps;
 
   if (window_ids_to_resume_.empty()) {
-    SDL_TRACE(logger_, "Invoking resume callback");
+    SDL_TRACE("Invoking resume callback");
     resume_callback_(owner_, *display_capabilities_);
     display_capabilities_.reset();
   }
@@ -113,12 +113,10 @@ void DisplayCapabilitiesBuilder::StopWaitingForWindow(
     const WindowID window_id) {
   SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(display_capabilities_lock_);
-  SDL_DEBUG(logger_,
-            "Window id " << window_id << " will be erased due to failure");
+  SDL_DEBUG("Window id " << window_id << " will be erased due to failure");
   window_ids_to_resume_.erase(window_id);
   if (window_ids_to_resume_.empty()) {
-    SDL_TRACE(logger_,
-              window_id << " was the last window pending resumption. "
+    SDL_TRACE(window_id << " was the last window pending resumption. "
                            "Invoking resume callback");
     resume_callback_(owner_, *display_capabilities_);
     display_capabilities_.reset();

@@ -65,8 +65,7 @@ void VRGetLanguageResponse::Run() {
       hmi_apis::FunctionID::VR_GetLanguage);
 
   if (Common_Result::SUCCESS != result_code) {
-    SDL_DEBUG(logger_,
-              "Request was not successful. Don't change HMI capabilities");
+    SDL_DEBUG("Request was not successful. Don't change HMI capabilities");
     return;
   }
 
@@ -83,12 +82,11 @@ void VRGetLanguageResponse::Run() {
   std::vector<std::string> sections_to_update{hmi_response::language};
   if (!hmi_capabilities_.SaveCachedCapabilitiesToFile(
           hmi_interface::vr, sections_to_update, message_->getSchema())) {
-    SDL_ERROR(logger_, "Failed to save VR.GetLanguage response to cache");
+    SDL_ERROR("Failed to save VR.GetLanguage response to cache");
   }
 
-  SDL_DEBUG(logger_,
-            "Raising event for function_id "
-                << function_id() << " and correlation_id " << correlation_id());
+  SDL_DEBUG("Raising event for function_id "
+            << function_id() << " and correlation_id " << correlation_id());
   event_engine::Event event(FunctionID::VR_GetLanguage);
   event.set_smart_object(*message_);
   event.raise(application_manager_.event_dispatcher());

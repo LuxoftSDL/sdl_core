@@ -99,18 +99,18 @@ void CloudWebsocketTransportAdapter::CreateDevice(const std::string& uid) {
   std::string str = uid;
 
   if (!boost::regex_search(str, results, group_pattern)) {
-    SDL_DEBUG(logger_, "Invalid Pattern: " << uid);
+    SDL_DEBUG("Invalid Pattern: " << uid);
     return;
   }
 
-  SDL_DEBUG(logger_, "#Results: " << results.size());
+  SDL_DEBUG("#Results: " << results.size());
   std::string results_str;
   for (size_t i = 0; i < results.size(); i++) {
     results_str += " R[" + std::to_string(i) + "]:";
     results_str +=
         (results[i].length() != 0) ? results[i] : std::string("<EMPTY>");
   }
-  SDL_DEBUG(logger_, "Results: " << results_str);
+  SDL_DEBUG("Results: " << results_str);
 
   std::string device_id = uid;
 
@@ -120,11 +120,10 @@ void CloudWebsocketTransportAdapter::CreateDevice(const std::string& uid) {
                             .query = results[9],
                             .fragment = results[10]};
 
-  SDL_DEBUG(logger_,
-            "Creating Cloud Device For Host: "
-                << endpoint.host << " at Port: " << endpoint.port
-                << " with Target: "
-                << (endpoint.path + endpoint.query + endpoint.fragment));
+  SDL_DEBUG("Creating Cloud Device For Host: "
+            << endpoint.host << " at Port: " << endpoint.port
+            << " with Target: "
+            << (endpoint.path + endpoint.query + endpoint.fragment));
 
   auto cloud_device = std::make_shared<CloudDevice>(endpoint, device_id);
 

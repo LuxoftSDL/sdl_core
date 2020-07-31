@@ -64,7 +64,7 @@ void ButtonGetCapabilitiesResponse::Run() {
       hmi_apis::FunctionID::Buttons_GetCapabilities);
 
   if (hmi_apis::Common_Result::SUCCESS != code) {
-    SDL_ERROR(logger_, "Error is returned. Capabilities won't be updated.");
+    SDL_ERROR("Error is returned. Capabilities won't be updated.");
     return;
   }
 
@@ -83,8 +83,7 @@ void ButtonGetCapabilitiesResponse::Run() {
 
   if (!hmi_capabilities_.SaveCachedCapabilitiesToFile(
           hmi_interface::buttons, sections_to_update, message_->getSchema())) {
-    SDL_ERROR(logger_,
-              "Failed to save Buttons.GetCapabilities response to cache");
+    SDL_ERROR("Failed to save Buttons.GetCapabilities response to cache");
   }
 }
 

@@ -63,7 +63,7 @@ void AllowAppResponse::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key);
 
   if (!app) {
-    SDL_ERROR(logger_, "NULL pointer");
+    SDL_ERROR("NULL pointer");
     return;
   }
   app->set_app_allowed(

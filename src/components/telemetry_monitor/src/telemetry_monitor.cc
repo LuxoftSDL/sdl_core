@@ -69,7 +69,7 @@ void TelemetryMonitor::set_streamer(std::shared_ptr<Streamer> streamer) {
     streamer_ = streamer;
     thread_->set_delegate(streamer_.get());
   } else {
-    SDL_ERROR(logger_, "Unable to replace streamer if it is active");
+    SDL_ERROR("Unable to replace streamer if it is active");
   }
 }
 
@@ -137,14 +137,14 @@ void Streamer::threadMain() {
 
   Start();
   while (!stop_flag_) {
-    SDL_INFO(logger_, "Server socket is listening ");
+    SDL_INFO("Server socket is listening ");
     client_socket_fd_ = accept(server_socket_fd_, NULL, NULL);
     if (0 > client_socket_fd_) {
-      SDL_ERROR(logger_, "Cant open socket . Socket is busy ");
+      SDL_ERROR("Cant open socket . Socket is busy ");
       Stop();
       break;
     }
-    SDL_INFO(logger_, "Client connected");
+    SDL_INFO("Client connected");
 
     is_client_connected_ = true;
     while (is_client_connected_) {
@@ -157,7 +157,7 @@ void Streamer::threadMain() {
       }
 
       if (!IsReady()) {
-        SDL_INFO(logger_, "Client disconnected.");
+        SDL_INFO("Client disconnected.");
         break;
       }
 
@@ -178,10 +178,10 @@ void Streamer::Start() {
   server_socket_fd_ = socket(AF_INET, SOCK_STREAM, 0);
 
   if (0 >= server_socket_fd_) {
-    SDL_ERROR(logger_, "Server open error");
+    SDL_ERROR("Server open error");
     return;
   } else {
-    SDL_DEBUG(logger_, "Server socket : " << server_socket_fd_);
+    SDL_DEBUG("Server socket : " << server_socket_fd_);
   }
 
   int32_t optval = 1;
@@ -190,7 +190,7 @@ void Streamer::Start() {
                        SO_REUSEADDR,
                        &optval,
                        sizeof optval)) {
-    SDL_ERROR(logger_, "Unable to set sockopt");
+    SDL_ERROR("Unable to set sockopt");
     return;
   }
 
@@ -202,13 +202,12 @@ void Streamer::Start() {
   if (-1 == bind(server_socket_fd_,
                  reinterpret_cast<struct sockaddr*>(&serv_addr_),
                  sizeof(serv_addr_))) {
-    SDL_ERROR(logger_,
-              "Unable to bind server " << kserver_->ip().c_str() << ':'
+    SDL_ERROR("Unable to bind server " << kserver_->ip().c_str() << ':'
                                        << kserver_->port());
     return;
   }
   if (-1 == listen(server_socket_fd_, 1)) {
-    SDL_ERROR(logger_, "Streamer listen error " << strerror(errno));
+    SDL_ERROR("Streamer listen error " << strerror(errno));
     return;
   }
 }
@@ -216,31 +215,31 @@ void Streamer::Start() {
 void Streamer::ShutDownAndCloseSocket(int32_t socket_fd) {
   SDL_AUTO_TRACE();
   if (0 < socket_fd) {
-    SDL_INFO(logger_, "Shutdown socket");
+    SDL_INFO("Shutdown socket");
     if (-1 == ::shutdown(socket_fd, SHUT_RDWR)) {
-      SDL_ERROR(logger_, "Unable to shutdown socket");
+      SDL_ERROR("Unable to shutdown socket");
     }
     if (-1 == close(socket_fd)) {
-      SDL_ERROR(logger_, "Unable to close socket");
+      SDL_ERROR("Unable to close socket");
     }
   } else {
-    SDL_WARN(logger_, "Socket in not connected: " << socket_fd);
+    SDL_WARN("Socket in not connected: " << socket_fd);
   }
 }
 
 void Streamer::Stop() {
   SDL_AUTO_TRACE();
   if (stop_flag_) {
-    SDL_WARN(logger_, "Already Stopped");
+    SDL_WARN("Already Stopped");
     return;
   }
   stop_flag_ = true;
   messages_.Reset();
-  SDL_WARN(logger_, "Stop server_socket_fd_");
+  SDL_WARN("Stop server_socket_fd_");
   ShutDownAndCloseSocket(server_socket_fd_);
   server_socket_fd_ = -1;
 
-  SDL_WARN(logger_, "Stop client_socket_fd_");
+  SDL_WARN("Stop client_socket_fd_");
   ShutDownAndCloseSocket(client_socket_fd_);
   client_socket_fd_ = -1;
   is_client_connected_ = false;
@@ -259,10 +258,10 @@ bool Streamer::IsReady() const {
   const int retval = select(client_socket_fd_ + 1, 0, &fds, 0, &tv);
 
   if (-1 == retval) {
-    SDL_ERROR(logger_, "An error occurred");
+    SDL_ERROR("An error occurred");
     result = false;
   } else if (0 == retval) {
-    SDL_ERROR(logger_, "The timeout expired");
+    SDL_ERROR("The timeout expired");
     result = false;
   }
 
@@ -272,12 +271,12 @@ bool Streamer::IsReady() const {
 bool Streamer::Send(const std::string& msg) {
   SDL_AUTO_TRACE();
   if (!IsReady()) {
-    SDL_ERROR(logger_, " Socket is not ready");
+    SDL_ERROR(" Socket is not ready");
     return false;
   }
 
   if (-1 == ::send(client_socket_fd_, msg.c_str(), msg.size(), MSG_NOSIGNAL)) {
-    SDL_ERROR(logger_, " Unable to send");
+    SDL_ERROR(" Unable to send");
     return false;
   }
   return true;

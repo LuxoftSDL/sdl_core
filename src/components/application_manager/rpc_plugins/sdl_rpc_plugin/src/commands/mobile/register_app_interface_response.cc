@@ -104,8 +104,7 @@ void RegisterAppInterfaceResponse::Run() {
   // Add registered application to the policy db right after response sent to
   // mobile to be able to check all other API according to app permissions
   if (!app) {
-    SDL_ERROR(logger_,
-              "Application with connection key " << connection_key()
+    SDL_ERROR("Application with connection key " << connection_key()
                                                  << " is not registered.");
     return;
   }
@@ -124,7 +123,7 @@ void RegisterAppInterfaceResponse::SetHeartBeatTimeout(
           connection_key, timeout);
     }
   } else {
-    SDL_INFO(logger_, "Policy is turn off");
+    SDL_INFO("Policy is turn off");
   }
 }
 

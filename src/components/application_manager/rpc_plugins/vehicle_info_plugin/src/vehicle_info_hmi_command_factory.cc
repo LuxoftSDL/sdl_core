@@ -150,9 +150,8 @@ app_mngr::CommandSharedPtr VehicleInfoHmiCommandFactory::CreateCommand(
   }
 
   UNUSED(message_type_str);
-  SDL_DEBUG(logger_,
-            "HMICommandFactory::CreateCommand function_id: "
-                << function_id << ", message type: " << message_type_str);
+  SDL_DEBUG("HMICommandFactory::CreateCommand function_id: "
+            << function_id << ", message type: " << message_type_str);
 
   return buildCommandCreator(function_id, message_type).create(message);
 }
@@ -212,7 +211,7 @@ app_mngr::CommandCreator& VehicleInfoHmiCommandFactory::buildCommandCreator(
                  ? factory.GetCreator<commands::VIDiagnosticMessageRequest>()
                  : factory.GetCreator<commands::VIDiagnosticMessageResponse>();
     default:
-      SDL_WARN(logger_, "Unsupported function_id: " << function_id);
+      SDL_WARN("Unsupported function_id: " << function_id);
       return factory.GetCreator<VehicleInfoInvalidCommand>();
   }
 }

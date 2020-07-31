@@ -63,8 +63,7 @@ void FromMicRecorderListener::OnErrorReceived(int32_t application_key,
                                               const DataForListener& data) {}
 
 void FromMicRecorderListener::OnActivityStarted(int32_t application_key) {
-  SDL_INFO(logger_,
-           "FromMicRecorderListener::OnActivityStarted " << application_key);
+  SDL_INFO("FromMicRecorderListener::OnActivityStarted " << application_key);
   if (application_key == current_application_) {
     return;
   }
@@ -80,11 +79,9 @@ void FromMicRecorderListener::OnActivityStarted(int32_t application_key) {
 }
 
 void FromMicRecorderListener::OnActivityEnded(int32_t application_key) {
-  SDL_INFO(logger_,
-           "FromMicRecorderListener::OnActivityEnded " << application_key);
+  SDL_INFO("FromMicRecorderListener::OnActivityEnded " << application_key);
   if (application_key != current_application_) {
-    SDL_WARN(logger_,
-             "Not performing activity on " << application_key << " but on "
+    SDL_WARN("Not performing activity on " << application_key << " but on "
                                            << current_application_);
     return;
   }

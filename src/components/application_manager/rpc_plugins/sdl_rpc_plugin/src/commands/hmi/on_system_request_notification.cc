@@ -98,8 +98,7 @@ void OnSystemRequestNotification::Run() {
       msg_params[strings::url] = policy_handler_.GetNextUpdateUrl(
           policy::PTUIterationType::DefaultIteration, app_id);
       if (0 == app_id) {
-        SDL_WARN(logger_,
-                 "Can't select application to forward OnSystemRequest.");
+        SDL_WARN("Can't select application to forward OnSystemRequest.");
         return;
       }
       msg_params[strings::app_id] = app_id;
@@ -112,24 +111,24 @@ void OnSystemRequestNotification::Run() {
   ApplicationSharedPtr app;
   if (msg_params.keyExists(strings::app_id)) {
     const uint32_t app_id = msg_params[strings::app_id].asUInt();
-    SDL_DEBUG(logger_, "Received OnSystemRequest for appID " << app_id);
-    SDL_DEBUG(logger_, "Searching app to send OnSystemRequest by appID.");
+    SDL_DEBUG("Received OnSystemRequest for appID " << app_id);
+    SDL_DEBUG("Searching app to send OnSystemRequest by appID.");
     app = application_manager_.application(app_id);
   } else {
-    SDL_DEBUG(logger_,
-              "Received OnSystemRequest without appID."
-              " One of registered apps will be used.");
-    SDL_DEBUG(logger_, "Searching registered app to send OnSystemRequest.");
+    SDL_DEBUG(
+        "Received OnSystemRequest without appID."
+        " One of registered apps will be used.");
+    SDL_DEBUG("Searching registered app to send OnSystemRequest.");
     const uint32_t selected_app_id = policy_handler_.GetAppIdForSending();
     if (0 == selected_app_id) {
-      SDL_WARN(logger_, "Can't select application to forward OnSystemRequest.");
+      SDL_WARN("Can't select application to forward OnSystemRequest.");
       return;
     }
     app = application_manager_.application(selected_app_id);
   }
 
   if (app.use_count() == 0) {
-    SDL_WARN(logger_, "No valid application found to forward OnSystemRequest.");
+    SDL_WARN("No valid application found to forward OnSystemRequest.");
     return;
   }
 
@@ -140,15 +139,13 @@ void OnSystemRequestNotification::Run() {
 
   if (policy::kDeviceAllowed !=
       policy_handler_.GetUserConsentForDevice(device_mac)) {
-    SDL_WARN(logger_,
-             "Application " << app->policy_app_id()
+    SDL_WARN("Application " << app->policy_app_id()
                             << " is registered from non-consented device."
                                "Can't forward notification to application.");
     return;
   }
 
-  SDL_DEBUG(logger_,
-            "Sending request with application id " << app->policy_app_id());
+  SDL_DEBUG("Sending request with application id " << app->policy_app_id());
 
   params[strings::connection_key] = app->app_id();
 

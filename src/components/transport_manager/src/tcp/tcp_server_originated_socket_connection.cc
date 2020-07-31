@@ -54,10 +54,10 @@ TcpServerOriginatedSocketConnection::~TcpServerOriginatedSocketConnection() {
 bool TcpServerOriginatedSocketConnection::Establish(ConnectError** error) {
   SDL_AUTO_TRACE();
   DCHECK(error);
-  SDL_DEBUG(logger_, "error " << error);
+  SDL_DEBUG("error " << error);
   DeviceSptr device = controller()->FindDevice(device_handle());
   if (device.use_count() == 0) {
-    SDL_ERROR(logger_, "Device " << device_handle() << " not found");
+    SDL_ERROR("Device " << device_handle() << " not found");
     *error = new ConnectError();
     return false;
   }
@@ -65,22 +65,20 @@ bool TcpServerOriginatedSocketConnection::Establish(ConnectError** error) {
 
   const int port = tcp_device->GetApplicationPort(application_handle());
   if (-1 == port) {
-    SDL_ERROR(logger_,
-              "Application port for " << application_handle() << " not found");
+    SDL_ERROR("Application port for " << application_handle() << " not found");
     *error = new ConnectError();
     return false;
   }
 
   if (IsConnectionTerminated()) {
-    SDL_ERROR(logger_,
-              "Connection is already terminated. Socket will not be created");
+    SDL_ERROR("Connection is already terminated. Socket will not be created");
     *error = new ConnectError();
     return false;
   }
 
   const int socket = ::socket(AF_INET, SOCK_STREAM, 0);
   if (socket < 0) {
-    SDL_ERROR(logger_, "Failed to create socket");
+    SDL_ERROR("Failed to create socket");
     *error = new ConnectError();
     return false;
   }
@@ -90,11 +88,10 @@ bool TcpServerOriginatedSocketConnection::Establish(ConnectError** error) {
   addr.sin_addr.s_addr = tcp_device->in_addr();
   addr.sin_port = htons(port);
 
-  SDL_DEBUG(logger_, "Connecting " << inet_ntoa(addr.sin_addr) << ":" << port);
+  SDL_DEBUG("Connecting " << inet_ntoa(addr.sin_addr) << ":" << port);
   set_socket(socket);
   if (::connect(get_socket(), (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-    SDL_ERROR(logger_,
-              "Failed to connect for application " << application_handle()
+    SDL_ERROR("Failed to connect for application " << application_handle()
                                                    << ", error " << errno);
     *error = new ConnectError();
     ShutdownAndCloseSocket();

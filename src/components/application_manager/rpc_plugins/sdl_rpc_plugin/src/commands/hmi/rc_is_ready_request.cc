@@ -69,7 +69,7 @@ void RCIsReadyRequest::on_event(const event_engine::Event& event) {
   const smart_objects::SmartObject& message = event.smart_object();
   switch (event.id()) {
     case hmi_apis::FunctionID::RC_IsReady: {
-      SDL_DEBUG(logger_, "Received RC_IsReady event");
+      SDL_DEBUG("Received RC_IsReady event");
       unsubscribe_from_event(hmi_apis::FunctionID::RC_IsReady);
       const bool is_available = app_mngr::commands::ChangeInterfaceState(
           application_manager_, message, HmiInterfaces::HMI_INTERFACE_RC);
@@ -84,14 +84,14 @@ void RCIsReadyRequest::on_event(const event_engine::Event& event) {
               application_manager_, HmiInterfaces::HMI_INTERFACE_RC)) {
         hmi_capabilities_.UpdateRequestsRequiredForCapabilities(
             hmi_apis::FunctionID::RC_GetCapabilities);
-        SDL_INFO(logger_, "HmiInterfaces::HMI_INTERFACE_RC isn't available");
+        SDL_INFO("HmiInterfaces::HMI_INTERFACE_RC isn't available");
         return;
       }
       RequestInterfaceCapabilities(hmi_interface::rc);
       break;
     }
     default: {
-      SDL_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR("Received unknown event" << event.id());
       return;
     }
   }

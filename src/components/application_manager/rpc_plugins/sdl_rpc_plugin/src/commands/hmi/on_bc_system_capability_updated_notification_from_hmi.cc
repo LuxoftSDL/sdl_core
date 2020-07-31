@@ -68,7 +68,7 @@ OnBCSystemCapabilityUpdatedNotificationFromHMI::
   SDL_AUTO_TRACE();
 
   if (!(*message_)[strings::msg_params].keyExists(strings::app_id)) {
-    SDL_DEBUG(logger_, "Updating general display capabilities");
+    SDL_DEBUG("Updating general display capabilities");
     hmi_capabilities_.set_system_display_capabilities(display_capabilities);
     return ProcessSystemDisplayCapabilitiesResult::SUCCESS;
   }
@@ -77,12 +77,11 @@ OnBCSystemCapabilityUpdatedNotificationFromHMI::
       (*message_)[strings::msg_params][strings::app_id].asUInt();
   auto app = application_manager_.application(app_id);
   if (!app) {
-    SDL_ERROR(logger_,
-              "Application with app_id " << app_id << " is not registered");
+    SDL_ERROR("Application with app_id " << app_id << " is not registered");
     return ProcessSystemDisplayCapabilitiesResult::FAIL;
   }
 
-  SDL_DEBUG(logger_, "Updating display capabilities for app " << app_id);
+  SDL_DEBUG("Updating display capabilities for app " << app_id);
   app->set_display_capabilities(display_capabilities);
 
   // Remove app_id from notification to mobile
@@ -90,7 +89,7 @@ OnBCSystemCapabilityUpdatedNotificationFromHMI::
       (*message_)[strings::msg_params][strings::app_id];
   (*message_)[strings::msg_params].erase(strings::app_id);
   if (app->is_resuming() && app->is_app_data_resumption_allowed()) {
-    SDL_DEBUG(logger_, "Application is resuming");
+    SDL_DEBUG("Application is resuming");
     app->display_capabilities_builder().UpdateDisplayCapabilities(
         display_capabilities);
     return ProcessSystemDisplayCapabilitiesResult::CAPABILITIES_CACHED;
@@ -115,13 +114,13 @@ void OnBCSystemCapabilityUpdatedNotificationFromHMI::Run() {
         const auto result = ProcessSystemDisplayCapabilities(
             system_capability[strings::display_capabilities]);
         if (ProcessSystemDisplayCapabilitiesResult::FAIL == result) {
-          SDL_ERROR(logger_,
-                    "Failed to process display capabilities. Notification will "
-                    "be ignored");
+          SDL_ERROR(
+              "Failed to process display capabilities. Notification will "
+              "be ignored");
           return;
         } else if (ProcessSystemDisplayCapabilitiesResult::
                        CAPABILITIES_CACHED == result) {
-          SDL_TRACE(logger_, "Capabilities are being cached for resuming app");
+          SDL_TRACE("Capabilities are being cached for resuming app");
           return;
         }
       }
@@ -129,7 +128,7 @@ void OnBCSystemCapabilityUpdatedNotificationFromHMI::Run() {
     }
     case mobile_apis::SystemCapabilityType::REMOTE_CONTROL: {
       if (system_capability.keyExists(strings::rc_capability)) {
-        SDL_DEBUG(logger_, "Updating RC Capabilities");
+        SDL_DEBUG("Updating RC Capabilities");
         hmi_capabilities_.set_rc_capability(
             system_capability[strings::rc_capability]);
       }

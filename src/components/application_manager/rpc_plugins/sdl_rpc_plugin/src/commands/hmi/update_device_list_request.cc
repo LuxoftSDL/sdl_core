@@ -67,10 +67,10 @@ void UpdateDeviceListRequest::Run() {
   // hit code to RTC
   if (true == application_manager_.get_settings().launch_hmi()) {
     if (!application_manager_.IsHMICooperating()) {
-      SDL_INFO(logger_, "Wait for HMI Cooperation");
+      SDL_INFO("Wait for HMI Cooperation");
       subscribe_on_event(hmi_apis::FunctionID::BasicCommunication_OnReady);
       termination_condition_.Wait(auto_lock);
-      SDL_DEBUG(logger_, "HMI Cooperation OK");
+      SDL_DEBUG("HMI Cooperation OK");
     }
   }
 
@@ -82,13 +82,13 @@ void UpdateDeviceListRequest::on_event(const event_engine::Event& event) {
   sync_primitives::AutoLock auto_lock(wait_hmi_lock);
   switch (event.id()) {
     case hmi_apis::FunctionID::BasicCommunication_OnReady: {
-      SDL_INFO(logger_, "received OnReady");
+      SDL_INFO("received OnReady");
       unsubscribe_from_event(hmi_apis::FunctionID::BasicCommunication_OnReady);
       termination_condition_.Broadcast();
       break;
     };
     default: {
-      SDL_ERROR(logger_, "Unknown event ");
+      SDL_ERROR("Unknown event ");
       break;
     };
   }

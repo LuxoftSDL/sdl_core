@@ -100,9 +100,8 @@ bool ReleaseInteriorVehicleDataModuleRequest::ProcessCapabilities() {
   const ModuleUid module(module_type, module_id);
   if (rc_capability &&
       !rc_capabilities_manager_.CheckIfModuleExistsInCapabilities(module)) {
-    SDL_WARN(
-        logger_,
-        "Accessing not supported module: " << module_type << " " << module_id);
+    SDL_WARN("Accessing not supported module: " << module_type << " "
+                                                << module_id);
     SendResponse(false,
                  mobile_apis::Result::UNSUPPORTED_RESOURCE,
                  "Accessing not supported module");
@@ -124,7 +123,7 @@ void ReleaseInteriorVehicleDataModuleRequest::Execute() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -151,12 +150,11 @@ void ReleaseInteriorVehicleDataModuleRequest::Execute() {
         NotificationTrigger::MODULE_ALLOCATION, app);
   }
 
-  SDL_DEBUG(logger_,
-            "Resource for module: "
-                << ModuleType() << " with id: " << module_id
-                << " was released with result " << std::boolalpha
-                << response_params.success_result
-                << " and result_code: " << response_params.result_code);
+  SDL_DEBUG("Resource for module: "
+            << ModuleType() << " with id: " << module_id
+            << " was released with result " << std::boolalpha
+            << response_params.success_result
+            << " and result_code: " << response_params.result_code);
 
   SendResponse(response_params.success_result,
                response_params.result_code,

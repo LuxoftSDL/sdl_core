@@ -34,12 +34,12 @@
 #define SRC_COMPONENTS_INCLUDE_UTILS_LOGGER_H_
 
 #ifdef ENABLE_LOG
-#include <string>
 #include <sstream>
+#include <string>
 
+#include "utils/auto_trace.h"
 #include "utils/ilogger.h"
 #include "utils/logger_status.h"
-#include "utils/auto_trace.h"
 
 // Redefince for each paticular logger implementation
 namespace logger {
@@ -52,15 +52,13 @@ typedef logger::Log4CXXLogger ExternalLogger;
   static std::string logger_(logger_name); \
   }
 
-#define SDL_CREATE_LOCAL_LOGGERPTR(logger_name)  \
+#define SDL_CREATE_LOCAL_LOGGERPTR(logger_name) \
   std::string logger_(logger_name);
-
 
 // Logger deinitilization function and macro, need to stop log4cxx writing
 // without this deinitilization log4cxx threads continue using some instances
 // destroyed by exit()
-#define SDL_DEINIT_LOGGER() \
-  logger::Logger<ExternalLogger>::instance().DeInit();
+#define SDL_DEINIT_LOGGER() logger::Logger<ExternalLogger>::instance().DeInit();
 
 // Logger thread deinitilization macro that need to stop the thread of handling
 // messages for the log4cxx
@@ -69,12 +67,11 @@ typedef logger::Log4CXXLogger ExternalLogger;
 
 // special macros to dump logs from queue
 // it's need, for example, when crash happend
-#define SDL_FLUSH_LOGGER() \
-  logger::Logger<ExternalLogger>::instance().Flush();
+#define SDL_FLUSH_LOGGER() logger::Logger<ExternalLogger>::instance().Flush();
 
 #define SDL_IS_TRACE_ENABLED(logger)                       \
   logger::Logger<ExternalLogger>::instance().IsEnabledFor( \
-      logger_, logger::LogLevel::TRACE_LEVEL)
+      logger::LogLevel::TRACE_LEVEL)
 
 #define LOG_WITH_LEVEL(logLevel, logEvent)                             \
   do {                                                                 \
@@ -98,37 +95,37 @@ typedef logger::Log4CXXLogger ExternalLogger;
     }                                                                  \
   } while (false)
 
-#define SDL_TRACE(loggerPtr, logEvent) \
+#define SDL_TRACE(logEvent) \
   LOG_WITH_LEVEL(logger::LogLevel::TRACE_LEVEL, logEvent)
 
 #define SDL_AUTO_TRACE_WITH_NAME_SPECIFIED(auto_trace) \
-  logger::AutoTrace auto_trace(                                   \
-      logger_,                                                    \
+  logger::AutoTrace auto_trace(                        \
+      logger_,                                         \
       logger::SDLLocationInfo{__FILE__, __PRETTY_FUNCTION__, __LINE__})
 #define SDL_AUTO_TRACE() \
   SDL_AUTO_TRACE_WITH_NAME_SPECIFIED(SDL_local_auto_trace_object)
 
-#define SDL_DEBUG(loggerPtr, logEvent) \
+#define SDL_DEBUG(logEvent) \
   LOG_WITH_LEVEL(logger::LogLevel::DEBUG_LEVEL, logEvent)
 
-#define SDL_INFO(loggerPtr, logEvent) \
+#define SDL_INFO(logEvent) \
   LOG_WITH_LEVEL(logger::LogLevel::INFO_LEVEL, logEvent)
 
-#define SDL_WARN(loggerPtr, logEvent) \
+#define SDL_WARN(logEvent) \
   LOG_WITH_LEVEL(logger::LogLevel::WARNIGN_LEVEL, logEvent)
 
-#define SDL_ERROR(loggerPtr, logEvent) \
+#define SDL_ERROR(logEvent) \
   LOG_WITH_LEVEL(logger::LogLevel::ERROR_LEVEL, logEvent)
 
-#define SDL_FATAL(loggerPtr, logEvent) \
+#define SDL_FATAL(logEvent) \
   LOG_WITH_LEVEL(logger::LogLevel::FATAL_LEVEL, logEvent)
 
-#define SDL_ERROR_WITH_ERRNO(loggerPtr, message)                           \
-  SDL_ERROR(loggerPtr, message << ", error code " << errno << " (" << strerror(errno) \
+#define SDL_ERROR_WITH_ERRNO(message)                                      \
+  SDL_ERROR(message << ", error code " << errno << " (" << strerror(errno) \
                     << ")")
 
-#define SDL_WARN_WITH_ERRNO(loggerPtr, message)                           \
-  SDL_WARN(loggerPtr, message << ", error code " << errno << " (" << strerror(errno) \
+#define SDL_WARN_WITH_ERRNO(message)                                      \
+  SDL_WARN(message << ", error code " << errno << " (" << strerror(errno) \
                    << ")")
 
 #else  // ENABLE_LOG is OFF

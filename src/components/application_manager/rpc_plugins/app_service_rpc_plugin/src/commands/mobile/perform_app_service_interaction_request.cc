@@ -124,7 +124,7 @@ void PerformAppServiceInteractionRequest::Run() {
 
 void PerformAppServiceInteractionRequest::on_event(
     const event_engine::Event& event) {
-  SDL_DEBUG(logger_, "HMI PerformAppServiceInteraction on_event");
+  SDL_DEBUG("HMI PerformAppServiceInteraction on_event");
   const smart_objects::SmartObject& event_message = event.smart_object();
 
   auto msg_params = event_message[strings::msg_params];
@@ -171,7 +171,7 @@ void PerformAppServiceInteractionRequest::on_event(
 
 void PerformAppServiceInteractionRequest::on_event(
     const event_engine::MobileEvent& event) {
-  SDL_DEBUG(logger_, "Mobile PerformAppServiceInteraction on_event");
+  SDL_DEBUG("Mobile PerformAppServiceInteraction on_event");
   const smart_objects::SmartObject& event_message = event.smart_object();
 
   auto msg_params = event_message[strings::msg_params];

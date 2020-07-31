@@ -57,7 +57,7 @@ AppLaunchDataDB::AppLaunchDataDB(const AppLaunchSettings& settings,
     DCHECK(db_.get());
   } else {
     SDL_AUTO_TRACE();
-    SDL_ERROR(logger_, "Get not existed type of database storage");
+    SDL_ERROR("Get not existed type of database storage");
   }
 
   // Connect to resumption DB
@@ -72,36 +72,34 @@ bool AppLaunchDataDB::Init() {
   SDL_AUTO_TRACE();
 
   if (!db()->Open()) {
-    SDL_ERROR(logger_, "Failed opening database.");
-    SDL_INFO(logger_, "Starting opening retries.");
+    SDL_ERROR("Failed opening database.");
+    SDL_INFO("Starting opening retries.");
     const uint16_t attempts = settings_.app_launch_max_retry_attempt();
-    SDL_DEBUG(logger_, "Total attempts number is: " << attempts);
+    SDL_DEBUG("Total attempts number is: " << attempts);
     bool is_opened = false;
     const uint16_t open_attempt_timeout_ms =
         settings_.app_launch_retry_wait_time();
     const useconds_t sleep_interval_mcsec = open_attempt_timeout_ms * 1000u;
-    SDL_DEBUG(logger_,
-              "Open attempt timeout(ms) is: " << open_attempt_timeout_ms);
+    SDL_DEBUG("Open attempt timeout(ms) is: " << open_attempt_timeout_ms);
     for (size_t i = 0u; i < attempts; ++i) {
       usleep(sleep_interval_mcsec);
-      SDL_INFO(logger_, "Attempt: " << i + 1);
+      SDL_INFO("Attempt: " << i + 1);
       if (db()->Open()) {
-        SDL_INFO(logger_, "Database opened.");
+        SDL_INFO("Database opened.");
         is_opened = true;
         break;
       }
     }
     if (!is_opened) {
-      SDL_ERROR(logger_,
-                "Open retry sequence failed. Tried "
-                    << attempts << " attempts with " << open_attempt_timeout_ms
-                    << " open timeout(ms) for each.");
+      SDL_ERROR("Open retry sequence failed. Tried "
+                << attempts << " attempts with " << open_attempt_timeout_ms
+                << " open timeout(ms) for each.");
       return false;
     }
   }
 #ifndef __QNX__
   if (!db()->IsReadWrite()) {
-    SDL_ERROR(logger_, "There are no read/write permissions for database");
+    SDL_ERROR("There are no read/write permissions for database");
     return false;
   }
 #endif  // __QNX__
@@ -109,7 +107,6 @@ bool AppLaunchDataDB::Init() {
   utils::dbms::SQLQuery query(db());
   if (!query.Exec(kCreateSchema)) {
     SDL_ERROR(
-        logger_,
         "Failed creating schema of database: " << query.LastError().text());
     return false;
   }
@@ -122,16 +119,16 @@ bool AppLaunchDataDB::Persist() {
   bool retVal = false;
 
   if (!init_successeful_) {
-    SDL_ERROR(logger_,
-              "AppLaunch data base was not successfully "
-              "initialize, AppLaunch won't work!");
+    SDL_ERROR(
+        "AppLaunch data base was not successfully "
+        "initialize, AppLaunch won't work!");
     return retVal;
   }
 
   if ((retVal = WriteDb())) {
-    SDL_DEBUG(logger_, "App_lauch had been successfully saved.");
+    SDL_DEBUG("App_lauch had been successfully saved.");
   } else {
-    SDL_WARN(logger_, "Fail to save app_launch data.");
+    SDL_WARN("Fail to save app_launch data.");
   }
 
   return retVal;
@@ -143,17 +140,16 @@ bool AppLaunchDataDB::IsAppDataAlreadyExisted(
   bool retVal = false;
 
   if (!init_successeful_) {
-    SDL_ERROR(logger_,
-              "AppLaunch data base was not successfully "
-              "initialize, AppLaunch won't work!");
+    SDL_ERROR(
+        "AppLaunch data base was not successfully "
+        "initialize, AppLaunch won't work!");
     return retVal;
   }
 
   utils::dbms::SQLQuery query(db());
 
   if (!query.Prepare(kFindApplicationData)) {
-    SDL_WARN(logger_,
-             "Problem with verification queries 'kFindApplicationData'");
+    SDL_WARN("Problem with verification queries 'kFindApplicationData'");
     return retVal;
   }
 
@@ -164,9 +160,8 @@ bool AppLaunchDataDB::IsAppDataAlreadyExisted(
   if (query.Exec()) {
     retVal = query.GetBoolean(result_query);
   } else {
-    SDL_WARN(logger_,
-             "Failed execute query 'kGetNumberOfApplicationData'. Reson: "
-                 << query.LastError().text());
+    SDL_WARN("Failed execute query 'kGetNumberOfApplicationData'. Reson: "
+             << query.LastError().text());
   }
 
   return retVal;
@@ -177,18 +172,18 @@ bool AppLaunchDataDB::RefreshAppSessionTime(const ApplicationData& app_data) {
   bool retVal = false;
 
   if (!init_successeful_) {
-    SDL_ERROR(logger_,
-              "AppLaunch data base was not successfully "
-              "initialize, AppLaunch won't work!");
+    SDL_ERROR(
+        "AppLaunch data base was not successfully "
+        "initialize, AppLaunch won't work!");
     return retVal;
   }
 
   utils::dbms::SQLQuery query(db());
 
   if (!query.Prepare(kRefreshApplicationDataSessionTime)) {
-    SDL_WARN(logger_,
-             "Problem with verification queries "
-             "'kRefreshApplicationDataSessionTime'");
+    SDL_WARN(
+        "Problem with verification queries "
+        "'kRefreshApplicationDataSessionTime'");
     return retVal;
   }
 
@@ -197,12 +192,11 @@ bool AppLaunchDataDB::RefreshAppSessionTime(const ApplicationData& app_data) {
   query.Bind(bundle_id_index, app_data.bundle_id_);
 
   if (query.Exec()) {
-    SDL_DEBUG(logger_, "Dare&time last session were updated successfully");
+    SDL_DEBUG("Dare&time last session were updated successfully");
     retVal = WriteDb();
   } else {
-    SDL_WARN(logger_,
-             "Failed execute query 'kGetNumberOfApplicationData'. Reson: "
-                 << query.LastError().text());
+    SDL_WARN("Failed execute query 'kGetNumberOfApplicationData'. Reson: "
+             << query.LastError().text());
   }
 
   return retVal;
@@ -213,17 +207,16 @@ bool AppLaunchDataDB::AddNewAppData(const ApplicationData& app_data) {
   bool retVal = false;
 
   if (!init_successeful_) {
-    SDL_ERROR(logger_,
-              "AppLaunch data base was not successfully "
-              "initialize, AppLaunch won't work!");
+    SDL_ERROR(
+        "AppLaunch data base was not successfully "
+        "initialize, AppLaunch won't work!");
     return retVal;
   }
 
   utils::dbms::SQLQuery query(db());
 
   if (!query.Prepare(kAddApplicationData)) {
-    SDL_WARN(logger_,
-             "Problem with verification queries 'kAddApplicationData'");
+    SDL_WARN("Problem with verification queries 'kAddApplicationData'");
     return retVal;
   }
 
@@ -233,12 +226,11 @@ bool AppLaunchDataDB::AddNewAppData(const ApplicationData& app_data) {
 
   retVal = query.Exec();
   if (retVal) {
-    SDL_DEBUG(logger_, "New application data was added successfully");
+    SDL_DEBUG("New application data was added successfully");
     retVal = WriteDb();
   } else {
-    SDL_WARN(logger_,
-             "Failed execute query 'kGetNumberOfApplicationData'. Reson: "
-                 << query.LastError().text());
+    SDL_WARN("Failed execute query 'kGetNumberOfApplicationData'. Reson: "
+             << query.LastError().text());
   }
 
   return retVal;
@@ -250,25 +242,23 @@ std::vector<ApplicationDataPtr> AppLaunchDataDB::GetAppDataByDevMac(
   std::vector<ApplicationDataPtr> dev_apps;
 
   if (!init_successeful_) {
-    SDL_ERROR(logger_,
-              "AppLaunch data base was not successfully "
-              "initialize, AppLaunch won't work!");
+    SDL_ERROR(
+        "AppLaunch data base was not successfully "
+        "initialize, AppLaunch won't work!");
     return dev_apps;
   }
 
   utils::dbms::SQLQuery query(db());
 
   if (!query.Prepare(kGetApplicationDataByDevID)) {
-    SDL_WARN(logger_,
-             "Problem with verification queries 'kGetApplicationDataByDevID'");
+    SDL_WARN("Problem with verification queries 'kGetApplicationDataByDevID'");
     return dev_apps;
   }
 
   query.Bind(device_mac_index, dev_mac);
   const bool retVal = query.Exec();
   if (retVal) {
-    SDL_INFO(logger_,
-             "Values of ignition off counts were updated successfully");
+    SDL_INFO("Values of ignition off counts were updated successfully");
     do {
       const std::string device_mac = query.GetString(device_mac_index);
       const std::string mobile_app_id = query.GetString(application_id_index);
@@ -276,11 +266,10 @@ std::vector<ApplicationDataPtr> AppLaunchDataDB::GetAppDataByDevMac(
       dev_apps.push_back(std::make_shared<ApplicationData>(
           mobile_app_id, bundle_id, device_mac));
     } while (query.Next());
-    SDL_DEBUG(logger_, "All application data has been successfully loaded");
+    SDL_DEBUG("All application data has been successfully loaded");
   } else {
-    SDL_WARN(logger_,
-             "Failed execute query 'kGetNumberOfApplicationData'. Reson: "
-                 << query.LastError().text());
+    SDL_WARN("Failed execute query 'kGetNumberOfApplicationData'. Reson: "
+             << query.LastError().text());
   }
 
   return dev_apps;
@@ -294,11 +283,11 @@ bool AppLaunchDataDB::Clear() {
   retVal = query.Exec(kDropSchema);
 
   if (retVal) {
-    SDL_INFO(logger_, "App_Launch table had been cleared successfully");
+    SDL_INFO("App_Launch table had been cleared successfully");
     retVal = WriteDb();
     init_successeful_ = false;
   } else {
-    SDL_WARN(logger_, "Failed dropping database: " << query.LastError().text());
+    SDL_WARN("Failed dropping database: " << query.LastError().text());
   }
 
   return retVal;
@@ -309,31 +298,27 @@ uint32_t AppLaunchDataDB::GetCurentNumberOfAppData() const {
   uint32_t number_of_app_data = 0u;
 
   if (!init_successeful_) {
-    SDL_ERROR(logger_,
-              "AppLaunch data base was not successfully "
-              "initialize, AppLaunch won't work!");
+    SDL_ERROR(
+        "AppLaunch data base was not successfully "
+        "initialize, AppLaunch won't work!");
     return number_of_app_data;
   }
 
   utils::dbms::SQLQuery query(db());
 
   if (!query.Prepare(kGetNumberOfApplicationData)) {
-    SDL_WARN(logger_,
-             "Problem with verification queries 'kGetNumberOfApplicationData'");
+    SDL_WARN("Problem with verification queries 'kGetNumberOfApplicationData'");
     return number_of_app_data;
   }
 
   if (query.Exec()) {
-    SDL_INFO(logger_,
-             "Values of ignition off counts were updated successfully");
+    SDL_INFO("Values of ignition off counts were updated successfully");
 
     number_of_app_data = query.GetInteger(result_query);
-    SDL_DEBUG(logger_,
-              "Total cout saved mobile applications is " << number_of_app_data);
+    SDL_DEBUG("Total cout saved mobile applications is " << number_of_app_data);
   } else {
-    SDL_WARN(logger_,
-             "Failed execute query 'kGetNumberOfApplicationData'. Reson: "
-                 << query.LastError().text());
+    SDL_WARN("Failed execute query 'kGetNumberOfApplicationData'. Reson: "
+             << query.LastError().text());
   }
 
   return number_of_app_data;
@@ -344,28 +329,25 @@ bool AppLaunchDataDB::DeleteOldestAppData() {
   bool retVal = false;
 
   if (!init_successeful_) {
-    SDL_ERROR(logger_,
-              "AppLaunch data base was not successfully "
-              "initialize, AppLaunch won't work!");
+    SDL_ERROR(
+        "AppLaunch data base was not successfully "
+        "initialize, AppLaunch won't work!");
     return retVal;
   }
 
   utils::dbms::SQLQuery query(db());
 
   if (!query.Prepare(kDeleteOldestAppData)) {
-    SDL_WARN(logger_,
-             "Problem with verification queries 'kDeleteOldestAppData'");
+    SDL_WARN("Problem with verification queries 'kDeleteOldestAppData'");
     return retVal;
   }
 
   if ((retVal = query.Exec())) {
-    SDL_INFO(logger_,
-             "Values of ignition off counts were updated successfully");
+    SDL_INFO("Values of ignition off counts were updated successfully");
     retVal = WriteDb();
   } else {
-    SDL_WARN(logger_,
-             "Failed execute query 'kGetNumberOfApplicationData'. Reson: "
-                 << query.LastError().text());
+    SDL_WARN("Failed execute query 'kGetNumberOfApplicationData'. Reson: "
+             << query.LastError().text());
   }
 
   return retVal;

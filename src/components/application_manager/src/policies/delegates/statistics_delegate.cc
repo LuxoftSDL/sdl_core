@@ -104,7 +104,7 @@ void StatisticsDelegate::threadMain() {
       policy_handler_.Add(app_id_, stop_watch_, timespan_seconds_);
       break;
     default:
-      SDL_ERROR(logger_, "Unknown statistics operator");
+      SDL_ERROR("Unknown statistics operator");
       break;
   }
 }

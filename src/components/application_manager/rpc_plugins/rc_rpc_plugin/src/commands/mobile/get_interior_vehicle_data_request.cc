@@ -61,9 +61,8 @@ bool GetInteriorVehicleDataRequest::ProcessCapabilities() {
   const ModuleUid module(module_type, module_id);
   if (rc_capability &&
       !rc_capabilities_manager_.CheckIfModuleExistsInCapabilities(module)) {
-    SDL_WARN(
-        logger_,
-        "Accessing not supported module: " << module_type << " " << module_id);
+    SDL_WARN("Accessing not supported module: " << module_type << " "
+                                                << module_id);
     SetResourceState(ModuleType(), ResourceState::FREE);
     SendResponse(false,
                  mobile_apis::Result::UNSUPPORTED_RESOURCE,
@@ -118,9 +117,8 @@ void GetInteriorVehicleDataRequest::ProcessResponseToMobileFromCache(
       module_id;
 
   const auto& request_msg_params = (*message_)[app_mngr::strings::msg_params];
-  SDL_DEBUG(logger_,
-            "kSubscribe exist"
-                << request_msg_params.keyExists(message_params::kSubscribe));
+  SDL_DEBUG("kSubscribe exist"
+            << request_msg_params.keyExists(message_params::kSubscribe));
   if (request_msg_params.keyExists(message_params::kSubscribe)) {
     response_msg_params[message_params::kIsSubscribed] =
         request_msg_params[message_params::kSubscribe].asBool();
@@ -167,8 +165,7 @@ bool GetInteriorVehicleDataRequest::TheLastAppShouldBeUnsubscribed(
         RCHelpers::AppsSubscribedToModule(application_manager_, module);
     if (subscribed_to_module_type.size() == 1 &&
         subscribed_to_module_type.front() == app) {
-      SDL_DEBUG(logger_,
-                "The last application unsubscribes from " << module_type << " "
+      SDL_DEBUG("The last application unsubscribes from " << module_type << " "
                                                           << module_id);
       return true;
     }
@@ -199,7 +196,7 @@ void GetInteriorVehicleDataRequest::Execute() {
       RemoveExcessiveSubscription();
     }
     if (!CheckRateLimits()) {
-      SDL_WARN(logger_, "GetInteriorVehicleData frequency is too high.");
+      SDL_WARN("GetInteriorVehicleData frequency is too high.");
       SendResponse(false, mobile_apis::Result::REJECTED);
       return;
     }
@@ -244,8 +241,7 @@ void GetInteriorVehicleDataRequest::on_event(
 
   if (result) {
     if (!IsModuleIdProvided(hmi_response)) {
-      SDL_WARN(logger_,
-               "conditional mandatory parameter " << message_params::kModuleId
+      SDL_WARN("conditional mandatory parameter " << message_params::kModuleId
                                                   << " missed in hmi response");
       result = false;
       result_code = mobile_apis::Result::GENERIC_ERROR;
@@ -331,8 +327,7 @@ void GetInteriorVehicleDataRequest::ProccessSubscription(
   }
 
   if (is_subscribe_present_in_request && !isSubscribed_present_in_response) {
-    SDL_WARN(logger_,
-             "conditional mandatory parameter " << message_params::kIsSubscribed
+    SDL_WARN("conditional mandatory parameter " << message_params::kIsSubscribed
                                                 << " missed in hmi response");
 
     is_subscribed = extension->IsSubscribedToInteriorVehicleData(module);
@@ -342,8 +337,7 @@ void GetInteriorVehicleDataRequest::ProccessSubscription(
   }
 
   if (!is_subscribe_present_in_request && isSubscribed_present_in_response) {
-    SDL_WARN(logger_,
-             "Parameter " << message_params::kIsSubscribed
+    SDL_WARN("Parameter " << message_params::kIsSubscribed
                           << " is ignored due to absence '"
                           << message_params::kSubscribe
                           << "' parameter in request");
@@ -362,22 +356,20 @@ void GetInteriorVehicleDataRequest::ProccessSubscription(
           .asBool();
   is_subscribed = response_subscribe;
 
-  SDL_TRACE(logger_, "request_subscribe = " << request_subscribe);
-  SDL_TRACE(logger_, "response_subscribe = " << response_subscribe);
+  SDL_TRACE("request_subscribe = " << request_subscribe);
+  SDL_TRACE("response_subscribe = " << response_subscribe);
   if (request_subscribe == response_subscribe) {
     const std::string module_type = ModuleType();
     const std::string module_id = ModuleId();
     const ModuleUid module(module_type, module_id);
 
     if (response_subscribe) {
-      SDL_DEBUG(logger_,
-                "SubscribeToInteriorVehicleData "
-                    << app->app_id() << " " << module_type << " " << module_id);
+      SDL_DEBUG("SubscribeToInteriorVehicleData "
+                << app->app_id() << " " << module_type << " " << module_id);
       extension->SubscribeToInteriorVehicleData(module);
     } else {
-      SDL_DEBUG(logger_,
-                "UnsubscribeFromInteriorVehicleData "
-                    << app->app_id() << " " << module_type << " " << module_id);
+      SDL_DEBUG("UnsubscribeFromInteriorVehicleData "
+                << app->app_id() << " " << module_type << " " << module_id);
       extension->UnsubscribeFromInteriorVehicleData(module);
     }
   }

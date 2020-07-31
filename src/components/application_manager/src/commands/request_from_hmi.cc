@@ -212,7 +212,7 @@ void RequestFromHMI::SendProviderRequest(
   }
 
   if (hmi_destination) {
-    SDL_DEBUG(logger_, "Sending Request to HMI Provider");
+    SDL_DEBUG("Sending Request to HMI Provider");
     application_manager_.IncreaseForwardedRequestTimeout(
         application_manager::request_controller::RequestInfo::HmiConnectionKey,
         correlation_id());
@@ -221,7 +221,7 @@ void RequestFromHMI::SendProviderRequest(
   }
 
   if (!app) {
-    SDL_DEBUG(logger_, "Invalid App Provider pointer");
+    SDL_DEBUG("Invalid App Provider pointer");
     SendErrorResponse(correlation_id(),
                       static_cast<hmi_apis::FunctionID::eType>(function_id()),
                       error_code,
@@ -230,7 +230,7 @@ void RequestFromHMI::SendProviderRequest(
     return;
   }
 
-  SDL_DEBUG(logger_, "Sending Request to Mobile Provider");
+  SDL_DEBUG("Sending Request to Mobile Provider");
   application_manager_.IncreaseForwardedRequestTimeout(
       application_manager::request_controller::RequestInfo::HmiConnectionKey,
       correlation_id());
@@ -265,14 +265,13 @@ void RequestFromHMI::SendMobileRequest(
   }
 
   if (use_events) {
-    SDL_DEBUG(logger_,
-              "RequestFromHMI subscribe_on_event " << function_id << " "
+    SDL_DEBUG("RequestFromHMI subscribe_on_event " << function_id << " "
                                                    << mobile_correlation_id);
     subscribe_on_event(function_id, mobile_correlation_id);
   }
   if (!rpc_service_.ManageMobileCommand(
           result, commands::Command::CommandSource::SOURCE_SDL)) {
-    SDL_ERROR(logger_, "Unable to send request to mobile");
+    SDL_ERROR("Unable to send request to mobile");
   }
 }
 
@@ -298,18 +297,17 @@ void RequestFromHMI::SendHMIRequest(
   }
 
   if (use_events) {
-    SDL_DEBUG(logger_,
-              "RequestFromHMI subscribe_on_event " << function_id << " "
+    SDL_DEBUG("RequestFromHMI subscribe_on_event " << function_id << " "
                                                    << hmi_correlation_id);
     subscribe_on_event(function_id, hmi_correlation_id);
   }
   if (ProcessHMIInterfacesAvailability(hmi_correlation_id, function_id)) {
     if (!rpc_service_.ManageHMICommand(
             result, commands::Command::CommandSource::SOURCE_SDL_TO_HMI)) {
-      SDL_ERROR(logger_, "Unable to send request");
+      SDL_ERROR("Unable to send request");
     }
   } else {
-    SDL_DEBUG(logger_, "Interface is not available");
+    SDL_DEBUG("Interface is not available");
   }
 }
 

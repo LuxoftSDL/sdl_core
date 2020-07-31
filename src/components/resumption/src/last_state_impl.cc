@@ -64,8 +64,7 @@ void LastStateImpl::SaveStateToFileSystem() {
   const std::vector<uint8_t> char_vector_pdata(styled_string.begin(),
                                                styled_string.end());
   DCHECK(file_system::CreateDirectoryRecursively(app_storage_folder_));
-  SDL_INFO(logger_,
-           "LastState::SaveStateToFileSystem[DEPRECATED] " << app_info_storage_
+  SDL_INFO("LastState::SaveStateToFileSystem[DEPRECATED] " << app_info_storage_
                                                            << styled_string);
   DCHECK(file_system::Write(app_info_storage_, char_vector_pdata));
 }
@@ -83,7 +82,7 @@ void LastStateImpl::SaveToFileSystem() {
                                                styled_string.end());
   DCHECK(file_system::CreateDirectoryRecursively(app_storage_folder_));
   SDL_INFO(
-      logger_,
+
       "LastState::SaveToFileSystem " << app_info_storage_ << styled_string);
   DCHECK(file_system::Write(app_info_storage_, char_vector_pdata));
 }
@@ -94,17 +93,16 @@ void LastStateImpl::LoadFromFileSystem() {
   utils::JsonReader reader;
 
   if (result && reader.parse(buffer, &dictionary_)) {
-    SDL_INFO(logger_,
-             "Valid last state was found." << dictionary_.toStyledString());
+    SDL_INFO("Valid last state was found." << dictionary_.toStyledString());
     return;
   }
-  SDL_WARN(logger_, "No valid last state was found.");
+  SDL_WARN("No valid last state was found.");
 }
 
 void LastStateImpl::RemoveFromFileSystem() {
   SDL_AUTO_TRACE();
   if (!file_system::DeleteFile(app_info_storage_)) {
-    SDL_WARN(logger_, "Failed attempt to delete " << app_info_storage_);
+    SDL_WARN("Failed attempt to delete " << app_info_storage_);
   }
 }
 

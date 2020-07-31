@@ -63,8 +63,7 @@ void OnHMIStatusNotificationFromMobile::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (app.use_count() == 0) {
-    SDL_ERROR(logger_,
-              "OnHMIStatusNotificationFromMobile application doesn't exist");
+    SDL_ERROR("OnHMIStatusNotificationFromMobile application doesn't exist");
     return;
   }
 
@@ -81,9 +80,8 @@ void OnHMIStatusNotificationFromMobile::Run() {
   bool is_apps_requested_before =
       application_manager_.IsAppsQueriedFrom(handle);
 
-  SDL_DEBUG(logger_,
-            "Mobile HMI state notication came for connection key:"
-                << connection_key() << " and handle: " << handle);
+  SDL_DEBUG("Mobile HMI state notication came for connection key:"
+            << connection_key() << " and handle: " << handle);
 
   if (!is_apps_requested_before &&
       Message::is_sufficient_version(
@@ -98,10 +96,10 @@ void OnHMIStatusNotificationFromMobile::Run() {
   }
 
   if (is_apps_requested_before) {
-    SDL_DEBUG(logger_,
-              "Remote apps list had been requested already "
-              " for handle: "
-                  << handle);
+    SDL_DEBUG(
+        "Remote apps list had been requested already "
+        " for handle: "
+        << handle);
 
     if (Message::is_sufficient_version(
             protocol_handler::MajorProtocolVersion::PROTOCOL_VERSION_4,

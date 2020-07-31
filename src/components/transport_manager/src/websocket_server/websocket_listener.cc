@@ -65,8 +65,7 @@ TransportAdapter::Error WebSocketListener::StartListening() {
   acceptor_.open(endpoint.protocol(), ec);
   if (ec) {
     auto str_err = "ErrorOpen: " + ec.message();
-    SDL_ERROR(logger_,
-              str_err << " host/port: " << endpoint.address().to_string() << "/"
+    SDL_ERROR(str_err << " host/port: " << endpoint.address().to_string() << "/"
                       << endpoint.port());
     return TransportAdapter::FAIL;
   }
@@ -74,8 +73,7 @@ TransportAdapter::Error WebSocketListener::StartListening() {
   acceptor_.set_option(boost::asio::socket_base::reuse_address(true), ec);
   if (ec) {
     std::string str_err = "ErrorSetOption: " + ec.message();
-    SDL_ERROR(logger_,
-              str_err << " host/port: " << endpoint.address().to_string() << "/"
+    SDL_ERROR(str_err << " host/port: " << endpoint.address().to_string() << "/"
                       << endpoint.port());
     return TransportAdapter::FAIL;
   }
@@ -84,8 +82,7 @@ TransportAdapter::Error WebSocketListener::StartListening() {
   acceptor_.bind(endpoint, ec);
   if (ec) {
     std::string str_err = "ErrorBind: " + ec.message();
-    SDL_ERROR(logger_,
-              str_err << " host/port: " << endpoint.address().to_string() << "/"
+    SDL_ERROR(str_err << " host/port: " << endpoint.address().to_string() << "/"
                       << endpoint.port());
     return TransportAdapter::FAIL;
   }
@@ -94,8 +91,7 @@ TransportAdapter::Error WebSocketListener::StartListening() {
   acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
   if (ec) {
     std::string str_err = "ErrorListen: " + ec.message();
-    SDL_ERROR(logger_,
-              str_err << " host/port: " << endpoint.address().to_string() << "/"
+    SDL_ERROR(str_err << " host/port: " << endpoint.address().to_string() << "/"
                       << endpoint.port());
     return TransportAdapter::FAIL;
   }
@@ -112,17 +108,17 @@ TransportAdapter::Error WebSocketListener::AddCertificateAuthority() {
   SDL_AUTO_TRACE();
 
   const auto cert_path = settings_.ws_server_cert_path();
-  SDL_DEBUG(logger_, "Path to certificate : " << cert_path);
+  SDL_DEBUG("Path to certificate : " << cert_path);
   const auto key_path = settings_.ws_server_key_path();
-  SDL_DEBUG(logger_, "Path to key : " << key_path);
+  SDL_DEBUG("Path to key : " << key_path);
   const auto ca_cert_path = settings_.ws_server_ca_cert_path();
-  SDL_DEBUG(logger_, "Path to ca cert : " << ca_cert_path);
+  SDL_DEBUG("Path to ca cert : " << ca_cert_path);
   start_secure_ = settings_.wss_server_supported();
 
   if (start_secure_ && (!file_system::FileExists(cert_path) ||
                         !file_system::FileExists(key_path) ||
                         !file_system::FileExists(ca_cert_path))) {
-    SDL_ERROR(logger_, "Certificate or key file not found");
+    SDL_ERROR("Certificate or key file not found");
     return TransportAdapter::FAIL;
   }
 
@@ -131,12 +127,11 @@ TransportAdapter::Error WebSocketListener::AddCertificateAuthority() {
                            const std::string config_name) {
       bool start_unsecure = config.empty();
       if (!start_unsecure) {
-        SDL_ERROR(logger_,
-                  "Configuration for secure WS is incomplete. "
-                      << config_name
-                      << " config is "
-                         "present, meanwhile others may be missing. Please "
-                         "check INI file");
+        SDL_ERROR("Configuration for secure WS is incomplete. "
+                  << config_name
+                  << " config is "
+                     "present, meanwhile others may be missing. Please "
+                     "check INI file");
       }
       return start_unsecure;
     };
@@ -146,7 +141,7 @@ TransportAdapter::Error WebSocketListener::AddCertificateAuthority() {
       return TransportAdapter::FAIL;
     }
   } else {
-    SDL_INFO(logger_, "WebSocket server will start secure connection");
+    SDL_INFO("WebSocket server will start secure connection");
     ctx_.add_verify_path(cert_path);
     ctx_.set_options(boost::asio::ssl::context::default_workarounds);
     using context = boost::asio::ssl::context_base;
@@ -155,14 +150,13 @@ TransportAdapter::Error WebSocketListener::AddCertificateAuthority() {
     ctx_.use_certificate_chain_file(cert_path, sec_ec);
     ctx_.load_verify_file(ca_cert_path);
     if (sec_ec) {
-      SDL_ERROR(logger_,
-                "Loading WS server certificate failed: " << sec_ec.message());
+      SDL_ERROR("Loading WS server certificate failed: " << sec_ec.message());
       return TransportAdapter::FAIL;
     }
     sec_ec.clear();
     ctx_.use_private_key_file(key_path, context::pem, sec_ec);
     if (sec_ec) {
-      SDL_ERROR(logger_, "Loading WS server key failed: " << sec_ec.message());
+      SDL_ERROR("Loading WS server key failed: " << sec_ec.message());
       return TransportAdapter::FAIL;
     }
   }
@@ -177,7 +171,7 @@ bool WebSocketListener::Run() {
   if (is_connection_open) {
     boost::asio::post(*io_pool_.get(), [&]() { ioc_.run(); });
   } else {
-    SDL_ERROR(logger_, "Connection is shutdown or acceptor isn't open");
+    SDL_ERROR("Connection is shutdown or acceptor isn't open");
   }
 
   return is_connection_open;
@@ -241,7 +235,7 @@ void WebSocketListener::StartSession(boost::system::error_code ec) {
   SDL_AUTO_TRACE();
   if (ec) {
     std::string str_err = "ErrorAccept: " + ec.message();
-    SDL_ERROR(logger_, str_err);
+    SDL_ERROR(str_err);
     return;
   }
 
@@ -255,7 +249,7 @@ void WebSocketListener::StartSession(boost::system::error_code ec) {
       std::static_pointer_cast<WebSocketDevice>(
           controller_->GetWebEngineDevice());
 
-  SDL_INFO(logger_, "Connected client: " << app_handle);
+  SDL_INFO("Connected client: " << app_handle);
 
 #ifdef ENABLE_SECURITY
   if (start_secure_) {
@@ -285,7 +279,7 @@ void WebSocketListener::Shutdown() {
     acceptor_.close(ec);
 
     if (ec) {
-      SDL_ERROR(logger_, "Acceptor closed with error: " << ec);
+      SDL_ERROR("Acceptor closed with error: " << ec);
     }
 
     io_pool_->stop();

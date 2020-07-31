@@ -112,11 +112,11 @@ void OnDeviceStateChangedNotification::Run() {
       }
     } else {
       // Policy uses hashed MAC address as device_id
-      SDL_DEBUG(logger_, "Device_id from HMI: " << device_id);
+      SDL_DEBUG("Device_id from HMI: " << device_id);
       std::string bt_mac = convert_to_bt_mac(device_id);
-      SDL_DEBUG(logger_, "Device_id as BT MAC: " << bt_mac);
+      SDL_DEBUG("Device_id as BT MAC: " << bt_mac);
       device_id = encryption::MakeHash(bt_mac);
-      SDL_DEBUG(logger_, "Device_id hashed as BT MAC : " << device_id);
+      SDL_DEBUG("Device_id hashed as BT MAC : " << device_id);
     }
     policy_handler_.RemoveDevice(device_id);
   }

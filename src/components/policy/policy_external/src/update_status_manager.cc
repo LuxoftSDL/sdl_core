@@ -146,11 +146,11 @@ void UpdateStatusManager::OnExistedApplicationAdded(
 void UpdateStatusManager::OnNewApplicationAdded(const DeviceConsent consent) {
   SDL_AUTO_TRACE();
   if (kDeviceAllowed != consent) {
-    SDL_DEBUG(logger_, "Application registered from non-consented device");
+    SDL_DEBUG("Application registered from non-consented device");
     app_registered_from_non_consented_device_ = true;
     return;
   }
-  SDL_DEBUG(logger_, "Application registered from consented device");
+  SDL_DEBUG("Application registered from consented device");
   app_registered_from_non_consented_device_ = false;
   if (kOnResetRetrySequence == last_processed_event_) {
     current_status_.reset(new UpToDateStatus());
@@ -245,21 +245,21 @@ UpdateStatusManager::UpdateThreadDelegate::UpdateThreadDelegate(
     , stop_flag_(false)
     , update_status_manager_(update_status_manager) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "Create UpdateThreadDelegate");
+  SDL_DEBUG("Create UpdateThreadDelegate");
 }
 
 UpdateStatusManager::UpdateThreadDelegate::~UpdateThreadDelegate() {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "Delete UpdateThreadDelegate");
+  SDL_DEBUG("Delete UpdateThreadDelegate");
 }
 
 void UpdateStatusManager::UpdateThreadDelegate::threadMain() {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "UpdateStatusManager thread started (started normal)");
+  SDL_DEBUG("UpdateStatusManager thread started (started normal)");
   sync_primitives::AutoLock auto_lock(state_lock_);
   while (false == stop_flag_) {
     if (timeout_ > 0) {
-      SDL_DEBUG(logger_, "Timeout is greater then 0");
+      SDL_DEBUG("Timeout is greater then 0");
       sync_primitives::ConditionalVariable::WaitStatus wait_status =
           termination_condition_.WaitFor(auto_lock, timeout_);
       if (sync_primitives::ConditionalVariable::kTimeout == wait_status) {
@@ -279,7 +279,7 @@ void UpdateStatusManager::UpdateThreadDelegate::exitThreadMain() {
   SDL_AUTO_TRACE();
   sync_primitives::AutoLock auto_lock(state_lock_);
   stop_flag_ = true;
-  SDL_DEBUG(logger_, "before notify");
+  SDL_DEBUG("before notify");
   termination_condition_.NotifyOne();
 }
 

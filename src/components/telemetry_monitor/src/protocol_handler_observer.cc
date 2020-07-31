@@ -50,7 +50,7 @@ void ProtocolHandlerObserver::StartMessageProcess(
   }
   if (time_starts.find(message_id) != time_starts.end()) {
     SDL_DEBUG(
-        logger_,
+
         "Already waiting for stop processing for Message ID: " << message_id);
     return;
   }
@@ -63,7 +63,7 @@ void ProtocolHandlerObserver::EndMessageProcess(
   std::map<uint32_t, date_time::TimeDuration>::const_iterator it =
       time_starts.find(message_id);
   if (it == time_starts.end()) {
-    SDL_WARN(logger_, "Cant find start time for message" << message_id);
+    SDL_WARN("Cant find start time for message" << message_id);
     return;
   }
   m->begin = time_starts[message_id];

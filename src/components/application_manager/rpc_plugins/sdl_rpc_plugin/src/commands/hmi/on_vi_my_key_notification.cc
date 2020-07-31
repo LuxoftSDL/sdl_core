@@ -38,7 +38,6 @@ using namespace application_manager;
 
 namespace commands {
 
-
 SDL_CREATE_LOGGERPTR("OnVIMyKeyNotification")
 
 OnVIMyKeyNotification::OnVIMyKeyNotification(

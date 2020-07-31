@@ -106,7 +106,7 @@ mobile_apis::Result::eType PrepareResultCodeAndInfo(
     info = "Accessing not supported module data.";
   }
   return result_code;
-  SDL_WARN(logger_, info);
+  SDL_WARN(info);
 }
 
 void SetInteriorVehicleDataRequest::Execute() {
@@ -120,8 +120,7 @@ void SetInteriorVehicleDataRequest::Execute() {
     const std::string module_id = ModuleId();
     const ModuleUid module(module_type, module_id);
     if (!rc_capabilities_manager_.CheckIfModuleExistsInCapabilities(module)) {
-      SDL_WARN(logger_,
-               "Accessing not supported module: " << module_type << " "
+      SDL_WARN("Accessing not supported module: " << module_type << " "
                                                   << module_id);
       SetResourceState(ModuleType(), ResourceState::FREE);
       SendResponse(false,
@@ -146,7 +145,7 @@ void SetInteriorVehicleDataRequest::Execute() {
 
     if (rc_capabilities_manager_.AreAllParamsReadOnly(module_data,
                                                       module_type)) {
-      SDL_WARN(logger_, "All request params in module type are READ ONLY!");
+      SDL_WARN("All request params in module type are READ ONLY!");
       SetResourceState(ModuleType(), ResourceState::FREE);
       SendResponse(false,
                    mobile_apis::Result::READ_ONLY,
@@ -158,7 +157,7 @@ void SetInteriorVehicleDataRequest::Execute() {
 
     if (rc_capabilities_manager_.AreReadOnlyParamsPresent(
             module_data, module_type, module_data_capabilities)) {
-      SDL_DEBUG(logger_, "Request module type has READ ONLY parameters");
+      SDL_DEBUG("Request module type has READ ONLY parameters");
 
       if (enums_value::kLight == module_data_capabilities.first &&
           capabilitiesStatus::kSuccess != module_data_capabilities.second) {
@@ -170,7 +169,7 @@ void SetInteriorVehicleDataRequest::Execute() {
         return;
       }
 
-      SDL_DEBUG(logger_, "Cutting-off READ ONLY parameters... ");
+      SDL_DEBUG("Cutting-off READ ONLY parameters... ");
 
       CutOffReadOnlyParams(module_data);
     }
@@ -190,7 +189,7 @@ void SetInteriorVehicleDataRequest::Execute() {
 
     if (app_wants_to_set_audio_src) {
       if (!app->IsAllowedToChangeAudioSource()) {
-        SDL_WARN(logger_, "App is not allowed to change audio source");
+        SDL_WARN("App is not allowed to change audio source");
         SetResourceState(ModuleType(), ResourceState::FREE);
         SendResponse(false,
                      mobile_apis::Result::REJECTED,
@@ -210,7 +209,7 @@ void SetInteriorVehicleDataRequest::Execute() {
                    &(*message_)[app_mngr::strings::msg_params],
                    true);
   } else {
-    SDL_WARN(logger_, "Request module type & data mismatch!");
+    SDL_WARN("Request module type & data mismatch!");
     SetResourceState(ModuleType(), ResourceState::FREE);
     SendResponse(false,
                  mobile_apis::Result::INVALID_DATA,
@@ -244,8 +243,7 @@ void SetInteriorVehicleDataRequest::on_event(
 
   if (result) {
     if (!IsModuleIdProvided(hmi_response)) {
-      SDL_WARN(logger_,
-               "conditional mandatory parameter " << message_params::kModuleId
+      SDL_WARN("conditional mandatory parameter " << message_params::kModuleId
                                                   << " missed in hmi response");
       result = false;
       result_code = mobile_apis::Result::GENERIC_ERROR;
@@ -264,7 +262,7 @@ void SetInteriorVehicleDataRequest::on_event(
     auto app = application_manager_.application(connection_key());
 
     if (!app) {
-      SDL_ERROR(logger_, "NULL pointer.");
+      SDL_ERROR("NULL pointer.");
       SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED, "");
       return;
     }
@@ -318,9 +316,8 @@ void SetInteriorVehicleDataRequest::CutOffReadOnlyParams(
     for (; it != equalizer_settings.asArray()->end(); ++it) {
       if (it->keyExists(message_params::kChannelName)) {
         it->erase(message_params::kChannelName);
-        SDL_DEBUG(logger_,
-                  "Cutting-off READ ONLY parameter: "
-                      << message_params::kChannelName);
+        SDL_DEBUG("Cutting-off READ ONLY parameter: "
+                  << message_params::kChannelName);
       }
     }
   }
@@ -331,7 +328,7 @@ void SetInteriorVehicleDataRequest::CutOffReadOnlyParams(
   for (const auto& param : ro_params) {
     if (module_type_params.keyExists(param)) {
       module_data[data_mapping(module_type)].erase(param);
-      SDL_DEBUG(logger_, "Cutting-off READ ONLY parameter: " << param);
+      SDL_DEBUG("Cutting-off READ ONLY parameter: " << param);
     }
   }
 }

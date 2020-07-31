@@ -58,7 +58,7 @@ void StreamerListener::OnErrorReceived(int32_t application_key,
 void StreamerListener::OnActivityStarted(int32_t application_key) {
   SDL_AUTO_TRACE();
   if (current_application_ == application_key) {
-    SDL_WARN(logger_, "Already performing activity for " << application_key);
+    SDL_WARN("Already performing activity for " << application_key);
     return;
   }
   current_application_ = application_key;
@@ -67,8 +67,7 @@ void StreamerListener::OnActivityStarted(int32_t application_key) {
 void StreamerListener::OnActivityEnded(int32_t application_key) {
   SDL_AUTO_TRACE();
   if (current_application_ != application_key) {
-    SDL_WARN(logger_,
-             "Already not performing activity for " << application_key);
+    SDL_WARN("Already not performing activity for " << application_key);
     return;
   }
   current_application_ = 0;

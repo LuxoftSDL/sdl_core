@@ -64,7 +64,7 @@ std::string StringifyFrameType(uint8_t type) {
       return "FRAME_TYPE_FIRST";
 
     default:
-      SDL_ERROR(logger_, "Unknown frame type:" << static_cast<int>(type));
+      SDL_ERROR("Unknown frame type:" << static_cast<int>(type));
       break;
   }
 
@@ -120,8 +120,7 @@ void ProtocolPacket::ProtocolHeader::deserialize(const uint8_t* message,
   SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(message);
   if (messageSize < PROTOCOL_HEADER_V1_SIZE) {
-    SDL_DEBUG(logger_,
-              "Message size less " << PROTOCOL_HEADER_V1_SIZE << " bytes");
+    SDL_DEBUG("Message size less " << PROTOCOL_HEADER_V1_SIZE << " bytes");
     return;
   }
   // first 4 bits
@@ -143,14 +142,13 @@ void ProtocolPacket::ProtocolHeader::deserialize(const uint8_t* message,
     case PROTOCOL_VERSION_4:
     case PROTOCOL_VERSION_5: {
       if (messageSize < PROTOCOL_HEADER_V2_SIZE) {
-        SDL_DEBUG(logger_,
-                  "Message size less " << PROTOCOL_HEADER_V2_SIZE << " bytes");
+        SDL_DEBUG("Message size less " << PROTOCOL_HEADER_V2_SIZE << " bytes");
         return;
       }
       messageId = read_be_uint32(message + 8);
     } break;
     default:
-      SDL_WARN(logger_, "Unknown version:" << static_cast<int>(version));
+      SDL_WARN("Unknown version:" << static_cast<int>(version));
       messageId = 0;
       break;
   }
@@ -166,41 +164,39 @@ ProtocolPacket::ProtocolHeaderValidator::ProtocolHeaderValidator()
 
 void ProtocolPacket::ProtocolHeaderValidator::set_max_payload_size(
     const size_t max_payload_size) {
-  SDL_DEBUG(logger_, "New maximum payload size is " << max_payload_size);
+  SDL_DEBUG("New maximum payload size is " << max_payload_size);
   max_payload_size_ = max_payload_size;
 }
 
 void ProtocolPacket::ProtocolHeaderValidator::set_max_control_payload_size(
     const size_t max_payload_size) {
-  SDL_DEBUG(logger_,
-            "New maximum Control payload size is " << max_payload_size);
+  SDL_DEBUG("New maximum Control payload size is " << max_payload_size);
   max_control_payload_size_ = max_payload_size;
 }
 
 void ProtocolPacket::ProtocolHeaderValidator::set_max_rpc_payload_size(
     const size_t max_payload_size) {
-  SDL_DEBUG(logger_, "New maximum RPC payload size is " << max_payload_size);
+  SDL_DEBUG("New maximum RPC payload size is " << max_payload_size);
   max_rpc_payload_size_ = max_payload_size;
 }
 
 void ProtocolPacket::ProtocolHeaderValidator::set_max_audio_payload_size(
     const size_t max_payload_size) {
-  SDL_DEBUG(logger_, "New maximum audio payload size is " << max_payload_size);
+  SDL_DEBUG("New maximum audio payload size is " << max_payload_size);
   max_audio_payload_size_ = max_payload_size;
 }
 
 void ProtocolPacket::ProtocolHeaderValidator::set_max_video_payload_size(
     const size_t max_payload_size) {
-  SDL_DEBUG(logger_, "New maximum video payload size is " << max_payload_size);
+  SDL_DEBUG("New maximum video payload size is " << max_payload_size);
   max_video_payload_size_ = max_payload_size;
 }
 
 void ProtocolPacket::ProtocolHeaderValidator::
     set_max_protocol_version_supported(
         const uint16_t max_protocol_version_supported) {
-  SDL_DEBUG(logger_,
-            "New maximum protocol version supported is "
-                << max_protocol_version_supported);
+  SDL_DEBUG("New maximum protocol version supported is "
+            << max_protocol_version_supported);
   max_protocol_version_supported_ = max_protocol_version_supported;
 }
 
@@ -258,14 +254,14 @@ ProtocolPacket::ProtocolHeaderValidator::max_payload_size_by_service_type(
                                                   : max_video_payload_size_;
       break;
     case kInvalidServiceType:
-      SDL_WARN(logger_, "Invalid service type: " << static_cast<int>(type));
+      SDL_WARN("Invalid service type: " << static_cast<int>(type));
   }
   return payload_size;
 }
 
 RESULT_CODE ProtocolPacket::ProtocolHeaderValidator::validate(
     const ProtocolHeader& header) const {
-  SDL_DEBUG(logger_, "Validating header - " << header);
+  SDL_DEBUG("Validating header - " << header);
   // expected payload size will be calculated depending
   // on used protocol version and service type
   size_t payload_size = MAXIMUM_FRAME_DATA_V2_SIZE;
@@ -286,15 +282,14 @@ RESULT_CODE ProtocolPacket::ProtocolHeaderValidator::validate(
           ServiceTypeFromByte(header.serviceType));
       break;
     default:
-      SDL_WARN(logger_, "Unknown version:" << static_cast<int>(header.version));
+      SDL_WARN("Unknown version:" << static_cast<int>(header.version));
       return RESULT_FAIL;
   }
 
   // ServiceType shall be equal 0x0 (Control), 0x07 (RPC), 0x0A (PCM), 0x0B
   // (Video), 0x0F (Bulk)
   if (ServiceTypeFromByte(header.serviceType) == kInvalidServiceType) {
-    SDL_WARN(logger_,
-             "Invalide service type" << static_cast<int>(header.serviceType));
+    SDL_WARN("Invalide service type" << static_cast<int>(header.serviceType));
     return RESULT_FAIL;
   }
   // Check frame info for each frame type
@@ -321,26 +316,23 @@ RESULT_CODE ProtocolPacket::ProtocolHeaderValidator::validate(
         case FRAME_DATA_HEART_BEAT_ACK:
           break;
         default:
-          SDL_WARN(logger_,
-                   "FRAME_TYPE_CONTROL - Invalide frame data "
-                       << static_cast<int>(header.frameData));
+          SDL_WARN("FRAME_TYPE_CONTROL - Invalide frame data "
+                   << static_cast<int>(header.frameData));
           return RESULT_FAIL;
       }
       break;
     }
     case FRAME_TYPE_SINGLE:
       if (header.frameData != FRAME_DATA_SINGLE) {
-        SDL_WARN(logger_,
-                 "FRAME_TYPE_SINGLE - Invalide frame data "
-                     << static_cast<int>(header.frameData));
+        SDL_WARN("FRAME_TYPE_SINGLE - Invalide frame data "
+                 << static_cast<int>(header.frameData));
         return RESULT_FAIL;
       }
       break;
     case FRAME_TYPE_FIRST:
       if (header.frameData != FRAME_DATA_FIRST) {
-        SDL_WARN(logger_,
-                 "FRAME_TYPE_FIRST - Invalide frame data "
-                     << static_cast<int>(header.frameData));
+        SDL_WARN("FRAME_TYPE_FIRST - Invalide frame data "
+                 << static_cast<int>(header.frameData));
         return RESULT_FAIL;
       }
       break;
@@ -348,8 +340,7 @@ RESULT_CODE ProtocolPacket::ProtocolHeaderValidator::validate(
       // Could have any FrameInfo value
       break;
     default:
-      SDL_WARN(logger_,
-               "Unknown frame type " << static_cast<int>(header.frameType));
+      SDL_WARN("Unknown frame type " << static_cast<int>(header.frameType));
       // All other Frame type is invalid
       return RESULT_FAIL;
   }
@@ -367,28 +358,26 @@ RESULT_CODE ProtocolPacket::ProtocolHeaderValidator::validate(
           (FRAME_TYPE_CONTROL != header.frameType && header.dataSize == 0u)) {
         UNUSED(StringifyFrameType);
         SDL_WARN(
-            logger_,
+
             "Packet data size of "
-                << StringifyFrameType(header.frameType)
-                << " frame must be in range (0, payload_size=" << payload_size
-                << "], but actual value is " << header.dataSize);
+            << StringifyFrameType(header.frameType)
+            << " frame must be in range (0, payload_size=" << payload_size
+            << "], but actual value is " << header.dataSize);
         return RESULT_FAIL;
       }
     } break;
 
     case FRAME_TYPE_FIRST:
       if (FIRST_FRAME_DATA_SIZE != header.dataSize) {
-        SDL_WARN(logger_,
-                 "Packet data size of FRAME_TYPE_FIRST frame must equal "
-                     << static_cast<int>(FIRST_FRAME_DATA_SIZE)
-                     << ", but actual value is " << header.dataSize);
+        SDL_WARN("Packet data size of FRAME_TYPE_FIRST frame must equal "
+                 << static_cast<int>(FIRST_FRAME_DATA_SIZE)
+                 << ", but actual value is " << header.dataSize);
         return RESULT_FAIL;
       }
       break;
 
     default:
-      SDL_WARN(logger_,
-               "Unknown frame type " << static_cast<int>(header.frameType));
+      SDL_WARN("Unknown frame type " << static_cast<int>(header.frameType));
       return RESULT_FAIL;
   }
   // Message ID be equal or greater than 0x01 (not actual for 1 protocol version
@@ -396,11 +385,11 @@ RESULT_CODE ProtocolPacket::ProtocolHeaderValidator::validate(
   if (header.messageId <= 0) {
     if (FRAME_TYPE_CONTROL != header.frameType &&
         PROTOCOL_VERSION_1 != header.version) {
-      SDL_WARN(logger_, "Message ID shall be greater than 0x00");
+      SDL_WARN("Message ID shall be greater than 0x00");
       return RESULT_FAIL;
     }
   }
-  SDL_DEBUG(logger_, "Message header is completely correct.");
+  SDL_DEBUG("Message header is completely correct.");
   return RESULT_OK;
 }
 
@@ -625,7 +614,7 @@ uint8_t* ProtocolPacket::data() const {
 
 void ProtocolPacket::set_total_data_bytes(size_t dataBytes) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "Data bytes : " << dataBytes);
+  SDL_DEBUG("Data bytes : " << dataBytes);
   if (dataBytes) {
     delete[] packet_data_.data;
     packet_data_.data = new (std::nothrow) uint8_t[dataBytes];

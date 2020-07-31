@@ -61,7 +61,7 @@ PublishAppServiceRequest::~PublishAppServiceRequest() {}
 
 void PublishAppServiceRequest::Run() {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "Received a PublishAppService " << connection_key());
+  SDL_DEBUG("Received a PublishAppService " << connection_key());
   MessageHelper::PrintSmartObject(*message_);
 
   smart_objects::SmartObject response_params =

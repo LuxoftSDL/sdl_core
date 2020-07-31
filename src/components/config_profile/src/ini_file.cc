@@ -279,7 +279,7 @@ char ini_write_value(const char* fname,
   if (0 != rename(temp_fname, fname)) {
     if (0 != remove(temp_fname)) {
       SDL_WARN_WITH_ERRNO(
-          logger_, "Unable to remove temp file: " << std::string(temp_fname));
+          "Unable to remove temp file: " << std::string(temp_fname));
     }
     return FALSE;
   }

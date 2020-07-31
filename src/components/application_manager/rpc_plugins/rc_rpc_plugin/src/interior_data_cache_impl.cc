@@ -49,9 +49,8 @@ InteriorDataCacheImpl::~InteriorDataCacheImpl() {}
 
 void InteriorDataCacheImpl::Add(const ModuleUid& module,
                                 const smart_objects::SmartObject& module_data) {
-  SDL_TRACE(
-      logger_,
-      "module_type : " << module.first << " module_id : " << module.second);
+  SDL_TRACE("module_type : " << module.first
+                             << " module_id : " << module.second);
   sync_primitives::AutoLock autolock(cached_data_lock_);
   auto it = cached_data_.find(module);
   if (cached_data_.end() == it) {
@@ -67,15 +66,13 @@ smart_objects::SmartObject InteriorDataCacheImpl::Retrieve(
   sync_primitives::AutoLock autolock(cached_data_lock_);
   auto it = cached_data_.find(module);
   if (it == cached_data_.end()) {
-    SDL_WARN(logger_,
-             "Module with type: " << module.first
+    SDL_WARN("Module with type: " << module.first
                                   << " and id: " << module.second
                                   << " was not found in cache");
     return smart_objects::SmartObject(smart_objects::SmartType_Null);
   }
-  SDL_TRACE(
-      logger_,
-      "module_type : " << module.first << " module_id : " << module.second);
+  SDL_TRACE("module_type : " << module.first
+                             << " module_id : " << module.second);
   return it->second;
 }
 
@@ -96,21 +93,18 @@ bool InteriorDataCacheImpl::Contains(const ModuleUid& module) const {
   sync_primitives::AutoLock autolock(cached_data_lock_);
   auto it = cached_data_.find(module);
   const bool contains = it != cached_data_.end();
-  SDL_TRACE(logger_,
-            "module_type : " << module.first << " module_id : " << module.second
+  SDL_TRACE("module_type : " << module.first << " module_id : " << module.second
                              << " " << (contains ? "true" : "false"));
   return contains;
 }
 
 void InteriorDataCacheImpl::Remove(const ModuleUid& module) {
-  SDL_TRACE(
-      logger_,
-      "module_type : " << module.first << " module_id : " << module.second);
+  SDL_TRACE("module_type : " << module.first
+                             << " module_id : " << module.second);
   sync_primitives::AutoLock autolock(cached_data_lock_);
   auto it = cached_data_.find(module);
   if (cached_data_.end() == it) {
-    SDL_TRACE(logger_,
-              "Not existing module : " << module.first << " " << module.second);
+    SDL_TRACE("Not existing module : " << module.first << " " << module.second);
     return;
   }
   cached_data_.erase(it);

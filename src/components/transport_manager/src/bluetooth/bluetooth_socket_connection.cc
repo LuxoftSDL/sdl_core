@@ -62,7 +62,7 @@ BluetoothSocketConnection::~BluetoothSocketConnection() {
 
 bool BluetoothSocketConnection::Establish(ConnectError** error) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "error: " << error);
+  SDL_DEBUG("error: " << error);
   DeviceSptr device = controller()->FindDevice(device_handle());
 
   BluetoothDevice* bluetooth_device =
@@ -71,9 +71,9 @@ bool BluetoothSocketConnection::Establish(ConnectError** error) {
   uint8_t rfcomm_channel;
   if (!bluetooth_device->GetRfcommChannel(application_handle(),
                                           &rfcomm_channel)) {
-    SDL_DEBUG(logger_, "Application " << application_handle() << " not found");
+    SDL_DEBUG("Application " << application_handle() << " not found");
     *error = new ConnectError();
-    SDL_TRACE(logger_, "exit with FALSE");
+    SDL_TRACE("exit with FALSE");
     return false;
   }
 
@@ -88,25 +88,25 @@ bool BluetoothSocketConnection::Establish(ConnectError** error) {
 
   int attempts = 4;
   int connect_status = 0;
-  SDL_DEBUG(logger_, "start rfcomm Connect attempts");
+  SDL_DEBUG("start rfcomm Connect attempts");
   do {
     rfcomm_socket = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
     if (-1 == rfcomm_socket) {
       SDL_ERROR_WITH_ERRNO(
-          logger_,
+
           "Failed to create RFCOMM socket for device " << device_handle());
       *error = new ConnectError();
-      SDL_TRACE(logger_, "exit with FALSE");
+      SDL_TRACE("exit with FALSE");
       return false;
     }
     connect_status = ::connect(rfcomm_socket,
                                (struct sockaddr*)&remoteSocketAddress,
                                sizeof(remoteSocketAddress));
     if (0 == connect_status) {
-      SDL_DEBUG(logger_, "rfcomm Connect ok");
+      SDL_DEBUG("rfcomm Connect ok");
       break;
     } else {  // If connect_status is not 0, an errno is returned
-      SDL_WARN_WITH_ERRNO(logger_, "rfcomm Connect failed");
+      SDL_WARN_WITH_ERRNO("rfcomm Connect failed");
       close(rfcomm_socket);  // Always close the socket upon error
       if (errno != ECONNREFUSED && errno != ECONNRESET) {
         break;
@@ -114,20 +114,20 @@ bool BluetoothSocketConnection::Establish(ConnectError** error) {
     }
     sleep(2);
   } while (--attempts > 0);
-  SDL_INFO(logger_, "rfcomm Connect attempts finished");
+  SDL_INFO("rfcomm Connect attempts finished");
   if (0 != connect_status) {
     SDL_DEBUG(
-        logger_,
+
         "Failed to Connect to remote device "
-            << BluetoothDevice::GetUniqueDeviceId(remoteSocketAddress.rc_bdaddr)
-            << " for session " << this);
+        << BluetoothDevice::GetUniqueDeviceId(remoteSocketAddress.rc_bdaddr)
+        << " for session " << this);
     *error = new ConnectError();
-    SDL_TRACE(logger_, "exit with FALSE");
+    SDL_TRACE("exit with FALSE");
     return false;
   }
 
   set_socket(rfcomm_socket);
-  SDL_TRACE(logger_, "exit with TRUE");
+  SDL_TRACE("exit with TRUE");
   return true;
 }
 

@@ -197,9 +197,9 @@ void WebSocketConnection<Session>::LoopThreadDelegate::DrainQueue() {
   while (!message_queue_.IsShuttingDown() && message_queue_.pop(message_ptr)) {
     auto res = data_write_(message_ptr);
     if (TransportAdapter::FAIL == res) {
-      SDL_WARN(wsc_logger_,
-               "Writing to websocket stream failed. Will now close "
-               "websocket connection.");
+      SDL_WARN(
+          "Writing to websocket stream failed. Will now close "
+          "websocket connection.");
       on_io_error_();
     }
   }

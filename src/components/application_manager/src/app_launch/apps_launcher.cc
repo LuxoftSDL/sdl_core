@@ -75,7 +75,7 @@ void AppsLauncher::StopLaunching(ApplicationDataPtr app_data) {
     free_launchers_.push_back(launcher);
     works_launchers_.erase(it);
   } else {
-    SDL_DEBUG(logger_, "Unable to StopLaunching" << app_data->mobile_app_id_);
+    SDL_DEBUG("Unable to StopLaunching" << app_data->mobile_app_id_);
   }
 }
 
@@ -109,8 +109,7 @@ void AppsLauncher::Launcher::PosponedLaunch(
   app_data_ = app_data;
   retry_index_ = 0;
   retry_timer_.Start(app_launch_retry_wait_time_, timer::kPeriodic);
-  SDL_DEBUG(logger_,
-            "Applicaiton " << app_data->mobile_app_id_ << " on device "
+  SDL_DEBUG("Applicaiton " << app_data->mobile_app_id_ << " on device "
                            << app_data->device_mac_ << " will be launched in "
                            << app_launch_retry_wait_time_ << " ms");
 }
@@ -123,8 +122,7 @@ void AppsLauncher::Launcher::Clear() {
 
 void AppsLauncher::Launcher::LaunchNow() {
   if (retry_index_++ < app_launch_max_retry_attempt_) {
-    SDL_DEBUG(logger_,
-              "Run App " << app_data_->mobile_app_id_ << "with bundle "
+    SDL_DEBUG("Run App " << app_data_->mobile_app_id_ << "with bundle "
                          << app_data_->bundle_id_ << " On Device "
                          << app_data_->device_mac_);
 

@@ -84,7 +84,7 @@ void RequestController::InitializeThreadpool() {
     snprintf(name, sizeof(name) / sizeof(name[0]), "AM Pool %d", i);
     pool_.push_back(threads::CreateThread(name, new Worker(this)));
     pool_[i]->start();
-    SDL_DEBUG(logger_, "Request thread initialized: " << name);
+    SDL_DEBUG("Request thread initialized: " << name);
   }
 }
 
@@ -93,7 +93,7 @@ void RequestController::DestroyThreadpool() {
   {
     AutoLock auto_lock(mobile_request_list_lock_);
     pool_state_ = TPoolState::STOPPED;
-    SDL_DEBUG(logger_, "Broadcasting STOP signal to all threads...");
+    SDL_DEBUG("Broadcasting STOP signal to all threads...");
     cond_var_.Broadcast();  // notify all threads we are shutting down
   }
   for (size_t i = 0; i < pool_.size(); i++) {
@@ -109,7 +109,7 @@ RequestController::TResult RequestController::CheckPosibilitytoAdd(
     const RequestPtr request, const mobile_apis::HMILevel::eType level) {
   SDL_AUTO_TRACE();
   if (!CheckPendingRequestsAmount(settings_.pending_requests_amount())) {
-    SDL_ERROR(logger_, "Too many pending request");
+    SDL_ERROR("Too many pending request");
     return RequestController::TOO_MANY_PENDING_REQUESTS;
   }
 
@@ -117,18 +117,17 @@ RequestController::TResult RequestController::CheckPosibilitytoAdd(
       request_tracker_.Track(request->connection_key(), level);
 
   if (TrackResult::kNoneLevelMaxRequestsExceeded == track_result) {
-    SDL_ERROR(logger_, "Too many application requests in hmi level NONE");
+    SDL_ERROR("Too many application requests in hmi level NONE");
     return RequestController::NONE_HMI_LEVEL_MANY_REQUESTS;
   }
 
   if (TrackResult::kMaxRequestsExceeded == track_result) {
-    SDL_ERROR(logger_, "Too many application requests");
+    SDL_ERROR("Too many application requests");
     return RequestController::TOO_MANY_REQUESTS;
   }
 
   if (IsLowVoltage()) {
-    SDL_ERROR(logger_,
-              "Impossible to add request due to Low Voltage is active");
+    SDL_ERROR("Impossible to add request due to Low Voltage is active");
     return RequestController::INVALID_DATA;
   }
 
@@ -143,14 +142,13 @@ bool RequestController::CheckPendingRequestsAmount(
     const bool available_to_add =
         pending_requests_amount > pending_requests_size;
     if (!available_to_add) {
-      SDL_WARN(logger_,
-               "Pending requests count " << pending_requests_size
+      SDL_WARN("Pending requests count " << pending_requests_size
                                          << " exceed application limit "
                                          << pending_requests_amount);
     }
     return available_to_add;
   }
-  SDL_DEBUG(logger_, "CheckPendingRequestsAmount disabled");
+  SDL_DEBUG("CheckPendingRequestsAmount disabled");
   return true;
 }
 
@@ -158,20 +156,18 @@ RequestController::TResult RequestController::addMobileRequest(
     const RequestPtr request, const mobile_apis::HMILevel::eType& hmi_level) {
   SDL_AUTO_TRACE();
   if (!request) {
-    SDL_ERROR(logger_, "Null Pointer request");
+    SDL_ERROR("Null Pointer request");
     cond_var_.NotifyOne();
     return INVALID_DATA;
   }
-  SDL_DEBUG(
-      logger_,
-      "correlation_id : " << request->correlation_id()
-                          << "connection_key : " << request->connection_key());
+  SDL_DEBUG("correlation_id : " << request->correlation_id()
+                                << "connection_key : "
+                                << request->connection_key());
   RequestController::TResult result = CheckPosibilitytoAdd(request, hmi_level);
   if (SUCCESS == result) {
     AutoLock auto_lock_list(mobile_request_list_lock_);
     mobile_request_list_.push_back(request);
-    SDL_DEBUG(logger_,
-              "Waiting for execution: " << mobile_request_list_.size());
+    SDL_DEBUG("Waiting for execution: " << mobile_request_list_.size());
     // wake up one thread that is waiting for a task to be available
   }
   cond_var_.NotifyOne();
@@ -183,10 +179,10 @@ RequestController::TResult RequestController::addHMIRequest(
   SDL_AUTO_TRACE();
 
   if (request.use_count() == 0) {
-    SDL_ERROR(logger_, "HMI request pointer is invalid");
+    SDL_ERROR("HMI request pointer is invalid");
     return RequestController::INVALID_DATA;
   }
-  SDL_DEBUG(logger_, " correlation_id : " << request->correlation_id());
+  SDL_DEBUG(" correlation_id : " << request->correlation_id());
 
   const uint64_t timeout_in_mseconds =
       static_cast<uint64_t>(request->default_timeout());
@@ -194,20 +190,18 @@ RequestController::TResult RequestController::addHMIRequest(
       std::make_shared<HMIRequestInfo>(request, timeout_in_mseconds);
 
   if (0 == timeout_in_mseconds) {
-    SDL_DEBUG(logger_,
-              "Default timeout was set to 0."
-              "RequestController will not track timeout of this request.");
+    SDL_DEBUG(
+        "Default timeout was set to 0."
+        "RequestController will not track timeout of this request.");
   }
 
   if (IsLowVoltage()) {
-    SDL_ERROR(logger_,
-              "Impossible to add request due to Low Voltage is active");
+    SDL_ERROR("Impossible to add request due to Low Voltage is active");
     return RequestController::INVALID_DATA;
   }
 
   waiting_for_response_.Add(request_info_ptr);
-  SDL_DEBUG(logger_,
-            "Waiting for response count:" << waiting_for_response_.Size());
+  SDL_DEBUG("Waiting for response count:" << waiting_for_response_.Size());
 
   NotifyTimer();
   return RequestController::SUCCESS;
@@ -216,8 +210,7 @@ RequestController::TResult RequestController::addHMIRequest(
 void RequestController::addNotification(const RequestPtr ptr) {
   SDL_AUTO_TRACE();
   if (IsLowVoltage()) {
-    SDL_ERROR(logger_,
-              "Impossible to add notification due to Low Voltage is active");
+    SDL_ERROR("Impossible to add notification due to Low Voltage is active");
     return;
   }
   notification_list_.push_back(ptr);
@@ -230,13 +223,13 @@ void RequestController::removeNotification(
   for (; notification_list_.end() != it;) {
     if (it->get() == notification) {
       notification_list_.erase(it++);
-      SDL_DEBUG(logger_, "Notification removed");
+      SDL_DEBUG("Notification removed");
       return;
     } else {
       ++it;
     }
   }
-  SDL_DEBUG(logger_, "Cannot find notification");
+  SDL_DEBUG("Cannot find notification");
 }
 
 void RequestController::TerminateRequest(const uint32_t correlation_id,
@@ -244,8 +237,7 @@ void RequestController::TerminateRequest(const uint32_t correlation_id,
                                          const int32_t function_id,
                                          bool force_terminate) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_,
-            "correlation_id = " << correlation_id
+  SDL_DEBUG("correlation_id = " << correlation_id
                                 << " connection_key = " << connection_key
                                 << " function_id = " << function_id
                                 << " force_terminate = " << force_terminate);
@@ -257,9 +249,9 @@ void RequestController::TerminateRequest(const uint32_t correlation_id,
       if (0 == duplicate_message_count_[correlation_id]) {
         duplicate_message_count_.erase(dup_it);
       }
-      SDL_DEBUG(logger_,
-                "Ignoring termination request due to duplicate correlation "
-                "ID being sent");
+      SDL_DEBUG(
+          "Ignoring termination request due to duplicate correlation "
+          "ID being sent");
       return;
     }
   }
@@ -267,17 +259,17 @@ void RequestController::TerminateRequest(const uint32_t correlation_id,
   RequestInfoPtr request =
       waiting_for_response_.Find(connection_key, correlation_id);
   if (!request) {
-    SDL_WARN(logger_, "Request was not found in waiting_for_response");
+    SDL_WARN("Request was not found in waiting_for_response");
     return;
   }
   if (request->request()->function_id() != function_id) {
-    SDL_ERROR(logger_, "Request and response function_id's don't match");
+    SDL_ERROR("Request and response function_id's don't match");
     return;
   }
   if (force_terminate || request->request()->AllowedToTerminate()) {
     waiting_for_response_.RemoveRequest(request);
   } else {
-    SDL_WARN(logger_, "Request was not terminated");
+    SDL_WARN("Request was not terminated");
   }
   NotifyTimer();
 }
@@ -298,8 +290,7 @@ void RequestController::OnHMIResponse(const uint32_t correlation_id,
 void RequestController::terminateWaitingForExecutionAppRequests(
     const uint32_t& app_id) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_,
-            "app_id: " << app_id << "Waiting for execution"
+  SDL_DEBUG("app_id: " << app_id << "Waiting for execution"
                        << mobile_request_list_.size());
   AutoLock auto_lock(mobile_request_list_lock_);
   std::list<RequestPtr>::iterator request_it = mobile_request_list_.begin();
@@ -311,21 +302,19 @@ void RequestController::terminateWaitingForExecutionAppRequests(
       ++request_it;
     }
   }
-  SDL_DEBUG(logger_, "Waiting for execution " << mobile_request_list_.size());
+  SDL_DEBUG("Waiting for execution " << mobile_request_list_.size());
 }
 
 void RequestController::terminateWaitingForResponseAppRequests(
     const uint32_t& app_id) {
   SDL_AUTO_TRACE();
   waiting_for_response_.RemoveByConnectionKey(app_id);
-  SDL_DEBUG(logger_,
-            "Waiting for response count : " << waiting_for_response_.Size());
+  SDL_DEBUG("Waiting for response count : " << waiting_for_response_.Size());
 }
 
 void RequestController::terminateAppRequests(const uint32_t& app_id) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_,
-            "app_id : " << app_id << "Requests waiting for execution count : "
+  SDL_DEBUG("app_id : " << app_id << "Requests waiting for execution count : "
                         << mobile_request_list_.size()
                         << "Requests waiting for response count : "
                         << waiting_for_response_.Size());
@@ -343,10 +332,10 @@ void RequestController::terminateAllHMIRequests() {
 void RequestController::terminateAllMobileRequests() {
   SDL_AUTO_TRACE();
   waiting_for_response_.RemoveMobileRequests();
-  SDL_DEBUG(logger_, "Mobile Requests waiting for response cleared");
+  SDL_DEBUG("Mobile Requests waiting for response cleared");
   AutoLock waiting_execution_auto_lock(mobile_request_list_lock_);
   mobile_request_list_.clear();
-  SDL_DEBUG(logger_, "Mobile Requests waiting for execution cleared");
+  SDL_DEBUG("Mobile Requests waiting for execution cleared");
   NotifyTimer();
 }
 
@@ -355,12 +344,11 @@ void RequestController::updateRequestTimeout(const uint32_t& app_id,
                                              const uint32_t& new_timeout) {
   SDL_AUTO_TRACE();
 
-  SDL_DEBUG(logger_,
-            "app_id : " << app_id << " mobile_correlation_id : "
+  SDL_DEBUG("app_id : " << app_id << " mobile_correlation_id : "
                         << correlation_id << " new_timeout : " << new_timeout);
-  SDL_DEBUG(logger_,
-            "New_timeout is NULL. RequestCtrl will "
-            "not manage this request any more");
+  SDL_DEBUG(
+      "New_timeout is NULL. RequestCtrl will "
+      "not manage this request any more");
 
   RequestInfoPtr request_info =
       waiting_for_response_.Find(app_id, correlation_id);
@@ -369,15 +357,13 @@ void RequestController::updateRequestTimeout(const uint32_t& app_id,
     request_info->updateTimeOut(new_timeout);
     waiting_for_response_.Add(request_info);
     NotifyTimer();
-    SDL_INFO(logger_,
-             "Timeout updated for "
-                 << " app_id: " << app_id << " correlation_id: "
-                 << correlation_id << " new_timeout (ms): " << new_timeout);
+    SDL_INFO("Timeout updated for "
+             << " app_id: " << app_id << " correlation_id: " << correlation_id
+             << " new_timeout (ms): " << new_timeout);
   } else {
-    SDL_ERROR(logger_,
-              "Can't find request with "
-                  << " app_id: " << app_id
-                  << " correlation_id: " << correlation_id);
+    SDL_ERROR("Can't find request with "
+              << " app_id: " << app_id
+              << " correlation_id: " << correlation_id);
   }
 }
 
@@ -391,18 +377,17 @@ void RequestController::OnWakeUp() {
   terminateAllHMIRequests();
   terminateAllMobileRequests();
   is_low_voltage_ = false;
-  SDL_DEBUG(logger_, "Terminate old requests done");
+  SDL_DEBUG("Terminate old requests done");
 }
 
 bool RequestController::IsLowVoltage() {
-  SDL_TRACE(logger_, "result: " << is_low_voltage_);
+  SDL_TRACE("result: " << is_low_voltage_);
   return is_low_voltage_;
 }
 
 void RequestController::TimeoutThread() {
   SDL_AUTO_TRACE();
   SDL_DEBUG(
-      logger_,
       "ENTER Waiting fore response count: " << waiting_for_response_.Size());
   sync_primitives::AutoLock auto_lock(timer_lock);
   while (!timer_stop_flag_) {
@@ -413,53 +398,48 @@ void RequestController::TimeoutThread() {
       continue;
     }
     if (!probably_expired->isExpired()) {
-      SDL_DEBUG(logger_,
-                "Timeout for "
-                    << (RequestInfo::HMIRequest ==
-                                probably_expired->request_type()
-                            ? "HMI"
-                            : "Mobile")
-                    << " request id: " << probably_expired->requestId()
-                    << " connection_key: " << probably_expired->app_id()
-                    << " NOT expired");
+      SDL_DEBUG("Timeout for "
+                << (RequestInfo::HMIRequest == probably_expired->request_type()
+                        ? "HMI"
+                        : "Mobile")
+                << " request id: " << probably_expired->requestId()
+                << " connection_key: " << probably_expired->app_id()
+                << " NOT expired");
       const date_time::TimeDuration current_time = date_time::getCurrentTime();
       const date_time::TimeDuration end_time = probably_expired->end_time();
       if (current_time < end_time) {
         const uint32_t msecs =
             static_cast<uint32_t>(date_time::getmSecs(end_time - current_time));
-        SDL_DEBUG(logger_, "Sleep for " << msecs << " millisecs");
+        SDL_DEBUG("Sleep for " << msecs << " millisecs");
         timer_condition_.WaitFor(auto_lock, msecs);
       }
       continue;
     }
-    SDL_INFO(logger_,
-             "Timeout for "
-                 << (RequestInfo::HMIRequest == probably_expired->request_type()
-                         ? "HMI"
-                         : "Mobile")
-                 << " request id: " << probably_expired->requestId()
-                 << " connection_key: " << probably_expired->app_id()
-                 << " is expired");
+    SDL_INFO("Timeout for "
+             << (RequestInfo::HMIRequest == probably_expired->request_type()
+                     ? "HMI"
+                     : "Mobile")
+             << " request id: " << probably_expired->requestId()
+             << " connection_key: " << probably_expired->app_id()
+             << " is expired");
     const uint32_t experied_request_id = probably_expired->requestId();
     const uint32_t experied_app_id = probably_expired->app_id();
 
     probably_expired->request()->onTimeOut();
     if (RequestInfo::HmiConnectionKey == probably_expired->app_id()) {
-      SDL_DEBUG(logger_,
-                "Erase HMI request: " << probably_expired->requestId());
+      SDL_DEBUG("Erase HMI request: " << probably_expired->requestId());
       waiting_for_response_.RemoveRequest(probably_expired);
     }
     probably_expired = waiting_for_response_.FrontWithNotNullTimeout();
     if (probably_expired) {
       if (experied_request_id == probably_expired->requestId() &&
           experied_app_id == probably_expired->app_id()) {
-        SDL_DEBUG(logger_, "Expired request wasn't removed");
+        SDL_DEBUG("Expired request wasn't removed");
         break;
       }
     }
   }
   SDL_DEBUG(
-      logger_,
       "EXIT Waiting for response count : " << waiting_for_response_.Size());
 }
 
@@ -479,9 +459,9 @@ void RequestController::Worker::threadMain() {
            (request_controller_->mobile_request_list_.empty())) {
       // Wait until there is a task in the queue
       // Unlock mutex while wait, then lock it back when signaled
-      SDL_INFO(logger_, "Unlocking and waiting");
+      SDL_INFO("Unlocking and waiting");
       request_controller_->cond_var_.Wait(auto_lock);
-      SDL_INFO(logger_, "Signaled and locking");
+      SDL_INFO("Signaled and locking");
     }
 
     // If the thread was shutdown, return from here
@@ -490,7 +470,7 @@ void RequestController::Worker::threadMain() {
     }
 
     if (request_controller_->mobile_request_list_.empty()) {
-      SDL_WARN(logger_, "Mobile request list is empty");
+      SDL_WARN("Mobile request list is empty");
       break;
     }
 
@@ -522,15 +502,15 @@ void RequestController::Worker::threadMain() {
       }
       continue;
     }
-    SDL_DEBUG(logger_, "timeout_in_mseconds " << timeout_in_mseconds);
+    SDL_DEBUG("timeout_in_mseconds " << timeout_in_mseconds);
 
     if (0 != timeout_in_mseconds) {
       request_controller_->NotifyTimer();
     } else {
-      SDL_DEBUG(logger_,
-                "Default timeout was set to 0. "
-                "RequestController will not track timeout "
-                "of this request.");
+      SDL_DEBUG(
+          "Default timeout was set to 0. "
+          "RequestController will not track timeout "
+          "of this request.");
     }
 
     AutoUnlock unlock(auto_lock);
@@ -538,10 +518,9 @@ void RequestController::Worker::threadMain() {
     // execute
     if ((false == request_controller_->IsLowVoltage()) &&
         request_ptr->CheckPermissions() && init_res) {
-      SDL_DEBUG(logger_,
-                "Execute MobileRequest corr_id = "
-                    << request_info_ptr->requestId()
-                    << " with timeout: " << timeout_in_mseconds);
+      SDL_DEBUG("Execute MobileRequest corr_id = "
+                << request_info_ptr->requestId()
+                << " with timeout: " << timeout_in_mseconds);
       request_ptr->Run();
     }
   }

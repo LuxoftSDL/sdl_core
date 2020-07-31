@@ -53,15 +53,13 @@
 namespace {
 #define LOG_UPDATED_VALUE(value, key, section)                          \
   {                                                                     \
-    SDL_INFO(logger_,                                                   \
-             "Setting value '" << value << "' for key '" << key         \
+    SDL_INFO("Setting value '" << value << "' for key '" << key         \
                                << "' in section '" << section << "'."); \
   }
 
 #define LOG_UPDATED_BOOL_VALUE(value, key, section)                            \
   {                                                                            \
-    SDL_INFO(logger_,                                                          \
-             "Setting value '" << std::boolalpha << value << "' for key '"     \
+    SDL_INFO("Setting value '" << std::boolalpha << value << "' for key '"     \
                                << key << "' in section '" << section << "'."); \
   }
 
@@ -2848,7 +2846,7 @@ bool Profile::StringToNumber(const std::string& input, uint64_t& output) const {
 
 bool Profile::IsRelativePath(const std::string& path) {
   if (path.empty()) {
-    SDL_ERROR(logger_, "Empty path passed.");
+    SDL_ERROR("Empty path passed.");
     return false;
   }
   return '/' != path[0];

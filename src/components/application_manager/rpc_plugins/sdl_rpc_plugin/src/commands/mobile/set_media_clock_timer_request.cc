@@ -66,12 +66,12 @@ void SetMediaClockRequest::Run() {
 
   if (!app) {
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     return;
   }
 
   if (!app->is_media_application()) {
-    SDL_ERROR(logger_, "Application is not media application");
+    SDL_ERROR("Application is not media application");
     SendResponse(false, mobile_apis::Result::REJECTED);
     return;
   }
@@ -113,7 +113,7 @@ void SetMediaClockRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      SDL_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR("Received unknown event" << event.id());
       return;
     }
   }
@@ -128,7 +128,7 @@ bool SetMediaClockRequest::isDataValid() {
   if (update_mode == mobile_apis::UpdateMode::COUNTUP ||
       update_mode == mobile_apis::UpdateMode::COUNTDOWN) {
     if (!msg_params.keyExists(strings::start_time)) {
-      SDL_INFO(logger_, "Invalid data");
+      SDL_INFO("Invalid data");
       return false;
     }
 
@@ -153,13 +153,13 @@ bool SetMediaClockRequest::isDataValid() {
            (update_mode == mobile_apis::UpdateMode::COUNTDOWN)) ||
           ((end_time_in_seconds < start_time_in_seconds) &&
            (update_mode == mobile_apis::UpdateMode::COUNTUP))) {
-        SDL_INFO(logger_, "Invalid data");
+        SDL_INFO("Invalid data");
         return false;
       }
     }
   }
 
-  SDL_INFO(logger_, "Data is valid");
+  SDL_INFO("Data is valid");
   return true;
 }
 

@@ -50,12 +50,12 @@ bool JsonReader::parse(const std::string& json, Json::Value* root) {
     is_parsing_ok =
         reader_->parse(json.c_str(), json.c_str() + json_len, root, &err);
   } catch (Json::RuntimeError& e) {
-    SDL_DEBUG(logger_, "Exception caught during parse json: " << e.what());
+    SDL_DEBUG("Exception caught during parse json: " << e.what());
     return false;
   }
 
   if (!is_parsing_ok) {
-    SDL_ERROR(logger_, "Json parsing fails: " << err);
+    SDL_ERROR("Json parsing fails: " << err);
   }
   return is_parsing_ok;
 }

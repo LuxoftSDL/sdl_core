@@ -64,7 +64,6 @@ void BCGetAppPropertiesRequest::FillAppProperties(
 
   if (!result) {
     SDL_DEBUG(
-        logger_,
         "Failed to get app parameters for policy_app_id: " << policy_app_id);
     return;
   }
@@ -113,9 +112,9 @@ void BCGetAppPropertiesRequest::Run() {
       response_params[strings::properties][0] = properties;
     }
   } else {
-    SDL_DEBUG(logger_,
-              "policyAppID was absent in request, all apps properties "
-              "will be returned.");
+    SDL_DEBUG(
+        "policyAppID was absent in request, all apps properties "
+        "will be returned.");
     const auto app_ids = policy_handler_.GetApplicationPolicyIDs();
     int i = 0;
     for (auto& app_id : app_ids) {

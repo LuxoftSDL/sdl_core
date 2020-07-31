@@ -67,7 +67,7 @@ void UnsubscribeVehicleDataRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "NULL pointer");
+    SDL_ERROR("NULL pointer");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -84,20 +84,19 @@ void UnsubscribeVehicleDataRequest::Run() {
   std::set<std::string> custom_vehicle_data;
 
   auto app_not_subscribed_response = [this](const std::string& key_name) {
-    SDL_DEBUG(logger_,
-              "App with connection key "
-                  << connection_key()
-                  << " is not subscribed for VehicleData: " << key_name);
+    SDL_DEBUG("App with connection key "
+              << connection_key()
+              << " is not subscribed for VehicleData: " << key_name);
     vi_already_unsubscribed_by_this_app_.insert(key_name);
     response_params_[key_name][strings::result_code] =
         mobile_apis::VehicleDataResultCode::VDRC_DATA_NOT_SUBSCRIBED;
   };
 
   auto other_app_subscribed_response = [this](const std::string& key_name) {
-    SDL_DEBUG(logger_,
-              "There are apps still subscribed for "
-              "VehicleDataType: "
-                  << key_name);
+    SDL_DEBUG(
+        "There are apps still subscribed for "
+        "VehicleDataType: "
+        << key_name);
     vi_still_subscribed_by_another_apps_.insert(key_name);
     response_params_[key_name][strings::result_code] =
         mobile_apis::VehicleDataResultCode::VDRC_SUCCESS;
@@ -119,9 +118,8 @@ void UnsubscribeVehicleDataRequest::Run() {
       continue;
     }
 
-    SDL_DEBUG(logger_,
-              "Unsubscribed app with connection key "
-                  << connection_key() << " from VehicleDataType: " << name);
+    SDL_DEBUG("Unsubscribed app with connection key "
+              << connection_key() << " from VehicleDataType: " << name);
 
     ++unsubscribed_items;
 
@@ -185,7 +183,7 @@ void UnsubscribeVehicleDataRequest::on_event(const event_engine::Event& event) {
   const smart_objects::SmartObject& message = event.smart_object();
 
   if (hmi_apis::FunctionID::VehicleInfo_UnsubscribeVehicleData != event.id()) {
-    SDL_ERROR(logger_, "Received unknown event.");
+    SDL_ERROR("Received unknown event.");
     return;
   }
   EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_VehicleInfo);
@@ -194,7 +192,7 @@ void UnsubscribeVehicleDataRequest::on_event(const event_engine::Event& event) {
       application_manager_.application(CommandRequestImpl::connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "NULL pointer.");
+    SDL_ERROR("NULL pointer.");
     return;
   }
 
@@ -299,16 +297,14 @@ bool UnsubscribeVehicleDataRequest::CheckSubscriptionStatus(
     std::string key, const smart_objects::SmartObject& msg_params) {
   const auto unsubscribed_items = msg_params.enumerate();
   if (unsubscribed_items.end() == unsubscribed_items.find(key)) {
-    SDL_WARN(logger_,
-             key << " is waiting to be unsubscribed, but missing in "
+    SDL_WARN(key << " is waiting to be unsubscribed, but missing in "
                     "vehicle response.");
     return false;
   }
 
   auto res_code = msg_params[key][strings::result_code].asInt();
   if (hmi_apis::Common_VehicleDataResultCode::VDRC_SUCCESS != res_code) {
-    SDL_WARN(logger_,
-             "Unubscribing from " << key << " for " << connection_key()
+    SDL_WARN("Unubscribing from " << key << " for " << connection_key()
                                   << " failed.");
     return false;
   }
@@ -317,7 +313,7 @@ bool UnsubscribeVehicleDataRequest::CheckSubscriptionStatus(
 
 bool UnsubscribeVehicleDataRequest::UnsubscribePendingVehicleData(
     ApplicationSharedPtr app, const smart_objects::SmartObject& msg_params) {
-  SDL_DEBUG(logger_, "Unsubscribing from all pending VehicleData");
+  SDL_DEBUG("Unsubscribing from all pending VehicleData");
 
   for (const auto& vi_name : vi_waiting_for_unsubscribe_) {
     const auto converted_item = ConvertRequestToResponseName(vi_name);

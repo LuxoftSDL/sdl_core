@@ -166,7 +166,7 @@ bool TcpTransportAdapter::Restore() {
     }
   }
   bool result = !errors_occurred;
-  SDL_DEBUG(logger_, "result " << std::boolalpha << result);
+  SDL_DEBUG("result " << std::boolalpha << result);
   return result;
 }
 

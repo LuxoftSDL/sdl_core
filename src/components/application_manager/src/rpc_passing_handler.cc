@@ -103,7 +103,7 @@ bool RPCPassingHandler::ExtractRPCParams(
 
   if (smart_objects::SmartType_Map == s_map.getType()) {
     for (auto iter = s_map.map_begin(); iter != s_map.map_end(); ++iter) {
-      SDL_DEBUG(logger_, "Request's param: " << iter->first);
+      SDL_DEBUG("Request's param: " << iter->first);
       params.insert(iter->first);
     }
   }
@@ -169,24 +169,23 @@ bool RPCPassingHandler::RPCPassThrough(smart_objects::SmartObject rpc_message) {
   int32_t message_type =
       rpc_message[strings::params][strings::message_type].asInt();
 
-  SDL_DEBUG(logger_, "RPC_PASSING: ");
+  SDL_DEBUG("RPC_PASSING: ");
   MessageHelper::PrintSmartObject(rpc_message);
 
   // Clear timers for timed out requests
   ClearCompletedTimers();
   switch (message_type) {
     case MessageType::kRequest: {
-      SDL_DEBUG(logger_, "Handle request");
+      SDL_DEBUG("Handle request");
       rpc_request_queue_lock_.Acquire();
       if (rpc_request_queue.find(correlation_id) == rpc_request_queue.end()) {
         rpc_request_queue_lock_.Release();
         SDL_DEBUG(
-            logger_,
             "Correlation id DOES NOT exist in map. Constructing request queue");
         PopulateRPCRequestQueue(rpc_message);
       } else {
         rpc_request_queue_lock_.Release();
-        SDL_DEBUG(logger_, "Correlation id DOES exist in map. Returning");
+        SDL_DEBUG("Correlation id DOES exist in map. Returning");
         std::shared_ptr<smart_objects::SmartObject> response(
             MessageHelper::CreateNegativeResponse(
                 rpc_message[strings::params][strings::connection_key].asUInt(),
@@ -204,8 +203,7 @@ bool RPCPassingHandler::RPCPassThrough(smart_objects::SmartObject rpc_message) {
 
       rpc_request_queue_lock_.Acquire();
       if (rpc_request_queue[correlation_id].second.empty()) {
-        SDL_DEBUG(logger_,
-                  "No services left in map. Using core to handle request");
+        SDL_DEBUG("No services left in map. Using core to handle request");
         rpc_request_queue.erase(correlation_id);
         rpc_request_queue_lock_.Release();
         return false;
@@ -219,7 +217,7 @@ bool RPCPassingHandler::RPCPassThrough(smart_objects::SmartObject rpc_message) {
     }
 
     case MessageType::kResponse: {
-      SDL_DEBUG(logger_, "Handle response");
+      SDL_DEBUG("Handle response");
       rpc_request_queue_lock_.Acquire();
       if (rpc_request_queue.find(correlation_id) == rpc_request_queue.end()) {
         rpc_request_queue_lock_.Release();
@@ -235,11 +233,11 @@ bool RPCPassingHandler::RPCPassThrough(smart_objects::SmartObject rpc_message) {
               &result_code);
 
       if (result_code == mobile_apis::Result::UNSUPPORTED_REQUEST) {
-        SDL_DEBUG(logger_, "Service sent UNSUPPORTED_REQUEST");
+        SDL_DEBUG("Service sent UNSUPPORTED_REQUEST");
         PerformNextRequest(correlation_id);
         return true;
       } else {
-        SDL_DEBUG(logger_, "Valid RPC passing response");
+        SDL_DEBUG("Valid RPC passing response");
         ForwardResponseToMobile(correlation_id, rpc_message);
         return true;
       }
@@ -285,16 +283,14 @@ void RPCPassingHandler::PopulateRPCRequestQueue(
   sync_primitives::AutoLock lock(rpc_request_queue_lock_);
   rpc_request_queue[correlation_id] = entry;
 
-  SDL_DEBUG(logger_,
-            "Added " << rpc_request_queue[correlation_id].second.size()
+  SDL_DEBUG("Added " << rpc_request_queue[correlation_id].second.size()
                      << " requests to the queue");
 }
 void RPCPassingHandler::ForwardRequestToMobile(uint32_t correlation_id) {
   rpc_request_queue_lock_.Acquire();
   uint32_t connection_key =
       rpc_request_queue[correlation_id].second.front().connection_key;
-  SDL_DEBUG(logger_,
-            "Forwarding request to service with app id " << connection_key);
+  SDL_DEBUG("Forwarding request to service with app id " << connection_key);
 
   smart_objects::SmartObject message(rpc_request_queue[correlation_id].first);
   message[strings::params][strings::connection_key] = connection_key;
@@ -306,7 +302,7 @@ void RPCPassingHandler::ForwardRequestToMobile(uint32_t correlation_id) {
 }
 
 void RPCPassingHandler::ForwardRequestToCore(uint32_t correlation_id) {
-  SDL_DEBUG(logger_, "No services left in map. using core to handle request");
+  SDL_DEBUG("No services left in map. using core to handle request");
   rpc_request_queue_lock_.Acquire();
   smart_objects::SmartObject message(rpc_request_queue[correlation_id].first);
   smart_objects::SmartObjectSPtr result =
@@ -353,8 +349,7 @@ void RPCPassingHandler::ForwardResponseToMobile(
           .asUInt();
   rpc_request_queue_lock_.Release();
 
-  SDL_DEBUG(logger_,
-            "Forwarding response to mobile app " << origin_connection_key);
+  SDL_DEBUG("Forwarding response to mobile app " << origin_connection_key);
   smart_objects::SmartObject message(response_message);
   message[strings::params][strings::connection_key] = origin_connection_key;
   smart_objects::SmartObjectSPtr result =
@@ -363,10 +358,10 @@ void RPCPassingHandler::ForwardResponseToMobile(
 }
 
 bool RPCPassingHandler::PerformNextRequest(uint32_t correlation_id) {
-  SDL_DEBUG(logger_, "Performing next request in queue");
+  SDL_DEBUG("Performing next request in queue");
   rpc_request_queue_lock_.Acquire();
   if (rpc_request_queue.find(correlation_id) == rpc_request_queue.end()) {
-    SDL_ERROR(logger_, "Correlation id does NOT exist in map");
+    SDL_ERROR("Correlation id does NOT exist in map");
     rpc_request_queue_lock_.Release();
     return false;
   }
@@ -385,7 +380,7 @@ bool RPCPassingHandler::PerformNextRequest(uint32_t correlation_id) {
 
 void RPCPassingHandler::OnPassThroughRequestTimeout() {
   timeout_queue_lock_.Acquire();
-  SDL_DEBUG(logger_, "Request Timed out");
+  SDL_DEBUG("Request Timed out");
   auto timeout_entry = timeout_queue_.front();
   uint32_t correlation_id = timeout_entry.second;
   timeout_queue_lock_.Release();
@@ -395,12 +390,11 @@ void RPCPassingHandler::OnPassThroughRequestTimeout() {
 void RPCPassingHandler::ClearCompletedTimers() {
   sync_primitives::AutoLock lock(timeout_queue_lock_);
 
-  SDL_DEBUG(logger_, "Clearing Completed Timers");
+  SDL_DEBUG("Clearing Completed Timers");
   for (auto it = timeout_queue_.begin(); it != timeout_queue_.end();) {
     TimerSPtr timer = it->first;
     if (timer->is_completed()) {
-      SDL_DEBUG(logger_,
-                "Removing completed timer for correlation id " << it->second);
+      SDL_DEBUG("Removing completed timer for correlation id " << it->second);
       it = timeout_queue_.erase(it);
     } else {
       ++it;
@@ -416,8 +410,7 @@ void RPCPassingHandler::AddRequestTimer(uint32_t correlation_id) {
   const uint32_t timeout_ms =
       app_manager_.get_settings().rpc_pass_through_timeout();
   rpc_passing_timer->Start(timeout_ms, timer::kSingleShot);
-  SDL_DEBUG(logger_,
-            "Adding and starting timer for correlation id " << correlation_id);
+  SDL_DEBUG("Adding and starting timer for correlation id " << correlation_id);
   sync_primitives::AutoLock lock(timeout_queue_lock_);
   timeout_queue_.push_back(std::make_pair(rpc_passing_timer, correlation_id));
 }
@@ -429,8 +422,7 @@ void RPCPassingHandler::RemoveRequestTimer(uint32_t correlation_id) {
     TimerSPtr timer = it->first;
     uint32_t cid = it->second;
     if (cid == correlation_id) {
-      SDL_DEBUG(logger_,
-                "Removing timer for correlation id " << correlation_id);
+      SDL_DEBUG("Removing timer for correlation id " << correlation_id);
       it = timeout_queue_.erase(it);
     } else {
       ++it;

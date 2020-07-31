@@ -63,8 +63,7 @@ void GetWayPointsRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_,
-              "An application with connection key " << connection_key()
+    SDL_ERROR("An application with connection key " << connection_key()
                                                     << " is not registered.");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
@@ -85,13 +84,13 @@ void GetWayPointsRequest::on_event(const event_engine::Event& event) {
   const smart_objects::SmartObject& message = event.smart_object();
   switch (event.id()) {
     case hmi_apis::FunctionID::UI_OnResetTimeout: {
-      SDL_INFO(logger_, "Received UI_OnResetTimeout event");
+      SDL_INFO("Received UI_OnResetTimeout event");
       application_manager_.updateRequestTimeout(
           connection_key(), correlation_id(), default_timeout());
       break;
     }
     case hmi_apis::FunctionID::Navigation_GetWayPoints: {
-      SDL_INFO(logger_, "Received Navigation_GetWayPoints event");
+      SDL_INFO("Received Navigation_GetWayPoints event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_Navigation);
       const hmi_apis::Common_Result::eType result_code =
           static_cast<hmi_apis::Common_Result::eType>(
@@ -107,7 +106,7 @@ void GetWayPointsRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      SDL_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR("Received unknown event" << event.id());
       break;
     }
   }

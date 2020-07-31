@@ -118,8 +118,7 @@ FakeRequestInfo::FakeRequestInfo(uint32_t app_id, uint32_t correaltion_id) {
 
 bool RequestInfoSet::Add(RequestInfoPtr request_info) {
   DCHECK_OR_RETURN(request_info, false);
-  SDL_DEBUG(logger_,
-            "Add request app_id = " << request_info->app_id() << "; corr_id = "
+  SDL_DEBUG("Add request app_id = " << request_info->app_id() << "; corr_id = "
                                     << request_info->requestId());
   sync_primitives::AutoLock lock(pending_requests_lock_);
   CheckSetSizes();
@@ -135,8 +134,7 @@ bool RequestInfoSet::Add(RequestInfoPtr request_info) {
     CheckSetSizes();
     return true;
   } else {
-    SDL_ERROR(logger_,
-              "Request with app_id = " << request_info->app_id() << "; corr_id "
+    SDL_ERROR("Request with app_id = " << request_info->app_id() << "; corr_id "
                                        << request_info->requestId()
                                        << " Already exist ");
   }
@@ -192,7 +190,7 @@ RequestInfoPtr RequestInfoSet::FrontWithNotNullTimeout() {
 bool RequestInfoSet::Erase(const RequestInfoPtr request_info) {
   DCHECK(request_info);
   if (!request_info) {
-    SDL_ERROR(logger_, "NULL ponter request_info");
+    SDL_ERROR("NULL ponter request_info");
     return false;
   }
   CheckSetSizes();
@@ -204,7 +202,7 @@ bool RequestInfoSet::Erase(const RequestInfoPtr request_info) {
         time_sorted_pending_requests_.find(request_info);
     DCHECK(it != time_sorted_pending_requests_.end());
     if (it == time_sorted_pending_requests_.end()) {
-      SDL_ERROR(logger_, "Can't find request in time_sorted_requests_");
+      SDL_ERROR("Can't find request in time_sorted_requests_");
       return false;
     }
     const RequestInfoPtr found = *it;

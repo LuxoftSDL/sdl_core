@@ -65,7 +65,7 @@ void ASGetAppServiceDataRequestFromHMI::Run() {
   std::string service_type =
       (*message_)[strings::msg_params][strings::service_type].asString();
 
-  SDL_DEBUG(logger_, "Get Service Type: " << service_type);
+  SDL_DEBUG("Get Service Type: " << service_type);
 
   SendProviderRequest(mobile_apis::FunctionID::GetAppServiceDataID,
                       hmi_apis::FunctionID::AppService_GetAppServiceData,
@@ -175,7 +175,6 @@ bool ASGetAppServiceDataRequestFromHMI::ValidateResponse(
     smart_objects::SmartObject& message_params) {
   if (!message_params.keyExists(strings::service_data)) {
     SDL_DEBUG(
-        logger_,
         "GASD response received without any service data, passing through");
     return true;
   }
@@ -187,7 +186,7 @@ bool ASGetAppServiceDataRequestFromHMI::ValidateResponse(
   auto service =
       application_manager_.GetAppServiceManager().FindServiceByID(service_id);
   if (!service) {
-    SDL_ERROR(logger_, "GASD response received with an unpublished service ID");
+    SDL_ERROR("GASD response received with an unpublished service ID");
     SendErrorResponse(
         correlation_id(),
         hmi_apis::FunctionID::AppService_GetAppServiceData,
@@ -203,7 +202,7 @@ bool ASGetAppServiceDataRequestFromHMI::ValidateResponse(
           service_type, &service_type_value)) {
     auto app = application_manager_.application(service->connection_key);
     if (!app) {
-      SDL_ERROR(logger_, "Failed to find service provider for GASD response");
+      SDL_ERROR("Failed to find service provider for GASD response");
       SendErrorResponse(
           correlation_id(),
           hmi_apis::FunctionID::AppService_GetAppServiceData,

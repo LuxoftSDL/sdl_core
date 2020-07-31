@@ -150,9 +150,8 @@ app_mngr::CommandSharedPtr VehicleInfoMobileCommandFactory::CreateCommand(
   }
 
   UNUSED(message_type_str);
-  SDL_DEBUG(logger_,
-            "HMICommandFactory::CreateCommand function_id: "
-                << function_id << ", message type: " << message_type_str);
+  SDL_DEBUG("HMICommandFactory::CreateCommand function_id: "
+            << function_id << ", message type: " << message_type_str);
 
   return get_creator_factory(function_id, message_type, source).create(message);
 }

@@ -46,7 +46,7 @@ PolicyTable::PolicyTable(std::shared_ptr<PTRepresentation> pt_data)
     : pt_data_(pt_data) {}
 
 PolicyTable::~PolicyTable() {
-  SDL_INFO(logger_, "Destroying policy table.");
+  SDL_INFO("Destroying policy table.");
 }
 
 }  // namespace policy

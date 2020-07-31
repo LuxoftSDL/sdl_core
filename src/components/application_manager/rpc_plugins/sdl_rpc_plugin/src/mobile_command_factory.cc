@@ -540,8 +540,7 @@ CommandSharedPtr MobileCommandFactory::CreateCommand(
       static_cast<mobile_apis::FunctionID::eType>(
           (*message)[strings::params][strings::function_id].asInt());
 
-  SDL_DEBUG(logger_,
-            "MobileCommandFactory::CreateCommand function_id: " << function_id);
+  SDL_DEBUG("MobileCommandFactory::CreateCommand function_id: " << function_id);
 
   return get_creator_factory(function_id, message_type, source).create(message);
 }

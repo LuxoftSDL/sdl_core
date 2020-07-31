@@ -239,7 +239,7 @@ void CommandRequestImpl::onTimeOut() {
     // FIXME (dchmerev@luxoft.com): atomic_xchg fits better
     sync_primitives::AutoLock auto_lock(state_lock_);
     if (kCompleted == current_state_) {
-      SDL_DEBUG(logger_, "current_state_ = kCompleted");
+      SDL_DEBUG("current_state_ = kCompleted");
       // don't send timeout if request completed
       return;
     }
@@ -374,39 +374,34 @@ bool CommandRequestImpl::ProcessHMIInterfacesAvailability(
 void CommandRequestImpl::UpdateHash() {
   SDL_AUTO_TRACE();
   if (hash_update_mode_ == kSkipHashUpdate) {
-    SDL_DEBUG(logger_, "Hash update is disabled for " << function_id());
+    SDL_DEBUG("Hash update is disabled for " << function_id());
     return;
   }
 
   if (HmiInterfaces::InterfaceState::STATE_NOT_RESPONSE ==
       application_manager_.hmi_interfaces().GetInterfaceState(
           HmiInterfaces::InterfaceID::HMI_INTERFACE_UI)) {
-    SDL_ERROR(logger_,
-              "UI interface has not responded. Hash won't be updated.");
+    SDL_ERROR("UI interface has not responded. Hash won't be updated.");
     return;
   }
 
   if (!is_success_result_) {
-    SDL_WARN(logger_, "Command is not succeeded. Hash won't be updated.");
+    SDL_WARN("Command is not succeeded. Hash won't be updated.");
     return;
   }
 
   ApplicationSharedPtr application =
       application_manager_.application(connection_key());
   if (!application) {
-    SDL_ERROR(logger_,
-              "Application with connection key "
-                  << connection_key()
-                  << " not found. Not able to update hash.");
+    SDL_ERROR("Application with connection key "
+              << connection_key() << " not found. Not able to update hash.");
     return;
   }
 
-  SDL_DEBUG(
-      logger_,
-      "Updating hash for application with connection key "
-          << connection_key() << " while processing function id "
-          << MessageHelper::StringifiedFunctionID(
-                 static_cast<mobile_api::FunctionID::eType>(function_id())));
+  SDL_DEBUG("Updating hash for application with connection key "
+            << connection_key() << " while processing function id "
+            << MessageHelper::StringifiedFunctionID(
+                   static_cast<mobile_api::FunctionID::eType>(function_id())));
 
   application->UpdateHash();
 }
@@ -443,7 +438,7 @@ void CommandRequestImpl::SendProviderRequest(
   }
 
   if (hmi_destination) {
-    SDL_DEBUG(logger_, "Sending Request to HMI Provider");
+    SDL_DEBUG("Sending Request to HMI Provider");
     application_manager_.IncreaseForwardedRequestTimeout(connection_key(),
                                                          correlation_id());
     SendHMIRequest(hmi_function_id, &(*msg)[strings::msg_params], use_events);
@@ -451,7 +446,7 @@ void CommandRequestImpl::SendProviderRequest(
   }
 
   if (!app) {
-    SDL_DEBUG(logger_, "Invalid App Provider pointer");
+    SDL_DEBUG("Invalid App Provider pointer");
     SendResponse(false, error_code, error_msg.c_str());
     return;
   }
@@ -488,14 +483,13 @@ void CommandRequestImpl::SendMobileRequest(
   request[strings::params][strings::correlation_id] = mobile_correlation_id;
   request[strings::params][strings::message_type] = MessageType::kRequest;
   if (use_events) {
-    SDL_DEBUG(logger_,
-              "SendMobileRequest subscribe_on_event " << function_id << " "
+    SDL_DEBUG("SendMobileRequest subscribe_on_event " << function_id << " "
                                                       << mobile_correlation_id);
     subscribe_on_event(function_id, mobile_correlation_id);
   }
 
   if (!rpc_service_.ManageMobileCommand(msg, SOURCE_SDL)) {
-    SDL_ERROR(logger_, "Unable to send request to mobile");
+    SDL_ERROR("Unable to send request to mobile");
   }
 }
 
@@ -523,18 +517,17 @@ uint32_t CommandRequestImpl::SendHMIRequest(
   }
 
   if (use_events) {
-    SDL_DEBUG(logger_,
-              "SendHMIRequest subscribe_on_event " << function_id << " "
+    SDL_DEBUG("SendHMIRequest subscribe_on_event " << function_id << " "
                                                    << hmi_correlation_id);
     subscribe_on_event(function_id, hmi_correlation_id);
   }
   if (ProcessHMIInterfacesAvailability(hmi_correlation_id, function_id)) {
     if (!rpc_service_.ManageHMICommand(result, SOURCE_SDL_TO_HMI)) {
-      SDL_ERROR(logger_, "Unable to send request");
+      SDL_ERROR("Unable to send request");
       SendResponse(false, mobile_apis::Result::OUT_OF_MEMORY);
     }
   } else {
-    SDL_DEBUG(logger_, "Interface is not available");
+    SDL_DEBUG("Interface is not available");
   }
   return hmi_correlation_id;
 }
@@ -545,7 +538,7 @@ void CommandRequestImpl::CreateHMINotification(
   smart_objects::SmartObjectSPtr result =
       std::make_shared<smart_objects::SmartObject>();
   if (!result) {
-    SDL_ERROR(logger_, "Memory allocation failed.");
+    SDL_ERROR("Memory allocation failed.");
     return;
   }
   smart_objects::SmartObject& notify = *result;
@@ -560,7 +553,7 @@ void CommandRequestImpl::CreateHMINotification(
   notify[strings::msg_params] = msg_params;
 
   if (!rpc_service_.ManageHMICommand(result, SOURCE_SDL_TO_HMI)) {
-    SDL_ERROR(logger_, "Unable to send HMI notification");
+    SDL_ERROR("Unable to send HMI notification");
   }
 }
 
@@ -673,7 +666,7 @@ mobile_apis::Result::eType CommandRequestImpl::GetMobileResultCode(
       break;
     }
     default: {
-      SDL_ERROR(logger_, "Unknown HMI result code " << hmi_code);
+      SDL_ERROR("Unknown HMI result code " << hmi_code);
       break;
     }
   }
@@ -702,13 +695,13 @@ bool CommandRequestImpl::CheckHMICapabilities(
   using namespace mobile_apis;
 
   if (!hmi_capabilities_.is_ui_cooperating()) {
-    SDL_ERROR(logger_, "UI is not supported by HMI");
+    SDL_ERROR("UI is not supported by HMI");
     return false;
   }
 
   auto button_capabilities = hmi_capabilities_.button_capabilities();
   if (!button_capabilities) {
-    SDL_ERROR(logger_, "Invalid button capabilities object");
+    SDL_ERROR("Invalid button capabilities object");
     return false;
   }
 
@@ -717,12 +710,12 @@ bool CommandRequestImpl::CheckHMICapabilities(
     const ButtonName::eType current_button = static_cast<ButtonName::eType>(
         capabilities.getElement(hmi_response::button_name).asInt());
     if (current_button == button) {
-      SDL_DEBUG(logger_, "Button capabilities for " << button << " was found");
+      SDL_DEBUG("Button capabilities for " << button << " was found");
       return true;
     }
   }
 
-  SDL_DEBUG(logger_, "Button capabilities for " << button << " was not found");
+  SDL_DEBUG("Button capabilities for " << button << " was not found");
   return false;
 }
 
@@ -904,10 +897,10 @@ void CommandRequestImpl::EndAwaitForInterface(
   if (it != awaiting_response_interfaces_.end()) {
     awaiting_response_interfaces_.erase(it);
   } else {
-    SDL_WARN(logger_,
-             "EndAwaitForInterface called on interface \
+    SDL_WARN(
+        "EndAwaitForInterface called on interface \
                     which was not put into await state: "
-                 << interface_id);
+        << interface_id);
   }
 }
 
@@ -961,7 +954,7 @@ void CommandRequestImpl::AddTimeOutComponentInfoToMessage(
   SDL_AUTO_TRACE();
   sync_primitives::AutoLock lock(awaiting_response_interfaces_lock_);
   if (awaiting_response_interfaces_.empty()) {
-    SDL_ERROR(logger_, "No interfaces awaiting, info param is empty");
+    SDL_ERROR("No interfaces awaiting, info param is empty");
     return;
   }
 
@@ -971,7 +964,6 @@ void CommandRequestImpl::AddTimeOutComponentInfoToMessage(
                       std::string(""),
                       InfoInterfaceSeparator);
   SDL_DEBUG(
-      logger_,
       "Not responding interfaces string: " << not_responding_interfaces_string);
   if (!not_responding_interfaces_string.empty()) {
     const std::string component_info =

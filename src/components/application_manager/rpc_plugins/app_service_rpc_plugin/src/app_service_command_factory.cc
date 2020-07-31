@@ -66,8 +66,7 @@ app_mngr::CommandSharedPtr AppServiceCommandFactory::CreateCommand(
 bool AppServiceCommandFactory::IsAbleToProcess(
     const int32_t function_id,
     const commands::Command::CommandSource source) const {
-  SDL_DEBUG(logger_,
-            "AppServiceCommandFactory::IsAbleToProcess" << function_id << " "
+  SDL_DEBUG("AppServiceCommandFactory::IsAbleToProcess" << function_id << " "
                                                         << source);
   return (commands::Command::SOURCE_HMI == source ||
           commands::Command::SOURCE_SDL_TO_HMI == source)

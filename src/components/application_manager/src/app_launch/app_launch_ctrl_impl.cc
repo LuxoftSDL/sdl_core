@@ -104,7 +104,7 @@ void AppLaunchCtrlImpl::OnDeviceConnected(const std::string& device_mac) {
   if (apps_on_device.size() > 0) {
     device_apps_launcher_.LaunchAppsOnDevice(device_mac, apps_on_device);
   } else {
-    SDL_DEBUG(logger_, "No apps in saved for device " << device_mac);
+    SDL_DEBUG("No apps in saved for device " << device_mac);
   }
 }
 

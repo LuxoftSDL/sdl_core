@@ -767,9 +767,9 @@ void HMICapabilitiesImpl::Init(
     resumption::LastStateWrapperPtr last_state_wrapper) {
   hmi_language_handler_.Init(last_state_wrapper);
   if (!LoadCapabilitiesFromFile()) {
-    SDL_ERROR(logger_, "file hmi_capabilities.json was not loaded");
+    SDL_ERROR("file hmi_capabilities.json was not loaded");
   } else {
-    SDL_INFO(logger_, "file hmi_capabilities.json was loaded");
+    SDL_INFO("file hmi_capabilities.json was loaded");
   }
   hmi_language_handler_.set_default_capabilities_languages(
       ui_language_, vr_language_, tts_language_);
@@ -1003,8 +1003,7 @@ struct JsonCapabilitiesGetter {
       return GetCachedJsonMember(member_name);
     }
 
-    SDL_DEBUG(logger_,
-              "Add request ID: " << request_id
+    SDL_DEBUG("Add request ID: " << request_id
                                  << " for the interface: " << member_name);
     default_initialized_capabilities.insert(request_id);
 
@@ -1077,19 +1076,18 @@ bool HMICapabilitiesImpl::LoadCapabilitiesFromFile() {
   Json::Value root_json_override;
 
   if (file_system::FileExists(cache_file_name)) {
-    SDL_DEBUG(logger_, "HMI capabilities cache was found: " << cache_file_name);
+    SDL_DEBUG("HMI capabilities cache was found: " << cache_file_name);
 
     std::string cache_json_string;
     if (!file_system::ReadFile(cache_file_name, cache_json_string)) {
-      SDL_DEBUG(logger_,
-                "Failed to read data from cache file. Cache will be ignored");
+      SDL_DEBUG("Failed to read data from cache file. Cache will be ignored");
     }
 
     try {
       utils::JsonReader reader;
       std::string json(cache_json_string.begin(), cache_json_string.end());
       if (!reader.parse(json, &root_json_override)) {
-        SDL_ERROR(logger_, "Cached JSON file is invalid. Deleting the file");
+        SDL_ERROR("Cached JSON file is invalid. Deleting the file");
         file_system::DeleteFile(cache_file_name);
         root_json_override =
             Json::Value::null;  // Just to clear intermediate state of value
@@ -1104,7 +1102,7 @@ bool HMICapabilitiesImpl::LoadCapabilitiesFromFile() {
     utils::JsonReader reader;
     std::string json(json_string.begin(), json_string.end());
     if (!reader.parse(json, &root_json)) {
-      SDL_DEBUG(logger_, "Default JSON parsing fails");
+      SDL_DEBUG("Default JSON parsing fails");
       return false;
     }
 
@@ -1660,9 +1658,9 @@ void HMICapabilitiesImpl::UpdateRequestsRequiredForCapabilities(
     hmi_apis::FunctionID::eType requested_interface) {
   SDL_AUTO_TRACE();
   if (app_mngr_.IsHMICooperating()) {
-    SDL_DEBUG(logger_,
-              "Remove from default initialized capabilities skipped, "
-              "because hmi_cooperating equal true already");
+    SDL_DEBUG(
+        "Remove from default initialized capabilities skipped, "
+        "because hmi_cooperating equal true already");
     return;
   }
 
@@ -1677,7 +1675,7 @@ void HMICapabilitiesImpl::OnSoftwareVersionReceived(
   SDL_AUTO_TRACE();
 
   if (ccpu_version == ccpu_version_) {
-    SDL_DEBUG(logger_, "Software version not changed");
+    SDL_DEBUG("Software version not changed");
     if (requests_required_for_capabilities_.empty()) {
       app_mngr_.SetHMICooperating(true);
     }
@@ -1685,7 +1683,7 @@ void HMICapabilitiesImpl::OnSoftwareVersionReceived(
     return;
   }
 
-  SDL_DEBUG(logger_, "Software version changed");
+  SDL_DEBUG("Software version changed");
   set_ccpu_version(ccpu_version);
   UpdateCachedCapabilities();
 }
@@ -1696,7 +1694,7 @@ void HMICapabilitiesImpl::UpdateCachedCapabilities() {
   DeleteCachedCapabilitiesFile();
 
   if (!LoadCapabilitiesFromFile()) {
-    SDL_ERROR(logger_, "file hmi_capabilities.json was not loaded");
+    SDL_ERROR("file hmi_capabilities.json was not loaded");
   }
 
   app_mngr_.RequestForInterfacesAvailability();
@@ -1708,9 +1706,8 @@ bool HMICapabilitiesImpl::AllFieldsSaved(
     const std::vector<std::string>& sections_to_check) const {
   SDL_AUTO_TRACE();
   if (!JsonIsMemberSafe(root_node, interface_name.c_str())) {
-    SDL_DEBUG(logger_,
-              interface_name
-                  << " interface is not found. All fields should be saved");
+    SDL_DEBUG(interface_name
+              << " interface is not found. All fields should be saved");
     return false;
   }
 
@@ -1719,7 +1716,7 @@ bool HMICapabilitiesImpl::AllFieldsSaved(
        ++it) {
     const std::string section = (*it).c_str();
     if (!JsonIsMemberSafe(interface_node, section.c_str())) {
-      SDL_DEBUG(logger_, "Field " << *it << " should be saved into the file");
+      SDL_DEBUG("Field " << *it << " should be saved into the file");
       return false;
     }
 
@@ -1730,8 +1727,7 @@ bool HMICapabilitiesImpl::AllFieldsSaved(
 
       if (active_language !=
           MessageHelper::CommonLanguageFromString(json_language.asString())) {
-        SDL_DEBUG(logger_,
-                  "Active " << interface_name
+        SDL_DEBUG("Active " << interface_name
                             << " language is not the same as the persisted "
                                "one. Field should be overwritten");
         return false;
@@ -1751,8 +1747,7 @@ void HMICapabilitiesImpl::RemoveFromRequestsRequiredForCapabilities(
                  requested_interface);
   if (it != requests_required_for_capabilities_.end()) {
     requests_required_for_capabilities_.erase(it);
-    SDL_DEBUG(logger_,
-              "Wait for " << requests_required_for_capabilities_.size()
+    SDL_DEBUG("Wait for " << requests_required_for_capabilities_.size()
                           << " responses");
   }
 }
@@ -1989,7 +1984,7 @@ void HMICapabilitiesImpl::PrepareRCJsonValueForSaving(
 
 void HMICapabilitiesImpl::AddRequiredRequestsForCapabilities(
     const std::string& interface_name) {
-  SDL_DEBUG(logger_, "Add request IDs for interface: " << interface_name);
+  SDL_DEBUG("Add request IDs for interface: " << interface_name);
 
   if (interface_name == hmi_interface::ui) {
     requests_required_for_capabilities_.insert(
@@ -2039,7 +2034,7 @@ void HMICapabilitiesImpl::PrepareJsonValueForSaving(
     const std::vector<std::string>& sections_to_update,
     const smart_objects::CSmartSchema& schema,
     Json::Value& out_root_node) const {
-  SDL_DEBUG(logger_, "Prepare " << interface_name << " sections for saving");
+  SDL_DEBUG("Prepare " << interface_name << " sections for saving");
 
   if (out_root_node.isNull()) {
     out_root_node = Json::Value(Json::objectValue);
@@ -2084,25 +2079,24 @@ bool HMICapabilitiesImpl::SaveCachedCapabilitiesToFile(
   SDL_AUTO_TRACE();
 
   if (sections_to_update.empty()) {
-    SDL_DEBUG(logger_, "There is no one section to update in the cache file");
+    SDL_DEBUG("There is no one section to update in the cache file");
     return true;
   }
 
   const std::string cache_file_name =
       app_mngr_.get_settings().hmi_capabilities_cache_file_name();
   if (cache_file_name.empty()) {
-    SDL_DEBUG(logger_,
-              "Cache file name is not specified. No need to save cache");
+    SDL_DEBUG("Cache file name is not specified. No need to save cache");
     return true;
   }
 
   Json::Value root_node;
   if (file_system::FileExists(cache_file_name)) {
-    SDL_DEBUG(logger_, "Cache file exists. Check for it's content");
+    SDL_DEBUG("Cache file exists. Check for it's content");
 
     std::string file_content;
     if (!file_system::ReadFile(cache_file_name, file_content)) {
-      SDL_ERROR(logger_, "Failed to read file content");
+      SDL_ERROR("Failed to read file content");
       return false;
     }
 
@@ -2112,24 +2106,23 @@ bool HMICapabilitiesImpl::SaveCachedCapabilitiesToFile(
                        file_content.c_str() + file_content.length(),
                        &root_node,
                        NULL)) {
-      SDL_ERROR(logger_, "Can't parse the file. Skipping");
+      SDL_ERROR("Can't parse the file. Skipping");
       return false;
     }
 
     if (AllFieldsSaved(root_node, interface_name, sections_to_update)) {
-      SDL_DEBUG(logger_,
-                "All " << interface_name
+      SDL_DEBUG("All " << interface_name
                        << " fields are present in the file. No need to update");
       return true;
     }
 
-    SDL_DEBUG(logger_, "Some fields in the cache file should be updated");
+    SDL_DEBUG("Some fields in the cache file should be updated");
   }
 
   PrepareJsonValueForSaving(
       interface_name.c_str(), sections_to_update, schema, root_node);
 
-  SDL_DEBUG(logger_, "Saving cache to file: " << cache_file_name);
+  SDL_DEBUG("Saving cache to file: " << cache_file_name);
   const std::string content_to_save = root_node.toStyledString();
   const std::vector<uint8_t> binary_data_to_save(content_to_save.begin(),
                                                  content_to_save.end());
@@ -2142,17 +2135,17 @@ bool HMICapabilitiesImpl::DeleteCachedCapabilitiesFile() const {
   const std::string cache_file_name =
       app_mngr_.get_settings().hmi_capabilities_cache_file_name();
   if (cache_file_name.empty()) {
-    SDL_DEBUG(logger_, "Cache file name is not specified. Nothing to delete");
+    SDL_DEBUG("Cache file name is not specified. Nothing to delete");
     return false;
   }
 
   if (!file_system::FileExists(cache_file_name)) {
-    SDL_DEBUG(logger_, "Cache file does not exist");
+    SDL_DEBUG("Cache file does not exist");
     return false;
   }
 
   if (!file_system::DeleteFile(cache_file_name)) {
-    SDL_ERROR(logger_, "Failed to delete cache file");
+    SDL_ERROR("Failed to delete cache file");
     return false;
   }
   return true;

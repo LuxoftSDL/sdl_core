@@ -43,7 +43,6 @@
 #include "security_manager/security_manager_impl.h"
 #endif  // ENABLE_SECURITY
 
-
 #include "appMain/low_voltage_signals_handler.h"
 
 using threads::Thread;
@@ -120,7 +119,7 @@ bool LifeCycleImpl::StartComponents() {
   app_manager_->set_connection_handler(connection_handler_);
   app_manager_->AddPolicyObserver(protocol_handler_);
   if (!app_manager_->Init(last_state_wrapper_, media_manager_)) {
-    SDL_ERROR(logger_, "Application manager init failed.");
+    SDL_ERROR("Application manager init failed.");
     return false;
   }
 
@@ -143,7 +142,7 @@ bool LifeCycleImpl::StartComponents() {
 
   app_manager_->AddPolicyObserver(security_manager_);
   if (!crypto_manager_->Init()) {
-    SDL_ERROR(logger_, "CryptoManager initialization fail.");
+    SDL_ERROR("CryptoManager initialization fail.");
     return false;
   }
 #endif  // ENABLE_SECURITY
@@ -172,7 +171,7 @@ bool LifeCycleImpl::StartComponents() {
   app_manager_->set_protocol_handler(protocol_handler_);
   if (transport_manager::E_SUCCESS !=
       transport_manager_->Init(last_state_wrapper_)) {
-    SDL_ERROR(logger_, "Transport manager init failed.");
+    SDL_ERROR("Transport manager init failed.");
     return false;
   }
   // start transport manager
@@ -232,19 +231,19 @@ namespace {
 void sig_handler(int sig) {
   switch (sig) {
     case SIGINT:
-      SDL_DEBUG(logger_, "SIGINT signal has been caught");
+      SDL_DEBUG("SIGINT signal has been caught");
       break;
     case SIGTERM:
-      SDL_DEBUG(logger_, "SIGTERM signal has been caught");
+      SDL_DEBUG("SIGTERM signal has been caught");
       break;
     case SIGSEGV:
-      SDL_DEBUG(logger_, "SIGSEGV signal has been caught");
+      SDL_DEBUG("SIGSEGV signal has been caught");
       SDL_FLUSH_LOGGER();
       // exit need to prevent endless sending SIGSEGV
       // http://stackoverflow.com/questions/2663456/how-to-write-a-signal-handler-to-catch-sigsegv
       abort();
     default:
-      SDL_DEBUG(logger_, "Unexpected signal has been caught");
+      SDL_DEBUG("Unexpected signal has been caught");
       exit(EXIT_FAILURE);
   }
 }
@@ -255,7 +254,7 @@ void LifeCycleImpl::Run() {
   // Register signal handlers and wait sys signals
   // from OS
   if (!utils::Signals::WaitTerminationSignals(&sig_handler)) {
-    SDL_FATAL(logger_, "Fail to catch system signal!");
+    SDL_FATAL("Fail to catch system signal!");
   }
 }
 
@@ -274,7 +273,7 @@ void LifeCycleImpl::StopComponents() {
   DCHECK_OR_RETURN_VOID(app_manager_);
   app_manager_->Stop();
 
-  SDL_INFO(logger_, "Stopping Protocol Handler");
+  SDL_INFO("Stopping Protocol Handler");
   DCHECK_OR_RETURN_VOID(protocol_handler_);
   protocol_handler_->RemoveProtocolObserver(media_manager_);
 
@@ -282,23 +281,23 @@ void LifeCycleImpl::StopComponents() {
   protocol_handler_->RemoveProtocolObserver(security_manager_);
   if (security_manager_) {
     security_manager_->RemoveListener(app_manager_);
-    SDL_INFO(logger_, "Destroying Crypto Manager");
+    SDL_INFO("Destroying Crypto Manager");
     delete crypto_manager_;
     crypto_manager_ = NULL;
-    SDL_INFO(logger_, "Destroying Security Manager");
+    SDL_INFO("Destroying Security Manager");
     delete security_manager_;
     security_manager_ = NULL;
   }
 #endif  // ENABLE_SECURITY
   protocol_handler_->Stop();
 
-  SDL_INFO(logger_, "Destroying Media Manager");
+  SDL_INFO("Destroying Media Manager");
   DCHECK_OR_RETURN_VOID(media_manager_);
   media_manager_->SetProtocolHandler(NULL);
   delete media_manager_;
   media_manager_ = NULL;
 
-  SDL_INFO(logger_, "Destroying Transport Manager.");
+  SDL_INFO("Destroying Transport Manager.");
   DCHECK_OR_RETURN_VOID(transport_manager_);
   transport_manager_->PerformActionOnClients(
       transport_manager::TransportAction::kVisibilityOff);
@@ -306,31 +305,31 @@ void LifeCycleImpl::StopComponents() {
   delete transport_manager_;
   transport_manager_ = NULL;
 
-  SDL_INFO(logger_, "Stopping Connection Handler.");
+  SDL_INFO("Stopping Connection Handler.");
   DCHECK_OR_RETURN_VOID(connection_handler_);
   connection_handler_->Stop();
 
-  SDL_INFO(logger_, "Destroying Protocol Handler");
+  SDL_INFO("Destroying Protocol Handler");
   DCHECK(protocol_handler_);
   delete protocol_handler_;
   protocol_handler_ = NULL;
 
-  SDL_INFO(logger_, "Destroying Connection Handler.");
+  SDL_INFO("Destroying Connection Handler.");
   delete connection_handler_;
   connection_handler_ = NULL;
 
-  SDL_INFO(logger_, "Destroying Last State.");
+  SDL_INFO("Destroying Last State.");
   last_state_wrapper_.reset();
 
-  SDL_INFO(logger_, "Destroying Application Manager.");
+  SDL_INFO("Destroying Application Manager.");
   DCHECK(app_manager_);
   delete app_manager_;
   app_manager_ = NULL;
 
-  SDL_INFO(logger_, "Destroying Low Voltage Signals Handler.");
+  SDL_INFO("Destroying Low Voltage Signals Handler.");
   low_voltage_signals_handler_.reset();
 
-  SDL_INFO(logger_, "Destroying HMI Message Handler and MB adapter.");
+  SDL_INFO("Destroying HMI Message Handler and MB adapter.");
 
 #ifdef MESSAGEBROKER_HMIADAPTER
   if (mb_adapter_) {
@@ -346,7 +345,7 @@ void LifeCycleImpl::StopComponents() {
     delete mb_adapter_thread_;
     mb_adapter_thread_ = NULL;
   }
-  SDL_INFO(logger_, "Destroying Message Broker");
+  SDL_INFO("Destroying Message Broker");
 #endif  // MESSAGEBROKER_HMIADAPTER
   DCHECK_OR_RETURN_VOID(hmi_handler_);
   delete hmi_handler_;

@@ -119,8 +119,7 @@ void OnSystemCapabilityUpdatedNotification::Run() {
                                app_services->end(),
                                matching_service_predicate);
         if (it != app_services->end()) {
-          SDL_DEBUG(logger_,
-                    "Replacing updated record with service_id " << service_id);
+          SDL_DEBUG("Replacing updated record with service_id " << service_id);
           app_services->erase(it);
         }
         app_services->push_back(updated_capabilities[i]);
@@ -137,11 +136,10 @@ void OnSystemCapabilityUpdatedNotification::Run() {
     }
 
     default: {
-      SDL_ERROR(logger_,
-                "Unknown system capability type: "
-                    << msg_params[strings::system_capability]
-                                 [strings::system_capability_type]
-                                     .asInt());
+      SDL_ERROR("Unknown system capability type: "
+                << msg_params[strings::system_capability]
+                             [strings::system_capability_type]
+                                 .asInt());
       return;
     }
   }
@@ -160,8 +158,7 @@ void OnSystemCapabilityUpdatedNotification::Run() {
         DCHECK_OR_RETURN(app, false);
         auto& ext = SystemCapabilityAppExtension::ExtractExtension(*app);
         if (!ext.IsSubscribedTo(system_capability_type)) {
-          SDL_DEBUG(logger_,
-                    "App " << app->app_id()
+          SDL_DEBUG("App " << app->app_id()
                            << " is not subscribed to this capability type");
           return false;
         }
@@ -169,14 +166,12 @@ void OnSystemCapabilityUpdatedNotification::Run() {
         if (mobile_apis::SystemCapabilityType::DISPLAYS ==
                 system_capability_type &&
             initial_connection_key > 0) {
-          SDL_DEBUG(logger_,
-                    "Display capabilities notification for app "
-                        << initial_connection_key << " only");
+          SDL_DEBUG("Display capabilities notification for app "
+                    << initial_connection_key << " only");
           return app->app_id() == initial_connection_key;
         }
 
-        SDL_DEBUG(logger_,
-                  "App " << app->app_id()
+        SDL_DEBUG("App " << app->app_id()
                          << " is subscribed to specified capability type");
         return true;
       };
@@ -184,8 +179,7 @@ void OnSystemCapabilityUpdatedNotification::Run() {
   const std::vector<ApplicationSharedPtr>& applications = FindAllApps(
       application_manager_.applications(), subscribed_to_capability_predicate);
 
-  SDL_DEBUG(logger_,
-            "Number of Notifications to be sent: " << applications.size());
+  SDL_DEBUG("Number of Notifications to be sent: " << applications.size());
 
   std::vector<ApplicationSharedPtr>::const_iterator app_it =
       applications.begin();
@@ -195,31 +189,27 @@ void OnSystemCapabilityUpdatedNotification::Run() {
     if (system_capability_type ==
             mobile_apis::SystemCapabilityType::REMOTE_CONTROL &&
         !app->is_remote_control_supported()) {
-      SDL_WARN(
-          logger_,
-          "App with connection key: "
-              << app->app_id()
-              << " was subcribed to REMOTE_CONTROL system capabilities, but "
-                 "does not have RC permissions. Unsubscribing");
+      SDL_WARN("App with connection key: "
+               << app->app_id()
+               << " was subcribed to REMOTE_CONTROL system capabilities, but "
+                  "does not have RC permissions. Unsubscribing");
       auto& ext = SystemCapabilityAppExtension::ExtractExtension(*app);
       ext.UnsubscribeFrom(system_capability_type);
       continue;
     }
 
     if (mobile_apis::SystemCapabilityType::DISPLAYS == system_capability_type) {
-      SDL_DEBUG(logger_, "Using common display capabilities");
+      SDL_DEBUG("Using common display capabilities");
       auto capabilities = hmi_capabilities_.system_display_capabilities();
       if (app->is_resuming() && app->is_app_data_resumption_allowed()) {
-        SDL_DEBUG(logger_,
-                  "Application "
-                      << app->app_id()
-                      << " is resuming. Providing cached capabilities");
+        SDL_DEBUG("Application "
+                  << app->app_id()
+                  << " is resuming. Providing cached capabilities");
         auto display_caps =
             app->display_capabilities_builder().display_capabilities();
         capabilities = display_caps;
       } else if (app->display_capabilities()) {
-        SDL_DEBUG(logger_,
-                  "Application " << app->app_id()
+        SDL_DEBUG("Application " << app->app_id()
                                  << " has specific display capabilities");
         const WindowID window_id =
             msg_params[strings::system_capability]
@@ -230,8 +220,7 @@ void OnSystemCapabilityUpdatedNotification::Run() {
       }
 
       if (!capabilities) {
-        SDL_WARN(logger_,
-                 "No available display capabilities for sending. Skipping");
+        SDL_WARN("No available display capabilities for sending. Skipping");
         continue;
       }
 
@@ -239,10 +228,8 @@ void OnSystemCapabilityUpdatedNotification::Run() {
           *capabilities;
     }
 
-    SDL_INFO(logger_,
-             "Sending OnSystemCapabilityUpdated " << capability_type_string
-                                                  << " application id "
-                                                  << app->app_id());
+    SDL_INFO("Sending OnSystemCapabilityUpdated "
+             << capability_type_string << " application id " << app->app_id());
     (*message_)[strings::params][strings::connection_key] = app->app_id();
     SendNotification();
   }

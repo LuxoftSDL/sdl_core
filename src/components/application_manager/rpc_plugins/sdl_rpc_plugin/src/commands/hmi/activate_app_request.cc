@@ -54,11 +54,11 @@ ActivateAppRequest::ActivateAppRequest(
                    policy_handle) {}
 
 ActivateAppRequest::~ActivateAppRequest() {
-  SDL_TRACE(logger_, "~ActivateAppRequest");
+  SDL_TRACE("~ActivateAppRequest");
 }
 
 void ActivateAppRequest::Run() {
-  SDL_TRACE(logger_, "enter " << correlation_id());
+  SDL_TRACE("enter " << correlation_id());
   uint32_t app_id = RequestToHMI::application_id();
   application_manager_.set_application_id(correlation_id(), app_id);
 #ifdef ENABLE_LOG
@@ -68,11 +68,11 @@ void ActivateAppRequest::Run() {
         static_cast<mobile_apis::HMILevel::eType>(
             (*message_)[strings::msg_params][strings::activate_app_hmi_level]
                 .asInt());
-    SDL_TRACE(logger_, "requested_hmi_level = " << requested_hmi_level);
+    SDL_TRACE("requested_hmi_level = " << requested_hmi_level);
   }
 #endif
   SendRequest();
-  SDL_TRACE(logger_, "exit");
+  SDL_TRACE("exit");
 }
 
 }  // namespace commands

@@ -64,13 +64,13 @@ void GetSystemCapabilityRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
 
   if ((*message_)[strings::msg_params].empty()) {
-    SDL_ERROR(logger_, strings::msg_params << " is empty.");
+    SDL_ERROR(strings::msg_params << " is empty.");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -173,7 +173,7 @@ void GetSystemCapabilityRequest::Run() {
 
       if (!capabilities) {
         SendResponse(false, mobile_apis::Result::DATA_NOT_AVAILABLE);
-        SDL_INFO(logger_, "system_display_capabilities are not available");
+        SDL_INFO("system_display_capabilities are not available");
         return;
       }
 
@@ -194,11 +194,10 @@ void GetSystemCapabilityRequest::Run() {
       auto& ext = SystemCapabilityAppExtension::ExtractExtension(*app);
       if ((*message_)[app_mngr::strings::msg_params][strings::subscribe]
               .asBool() == true) {
-        SDL_DEBUG(logger_, "Subscribe to system capability: " << response_type);
+        SDL_DEBUG("Subscribe to system capability: " << response_type);
         ext.SubscribeTo(response_type);
       } else {
-        SDL_DEBUG(logger_,
-                  "Unsubscribe from system capability: " << response_type);
+        SDL_DEBUG("Unsubscribe from system capability: " << response_type);
         ext.UnsubscribeFrom(response_type);
       }
     }
@@ -215,7 +214,7 @@ void GetSystemCapabilityRequest::Run() {
 }
 
 void GetSystemCapabilityRequest::on_event(const event_engine::Event& event) {
-  SDL_INFO(logger_, "GetSystemCapabilityRequest on_event");
+  SDL_INFO("GetSystemCapabilityRequest on_event");
 }
 
 }  // namespace commands

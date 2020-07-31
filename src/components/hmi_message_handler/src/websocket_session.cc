@@ -82,7 +82,7 @@ void WebsocketSession::Recv(boost::system::error_code ec) {
 
   if (ec) {
     std::string str_err = "ErrorMessage: " + ec.message();
-    SDL_ERROR(ws_logger_, str_err);
+    SDL_ERROR(str_err);
     shutdown_ = true;
     thread_delegate_->SetShutdown();
     controller_->deleteController(this);
@@ -123,7 +123,7 @@ void WebsocketSession::Read(boost::system::error_code ec,
   boost::ignore_unused(bytes_transferred);
   if (ec) {
     std::string str_err = "ErrorMessage: " + ec.message();
-    SDL_ERROR(ws_logger_, str_err);
+    SDL_ERROR(str_err);
     shutdown_ = true;
     thread_delegate_->SetShutdown();
     controller_->deleteController(this);
@@ -138,7 +138,7 @@ void WebsocketSession::Read(boost::system::error_code ec,
   Json::Value root;
 
   if (!reader.parse(data, &root)) {
-    SDL_ERROR(ws_logger_, "Invalid JSON Message.");
+    SDL_ERROR("Invalid JSON Message.");
     return;
   }
 
@@ -181,8 +181,7 @@ void WebsocketSession::onMessageReceived(Json::Value message) {
           if (message.isMember("result") && message["result"].isInt()) {
             mControllersIdStart = message["result"].asInt();
           } else {
-            SDL_ERROR(ws_logger_,
-                      "Not possible to initialize mControllersIdStart!");
+            SDL_ERROR("Not possible to initialize mControllersIdStart!");
           }
         } else if ("MB.subscribeTo" == method ||
                    "MB.unregisterComponent" == method ||
@@ -192,8 +191,7 @@ void WebsocketSession::onMessageReceived(Json::Value message) {
           controller_->processResponse(method, message);
         }
       } else {
-        SDL_ERROR(ws_logger_,
-                  "Request with id: " + id + " has not been found!");
+        SDL_ERROR("Request with id: " + id + " has not been found!");
       }
     } else {
       std::string method = message["method"].asString();
@@ -207,7 +205,7 @@ void WebsocketSession::onMessageReceived(Json::Value message) {
       }
     }
   } else {
-    SDL_ERROR(ws_logger_, "Message contains wrong data!\n");
+    SDL_ERROR("Message contains wrong data!\n");
     sendJsonMessage(error);
   }
 }
@@ -316,7 +314,7 @@ void WebsocketSession::LoopThreadDelegate::DrainQueue() {
     boost::system::error_code ec;
     handler_.ws_.write(boost::asio::buffer(*message_ptr), ec);
     if (ec) {
-      SDL_ERROR(ws_logger_, "A system error has occurred: " << ec.message());
+      SDL_ERROR("A system error has occurred: " << ec.message());
     }
   }
 }

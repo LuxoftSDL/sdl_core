@@ -178,9 +178,8 @@ bool RCCommandFactory::IsAbleToProcess(
 CommandCreator& RCCommandFactory::get_mobile_command_creator(
     const mobile_apis::FunctionID::eType id,
     const mobile_apis::messageType::eType message_type) const {
-  SDL_DEBUG(logger_,
-            "get_mobile_command_creator function_id: "
-                << id << " message_type: " << message_type);
+  SDL_DEBUG("get_mobile_command_creator function_id: "
+            << id << " message_type: " << message_type);
   RCCommandCreatorFactory rc_factory(params_);
   switch (id) {
     case mobile_apis::FunctionID::ButtonPressID: {
@@ -266,8 +265,7 @@ CommandCreator& RCCommandFactory::get_mobile_creator_factory(
 CommandCreator& RCCommandFactory::get_hmi_creator_factory(
     const hmi_apis::FunctionID::eType id,
     const hmi_apis::messageType::eType message_type) const {
-  SDL_DEBUG(logger_,
-            "CreateHMICommand function_id: " << id << " message_type: "
+  SDL_DEBUG("CreateHMICommand function_id: " << id << " message_type: "
                                              << message_type);
 
   RCCommandCreatorFactory rc_factory(params_);

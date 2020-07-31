@@ -67,7 +67,7 @@ void WebSocketSecureSession<ExecutorType>::AsyncHandshake(
   SDL_AUTO_TRACE();
   if (ec) {
     auto str_err = "ErrorMessage: " + ec.message();
-    SDL_ERROR(ws_logger_, str_err);
+    SDL_ERROR(str_err);
     WebSocketSession<ExecutorType>::on_io_error_();
     return;
   }

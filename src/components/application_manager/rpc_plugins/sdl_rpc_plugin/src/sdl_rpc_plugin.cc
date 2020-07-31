@@ -90,7 +90,7 @@ void SDLRPCPlugin::OnApplicationEvent(
     // Processing automatic subscription to SystemCapabilities for DISPLAY type
     const auto capability_type =
         mobile_apis::SystemCapabilityType::eType::DISPLAYS;
-    SDL_DEBUG(logger_, "Subscription to DISPLAYS capability is enabled");
+    SDL_DEBUG("Subscription to DISPLAYS capability is enabled");
     sys_cap_ext_ptr->SubscribeTo(capability_type);
   } else if (plugins::ApplicationEvent::kDeleteApplicationData == event) {
     ClearSubscriptions(application);

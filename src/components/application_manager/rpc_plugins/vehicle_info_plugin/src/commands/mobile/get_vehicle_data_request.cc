@@ -69,7 +69,7 @@ void GetVehicleDataRequest::Run() {
   auto app = application_manager_.application(connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "No such application : " << connection_key());
+    SDL_ERROR("No such application : " << connection_key());
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -180,7 +180,7 @@ void GetVehicleDataRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      SDL_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR("Received unknown event" << event.id());
       return;
     }
   }
@@ -190,7 +190,7 @@ bool GetVehicleDataRequest::CheckFrequency(Application& app) {
   if (app.AreCommandLimitsExceeded(
           static_cast<mobile_apis::FunctionID::eType>(function_id()),
           application_manager::TLimitSource::CONFIG_FILE)) {
-    SDL_ERROR(logger_, "GetVehicleData frequency is too high.");
+    SDL_ERROR("GetVehicleData frequency is too high.");
     return false;
   }
   return true;

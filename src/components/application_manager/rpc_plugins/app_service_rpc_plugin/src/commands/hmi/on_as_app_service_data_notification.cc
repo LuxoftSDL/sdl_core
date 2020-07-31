@@ -158,7 +158,7 @@ void OnASAppServiceDataNotification::GetNavigationImagePaths(
 bool OnASAppServiceDataNotification::ValidateParams(
     smart_objects::SmartObject& message_params) {
   if (!message_params.keyExists(strings::service_data)) {
-    SDL_DEBUG(logger_, "OASD notification received without any service data");
+    SDL_DEBUG("OASD notification received without any service data");
     return false;
   }
   smart_objects::SmartObject& service_data =
@@ -169,8 +169,7 @@ bool OnASAppServiceDataNotification::ValidateParams(
   auto service =
       application_manager_.GetAppServiceManager().FindServiceByID(service_id);
   if (!service) {
-    SDL_ERROR(logger_,
-              "OASD notification received with an unpublished service ID");
+    SDL_ERROR("OASD notification received with an unpublished service ID");
     return false;
   }
 
@@ -180,7 +179,7 @@ bool OnASAppServiceDataNotification::ValidateParams(
           service_type, &service_type_value)) {
     auto app = application_manager_.application(service->connection_key);
     if (!app) {
-      SDL_ERROR(logger_, "Failed to find service provider for OASD message");
+      SDL_ERROR("Failed to find service provider for OASD message");
       return false;
     }
 
@@ -205,7 +204,7 @@ bool OnASAppServiceDataNotification::ValidateParams(
 
 void OnASAppServiceDataNotification::Run() {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "Sending AS data to HMI");
+  SDL_DEBUG("Sending AS data to HMI");
   if (ValidateParams((*message_)[strings::msg_params])) {
     SendNotification();
   }

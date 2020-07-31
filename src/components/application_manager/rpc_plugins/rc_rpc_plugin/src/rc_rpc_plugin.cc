@@ -117,9 +117,8 @@ void RCRPCPlugin::OnApplicationEvent(
     application_manager::ApplicationSharedPtr application) {
   SDL_AUTO_TRACE();
   if (!application->is_remote_control_supported()) {
-    SDL_DEBUG(logger_,
-              "Remote control is not supported for application with app_id: "
-                  << application->app_id());
+    SDL_DEBUG("Remote control is not supported for application with app_id: "
+              << application->app_id());
     return;
   }
   switch (event) {

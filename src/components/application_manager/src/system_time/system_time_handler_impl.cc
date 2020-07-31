@@ -67,9 +67,8 @@ void SystemTimeHandlerImpl::DoSystemTimeQuery() {
 
   sync_primitives::AutoLock lock(state_lock_);
   if (!utc_time_can_be_received_) {
-    SDL_INFO(logger_,
-             "Navi module is not yet ready."
-                 << "Will process request once it became ready.");
+    SDL_INFO("Navi module is not yet ready."
+             << "Will process request once it became ready.");
     return;
   }
   SendTimeRequest();
@@ -110,7 +109,7 @@ void SystemTimeHandlerImpl::SendTimeRequest() {
   SDL_AUTO_TRACE();
 
   if (awaiting_get_system_time_) {
-    SDL_WARN(logger_, "Another GetSystemTime request in progress. Skipped");
+    SDL_WARN("Another GetSystemTime request in progress. Skipped");
     return;
   }
 
@@ -135,7 +134,7 @@ void SystemTimeHandlerImpl::on_event(
       ProcessSystemTimeResponse(event);
       break;
     default:
-      SDL_ERROR(logger_, "Unknown Event received");
+      SDL_ERROR("Unknown Event received");
       break;
   }
 }

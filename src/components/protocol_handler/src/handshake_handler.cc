@@ -61,7 +61,7 @@ HandshakeHandler::HandshakeHandler(
     , service_status_update_handler_(service_status_update_handler) {}
 
 HandshakeHandler::~HandshakeHandler() {
-  SDL_DEBUG(logger_, "Destroying of HandshakeHandler: " << this);
+  SDL_DEBUG("Destroying of HandshakeHandler: " << this);
 }
 
 uint32_t HandshakeHandler::connection_key() const {
@@ -122,12 +122,10 @@ bool HandshakeHandler::OnHandshakeDone(
     security_manager::SSLContext::HandshakeResult result) {
   SDL_AUTO_TRACE();
 
-  SDL_DEBUG(logger_,
-            "OnHandshakeDone for service : " << context_.service_type_);
+  SDL_DEBUG("OnHandshakeDone for service : " << context_.service_type_);
 
   if (connection_key != this->primary_connection_key()) {
-    SDL_DEBUG(logger_,
-              "Listener " << this << " expects notification for connection id: "
+    SDL_DEBUG("Listener " << this << " expects notification for connection id: "
                           << this->primary_connection_key()
                           << ". Received notification for connection id "
                           << connection_key << " will be ignored");
@@ -177,8 +175,7 @@ void HandshakeHandler::ProcessSuccessfulHandshake(const uint32_t connection_key,
 
   const bool can_be_protected = CanBeProtected();
 
-  SDL_DEBUG(logger_,
-            "Service can be protected: " << can_be_protected
+  SDL_DEBUG("Service can be protected: " << can_be_protected
                                          << " and service was protected: "
                                          << is_service_already_protected);
 
@@ -211,7 +208,7 @@ void HandshakeHandler::ProcessSuccessfulHandshake(const uint32_t connection_key,
 void HandshakeHandler::ProcessFailedHandshake(BsonObject& params,
                                               ServiceStatus service_status) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "Handshake failed");
+  SDL_DEBUG("Handshake failed");
   const std::vector<int>& force_protected =
       protocol_handler_.get_settings().force_protected_service();
 
@@ -220,8 +217,7 @@ void HandshakeHandler::ProcessFailedHandshake(BsonObject& params,
                 force_protected.end(),
                 context_.service_type_) == force_protected.end();
 
-  SDL_DEBUG(logger_,
-            "Service can be unprotected: " << can_be_unprotected
+  SDL_DEBUG("Service can be unprotected: " << can_be_unprotected
                                            << " and this is a new service: "
                                            << context_.is_new_service_);
 

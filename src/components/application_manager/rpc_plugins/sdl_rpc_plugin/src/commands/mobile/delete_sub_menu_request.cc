@@ -66,7 +66,7 @@ void DeleteSubMenuRequest::Run() {
 
   if (!app) {
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     return;
   }
 
@@ -74,7 +74,7 @@ void DeleteSubMenuRequest::Run() {
       (*message_)[strings::msg_params][strings::menu_id].asInt();
 
   if (!app->FindSubMenu(menu_id)) {
-    SDL_ERROR(logger_, "Menu with id " << menu_id << " is not found.");
+    SDL_ERROR("Menu with id " << menu_id << " is not found.");
     SendResponse(false, mobile_apis::Result::INVALID_ID);
     return;
   }
@@ -127,7 +127,7 @@ void DeleteSubMenuRequest::DeleteSubMenuUICommands(
 
   while (commands.end() != it) {
     if (!(*it->second).keyExists(strings::menu_params)) {
-      SDL_ERROR(logger_, "menu_params not exist");
+      SDL_ERROR("menu_params not exist");
       ++it;
       continue;
     }
@@ -170,7 +170,7 @@ void DeleteSubMenuRequest::on_event(const event_engine::Event& event) {
           application_manager_.application(connection_key());
 
       if (!application) {
-        SDL_ERROR(logger_, "NULL pointer");
+        SDL_ERROR("NULL pointer");
         return;
       }
 
@@ -189,7 +189,7 @@ void DeleteSubMenuRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      SDL_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR("Received unknown event" << event.id());
       return;
     }
   }

@@ -56,7 +56,7 @@ void NaviStopStreamRequest::Run() {
   SDL_AUTO_TRACE();
   if (!app_mngr::commands::CheckAvailabilityHMIInterfaces(
           application_manager_, HmiInterfaces::HMI_INTERFACE_Navigation)) {
-    SDL_INFO(logger_, "Interface Navi is not supported by system");
+    SDL_INFO("Interface Navi is not supported by system");
     return;
   }
   SendRequest();

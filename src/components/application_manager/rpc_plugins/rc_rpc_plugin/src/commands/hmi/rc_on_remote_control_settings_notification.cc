@@ -98,9 +98,8 @@ void RCOnRemoteControlSettingsNotification::Run() {
 
   if (!(*message_)[app_mngr::strings::msg_params].keyExists(
           message_params::kAllowed)) {
-    SDL_DEBUG(logger_,
-              "Notification is ignored due to \"allow\" parameter absense");
-    SDL_DEBUG(logger_, "RC Functionality remains unchanged");
+    SDL_DEBUG("Notification is ignored due to \"allow\" parameter absense");
+    SDL_DEBUG("RC Functionality remains unchanged");
     return;
   }
 
@@ -110,7 +109,7 @@ void RCOnRemoteControlSettingsNotification::Run() {
   if (is_allowed) {
     hmi_apis::Common_RCAccessMode::eType access_mode =
         hmi_apis::Common_RCAccessMode::INVALID_ENUM;
-    SDL_DEBUG(logger_, "Allowing RC Functionality");
+    SDL_DEBUG("Allowing RC Functionality");
     resource_allocation_manager_.set_rc_enabled(true);
     if ((*message_)[app_mngr::strings::msg_params].keyExists(
             message_params::kAccessMode)) {
@@ -118,17 +117,15 @@ void RCOnRemoteControlSettingsNotification::Run() {
           (*message_)[app_mngr::strings::msg_params]
                      [message_params::kAccessMode]
                          .asUInt());
-      SDL_DEBUG(logger_,
-                "Setting up access mode : " << AccessModeToString(access_mode));
+      SDL_DEBUG("Setting up access mode : " << AccessModeToString(access_mode));
     } else {
       access_mode = resource_allocation_manager_.GetAccessMode();
-      SDL_DEBUG(logger_,
-                "No access mode received. Using last known: "
-                    << AccessModeToString(access_mode));
+      SDL_DEBUG("No access mode received. Using last known: "
+                << AccessModeToString(access_mode));
     }
     resource_allocation_manager_.SetAccessMode(access_mode);
   } else {
-    SDL_DEBUG(logger_, "Disallowing RC Functionality");
+    SDL_DEBUG("Disallowing RC Functionality");
     DisallowRCFunctionality();
     resource_allocation_manager_.ResetAllAllocations();
     resource_allocation_manager_.set_rc_enabled(false);

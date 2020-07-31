@@ -43,8 +43,7 @@ void InteriorDataManagerImpl::OnDisablingRC() {
     }
   }
   for (auto& module : subscribed_modules) {
-    SDL_TRACE(logger_,
-              "unsubscribe from module type: " << module.first
+    SDL_TRACE("unsubscribe from module type: " << module.first
                                                << " id: " << module.second);
     UnsubscribeFromInteriorVehicleData(module);
   }
@@ -128,8 +127,7 @@ void InteriorDataManagerImpl::UnsubscribeFromInteriorVehicleData(
   cache_.Remove(module);
   auto unsubscribe_request = RCHelpers::CreateUnsubscribeRequestToHMI(
       module, app_mngr_.GetNextHMICorrelationID());
-  SDL_DEBUG(logger_,
-            "Send Unsubscribe from module type: " << module.first
+  SDL_DEBUG("Send Unsubscribe from module type: " << module.first
                                                   << " id: " << module.second);
   rpc_service_.ManageHMICommand(unsubscribe_request);
 }
@@ -142,8 +140,7 @@ void InteriorDataManagerImpl::UnsubscribeFromInteriorVehicleDataOfType(
     cache_.Remove(module);
     auto unsubscribe_request = RCHelpers::CreateUnsubscribeRequestToHMI(
         module, app_mngr_.GetNextHMICorrelationID());
-    SDL_DEBUG(logger_,
-              "Send Unsubscribe from module type: " << module.first << " id: "
+    SDL_DEBUG("Send Unsubscribe from module type: " << module.first << " id: "
                                                     << module.second);
     rpc_service_.ManageHMICommand(unsubscribe_request);
   }

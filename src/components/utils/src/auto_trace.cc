@@ -39,8 +39,8 @@ AutoTrace::AutoTrace(const std::string& logger, const SDLLocationInfo& location)
     : logger_(logger), location_(location) {
   if (logger::Logger<ExternalLogger>::instance().Enabled()) {
     if (logger::logger_status != logger::DeletingLoggerThread) {
-      if (logger::Logger<ExternalLogger>::instance().IsEnabledFor(logger_,
-                                                                  logger::LogLevel::TRACE_LEVEL)) {
+      if (logger::Logger<ExternalLogger>::instance().IsEnabledFor(
+              logger_, logger::LogLevel::TRACE_LEVEL)) {
         logger::SDLLogMessage message{logger_,
                                       LogLevel::TRACE_LEVEL,
                                       "Enter",
@@ -56,8 +56,8 @@ AutoTrace::AutoTrace(const std::string& logger, const SDLLocationInfo& location)
 AutoTrace::~AutoTrace() {
   if (logger::Logger<ExternalLogger>::instance().Enabled()) {
     if (logger::logger_status != logger::DeletingLoggerThread) {
-      if (logger::Logger<ExternalLogger>::instance().IsEnabledFor(logger_,
-                                                                  logger::LogLevel::TRACE_LEVEL)) {
+      if (logger::Logger<ExternalLogger>::instance().IsEnabledFor(
+              logger_, logger::LogLevel::TRACE_LEVEL)) {
         logger::SDLLogMessage message{logger_,
                                       LogLevel::TRACE_LEVEL,
                                       "Exit",

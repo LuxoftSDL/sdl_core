@@ -90,9 +90,8 @@ rc_rpc_types::ModuleConsent RCConsentManagerImpl::GetModuleConsent(
   last_state_accessor.GetMutableData().set_dictionary(last_state_dictionary);
 
   if (module_consents.empty()) {
-    SDL_DEBUG(
-        logger_,
-        "For app: " << app_id << " module type doesn't have any consents");
+    SDL_DEBUG("For app: " << app_id
+                          << " module type doesn't have any consents");
     return rc_rpc_types::ModuleConsent::NOT_EXISTS;
   }
 
@@ -103,8 +102,7 @@ rc_rpc_types::ModuleConsent RCConsentManagerImpl::GetModuleConsent(
     }
   }
 
-  SDL_DEBUG(logger_,
-            "For app: " << app_id << " and module resource [" << module_id.first
+  SDL_DEBUG("For app: " << app_id << " and module resource [" << module_id.first
                         << ":" << module_id.second << "] consent is absent");
 
   return rc_rpc_types::ModuleConsent::NOT_EXISTS;
@@ -146,7 +144,7 @@ void RCConsentManagerImpl::RemoveAllConsents() {
 rc_rpc_types::ModuleConsentState RCConsentManagerImpl::CheckModuleConsentState(
     const Json::Value& module_consent) const {
   if (!module_consent.isMember(message_params::kConsentDate)) {
-    SDL_DEBUG(logger_, "Date of consent is absent");
+    SDL_DEBUG("Date of consent is absent");
     return rc_rpc_types::ModuleConsentState::NOT_EXISTS;
   }
 
@@ -159,9 +157,8 @@ rc_rpc_types::ModuleConsentState RCConsentManagerImpl::CheckModuleConsentState(
   const auto past_period_in_days =
       date_time::calculateAmountDaysFromDate(consent_date);
 
-  SDL_DEBUG(logger_,
-            "Keeping time of consent is: " << past_period_in_days << " days");
-  SDL_DEBUG(logger_, "Period for expired: " << period_for_expiring);
+  SDL_DEBUG("Keeping time of consent is: " << past_period_in_days << " days");
+  SDL_DEBUG("Period for expired: " << period_for_expiring);
 
   return (past_period_in_days >= period_for_expiring)
              ? rc_rpc_types::ModuleConsentState::EXPIRED
@@ -203,17 +200,15 @@ void RCConsentManagerImpl::RemoveModuleExpiredConsents(
     const bool is_expired = rc_rpc_types::ModuleConsentState::EXPIRED ==
                             CheckModuleConsentState(consent);
     if (is_expired) {
-      SDL_DEBUG(logger_,
-                "Consent for module resource ["
-                    << consent[message_params::kModuleId].asString()
-                    << "] is expired and will be removed");
+      SDL_DEBUG("Consent for module resource ["
+                << consent[message_params::kModuleId].asString()
+                << "] is expired and will be removed");
     }
 
     if (is_module_id_exists && !is_expired) {
-      SDL_DEBUG(logger_,
-                "Consent for module resource ["
-                    << consent[message_params::kModuleId].asString()
-                    << "] is actual.");
+      SDL_DEBUG("Consent for module resource ["
+                << consent[message_params::kModuleId].asString()
+                << "] is actual.");
       temp_consents.append(consent);
     }
   }
@@ -230,14 +225,14 @@ Json::Value& RCConsentManagerImpl::GetRemoteControlDataOrAppend(
   if (!last_state_data.isMember(app_mngr::strings::remote_control)) {
     last_state_data[app_mngr::strings::remote_control] =
         Json::Value(Json::objectValue);
-    SDL_DEBUG(logger_, "remote_control section is missed");
+    SDL_DEBUG("remote_control section is missed");
   }
 
   Json::Value& remote_control =
       last_state_data[app_mngr::strings::remote_control];
 
   if (!remote_control.isObject()) {
-    SDL_ERROR(logger_, "remote_control type INVALID rewrite");
+    SDL_ERROR("remote_control type INVALID rewrite");
     remote_control = Json::Value(Json::objectValue);
   }
   return remote_control;
@@ -250,7 +245,7 @@ Json::Value& RCConsentManagerImpl::GetDeviceApplicationsOrAppend(
   auto& apps_consents = GetAppsConsentsOrAppend(last_state_data);
 
   if (!apps_consents.isArray()) {
-    SDL_DEBUG(logger_, "applications_consents type INVALID rewrite");
+    SDL_DEBUG("applications_consents type INVALID rewrite");
     apps_consents = Json::Value(Json::arrayValue);
   }
 
@@ -286,7 +281,7 @@ Json::Value& RCConsentManagerImpl::GetAppConsentsListOrAppend(
 
   sync_primitives::AutoLock autolock(applications_lock_);
   if (!device_applications.isArray()) {
-    SDL_DEBUG(logger_, "applications_consents type INVALID rewrite");
+    SDL_DEBUG("applications_consents type INVALID rewrite");
     device_applications = Json::Value(Json::arrayValue);
   }
 
@@ -321,14 +316,14 @@ Json::Value& RCConsentManagerImpl::GetAppsConsentsOrAppend(
   sync_primitives::AutoLock autolock(remote_control_lock_);
 
   if (!remote_control.isMember(message_params::kAppConsents)) {
-    SDL_DEBUG(logger_, "app_consents section is missed");
+    SDL_DEBUG("app_consents section is missed");
     remote_control[message_params::kAppConsents] =
         Json::Value(Json::arrayValue);
   }
 
   auto& app_consents = remote_control[message_params::kAppConsents];
   if (!app_consents.isArray()) {
-    SDL_DEBUG(logger_, "applications_consents type INVALID rewrite");
+    SDL_DEBUG("applications_consents type INVALID rewrite");
     app_consents = Json::Value(Json::arrayValue);
   }
   return app_consents;
@@ -356,8 +351,7 @@ Json::Value& RCConsentManagerImpl::GetModuleTypeConsentsOrAppend(
 
   // In case of absent specified module_type in section of specified
   // application, will be added empty section with this module type.
-  SDL_DEBUG(logger_,
-            "Section module_type: " << module_type << " is missed for app_id:"
+  SDL_DEBUG("Section module_type: " << module_type << " is missed for app_id:"
                                     << policy_app_id);
   auto consent_item = Json::Value(Json::objectValue);
   consent_item[message_params::kModuleType] = module_type;

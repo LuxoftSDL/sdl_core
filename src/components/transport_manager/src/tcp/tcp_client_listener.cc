@@ -104,16 +104,15 @@ TransportAdapter::Error TcpClientListener::Init() {
     // using INADDR_ANY. If socket creation fails, we will treat it an error.
     socket_ = CreateIPv4ServerSocket(port_);
     if (-1 == socket_) {
-      SDL_ERROR(logger_, "Failed to create TCP socket");
+      SDL_ERROR("Failed to create TCP socket");
       return TransportAdapter::FAIL;
     }
   } else {
     // Network interface is specified and we will listen only on the interface.
     // In this case, the server socket will be created once
     // NetworkInterfaceListener notifies the interface's IP address.
-    SDL_INFO(logger_,
-             "TCP server socket will listen on "
-                 << designated_interface_ << " once it has an IPv4 address.");
+    SDL_INFO("TCP server socket will listen on "
+             << designated_interface_ << " once it has an IPv4 address.");
   }
 
   if (!interface_listener_->Init()) {
@@ -163,7 +162,7 @@ TcpClientListener::~TcpClientListener() {
 
 void SetKeepaliveOptions(const int fd) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "fd: " << fd);
+  SDL_DEBUG("fd: " << fd);
   int yes = 1;
   int keepidle = 3;  // 3 seconds to disconnection detecting
   int keepcnt = 5;
@@ -171,26 +170,26 @@ void SetKeepaliveOptions(const int fd) {
 #ifdef __linux__
   int user_timeout = 7000;  // milliseconds
   if (0 != setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &yes, sizeof(yes))) {
-    SDL_WARN_WITH_ERRNO(logger_, "setsockopt SO_KEEPALIVE failed");
+    SDL_WARN_WITH_ERRNO( "setsockopt SO_KEEPALIVE failed");
   }
   if (0 !=
       setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &keepidle, sizeof(keepidle))) {
-    SDL_WARN_WITH_ERRNO(logger_, "setsockopt TCP_KEEPIDLE failed");
+    SDL_WARN_WITH_ERRNO( "setsockopt TCP_KEEPIDLE failed");
   }
   if (0 !=
       setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, &keepcnt, sizeof(keepcnt))) {
-    SDL_WARN_WITH_ERRNO(logger_, "setsockopt TCP_KEEPCNT failed");
+    SDL_WARN_WITH_ERRNO( "setsockopt TCP_KEEPCNT failed");
   }
   if (0 != setsockopt(
                fd, IPPROTO_TCP, TCP_KEEPINTVL, &keepintvl, sizeof(keepintvl))) {
-    SDL_WARN_WITH_ERRNO(logger_, "setsockopt TCP_KEEPINTVL failed");
+    SDL_WARN_WITH_ERRNO( "setsockopt TCP_KEEPINTVL failed");
   }
   if (0 != setsockopt(fd,
                       IPPROTO_TCP,
                       TCP_USER_TIMEOUT,
                       &user_timeout,
                       sizeof(user_timeout))) {
-    SDL_WARN_WITH_ERRNO(logger_, "setsockopt TCP_USER_TIMEOUT failed");
+    SDL_WARN_WITH_ERRNO( "setsockopt TCP_USER_TIMEOUT failed");
   }
 #elif defined(__QNX__)  // __linux__
   // TODO(KKolodiy): Out of order!
@@ -239,7 +238,7 @@ void TcpClientListener::Loop() {
       if (errno == EINTR) {
         continue;
       } else {
-        SDL_WARN(logger_, "select failed for TCP server socket");
+        SDL_WARN("select failed for TCP server socket");
         break;
       }
     }
@@ -249,16 +248,15 @@ void TcpClientListener::Loop() {
       if (ret < 0) {
         if (errno != EINTR && errno != EAGAIN && errno != EWOULDBLOCK) {
           SDL_WARN(
-              logger_,
+
               "Failed to read from pipe, aborting TCP server socket loop.");
           break;
         }
       } else if (ret == 0) {
-        SDL_WARN(logger_,
-                 "Pipe disconnected, aborting TCP server socket loop.");
+        SDL_WARN("Pipe disconnected, aborting TCP server socket loop.");
         break;
       } else {
-        SDL_DEBUG(logger_, "received stop command of TCP server socket loop");
+        SDL_DEBUG("received stop command of TCP server socket loop");
         break;
       }
     }
@@ -269,18 +267,18 @@ void TcpClientListener::Loop() {
       const int connection_fd = accept(
           socket_, (struct sockaddr*)&client_address, &client_address_size);
       if (thread_stop_requested_) {
-        SDL_DEBUG(logger_, "thread_stop_requested_");
+        SDL_DEBUG("thread_stop_requested_");
         close(connection_fd);
         break;
       }
 
       if (connection_fd < 0) {
-        SDL_ERROR_WITH_ERRNO(logger_, "accept() failed");
+        SDL_ERROR_WITH_ERRNO( "accept() failed");
         continue;
       }
 
       if (AF_INET != client_address.sin_family) {
-        SDL_DEBUG(logger_, "Address of connected client is invalid");
+        SDL_DEBUG("Address of connected client is invalid");
         close(connection_fd);
         continue;
       }
@@ -290,8 +288,8 @@ void TcpClientListener::Loop() {
       strncpy(device_name, inet_ntoa(client_address.sin_addr), size);
 
       device_name[size - 1] = '\0';
-      SDL_INFO(logger_, "Connected client " << device_name);
-      SDL_INFO(logger_, "Port is: " << port_);
+      SDL_INFO("Connected client " << device_name);
+      SDL_INFO("Port is: " << port_);
 
       if (enable_keepalive_) {
         SetKeepaliveOptions(connection_fd);
@@ -321,8 +319,7 @@ void TcpClientListener::Loop() {
       connection->set_socket(connection_fd);
       const TransportAdapter::Error error = connection->Start();
       if (TransportAdapter::OK != error) {
-        SDL_ERROR(logger_,
-                  "TCP connection::Start() failed with error: " << error);
+        SDL_ERROR("TCP connection::Start() failed with error: " << error);
       } else {
         device_uid_list.push_back(device->unique_device_id());
       }
@@ -336,13 +333,13 @@ void TcpClientListener::Loop() {
       controller_->DeviceDisconnected(*it, DisconnectDeviceError());
     }
   }
-  SDL_INFO(logger_, "TCP server socket loop is terminated.");
+  SDL_INFO("TCP server socket loop is terminated.");
 }
 
 void TcpClientListener::StopLoop() {
   SDL_AUTO_TRACE();
   if (pipe_fds_[1] < 0) {
-    SDL_WARN(logger_, "StopLoop called in invalid state");
+    SDL_WARN("StopLoop called in invalid state");
     return;
   }
 
@@ -352,15 +349,14 @@ void TcpClientListener::StopLoop() {
   int ret = write(pipe_fds_[1], dummy, sizeof(dummy));
   if (ret <= 0) {
     SDL_WARN_WITH_ERRNO(
-        logger_, "Failed to send stop message to TCP server socket loop");
+        "Failed to send stop message to TCP server socket loop");
   }
 }
 
 TransportAdapter::Error TcpClientListener::StartListening() {
   SDL_AUTO_TRACE();
   if (started_) {
-    SDL_WARN(logger_,
-             "TransportAdapter::BAD_STATE. Listener has already been started");
+    SDL_WARN("TransportAdapter::BAD_STATE. Listener has already been started");
     return TransportAdapter::BAD_STATE;
   }
 
@@ -371,14 +367,14 @@ TransportAdapter::Error TcpClientListener::StartListening() {
   if (!IsListeningOnSpecificInterface()) {
     TransportAdapter::Error ret = StartListeningThread();
     if (TransportAdapter::OK != ret) {
-      SDL_ERROR(logger_, "Tcp client listener thread start failed");
+      SDL_ERROR("Tcp client listener thread start failed");
       interface_listener_->Stop();
       return ret;
     }
   }
 
   started_ = true;
-  SDL_INFO(logger_, "Tcp client listener has started successfully");
+  SDL_INFO("Tcp client listener has started successfully");
   return TransportAdapter::OK;
 }
 
@@ -389,14 +385,14 @@ TransportAdapter::Error TcpClientListener::ResumeListening() {
   StartListeningThread();
   started_ = true;
 
-  SDL_INFO(logger_, "Tcp client listener was resumed successfully");
+  SDL_INFO("Tcp client listener was resumed successfully");
   return TransportAdapter::OK;
 }
 
 TransportAdapter::Error TcpClientListener::StopListening() {
   SDL_AUTO_TRACE();
   if (!started_) {
-    SDL_DEBUG(logger_, "TcpClientListener is not running now");
+    SDL_DEBUG("TcpClientListener is not running now");
     return TransportAdapter::BAD_STATE;
   }
 
@@ -405,30 +401,30 @@ TransportAdapter::Error TcpClientListener::StopListening() {
   StopListeningThread();
 
   started_ = false;
-  SDL_INFO(logger_, "Tcp client listener was stopped successfully");
+  SDL_INFO("Tcp client listener was stopped successfully");
   return TransportAdapter::OK;
 }
 
 TransportAdapter::Error TcpClientListener::SuspendListening() {
   SDL_AUTO_TRACE();
   if (!started_) {
-    SDL_DEBUG(logger_, "TcpClientListener is not running now");
+    SDL_DEBUG("TcpClientListener is not running now");
     return TransportAdapter::BAD_STATE;
   }
 
   if (shutdown(socket_, SHUT_RDWR) != 0) {
-    SDL_WARN(logger_, "Socket was unable to be shutdowned");
+    SDL_WARN("Socket was unable to be shutdowned");
   }
 
   if (close(socket_) != 0) {
-    SDL_ERROR_WITH_ERRNO(logger_, "Failed to close socket");
+    SDL_ERROR_WITH_ERRNO( "Failed to close socket");
   }
 
   interface_listener_->Deinit();
   StopListeningThread();
   started_ = false;
 
-  SDL_INFO(logger_, "Tcp client listener was suspended");
+  SDL_INFO("Tcp client listener was suspended");
   return TransportAdapter::OK;
 }
 
@@ -454,11 +450,11 @@ TransportAdapter::Error TcpClientListener::StartListeningThread() {
     // recreate the pipe every time, so that the thread loop will not get
     // leftover data inside pipe after it is started
     if (pipe(pipe_fds_) != 0) {
-      SDL_ERROR_WITH_ERRNO(logger_, "Failed to create internal pipe");
+      SDL_ERROR_WITH_ERRNO( "Failed to create internal pipe");
       return TransportAdapter::FAIL;
     }
     if (!SetNonblocking(pipe_fds_[0])) {
-      SDL_WARN(logger_, "Failed to configure pipe to non-blocking");
+      SDL_WARN("Failed to configure pipe to non-blocking");
     }
   }
 
@@ -497,14 +493,13 @@ void TcpClientListener::OnIPAddressUpdated(const std::string ipv4_addr,
       if (!current_ip_address_.empty()) {
         // the server socket is running, terminate it
         SDL_DEBUG(
-            logger_,
+
             "Stopping current TCP server socket on " << designated_interface_);
         StopOnNetworkInterface();
       }
       if (!ipv4_addr.empty()) {
         // start (or restart) server socket with the new IP address
-        SDL_DEBUG(logger_,
-                  "Starting TCP server socket on " << designated_interface_);
+        SDL_DEBUG("Starting TCP server socket on " << designated_interface_);
         StartOnNetworkInterface();
       }
     }
@@ -535,7 +530,7 @@ bool TcpClientListener::StartOnNetworkInterface() {
       if (socket_ < 0) {
         socket_ = CreateIPv4ServerSocket(port_, designated_interface_);
         if (-1 == socket_) {
-          SDL_WARN(logger_, "Failed to create TCP socket");
+          SDL_WARN("Failed to create TCP socket");
           return false;
         }
       }
@@ -544,10 +539,10 @@ bool TcpClientListener::StartOnNetworkInterface() {
     remove_devices_on_terminate_ = true;
 
     if (TransportAdapter::OK != StartListeningThread()) {
-      SDL_WARN(logger_, "Failed to start TCP client listener");
+      SDL_WARN("Failed to start TCP client listener");
       return false;
     }
-    SDL_INFO(logger_, "TCP server socket started on " << designated_interface_);
+    SDL_INFO("TCP server socket started on " << designated_interface_);
   }
   return true;
 }
@@ -557,7 +552,7 @@ bool TcpClientListener::StopOnNetworkInterface() {
 
   if (IsListeningOnSpecificInterface()) {
     if (TransportAdapter::OK != StopListeningThread()) {
-      SDL_WARN(logger_, "Failed to stop TCP client listener");
+      SDL_WARN("Failed to stop TCP client listener");
       return false;
     }
 
@@ -569,8 +564,7 @@ bool TcpClientListener::StopOnNetworkInterface() {
 
     remove_devices_on_terminate_ = false;
 
-    SDL_INFO(logger_,
-             "TCP server socket on " << designated_interface_ << " stopped");
+    SDL_INFO("TCP server socket on " << designated_interface_ << " stopped");
   }
   return true;
 }
@@ -593,7 +587,7 @@ int TcpClientListener::CreateIPv4ServerSocket(
 
   int sock = socket(AF_INET, SOCK_STREAM, 0);
   if (-1 == sock) {
-    SDL_ERROR_WITH_ERRNO(logger_, "Failed to create socket");
+    SDL_ERROR_WITH_ERRNO( "Failed to create socket");
     return -1;
   }
 
@@ -605,20 +599,20 @@ int TcpClientListener::CreateIPv4ServerSocket(
   int optval = 1;
   if (0 !=
       setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))) {
-    SDL_WARN_WITH_ERRNO(logger_, "setsockopt SO_REUSEADDR failed");
+    SDL_WARN_WITH_ERRNO( "setsockopt SO_REUSEADDR failed");
   }
 
   if (bind(sock,
            reinterpret_cast<sockaddr*>(&server_address),
            sizeof(server_address)) != 0) {
-    SDL_ERROR_WITH_ERRNO(logger_, "bind() failed");
+    SDL_ERROR_WITH_ERRNO( "bind() failed");
     close(sock);
     return -1;
   }
 
   const int kBacklog = 128;
   if (0 != listen(sock, kBacklog)) {
-    SDL_ERROR_WITH_ERRNO(logger_, "listen() failed");
+    SDL_ERROR_WITH_ERRNO( "listen() failed");
     close(sock);
     return -1;
   }
@@ -630,10 +624,10 @@ void TcpClientListener::DestroyServerSocket(int sock) {
   SDL_AUTO_TRACE();
   if (sock >= 0) {
     if (shutdown(sock, SHUT_RDWR) != 0) {
-      SDL_ERROR_WITH_ERRNO(logger_, "Failed to shutdown socket");
+      SDL_ERROR_WITH_ERRNO( "Failed to shutdown socket");
     }
     if (close(sock) != 0) {
-      SDL_ERROR_WITH_ERRNO(logger_, "Failed to close socket");
+      SDL_ERROR_WITH_ERRNO( "Failed to close socket");
     }
   }
 }
@@ -658,7 +652,7 @@ bool TcpClientListener::GetIPv4Address(const std::string interface_name,
 
   struct ifaddrs* if_list;
   if (getifaddrs(&if_list) != 0) {
-    SDL_WARN(logger_, "getifaddrs failed");
+    SDL_WARN("getifaddrs failed");
     return false;
   }
 
@@ -698,13 +692,13 @@ bool TcpClientListener::GetIPv4Address(const std::string interface_name,
 static bool SetNonblocking(int s) {
   int prev_flag = fcntl(s, F_GETFL, 0);
   if (prev_flag == -1) {
-    SDL_ERROR_WITH_ERRNO(logger_, "Failed to acquire socket flag");
+    SDL_ERROR_WITH_ERRNO( "Failed to acquire socket flag");
     return false;
   }
 
   int ret = fcntl(s, F_SETFL, prev_flag | O_NONBLOCK);
   if (ret == -1) {
-    SDL_ERROR_WITH_ERRNO(logger_, "Failed to configure socket to non-blocking");
+    SDL_ERROR_WITH_ERRNO( "Failed to configure socket to non-blocking");
     return false;
   }
 

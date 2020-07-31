@@ -43,7 +43,6 @@ namespace commands {
 
 namespace mobile {
 
-
 SDL_CREATE_LOGGERPTR("OnDriverDistractionNotification")
 
 OnDriverDistractionNotification::OnDriverDistractionNotification(

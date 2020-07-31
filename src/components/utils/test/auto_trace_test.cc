@@ -39,11 +39,11 @@
 #include "utils/file_system.h"
 #include "utils/helpers.h"
 #include "utils/logger.h"
+#include "utils/logger/log4cxxlogger.h"
+#include "utils/logger/logger_impl.h"
 #include "utils/logger_status.h"
 #include "utils/threads/message_loop_thread.h"
 #include "utils/threads/thread.h"
-#include "utils/logger/logger_impl.h"
-#include "utils/logger/log4cxxlogger.h"
 
 namespace test {
 namespace components {
@@ -74,15 +74,15 @@ void InitLogger() {
   // --------------------------------------------------------------------------
   // Logger initialization
   logger::Log4CXXLogger logger("log4cxx.properties");
-    logger::Logger<logger::Log4CXXLogger>::instance().Init(
-          &logger);  // move logger_ to Logger instance
+  logger::Logger<logger::Log4CXXLogger>::instance().Init(
+      &logger);  // move logger_ to Logger instance
 
   // SDL_DEINIT_LOGGER() will be called in test_main.cc
 }
 
 void CreateDeleteAutoTrace(const std::string& testlog) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, testlog);
+  SDL_DEBUG(testlog);
 }
 
 /**

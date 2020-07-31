@@ -63,7 +63,7 @@ void DiagnosticMessageRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "Application is not registered.");
+    SDL_ERROR("Application is not registered.");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -79,8 +79,7 @@ void DiagnosticMessageRequest::Run() {
   if (supported_diag_modes.end() == std::find(supported_diag_modes.begin(),
                                               supported_diag_modes.end(),
                                               msg_diagnostic_mode)) {
-    SDL_ERROR(logger_,
-              "Received diagnostic mode " << msg_diagnostic_mode
+    SDL_ERROR("Received diagnostic mode " << msg_diagnostic_mode
                                           << " is not supported.");
     SendResponse(false,
                  mobile_apis::Result::REJECTED,
@@ -118,7 +117,7 @@ void DiagnosticMessageRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      SDL_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR("Received unknown event" << event.id());
       return;
     }
   }

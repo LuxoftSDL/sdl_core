@@ -40,7 +40,6 @@ using namespace application_manager;
 
 namespace commands {
 
-
 SDL_CREATE_LOGGERPTR("OnSystemTimeReadyNotification")
 
 OnSystemTimeReadyNotification::OnSystemTimeReadyNotification(

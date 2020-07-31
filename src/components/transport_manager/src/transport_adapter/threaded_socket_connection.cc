@@ -101,36 +101,36 @@ TransportAdapter::Error ThreadedSocketConnection::Start() {
   int fds[2];
   const int pipe_ret = pipe(fds);
   if (0 == pipe_ret) {
-    SDL_DEBUG(logger_, "pipe created");
+    SDL_DEBUG("pipe created");
     read_fd_ = fds[0];
     write_fd_ = fds[1];
   } else {
-    SDL_ERROR(logger_, "pipe creation failed");
+    SDL_ERROR("pipe creation failed");
     return TransportAdapter::FAIL;
   }
   const int fcntl_ret =
       fcntl(read_fd_, F_SETFL, fcntl(read_fd_, F_GETFL) | O_NONBLOCK);
   if (0 != fcntl_ret) {
-    SDL_ERROR(logger_, "fcntl failed");
+    SDL_ERROR("fcntl failed");
     return TransportAdapter::FAIL;
   }
 
   if (!thread_->start()) {
-    SDL_ERROR(logger_, "thread creation failed");
+    SDL_ERROR("thread creation failed");
     return TransportAdapter::FAIL;
   }
-  SDL_INFO(logger_, "thread created");
+  SDL_INFO("thread created");
   return TransportAdapter::OK;
 }
 
 void ThreadedSocketConnection::Finalize() {
   SDL_AUTO_TRACE();
   if (unexpected_disconnect_) {
-    SDL_DEBUG(logger_, "unexpected_disconnect");
+    SDL_DEBUG("unexpected_disconnect");
     controller_->ConnectionAborted(
         device_handle(), application_handle(), CommunicationError());
   } else {
-    SDL_DEBUG(logger_, "not unexpected_disconnect");
+    SDL_DEBUG("not unexpected_disconnect");
     controller_->ConnectionFinished(device_handle(), application_handle());
   }
 
@@ -140,15 +140,15 @@ void ThreadedSocketConnection::Finalize() {
 TransportAdapter::Error ThreadedSocketConnection::Notify() const {
   SDL_AUTO_TRACE();
   if (-1 == write_fd_) {
-    SDL_ERROR_WITH_ERRNO(
-        logger_, "Failed to wake up connection thread for connection " << this);
-    SDL_TRACE(logger_, "exit with TransportAdapter::BAD_STATE");
+    SDL_ERROR_WITH_ERRNO("Failed to wake up connection thread for connection "
+                         << this);
+    SDL_TRACE("exit with TransportAdapter::BAD_STATE");
     return TransportAdapter::BAD_STATE;
   }
   uint8_t c = 0;
   if (1 != write(write_fd_, &c, 1)) {
-    SDL_ERROR_WITH_ERRNO(
-        logger_, "Failed to wake up connection thread for connection " << this);
+    SDL_ERROR_WITH_ERRNO("Failed to wake up connection thread for connection "
+                         << this);
     return TransportAdapter::FAIL;
   }
   return TransportAdapter::OK;
@@ -178,22 +178,22 @@ void ThreadedSocketConnection::threadMain() {
   SDL_AUTO_TRACE();
   ConnectError* connect_error = nullptr;
   if (!Establish(&connect_error)) {
-    SDL_ERROR(logger_, "Connection Establish failed");
+    SDL_ERROR("Connection Establish failed");
     delete connect_error;
     Abort();
   } else {
-    SDL_DEBUG(logger_, "Connection established");
+    SDL_DEBUG("Connection established");
     controller_->ConnectDone(device_handle(), application_handle());
   }
 
   while (!terminate_flag_) {
     Transmit();
   }
-  SDL_DEBUG(logger_, "Connection is to finalize");
+  SDL_DEBUG("Connection is to finalize");
   Finalize();
   sync_primitives::AutoLock auto_lock(frames_to_send_mutex_);
   while (!frames_to_send_.empty()) {
-    SDL_INFO(logger_, "removing message");
+    SDL_INFO("removing message");
     ::protocol_handler::RawMessagePtr message = frames_to_send_.front();
     frames_to_send_.pop();
     controller_->DataSendFailed(
@@ -213,13 +213,13 @@ void ThreadedSocketConnection::ShutdownAndCloseSocket() {
   socket_ = -1;
   if (socket != -1) {
     if (shutdown(socket, SHUT_RDWR) != 0) {
-      SDL_WARN(logger_, "Socket was unable to be shutdowned");
+      SDL_WARN("Socket was unable to be shutdowned");
     }
     if (close(socket) != 0) {
-      SDL_ERROR_WITH_ERRNO(logger_, "Failed to close socket");
+      SDL_ERROR_WITH_ERRNO( "Failed to close socket");
     }
   } else {
-    SDL_WARN(logger_, "Socket has been already closed or not created yet");
+    SDL_WARN("Socket has been already closed or not created yet");
   }
 }
 
@@ -237,26 +237,24 @@ void ThreadedSocketConnection::Transmit() {
   poll_fds[1].fd = read_fd_;
   poll_fds[1].events = POLLIN | POLLPRI;
 
-  SDL_DEBUG(logger_, "poll " << this);
+  SDL_DEBUG("poll " << this);
   if (-1 == poll(poll_fds, kPollFdsSize, -1)) {
-    SDL_ERROR_WITH_ERRNO(logger_, "poll failed for connection " << this);
+    SDL_ERROR_WITH_ERRNO( "poll failed for connection " << this);
     Abort();
     return;
   }
-  SDL_DEBUG(logger_,
-            "poll is ok " << this << " revents0: " << std::hex
+  SDL_DEBUG("poll is ok " << this << " revents0: " << std::hex
                           << poll_fds[0].revents << " revents1:" << std::hex
                           << poll_fds[1].revents);
   // error check
   if (0 != (poll_fds[1].revents & (POLLERR | POLLHUP | POLLNVAL))) {
-    SDL_ERROR(logger_,
-              "Notification pipe for connection " << this << " terminated");
+    SDL_ERROR("Notification pipe for connection " << this << " terminated");
     Abort();
     return;
   }
 
   if (poll_fds[0].revents & (POLLERR | POLLHUP | POLLNVAL)) {
-    SDL_WARN(logger_, "Connection " << this << " terminated");
+    SDL_WARN("Connection " << this << " terminated");
     Abort();
     return;
   }
@@ -268,8 +266,8 @@ void ThreadedSocketConnection::Transmit() {
     bytes_read = read(read_fd_, buffer, sizeof(buffer));
   } while (bytes_read > 0);
   if ((bytes_read < 0) && (EAGAIN != errno)) {
-    SDL_ERROR_WITH_ERRNO(logger_, "Failed to clear notification pipe");
-    SDL_ERROR_WITH_ERRNO(logger_, "poll failed for connection " << this);
+    SDL_ERROR_WITH_ERRNO( "Failed to clear notification pipe");
+    SDL_ERROR_WITH_ERRNO( "poll failed for connection " << this);
     Abort();
     return;
   }
@@ -278,12 +276,12 @@ void ThreadedSocketConnection::Transmit() {
 
   // Send data if possible
   if (!is_queue_empty && (poll_fds[0].revents & POLLOUT)) {
-    SDL_DEBUG(logger_, "frames_to_send_ not empty() ");
+    SDL_DEBUG("frames_to_send_ not empty() ");
 
     // send data
     const bool send_ok = Send();
     if (!send_ok) {
-      SDL_ERROR(logger_, "Send() failed ");
+      SDL_ERROR("Send() failed ");
       Abort();
       return;
     }
@@ -293,7 +291,7 @@ void ThreadedSocketConnection::Transmit() {
   if (poll_fds[0].revents & (POLLIN | POLLPRI)) {
     const bool receive_ok = Receive();
     if (!receive_ok) {
-      SDL_ERROR(logger_, "Receive() failed ");
+      SDL_ERROR("Receive() failed ");
       Abort();
       return;
     }
@@ -309,19 +307,18 @@ bool ThreadedSocketConnection::Receive() {
     bytes_read = recv(socket_, buffer, sizeof(buffer), MSG_DONTWAIT);
 
     if (bytes_read > 0) {
-      SDL_DEBUG(logger_,
-                "Received " << bytes_read << " bytes for connection " << this);
+      SDL_DEBUG("Received " << bytes_read << " bytes for connection " << this);
       ::protocol_handler::RawMessagePtr frame(
           new protocol_handler::RawMessage(0, 0, buffer, bytes_read, false));
       controller_->DataReceiveDone(
           device_handle(), application_handle(), frame);
     } else if (bytes_read < 0) {
       if (EAGAIN != errno && EWOULDBLOCK != errno) {
-        SDL_ERROR_WITH_ERRNO(logger_, "recv() failed for connection " << this);
+        SDL_ERROR_WITH_ERRNO( "recv() failed for connection " << this);
         return false;
       }
     } else {
-      SDL_WARN(logger_, "Connection " << this << " closed by remote peer");
+      SDL_WARN("Connection " << this << " closed by remote peer");
       return false;
     }
   } while (bytes_read > 0);
@@ -340,13 +337,13 @@ bool ThreadedSocketConnection::Send() {
 
   size_t offset = 0;
   while (!frames_to_send_local.empty()) {
-    SDL_INFO(logger_, "frames_to_send is not empty");
+    SDL_INFO("frames_to_send is not empty");
     ::protocol_handler::RawMessagePtr frame = frames_to_send_local.front();
     const ssize_t bytes_sent =
         ::send(socket_, frame->data() + offset, frame->data_size() - offset, 0);
 
     if (bytes_sent >= 0) {
-      SDL_DEBUG(logger_, "bytes_sent >= 0");
+      SDL_DEBUG("bytes_sent >= 0");
       offset += bytes_sent;
       if (offset == frame->data_size()) {
         frames_to_send_local.pop();
@@ -354,8 +351,8 @@ bool ThreadedSocketConnection::Send() {
         controller_->DataSendDone(device_handle(), application_handle(), frame);
       }
     } else {
-      SDL_DEBUG(logger_, "bytes_sent < 0");
-      SDL_ERROR_WITH_ERRNO(logger_, "Send failed for connection " << this);
+      SDL_DEBUG("bytes_sent < 0");
+      SDL_ERROR_WITH_ERRNO( "Send failed for connection " << this);
       frames_to_send_local.pop();
       offset = 0;
       controller_->DataSendFailed(

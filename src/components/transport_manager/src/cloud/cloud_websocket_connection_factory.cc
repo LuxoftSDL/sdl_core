@@ -67,7 +67,7 @@ TransportAdapter::Error CloudWebsocketConnectionFactory::CreateConnection(
   TransportAdapter::Error error = ws_connection->Start();
   if (TransportAdapter::OK != error) {
     SDL_ERROR(
-        logger_,
+
         "Cloud Websocket connection::Start() failed with error: " << error);
   }
   return error;

@@ -105,7 +105,7 @@ void CustomVehicleDataManagerImpl::CreateMobileMessageParams(
                         ? FindSchemaByKeyRecursive(key)
                         : FindSchemaByKeyNonRecursive(key);
       if (!schema.is_initialized()) {
-        SDL_DEBUG(logger_, "Schema for: " << key << " cannot be found");
+        SDL_DEBUG("Schema for: " << key << " cannot be found");
         continue;
       }
 

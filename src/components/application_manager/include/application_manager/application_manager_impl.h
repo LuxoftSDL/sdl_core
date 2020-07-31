@@ -1261,7 +1261,7 @@ class ApplicationManagerImpl
     typename ApplicationList::const_iterator it;
     for (it = app_list.begin(); it != app_list.end(); ++it) {
       if (it->use_count() == 0) {
-        SDL_ERROR(logger_, "Application not found ");
+        SDL_ERROR("Application not found ");
         continue;
       }
 
@@ -1275,12 +1275,12 @@ class ApplicationManagerImpl
                                                     app_mngr)) {
         applications[app_count++] = hmi_application;
       } else {
-        SDL_DEBUG(logger_, "Can't CreateHMIApplicationStruct ");
+        SDL_DEBUG("Can't CreateHMIApplicationStruct ");
       }
     }
 
     if (0 == app_count) {
-      SDL_WARN(logger_, "Empty applications list");
+      SDL_WARN("Empty applications list");
     }
   }
 

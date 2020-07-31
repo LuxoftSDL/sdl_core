@@ -68,7 +68,7 @@ void ListFilesRequest::Run() {
 
   if (!application) {
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     return;
   }
 
@@ -79,8 +79,7 @@ void ListFilesRequest::Run() {
        application->list_files_in_none_count())) {
     // If application is in the HMI_NONE level the quantity of allowed
     // DeleteFile request is limited by the configuration profile
-    SDL_ERROR(logger_,
-              "Too many requests from the app with HMILevel HMI_NONE ");
+    SDL_ERROR("Too many requests from the app with HMILevel HMI_NONE ");
     SendResponse(false, mobile_apis::Result::REJECTED);
     return;
   }
@@ -99,10 +98,10 @@ void ListFilesRequest::Run() {
   std::vector<std::string>::const_iterator it = persistent_files.begin();
   for (; it != persistent_files.end(); ++it) {
     if (i < application_manager_.get_settings().list_files_response_size()) {
-      SDL_DEBUG(logger_, "File " + *it + " added to ListFiles response");
+      SDL_DEBUG("File " + *it + " added to ListFiles response");
       (*message_)[strings::msg_params][strings::filenames][i++] = *it;
     } else {
-      SDL_DEBUG(logger_, "File " + *it + " not added to ListFiles response");
+      SDL_DEBUG("File " + *it + " not added to ListFiles response");
     }
   }
   (*message_)[strings::params][strings::message_type] =

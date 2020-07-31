@@ -88,9 +88,8 @@ app_mngr::CommandSharedPtr AppServiceMobileCommandFactory::CreateCommand(
   }
 
   UNUSED(message_type_str);
-  SDL_DEBUG(logger_,
-            "HMICommandFactory::CreateCommand function_id: "
-                << function_id << ", message type: " << message_type_str);
+  SDL_DEBUG("HMICommandFactory::CreateCommand function_id: "
+            << function_id << ", message type: " << message_type_str);
 
   return buildCommandCreator(function_id, message_type, source).create(message);
 }
@@ -170,7 +169,7 @@ app_mngr::CommandCreator& AppServiceMobileCommandFactory::buildCommandCreator(
       }
       break;
     default:
-      SDL_WARN(logger_, "Unsupported function_id: " << function_id);
+      SDL_WARN("Unsupported function_id: " << function_id);
   }
   return factory.GetCreator<app_mngr::InvalidCommand>();
 }

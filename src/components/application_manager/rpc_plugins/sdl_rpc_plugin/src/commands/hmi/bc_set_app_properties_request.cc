@@ -83,9 +83,8 @@ void BCSetAppPropertiesRequest::Run() {
     application_manager_.GetRPCService().ManageHMICommand(notification);
   }
   if (is_new_app) {
-    SDL_ERROR(logger_,
-              "Message contains unknow policyAppId: "
-                  << policy_app_id << ", PTU will be triggered");
+    SDL_ERROR("Message contains unknow policyAppId: "
+              << policy_app_id << ", PTU will be triggered");
     policy_handler_.OnLocalAppAdded();
   }
 

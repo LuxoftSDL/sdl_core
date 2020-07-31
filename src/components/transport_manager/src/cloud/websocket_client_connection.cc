@@ -90,21 +90,19 @@ TransportAdapter::Error WebsocketClientConnection::Start() {
   auto const port = cloud_device->GetPort();
   boost::system::error_code ec;
 
-  SDL_DEBUG(logger_, "Cloud app endpoint: " << cloud_properties.endpoint);
-  SDL_DEBUG(logger_, "Cloud app certificate: " << cloud_properties.certificate);
-  SDL_DEBUG(logger_,
-            "Cloud app authentication token: " << cloud_properties.auth_token);
+  SDL_DEBUG("Cloud app endpoint: " << cloud_properties.endpoint);
+  SDL_DEBUG("Cloud app certificate: " << cloud_properties.certificate);
+  SDL_DEBUG("Cloud app authentication token: " << cloud_properties.auth_token);
   SDL_DEBUG(
-      logger_,
+
       "Cloud app transport type: " << cloud_properties.cloud_transport_type);
-  SDL_DEBUG(logger_,
-            "Cloud app hybrid app preference: "
-                << cloud_properties.hybrid_app_preference);
+  SDL_DEBUG("Cloud app hybrid app preference: "
+            << cloud_properties.hybrid_app_preference);
 
   auto const results = resolver_.resolve(host, port, ec);
   if (ec) {
     std::string str_err = "ErrorMessage: " + ec.message();
-    SDL_ERROR(logger_, "Could not resolve host/port: " << str_err);
+    SDL_ERROR("Could not resolve host/port: " << str_err);
     return TransportAdapter::FAIL;
   }
 
@@ -121,9 +119,8 @@ TransportAdapter::Error WebsocketClientConnection::Start() {
 
   if (ec) {
     std::string str_err = "ErrorMessage: " + ec.message();
-    SDL_ERROR(logger_,
-              "Could not connect to websocket: " << host << ":" << port);
-    SDL_ERROR(logger_, str_err);
+    SDL_ERROR("Could not connect to websocket: " << host << ":" << port);
+    SDL_ERROR(str_err);
     return TransportAdapter::FAIL;
   }
 
@@ -133,10 +130,9 @@ TransportAdapter::Error WebsocketClientConnection::Start() {
 
     if (ec) {
       std::string str_err = "ErrorMessage: " + ec.message();
-      SDL_ERROR(logger_,
-                "Failed to add certificate authority: "
-                    << cloud_properties.certificate);
-      SDL_ERROR(logger_, str_err);
+      SDL_ERROR("Failed to add certificate authority: "
+                << cloud_properties.certificate);
+      SDL_ERROR(str_err);
       Shutdown();
       return TransportAdapter::FAIL;
     }
@@ -146,10 +142,9 @@ TransportAdapter::Error WebsocketClientConnection::Start() {
 
     if (ec) {
       std::string str_err = "ErrorMessage: " + ec.message();
-      SDL_ERROR(logger_,
-                "Could not complete SSL Handshake failed with host/port: "
-                    << host << ":" << port);
-      SDL_ERROR(logger_, str_err);
+      SDL_ERROR("Could not complete SSL Handshake failed with host/port: "
+                << host << ":" << port);
+      SDL_ERROR(str_err);
       Shutdown();
       return TransportAdapter::FAIL;
     }
@@ -168,9 +163,9 @@ TransportAdapter::Error WebsocketClientConnection::Start() {
   if (ec) {
     std::string str_err = "ErrorMessage: " + ec.message();
     SDL_ERROR(
-        logger_,
+
         "Could not complete handshake with host/port: " << host << ":" << port);
-    SDL_ERROR(logger_, str_err);
+    SDL_ERROR(str_err);
     return TransportAdapter::FAIL;
   }
 
@@ -207,7 +202,7 @@ TransportAdapter::Error WebsocketClientConnection::Start() {
   boost::asio::post(io_pool_, [&]() { ioc_.run(); });
 
   SDL_DEBUG(
-      logger_,
+
       "Successfully started websocket connection @: " << host << ":" << port);
   return TransportAdapter::OK;
 }
@@ -219,7 +214,7 @@ void WebsocketClientConnection::Recv(boost::system::error_code ec) {
 
   if (ec) {
     std::string str_err = "ErrorMessage: " + ec.message();
-    SDL_ERROR(logger_, str_err);
+    SDL_ERROR(str_err);
     Shutdown();
     return;
   }
@@ -246,7 +241,7 @@ void WebsocketClientConnection::OnRead(boost::system::error_code ec,
   boost::ignore_unused(bytes_transferred);
   if (ec) {
     std::string str_err = "ErrorMessage: " + ec.message();
-    SDL_ERROR(logger_, str_err);
+    SDL_ERROR(str_err);
     ws_.lowest_layer().close();
     ioc_.stop();
     Shutdown();
@@ -335,7 +330,7 @@ void WebsocketClientConnection::LoopThreadDelegate::DrainQueue() {
       }
 #endif  // ENABLE_SECURITY
       if (ec) {
-        SDL_ERROR(logger_, "Error writing to websocket");
+        SDL_ERROR("Error writing to websocket");
         handler_.controller_->DataSendFailed(handler_.device_uid_,
                                              handler_.app_handle_,
                                              message_ptr,

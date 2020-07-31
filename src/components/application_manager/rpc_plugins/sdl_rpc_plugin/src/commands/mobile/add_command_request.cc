@@ -87,7 +87,7 @@ void AddCommandRequest::Run() {
       (*message_)[strings::params][strings::connection_key].asUInt());
 
   if (!app) {
-    SDL_ERROR(logger_, "No application associated with session key");
+    SDL_ERROR("No application associated with session key");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -99,22 +99,21 @@ void AddCommandRequest::Run() {
         application_manager_);
 
     if (mobile_apis::Result::INVALID_DATA == verification_result) {
-      SDL_ERROR(logger_,
-                "MessageHelper::VerifyImage return " << verification_result);
+      SDL_ERROR("MessageHelper::VerifyImage return " << verification_result);
       SendResponse(false, verification_result);
       return;
     }
   }
 
   if (!((*message_)[strings::msg_params].keyExists(strings::cmd_id))) {
-    SDL_ERROR(logger_, "INVALID_DATA");
+    SDL_ERROR("INVALID_DATA");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
 
   if (app->FindCommand(
           (*message_)[strings::msg_params][strings::cmd_id].asUInt())) {
-    SDL_ERROR(logger_, "INVALID_ID");
+    SDL_ERROR("INVALID_ID");
     SendResponse(false, mobile_apis::Result::INVALID_ID);
     return;
   }
@@ -151,13 +150,13 @@ void AddCommandRequest::Run() {
   }
 
   if (!data_exist) {
-    SDL_ERROR(logger_, "INVALID_DATA");
+    SDL_ERROR("INVALID_DATA");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
 
   if (IsWhiteSpaceExist()) {
-    SDL_ERROR(logger_, "Incoming add command has contains \t\n \\t \\n");
+    SDL_ERROR("Incoming add command has contains \t\n \\t \\n");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -247,9 +246,9 @@ bool AddCommandRequest::CheckCommandName(ApplicationConstSharedPtr app) {
                     [strings::menu_name]
                         .asString()) &&
         (saved_parent_id == parent_id)) {
-      SDL_INFO(logger_,
-               "AddCommandRequest::CheckCommandName received"
-               " command name already exist in same level menu");
+      SDL_INFO(
+          "AddCommandRequest::CheckCommandName received"
+          " command name already exist in same level menu");
       return false;
     }
   }
@@ -281,9 +280,9 @@ bool AddCommandRequest::CheckCommandVRSynonym(ApplicationConstSharedPtr app) {
                 .asCustomString();
 
         if (vr_cmd_i.CompareIgnoreCase(vr_cmd_j)) {
-          SDL_INFO(logger_,
-                   "AddCommandRequest::CheckCommandVRSynonym"
-                   " received command vr synonym already exist");
+          SDL_INFO(
+              "AddCommandRequest::CheckCommandVRSynonym"
+              " received command vr synonym already exist");
           return false;
         }
       }
@@ -304,9 +303,9 @@ bool AddCommandRequest::CheckCommandParentId(ApplicationConstSharedPtr app) {
   smart_objects::SmartObject* parent = app->FindSubMenu(parent_id);
 
   if (!parent) {
-    SDL_INFO(logger_,
-             "AddCommandRequest::CheckCommandParentId received"
-             " submenu doesn't exist");
+    SDL_INFO(
+        "AddCommandRequest::CheckCommandParentId received"
+        " submenu doesn't exist");
     return false;
   }
   return true;
@@ -323,7 +322,7 @@ void AddCommandRequest::on_event(const event_engine::Event& event) {
       application_manager_.application(connection_key());
 
   if (!application) {
-    SDL_ERROR(logger_, "NULL pointer");
+    SDL_ERROR("NULL pointer");
     return;
   }
 
@@ -335,7 +334,7 @@ void AddCommandRequest::on_event(const event_engine::Event& event) {
 
   switch (event.id()) {
     case hmi_apis::FunctionID::UI_AddCommand: {
-      SDL_INFO(logger_, "Received UI_AddCommand event");
+      SDL_INFO("Received UI_AddCommand event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_UI);
       is_ui_received_ = true;
       ui_result_ = static_cast<hmi_apis::Common_Result::eType>(
@@ -347,7 +346,7 @@ void AddCommandRequest::on_event(const event_engine::Event& event) {
       break;
     }
     case hmi_apis::FunctionID::VR_AddCommand: {
-      SDL_INFO(logger_, "Received VR_AddCommand event");
+      SDL_INFO("Received VR_AddCommand event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_VR);
       is_vr_received_ = true;
       vr_result_ = static_cast<hmi_apis::Common_Result::eType>(
@@ -359,7 +358,7 @@ void AddCommandRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      SDL_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR("Received unknown event" << event.id());
       return;
     }
   }
@@ -413,8 +412,7 @@ void AddCommandRequest::on_event(const event_engine::Event& event) {
                 (is_no_ui_error && is_vr_invalid_unsupported) ||
                 (is_no_vr_error && is_ui_invalid_unsupported);
 
-  SDL_DEBUG(logger_,
-            "calculated result " << ui_result_ << " " << is_no_ui_error << " "
+  SDL_DEBUG("calculated result " << ui_result_ << " " << is_no_ui_error << " "
                                  << is_no_vr_error);
   const bool is_vr_or_ui_warning =
       Compare<hmi_apis::Common_Result::eType, EQ, ONE>(
@@ -447,7 +445,7 @@ void AddCommandRequest::on_event(const event_engine::Event& event) {
     if (hmi_apis::Common_Result::UNSUPPORTED_RESOURCE == vr_result_) {
       result_code = MessageHelper::HMIToMobileResult(ui_result_);
     }
-    SDL_DEBUG(logger_, "HMIToMobileResult " << result_code);
+    SDL_DEBUG("HMIToMobileResult " << result_code);
   }
 
   if (BothSend() && hmi_apis::Common_Result::SUCCESS == vr_result_) {
@@ -468,7 +466,7 @@ void AddCommandRequest::on_event(const event_engine::Event& event) {
       SendHMIRequest(hmi_apis::FunctionID::VR_DeleteCommand, &msg_params);
       application->RemoveCommand(cmd_id);
       result = false;
-      SDL_DEBUG(logger_, "Result " << result);
+      SDL_DEBUG("Result " << result);
     }
   }
 
@@ -483,7 +481,7 @@ void AddCommandRequest::on_event(const event_engine::Event& event) {
 
     application->RemoveCommand(cmd_id);
     result = false;
-    SDL_DEBUG(logger_, "Result " << result);
+    SDL_DEBUG("Result " << result);
   }
 
   HmiInterfaces::InterfaceState ui_interface_state =
@@ -498,12 +496,12 @@ void AddCommandRequest::on_event(const event_engine::Event& event) {
         HmiInterfaces::STATE_NOT_AVAILABLE == vr_interface_state) ||
        (is_ui_unsupported &&
         HmiInterfaces::STATE_NOT_AVAILABLE == ui_interface_state))) {
-    SDL_DEBUG(logger_, "!BothSend() && is_vr_or_ui_unsupported");
+    SDL_DEBUG("!BothSend() && is_vr_or_ui_unsupported");
     result = false;
   }
 
   if (is_vr_and_ui_unsupported) {
-    SDL_DEBUG(logger_, "UI and VR interface both unsupported");
+    SDL_DEBUG("UI and VR interface both unsupported");
     result = false;
   }
 
@@ -534,7 +532,7 @@ bool AddCommandRequest::IsWhiteSpaceExist() {
                      [strings::menu_name]
                          .asCharArray();
     if (!CheckSyntax(str)) {
-      SDL_ERROR(logger_, "Invalid menu name syntax check failed.");
+      SDL_ERROR("Invalid menu name syntax check failed.");
       return true;
     }
   }
@@ -547,7 +545,7 @@ bool AddCommandRequest::IsWhiteSpaceExist() {
       str = (*message_)[strings::msg_params][strings::vr_commands][i]
                 .asCharArray();
       if (!CheckSyntax(str)) {
-        SDL_ERROR(logger_, "Invalid vr_commands syntax check failed");
+        SDL_ERROR("Invalid vr_commands syntax check failed");
         return true;
       }
     }
@@ -557,7 +555,7 @@ bool AddCommandRequest::IsWhiteSpaceExist() {
     str = (*message_)[strings::msg_params][strings::cmd_icon][strings::value]
               .asCharArray();
     if (!CheckSyntax(str)) {
-      SDL_ERROR(logger_, "Invalid cmd_icon value syntax check failed");
+      SDL_ERROR("Invalid cmd_icon value syntax check failed");
       return true;
     }
   }
@@ -601,7 +599,7 @@ void AddCommandRequest::RemoveCommand() {
   SDL_AUTO_TRACE();
   ApplicationSharedPtr app = application_manager_.application(connection_key());
   if (app.use_count() == 0) {
-    SDL_ERROR(logger_, "No application associated with session key");
+    SDL_ERROR("No application associated with session key");
     return;
   }
 

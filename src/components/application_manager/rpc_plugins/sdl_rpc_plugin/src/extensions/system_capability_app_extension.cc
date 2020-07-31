@@ -18,15 +18,13 @@ SystemCapabilityAppExtension::~SystemCapabilityAppExtension() {}
 
 bool SystemCapabilityAppExtension::SubscribeTo(
     const SystemCapabilityType system_capability_type) {
-  SDL_INFO(logger_,
-           "Subscribing to System Capability " << system_capability_type);
+  SDL_INFO("Subscribing to System Capability " << system_capability_type);
   return subscribed_data_.insert(system_capability_type).second;
 }
 
 bool SystemCapabilityAppExtension::UnsubscribeFrom(
     const SystemCapabilityType system_capability_type) {
-  SDL_INFO(logger_,
-           "Unsubscribing from System Capability " << system_capability_type);
+  SDL_INFO("Unsubscribing from System Capability " << system_capability_type);
   auto it = subscribed_data_.find(system_capability_type);
   if (it != subscribed_data_.end()) {
     subscribed_data_.erase(it);
@@ -36,13 +34,13 @@ bool SystemCapabilityAppExtension::UnsubscribeFrom(
 }
 
 void SystemCapabilityAppExtension::UnsubscribeFromAll() {
-  SDL_INFO(logger_, "Unsubscribing from ALL System Capabilities");
+  SDL_INFO("Unsubscribing from ALL System Capabilities");
   subscribed_data_.clear();
 }
 
 bool SystemCapabilityAppExtension::IsSubscribedTo(
     const SystemCapabilityType system_capability_type) const {
-  SDL_DEBUG(logger_, system_capability_type);
+  SDL_DEBUG(system_capability_type);
   return subscribed_data_.find(system_capability_type) !=
          subscribed_data_.end();
 }

@@ -75,13 +75,13 @@ bool ConditionalVariable::Wait(BaseLock& lock) {
       cond_var_.wait<boost::recursive_mutex>(test_rec_lock->mutex_);
     } else {
       // unknown, give up the lock
-      SDL_ERROR(logger_, "Unknown lock type!");
+      SDL_ERROR("Unknown lock type!");
       NOTREACHED();
     }
     lock.AssertFreeAndMarkTaken();
   } catch (const boost::exception& error) {
     std::string error_string = boost::diagnostic_information(error);
-    SDL_FATAL(logger_, error_string);
+    SDL_FATAL(error_string);
     NOTREACHED();
   }
   return true;
@@ -115,7 +115,7 @@ ConditionalVariable::WaitStatus ConditionalVariable::WaitFor(
           test_rec_lock->mutex_, boost::posix_time::milliseconds(milliseconds));
     } else {
       // this is an unknown lock, we have an issue
-      SDL_ERROR(logger_, "Unknown lock type!");
+      SDL_ERROR("Unknown lock type!");
       NOTREACHED();
     }
 
@@ -125,7 +125,7 @@ ConditionalVariable::WaitStatus ConditionalVariable::WaitFor(
     lock.AssertFreeAndMarkTaken();
   } catch (const boost::exception& error) {
     std::string error_string = boost::diagnostic_information(error);
-    SDL_FATAL(logger_, error_string);
+    SDL_FATAL(error_string);
     NOTREACHED();
   }
 

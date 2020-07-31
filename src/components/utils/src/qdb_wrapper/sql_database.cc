@@ -101,10 +101,10 @@ qdb_hdl_t* SQLDatabase::conn() const {
 bool SQLDatabase::Backup() {
   if (qdb_backup(conn_, QDB_ATTACH_DEFAULT) == -1) {
     error_ = Error::ERROR;
-    SDL_ERROR(logger_, "Backup returned error: " << std::strerror(errno));
+    SDL_ERROR("Backup returned error: " << std::strerror(errno));
     return false;
   }
-  SDL_INFO(logger_, "Backup was successful.");
+  SDL_INFO("Backup was successful.");
   return true;
 }
 

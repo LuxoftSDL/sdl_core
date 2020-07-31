@@ -95,7 +95,7 @@ void NotificationFromHMI::CreateHMIRequest(
   smart_objects::SmartObjectSPtr result =
       std::make_shared<smart_objects::SmartObject>();
   if (!result) {
-    SDL_ERROR(logger_, "Memory allocation failed.");
+    SDL_ERROR("Memory allocation failed.");
     return;
   }
 
@@ -117,7 +117,7 @@ void NotificationFromHMI::CreateHMIRequest(
   request[strings::msg_params] = msg_params;
 
   if (!rpc_service_.ManageHMICommand(result)) {
-    SDL_ERROR(logger_, "Unable to send request");
+    SDL_ERROR("Unable to send request");
     return;
   }
 }

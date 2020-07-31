@@ -107,9 +107,8 @@ void ServiceStatusUpdateHandler::OnServiceUpdate(
           update_reason);
     }
     default: {
-      SDL_WARN(logger_,
-               "Received unknown ServiceStatus: "
-                   << static_cast<int32_t>(service_status));
+      SDL_WARN("Received unknown ServiceStatus: "
+               << static_cast<int32_t>(service_status));
       return;
     }
   }

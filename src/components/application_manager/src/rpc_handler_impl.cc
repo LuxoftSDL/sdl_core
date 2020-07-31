@@ -71,13 +71,13 @@ void RPCHandlerImpl::ProcessMessageFromMobile(
   bool allow_unknown_parameters = false;
   DCHECK_OR_RETURN_VOID(so_from_mobile);
   if (!so_from_mobile) {
-    SDL_ERROR(logger_, "Null pointer");
+    SDL_ERROR("Null pointer");
     return;
   }
 
   if (message->type() == application_manager::MessageType::kRequest &&
       message->correlation_id() < 0) {
-    SDL_ERROR(logger_, "Request correlation id < 0. Returning INVALID_ID");
+    SDL_ERROR("Request correlation id < 0. Returning INVALID_ID");
     std::shared_ptr<smart_objects::SmartObject> response(
         MessageHelper::CreateNegativeResponse(message->connection_key(),
                                               message->function_id(),
@@ -102,9 +102,8 @@ void RPCHandlerImpl::ProcessMessageFromMobile(
   if (app_manager_.GetRPCService().IsAppServiceRPC(
           message->function_id(), commands::Command::SOURCE_MOBILE) ||
       rpc_passing) {
-    SDL_DEBUG(logger_,
-              "Allowing unknown parameters for request function "
-                  << message->function_id());
+    SDL_DEBUG("Allowing unknown parameters for request function "
+              << message->function_id());
     allow_unknown_parameters = true;
   }
 
@@ -114,7 +113,7 @@ void RPCHandlerImpl::ProcessMessageFromMobile(
                           warning_info,
                           allow_unknown_parameters,
                           !rpc_passing)) {
-    SDL_ERROR(logger_, "Cannot create smart object from message");
+    SDL_ERROR("Cannot create smart object from message");
     return;
   }
 
@@ -136,7 +135,7 @@ void RPCHandlerImpl::ProcessMessageFromMobile(
                                              message_type)) {
       // Since PassThrough failed, refiltering the message
       if (!ConvertMessageToSO(*message, *so_from_mobile, warning_info)) {
-        SDL_ERROR(logger_, "Cannot create smart object from message");
+        SDL_ERROR("Cannot create smart object from message");
         return;
       }
     }
@@ -148,7 +147,7 @@ void RPCHandlerImpl::ProcessMessageFromMobile(
 
   if (!app_manager_.GetRPCService().ManageMobileCommand(
           so_from_mobile, commands::Command::SOURCE_MOBILE, warning_info)) {
-    SDL_ERROR(logger_, "Received command didn't run successfully");
+    SDL_ERROR("Received command didn't run successfully");
   }
 #ifdef TELEMETRY_MONITOR
   metric->end = date_time::getCurrentTime();
@@ -174,9 +173,8 @@ void RPCHandlerImpl::ProcessMessageFromHMI(
       converted_result[jhs::S_PARAMS][jhs::S_FUNCTION_ID].asInt());
   if (app_manager_.GetRPCService().IsAppServiceRPC(
           function_id, commands::Command::SOURCE_HMI)) {
-    SDL_DEBUG(
-        logger_,
-        "Allowing unknown parameters for request function " << function_id);
+    SDL_DEBUG("Allowing unknown parameters for request function "
+              << function_id);
     allow_unknown_parameters = true;
   }
 
@@ -191,19 +189,19 @@ void RPCHandlerImpl::ProcessMessageFromHMI(
       (*smart_object)[strings::msg_params][strings::info] =
           std::string("Invalid message received from vehicle");
     } else {
-      SDL_ERROR(logger_, "Cannot create smart object from message");
+      SDL_ERROR("Cannot create smart object from message");
       return;
     }
   }
 
   if (!warning_info.empty()) {
-    SDL_WARN(logger_, "Warning while parsing HMI message: " << warning_info);
+    SDL_WARN("Warning while parsing HMI message: " << warning_info);
   }
 
-  SDL_DEBUG(logger_, "Converted message, trying to create hmi command");
+  SDL_DEBUG("Converted message, trying to create hmi command");
   if (!app_manager_.GetRPCService().ManageHMICommand(
           smart_object, commands::Command::SOURCE_HMI, warning_info)) {
-    SDL_ERROR(logger_, "Received command didn't run successfully");
+    SDL_ERROR("Received command didn't run successfully");
   }
 }
 
@@ -211,15 +209,15 @@ void RPCHandlerImpl::Handle(const impl::MessageFromMobile message) {
   SDL_AUTO_TRACE();
 
   if (!message) {
-    SDL_ERROR(logger_, "Null-pointer message received.");
+    SDL_ERROR("Null-pointer message received.");
     return;
   }
   if (app_manager_.is_stopping()) {
-    SDL_INFO(logger_, "Application manager is stopping");
+    SDL_INFO("Application manager is stopping");
     return;
   }
   if (app_manager_.IsLowVoltage()) {
-    SDL_ERROR(logger_, "Low Voltage is active.");
+    SDL_ERROR("Low Voltage is active.");
     return;
   }
 
@@ -230,11 +228,11 @@ void RPCHandlerImpl::Handle(const impl::MessageFromHmi message) {
   SDL_AUTO_TRACE();
 
   if (!message) {
-    SDL_ERROR(logger_, "Null-pointer message received.");
+    SDL_ERROR("Null-pointer message received.");
     return;
   }
   if (app_manager_.IsLowVoltage()) {
-    SDL_ERROR(logger_, "Low Voltage is active.");
+    SDL_ERROR("Low Voltage is active.");
     return;
   }
 
@@ -246,12 +244,12 @@ void RPCHandlerImpl::OnMessageReceived(
   SDL_AUTO_TRACE();
 
   if (app_manager_.IsLowVoltage()) {
-    SDL_ERROR(logger_, "Low Voltage is active.");
+    SDL_ERROR("Low Voltage is active.");
     return;
   }
 
   if (!message) {
-    SDL_ERROR(logger_, "Null-pointer message received.");
+    SDL_ERROR("Null-pointer message received.");
     NOTREACHED();
     return;
   }
@@ -259,7 +257,7 @@ void RPCHandlerImpl::OnMessageReceived(
   std::shared_ptr<Message> outgoing_message = ConvertRawMsgToMessage(message);
 
   if (outgoing_message) {
-    SDL_DEBUG(logger_, "Posting new Message");
+    SDL_DEBUG("Posting new Message");
     messages_from_mobile_.PostMessage(
         impl::MessageFromMobile(outgoing_message));
   }
@@ -275,7 +273,7 @@ void RPCHandlerImpl::OnMessageReceived(
   SDL_AUTO_TRACE();
 
   if (!message) {
-    SDL_ERROR(logger_, "Null-pointer message received.");
+    SDL_ERROR("Null-pointer message received.");
     NOTREACHED();
     return;
   }
@@ -335,8 +333,7 @@ bool RPCHandlerImpl::ConvertMessageToSO(
     const bool allow_unknown_parameters,
     const bool validate_params) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_,
-            "\t\t\tMessage to convert: protocol " << message.protocol_version()
+  SDL_DEBUG("\t\t\tMessage to convert: protocol " << message.protocol_version()
                                                   << "; json "
                                                   << message.json_message());
 
@@ -370,10 +367,8 @@ bool RPCHandlerImpl::ConvertMessageToSO(
           (validate_params &&
            !ValidateRpcSO(
                output, msg_version, report, allow_unknown_parameters))) {
-        SDL_WARN(logger_,
-                 "Failed to parse string to smart object with API version "
-                     << msg_version.toString() << " : "
-                     << message.json_message());
+        SDL_WARN("Failed to parse string to smart object with API version "
+                 << msg_version.toString() << " : " << message.json_message());
 
         std::shared_ptr<smart_objects::SmartObject> response(
             MessageHelper::CreateNegativeResponse(
@@ -390,9 +385,8 @@ bool RPCHandlerImpl::ConvertMessageToSO(
         return false;
       }
 
-      SDL_DEBUG(logger_,
-                "Convertion result for sdl object is true function_id "
-                    << output[jhs::S_PARAMS][jhs::S_FUNCTION_ID].asInt());
+      SDL_DEBUG("Convertion result for sdl object is true function_id "
+                << output[jhs::S_PARAMS][jhs::S_FUNCTION_ID].asInt());
 
       // Populate any warning info generated during the validation process
       out_warning_info = rpc::PrettyFormat(report);
@@ -403,10 +397,9 @@ bool RPCHandlerImpl::ConvertMessageToSO(
           message.protocol_version();
       if (message.binary_data()) {
         if (message.payload_size() < message.data_size()) {
-          SDL_ERROR(logger_,
-                    "Incomplete binary"
-                        << " binary size should be  " << message.data_size()
-                        << " payload data size is " << message.payload_size());
+          SDL_ERROR("Incomplete binary"
+                    << " binary size should be  " << message.data_size()
+                    << " payload data size is " << message.payload_size());
           std::shared_ptr<smart_objects::SmartObject> response(
               MessageHelper::CreateNegativeResponse(
                   message.connection_key(),
@@ -429,12 +422,11 @@ bool RPCHandlerImpl::ConvertMessageToSO(
           formatters::FormatterJsonRpc::FromString<
               hmi_apis::FunctionID::eType,
               hmi_apis::messageType::eType>(message.json_message(), output);
-      SDL_DEBUG(logger_,
-                "Convertion result: "
-                    << result << " function id "
-                    << output[jhs::S_PARAMS][jhs::S_FUNCTION_ID].asInt());
+      SDL_DEBUG("Convertion result: "
+                << result << " function id "
+                << output[jhs::S_PARAMS][jhs::S_FUNCTION_ID].asInt());
       if (!hmi_so_factory().attachSchema(output, true)) {
-        SDL_WARN(logger_, "Failed to attach schema to object.");
+        SDL_WARN("Failed to attach schema to object.");
         return false;
       }
 
@@ -445,9 +437,8 @@ bool RPCHandlerImpl::ConvertMessageToSO(
           smart_objects::errors::OK !=
               output.validate(
                   &report, empty_version, allow_unknown_parameters)) {
-        SDL_ERROR(
-            logger_,
-            "Incorrect parameter from HMI - " << rpc::PrettyFormat(report));
+        SDL_ERROR("Incorrect parameter from HMI - "
+                  << rpc::PrettyFormat(report));
 
         return HandleWrongMessageType(output, report);
       }
@@ -457,7 +448,7 @@ bool RPCHandlerImpl::ConvertMessageToSO(
       static ns_smart_device_link_rpc::V1::v4_protocol_v1_2_no_extra v1_shema;
 
       if (message.function_id() == 0 || message.type() == kUnknownType) {
-        SDL_ERROR(logger_, "Message received: UNSUPPORTED_VERSION");
+        SDL_ERROR("Message received: UNSUPPORTED_VERSION");
 
         int32_t conversation_result =
             formatters::CFormatterJsonSDLRPCv1::fromString<
@@ -491,14 +482,13 @@ bool RPCHandlerImpl::ConvertMessageToSO(
       break;
     }
     default:
-      SDL_WARN(logger_,
-               "Application used unsupported protocol :"
-                   << message.protocol_version() << ".");
+      SDL_WARN("Application used unsupported protocol :"
+               << message.protocol_version() << ".");
       return false;
   }
   output[strings::params][strings::protection] = message.is_message_encrypted();
 
-  SDL_DEBUG(logger_, "Successfully parsed message into smart object");
+  SDL_DEBUG("Successfully parsed message into smart object");
   return true;
 }
 
@@ -507,11 +497,11 @@ bool RPCHandlerImpl::HandleWrongMessageType(
   SDL_AUTO_TRACE();
   switch (output[strings::params][strings::message_type].asInt()) {
     case application_manager::MessageType::kNotification: {
-      SDL_ERROR(logger_, "Ignore wrong HMI notification");
+      SDL_ERROR("Ignore wrong HMI notification");
       return false;
     }
     case application_manager::MessageType::kRequest: {
-      SDL_ERROR(logger_, "Received invalid data on HMI request");
+      SDL_ERROR("Received invalid data on HMI request");
       output.erase(strings::msg_params);
       output[strings::params].erase(hmi_response::message);
       output[strings::params][hmi_response::code] =
@@ -522,15 +512,15 @@ bool RPCHandlerImpl::HandleWrongMessageType(
       return true;
     }
     case application_manager::MessageType::kResponse: {
-      SDL_ERROR(logger_, "Received invalid data on HMI response");
+      SDL_ERROR("Received invalid data on HMI response");
       break;
     }
     case application_manager::MessageType::kUnknownType: {
-      SDL_ERROR(logger_, "Received unknown type data on HMI");
+      SDL_ERROR("Received unknown type data on HMI");
       break;
     }
     default: {
-      SDL_ERROR(logger_, "Received error response on HMI");
+      SDL_ERROR("Received error response on HMI");
       break;
     }
   }
@@ -551,7 +541,7 @@ bool RPCHandlerImpl::ValidateRpcSO(smart_objects::SmartObject& message,
           message, !allow_unknown_parameters, msg_version, &report_out) ||
       message.validate(&report_out, msg_version, allow_unknown_parameters) !=
           smart_objects::errors::OK) {
-    SDL_WARN(logger_, "Failed to parse string to smart object");
+    SDL_WARN("Failed to parse string to smart object");
     return false;
   }
   return true;
@@ -563,11 +553,11 @@ std::shared_ptr<Message> RPCHandlerImpl::ConvertRawMsgToMessage(
   DCHECK(message);
   std::shared_ptr<Message> outgoing_message;
 
-  SDL_DEBUG(logger_, "Service type." << message->service_type());
+  SDL_DEBUG("Service type." << message->service_type());
   if (message->service_type() != protocol_handler::kRpc &&
       message->service_type() != protocol_handler::kBulk) {
     // skip this message, not under handling of ApplicationManager
-    SDL_TRACE(logger_, "Skipping message; not the under AM handling.");
+    SDL_TRACE("Skipping message; not the under AM handling.");
     return outgoing_message;
   }
 
@@ -577,7 +567,7 @@ std::shared_ptr<Message> RPCHandlerImpl::ConvertRawMsgToMessage(
   if (convertion_result) {
     outgoing_message = std::shared_ptr<Message>(convertion_result);
   } else {
-    SDL_ERROR(logger_, "Received invalid message");
+    SDL_ERROR("Received invalid message");
   }
 
   return outgoing_message;

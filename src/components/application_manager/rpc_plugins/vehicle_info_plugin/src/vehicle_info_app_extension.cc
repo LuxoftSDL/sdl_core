@@ -54,13 +54,13 @@ VehicleInfoAppExtension::~VehicleInfoAppExtension() {
 
 bool VehicleInfoAppExtension::subscribeToVehicleInfo(
     const std::string& vehicle_data) {
-  SDL_DEBUG(logger_, vehicle_data);
+  SDL_DEBUG(vehicle_data);
   return subscribed_data_.insert(vehicle_data).second;
 }
 
 bool VehicleInfoAppExtension::unsubscribeFromVehicleInfo(
     const std::string& vehicle_data) {
-  SDL_DEBUG(logger_, vehicle_data);
+  SDL_DEBUG(vehicle_data);
   auto it = subscribed_data_.find(vehicle_data);
   if (it != subscribed_data_.end()) {
     subscribed_data_.erase(it);
@@ -76,7 +76,7 @@ void VehicleInfoAppExtension::unsubscribeFromVehicleInfo() {
 
 bool VehicleInfoAppExtension::isSubscribedToVehicleInfo(
     const std::string& vehicle_data) const {
-  SDL_DEBUG(logger_, vehicle_data);
+  SDL_DEBUG(vehicle_data);
   return subscribed_data_.find(vehicle_data) != subscribed_data_.end();
 }
 

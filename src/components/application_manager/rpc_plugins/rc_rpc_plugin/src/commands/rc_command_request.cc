@@ -124,7 +124,7 @@ void RCCommandRequest::SendDisallowed(rc_rpc_plugin::TypeAccess access) {
   } else {
     return;
   }
-  SDL_ERROR(logger_, info);
+  SDL_ERROR(info);
   SendResponse(false, mobile_apis::Result::DISALLOWED, info.c_str());
 }
 
@@ -134,23 +134,23 @@ void RCCommandRequest::Run() {
       application_manager_.application(CommandRequestImpl::connection_key());
 
   if (!IsInterfaceAvailable(app_mngr::HmiInterfaces::HMI_INTERFACE_RC)) {
-    SDL_WARN(logger_, "HMI interface RC is not available");
+    SDL_WARN("HMI interface RC is not available");
     SendResponse(false,
                  mobile_apis::Result::UNSUPPORTED_RESOURCE,
                  "Remote control is not supported by system");
     return;
   }
-  SDL_TRACE(logger_, "RC interface is available!");
+  SDL_TRACE("RC interface is available!");
   if (!policy_handler_.CheckHMIType(
           app->policy_app_id(),
           mobile_apis::AppHMIType::eType::REMOTE_CONTROL,
           app->app_types())) {
-    SDL_WARN(logger_, "Application has no remote control functions");
+    SDL_WARN("Application has no remote control functions");
     SendResponse(false, mobile_apis::Result::DISALLOWED, "");
     return;
   }
   if (!resource_allocation_manager_.is_rc_enabled()) {
-    SDL_WARN(logger_, "Remote control is disabled by user");
+    SDL_WARN("Remote control is disabled by user");
     SetResourceState(ModuleType(), ResourceState::FREE);
     SendResponse(false,
                  mobile_apis::Result::USER_DISALLOWED,
@@ -159,7 +159,7 @@ void RCCommandRequest::Run() {
   }
   auto rc_capability = hmi_capabilities_.rc_capability();
   if (!rc_capability || rc_capability->empty()) {
-    SDL_WARN(logger_, "Accessing not supported module: " << ModuleType());
+    SDL_WARN("Accessing not supported module: " << ModuleType());
     SetResourceState(ModuleType(), ResourceState::FREE);
     SendResponse(false,
                  mobile_apis::Result::UNSUPPORTED_RESOURCE,
@@ -183,7 +183,7 @@ bool RCCommandRequest::AcquireResources() {
   const std::string module_id = ModuleId();
 
   if (!IsResourceFree(module_type, module_id)) {
-    SDL_WARN(logger_, "Resource is busy.");
+    SDL_WARN("Resource is busy.");
     SendResponse(false, mobile_apis::Result::IN_USE, "");
     return false;
   }
@@ -229,7 +229,7 @@ void RCCommandRequest::ProcessAccessResponse(
   const std::string module_type = ModuleType();
   const std::string module_id = ModuleId();
   if (!app) {
-    SDL_ERROR(logger_, "NULL pointer.");
+    SDL_ERROR("NULL pointer.");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED, "");
     return;
   }

@@ -87,7 +87,7 @@ void WebSocketSession<ExecutorType>::AsyncRead(boost::system::error_code ec) {
   SDL_AUTO_TRACE();
   if (ec) {
     auto str_err = "ErrorMessage: " + ec.message();
-    SDL_ERROR(ws_logger_, str_err);
+    SDL_ERROR(str_err);
     return;
   }
 
@@ -106,7 +106,7 @@ TransportAdapter::Error WebSocketSession<ExecutorType>::WriteDown(
   ws_.write(boost::asio::buffer(message->data(), message->data_size()), ec);
 
   if (ec) {
-    SDL_ERROR(ws_logger_, "A system error has occurred: " << ec.message());
+    SDL_ERROR("A system error has occurred: " << ec.message());
     return TransportAdapter::FAIL;
   }
 
@@ -119,7 +119,7 @@ void WebSocketSession<ExecutorType>::Read(boost::system::error_code ec,
   SDL_AUTO_TRACE();
   boost::ignore_unused(bytes_transferred);
   if (ec) {
-    SDL_ERROR(ws_logger_, ec.message());
+    SDL_ERROR(ec.message());
     buffer_.consume(buffer_.size());
     on_io_error_();
     return;
@@ -129,8 +129,7 @@ void WebSocketSession<ExecutorType>::Read(boost::system::error_code ec,
   const auto data = boost::asio::buffer_cast<const uint8_t*>(
       boost::beast::buffers_front(buffer_.data()));
 
-  SDL_DEBUG(ws_logger_,
-            "Msg: " << boost::beast::buffers_to_string(buffer_.data())
+  SDL_DEBUG("Msg: " << boost::beast::buffers_to_string(buffer_.data())
                     << " Size: " << size;);
 
   ::protocol_handler::RawMessagePtr frame(
@@ -152,7 +151,7 @@ bool WebSocketSession<ExecutorType>::Shutdown() {
   }
   buffer_.consume(buffer_.size());
   if (ec) {
-    SDL_ERROR(ws_logger_, ec.message());
+    SDL_ERROR(ec.message());
     return false;
   }
   return true;

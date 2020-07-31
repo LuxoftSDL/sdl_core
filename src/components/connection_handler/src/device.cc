@@ -55,7 +55,7 @@ Device::Device(DeviceHandle device_handle,
     , connection_type_(connection_type) {
   mac_address_ = encryption::MakeHash(mac_address);
   SDL_DEBUG(
-      logger_,
+
       "Device: MAC address - " << mac_address << ", hash - " << mac_address_);
 }
 

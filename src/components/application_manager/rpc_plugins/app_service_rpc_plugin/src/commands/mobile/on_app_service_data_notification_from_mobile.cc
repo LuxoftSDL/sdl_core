@@ -60,7 +60,7 @@ OnAppServiceDataNotificationFromMobile::
 
 void OnAppServiceDataNotificationFromMobile::Run() {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "Received an OnAppServiceData");
+  SDL_DEBUG("Received an OnAppServiceData");
   MessageHelper::PrintSmartObject(*message_);
 
   uint32_t app_connection_key = connection_key();
@@ -76,9 +76,9 @@ void OnAppServiceDataNotificationFromMobile::Run() {
       app->policy_app_id(), std::string(), service_type, NULL);
 
   if (!result) {
-    SDL_DEBUG(logger_,
-              "Incorrect service type received in "
-              "OnAppServiceDataNotificationFromMobile");
+    SDL_DEBUG(
+        "Incorrect service type received in "
+        "OnAppServiceDataNotificationFromMobile");
     return;
   }
 
@@ -89,15 +89,14 @@ void OnAppServiceDataNotificationFromMobile::Run() {
   AppService* service =
       application_manager_.GetAppServiceManager().FindServiceByID(service_id);
   if (!service) {
-    SDL_ERROR(logger_,
-              "No published services exist with service ID: " << service_id);
+    SDL_ERROR("No published services exist with service ID: " << service_id);
     return;
   } else if (!service->mobile_service ||
              service->connection_key != app_connection_key) {
-    SDL_ERROR(logger_, "Service was not published by this application");
+    SDL_ERROR("Service was not published by this application");
     return;
   } else if (!service->record[strings::service_active].asBool()) {
-    SDL_ERROR(logger_, "Service is not active");
+    SDL_ERROR("Service is not active");
     return;
   }
 
@@ -105,10 +104,9 @@ void OnAppServiceDataNotificationFromMobile::Run() {
       service->record[strings::service_manifest][strings::service_type]
           .asString();
   if (published_service_type != service_type) {
-    SDL_ERROR(logger_,
-              "Service type mismatch, expected "
-                  << service_type << ", but service was published with type "
-                  << published_service_type);
+    SDL_ERROR("Service type mismatch, expected "
+              << service_type << ", but service was published with type "
+              << published_service_type);
     return;
   }
 

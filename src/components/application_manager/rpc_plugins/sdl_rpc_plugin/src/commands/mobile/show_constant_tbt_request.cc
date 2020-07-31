@@ -70,12 +70,12 @@ void ShowConstantTBTRequest::Run() {
 
   if (!app) {
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     return;
   }
   // SDLAQ-CRS-664, VC3.1
   if ((*message_)[strings::msg_params].empty()) {
-    SDL_ERROR(logger_, "INVALID_DATA!");
+    SDL_ERROR("INVALID_DATA!");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -85,7 +85,7 @@ void ShowConstantTBTRequest::Run() {
   msg_params = (*message_)[strings::msg_params];
 
   if (IsWhiteSpaceExist()) {
-    SDL_ERROR(logger_, "Incoming show constant TBT has contains \t\n \\t \\n");
+    SDL_ERROR("Incoming show constant TBT has contains \t\n \\t \\n");
     SendResponse(false, mobile_apis::Result::INVALID_DATA);
     return;
   }
@@ -97,7 +97,7 @@ void ShowConstantTBTRequest::Run() {
           msg_params, app, policy_handler_, application_manager_);
 
   if (mobile_apis::Result::SUCCESS != processing_result) {
-    SDL_ERROR(logger_, "INVALID_DATA!");
+    SDL_ERROR("INVALID_DATA!");
     SendResponse(false, processing_result);
     return;
   }
@@ -107,7 +107,7 @@ void ShowConstantTBTRequest::Run() {
     verification_result = MessageHelper::VerifyImage(
         msg_params[strings::turn_icon], app, application_manager_);
     if (mobile_apis::Result::INVALID_DATA == verification_result) {
-      SDL_ERROR(logger_, "VerifyImage INVALID_DATA!");
+      SDL_ERROR("VerifyImage INVALID_DATA!");
       SendResponse(false, verification_result);
       return;
     }
@@ -117,7 +117,7 @@ void ShowConstantTBTRequest::Run() {
     verification_result = MessageHelper::VerifyImage(
         msg_params[strings::next_turn_icon], app, application_manager_);
     if (mobile_apis::Result::INVALID_DATA == verification_result) {
-      SDL_ERROR(logger_, "VerifyImage INVALID_DATA!");
+      SDL_ERROR("VerifyImage INVALID_DATA!");
       SendResponse(false, verification_result);
       return;
     }
@@ -192,7 +192,7 @@ void ShowConstantTBTRequest::on_event(const event_engine::Event& event) {
 
   switch (event.id()) {
     case hmi_apis::FunctionID::Navigation_ShowConstantTBT: {
-      SDL_INFO(logger_, "Received Navigation_ShowConstantTBT event");
+      SDL_INFO("Received Navigation_ShowConstantTBT event");
       EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_Navigation);
       const Common_Result::eType result_code =
           static_cast<Common_Result::eType>(
@@ -208,7 +208,7 @@ void ShowConstantTBTRequest::on_event(const event_engine::Event& event) {
       break;
     }
     default: {
-      SDL_ERROR(logger_, "Received unknown event" << event.id());
+      SDL_ERROR("Received unknown event" << event.id());
       break;
     }
   }
@@ -222,7 +222,7 @@ bool ShowConstantTBTRequest::IsWhiteSpaceExist() {
     str = (*message_)[strings::msg_params][strings::turn_icon][strings::value]
               .asCharArray();
     if (!CheckSyntax(str)) {
-      SDL_ERROR(logger_, "Invalid turn_icon value syntax check failed");
+      SDL_ERROR("Invalid turn_icon value syntax check failed");
       return true;
     }
   }
@@ -232,7 +232,7 @@ bool ShowConstantTBTRequest::IsWhiteSpaceExist() {
                      [strings::value]
                          .asCharArray();
     if (!CheckSyntax(str)) {
-      SDL_ERROR(logger_, "Invalid next_turn_icon value syntax check failed");
+      SDL_ERROR("Invalid next_turn_icon value syntax check failed");
       return true;
     }
   }
@@ -241,7 +241,7 @@ bool ShowConstantTBTRequest::IsWhiteSpaceExist() {
     str = (*message_)[strings::msg_params][strings::navigation_text_1]
               .asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      SDL_ERROR(logger_, "Invalid navigation_text_1 value syntax check failed");
+      SDL_ERROR("Invalid navigation_text_1 value syntax check failed");
       return true;
     }
   }
@@ -250,7 +250,7 @@ bool ShowConstantTBTRequest::IsWhiteSpaceExist() {
     str = (*message_)[strings::msg_params][strings::navigation_text_2]
               .asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      SDL_ERROR(logger_, "Invalid navigation_text_2 value syntax check failed");
+      SDL_ERROR("Invalid navigation_text_2 value syntax check failed");
       return true;
     }
   }
@@ -258,7 +258,7 @@ bool ShowConstantTBTRequest::IsWhiteSpaceExist() {
   if ((*message_)[strings::msg_params].keyExists(strings::eta)) {
     str = (*message_)[strings::msg_params][strings::eta].asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      SDL_ERROR(logger_, "Invalid eta value syntax check failed");
+      SDL_ERROR("Invalid eta value syntax check failed");
       return true;
     }
   }
@@ -267,7 +267,7 @@ bool ShowConstantTBTRequest::IsWhiteSpaceExist() {
     str =
         (*message_)[strings::msg_params][strings::total_distance].asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      SDL_ERROR(logger_, "Invalid total_distance value syntax check failed");
+      SDL_ERROR("Invalid total_distance value syntax check failed");
       return true;
     }
   }
@@ -277,8 +277,7 @@ bool ShowConstantTBTRequest::IsWhiteSpaceExist() {
     str = (*message_)[strings::msg_params][strings::time_to_destination]
               .asCharArray();
     if (strlen(str) && !CheckSyntax(str)) {
-      SDL_ERROR(logger_,
-                "Invalid time_to_destination value syntax check failed");
+      SDL_ERROR("Invalid time_to_destination value syntax check failed");
       return true;
     }
   }

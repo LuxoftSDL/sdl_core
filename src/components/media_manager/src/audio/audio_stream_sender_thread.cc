@@ -108,23 +108,23 @@ void AudioStreamSenderThread::sendAudioChunkToMobile() {
   std::vector<uint8_t>::iterator to;
 
   if (!file_system::ReadBinaryFile(fileName_, binaryData)) {
-    SDL_ERROR(logger_, "Unable to read file." << fileName_);
+    SDL_ERROR("Unable to read file." << fileName_);
 
     return;
   }
 
   if (binaryData.empty()) {
-    SDL_ERROR(logger_, "Binary data is empty.");
+    SDL_ERROR("Binary data is empty.");
     return;
   }
 
-  SDL_INFO(logger_, "offset = " << offset_);
+  SDL_INFO("offset = " << offset_);
 
   from = binaryData.begin() + offset_;
   to = binaryData.end();
 
   if (from < binaryData.end() /*from != binaryData.end()*/) {
-    SDL_INFO(logger_, "from != binaryData.end()");
+    SDL_INFO("from != binaryData.end()");
 
     offset_ = offset_ + to - from;
     std::vector<uint8_t> data(from, to);
@@ -143,9 +143,9 @@ void AudioStreamSenderThread::SendAudioPassThroughNotification(
   SDL_AUTO_TRACE();
 
   if (!application_manager_.is_audio_pass_thru_active()) {
-    SDL_ERROR(logger_,
-              "Trying to send PassThroughNotification"
-              " when PassThrough is not active");
+    SDL_ERROR(
+        "Trying to send PassThroughNotification"
+        " when PassThrough is not active");
     return;
   }
 
@@ -157,11 +157,11 @@ void AudioStreamSenderThread::SendAudioPassThroughNotification(
       std::make_shared<smart_objects::SmartObject>();
 
   if (!on_audio_pass) {
-    SDL_ERROR(logger_, "OnAudioPassThru NULL pointer");
+    SDL_ERROR("OnAudioPassThru NULL pointer");
     return;
   }
 
-  SDL_DEBUG(logger_, "Fill smart object");
+  SDL_DEBUG("Fill smart object");
 
   (*on_audio_pass)[strings::params][strings::message_type] =
       application_manager::MessageType::kNotification;
@@ -171,13 +171,13 @@ void AudioStreamSenderThread::SendAudioPassThroughNotification(
   (*on_audio_pass)[strings::params][strings::function_id] =
       mobile_apis::FunctionID::OnAudioPassThruID;
 
-  SDL_DEBUG(logger_, "Fill binary data");
+  SDL_DEBUG("Fill binary data");
   // binary data
   (*on_audio_pass)[strings::params][strings::binary_data] =
       smart_objects::SmartObject(data.binary_data);
 
-  SDL_DEBUG(logger_, "After fill binary data");
-  SDL_DEBUG(logger_, "Send data");
+  SDL_DEBUG("After fill binary data");
+  SDL_DEBUG("Send data");
   application_manager_.GetRPCService().ManageMobileCommand(
       on_audio_pass, application_manager::commands::Command::SOURCE_SDL);
 }

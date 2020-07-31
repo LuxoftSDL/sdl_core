@@ -62,7 +62,7 @@ void SubscribeVehicleDataRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "NULL pointer");
+    SDL_ERROR("NULL pointer");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -98,7 +98,7 @@ void SubscribeVehicleDataRequest::on_event(const event_engine::Event& event) {
   const smart_objects::SmartObject& message = event.smart_object();
 
   if (hmi_apis::FunctionID::VehicleInfo_SubscribeVehicleData != event.id()) {
-    SDL_ERROR(logger_, "Received unknown event.");
+    SDL_ERROR("Received unknown event.");
     return;
   }
   EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_VehicleInfo);
@@ -106,7 +106,7 @@ void SubscribeVehicleDataRequest::on_event(const event_engine::Event& event) {
       application_manager_.application(CommandRequestImpl::connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "NULL pointer.");
+    SDL_ERROR("NULL pointer.");
     return;
   }
 
@@ -136,7 +136,7 @@ void SubscribeVehicleDataRequest::on_event(const event_engine::Event& event) {
       const auto& converted_name = ConvertResponseToRequestName(param);
       if (vi_waiting_for_subscribe_.end() ==
           vi_waiting_for_subscribe_.find(converted_name)) {
-        SDL_DEBUG(logger_, "erase " << converted_name);
+        SDL_DEBUG("erase " << converted_name);
         converted_msg_params.erase(param);
       }
     }
@@ -186,8 +186,7 @@ bool SubscribeVehicleDataRequest::CheckSubscriptionStatus(
     std::string vi_name, const smart_objects::SmartObject& msg_params) {
   const auto subscribed_items = msg_params.enumerate();
   if (subscribed_items.end() == subscribed_items.find(vi_name)) {
-    SDL_WARN(logger_,
-             vi_name << " is waiting to be subscribed, but missing in "
+    SDL_WARN(vi_name << " is waiting to be subscribed, but missing in "
                         "vehicle response.");
     return false;
   }
@@ -195,8 +194,7 @@ bool SubscribeVehicleDataRequest::CheckSubscriptionStatus(
   auto res_code = msg_params[vi_name][strings::result_code].asInt();
   if (VD_ResultCode::VDRC_SUCCESS != res_code &&
       VD_ResultCode::VDRC_DATA_ALREADY_SUBSCRIBED != res_code) {
-    SDL_WARN(logger_,
-             "Subscription to " << vi_name << " for " << connection_key()
+    SDL_WARN("Subscription to " << vi_name << " for " << connection_key()
                                 << " failed.");
     return false;
   }
@@ -205,7 +203,7 @@ bool SubscribeVehicleDataRequest::CheckSubscriptionStatus(
 
 bool SubscribeVehicleDataRequest::SubscribePendingVehicleData(
     ApplicationSharedPtr app, smart_objects::SmartObject& msg_params) {
-  SDL_DEBUG(logger_, "Subscribing to all pending VehicleData");
+  SDL_DEBUG("Subscribing to all pending VehicleData");
 
   std::set<hmi_apis::Common_VehicleDataResultCode::eType> skiped_result_codes(
       {VD_ResultCode::VDRC_TRUNCATED_DATA,
@@ -300,11 +298,9 @@ void SubscribeVehicleDataRequest::CheckVISubscriptions(
       [this, &out_response_params](
           const std::string& key_name,
           const mobile_apis::VehicleDataType::eType vd_type) {
-        SDL_DEBUG(
-            logger_,
-            "App with connection key "
-                << connection_key()
-                << " is subscribed already for VehicleData: " << key_name);
+        SDL_DEBUG("App with connection key "
+                  << connection_key()
+                  << " is subscribed already for VehicleData: " << key_name);
         vi_already_subscribed_by_this_app_.insert(key_name);
         out_response_params[key_name][strings::data_type] = vd_type;
         out_response_params[key_name][strings::result_code] =
@@ -316,21 +312,18 @@ void SubscribeVehicleDataRequest::CheckVISubscriptions(
           const std::string& key_name,
           const mobile_apis::VehicleDataType::eType vd_type,
           vehicle_info_plugin::VehicleInfoAppExtension& ext) {
-        SDL_DEBUG(logger_,
-                  "There are apps subscribed already for "
-                  "VehicleDataType: "
-                      << key_name);
+        SDL_DEBUG(
+            "There are apps subscribed already for "
+            "VehicleDataType: "
+            << key_name);
 
         if (!ext.subscribeToVehicleInfo(key_name)) {
-          SDL_ERROR(logger_,
-                    "Unable to subscribe for VehicleDataType: " << key_name);
+          SDL_ERROR("Unable to subscribe for VehicleDataType: " << key_name);
           return;
         }
-        SDL_DEBUG(
-            logger_,
-            "App with connection key "
-                << connection_key()
-                << " have been subscribed for VehicleDataType: " << key_name);
+        SDL_DEBUG("App with connection key "
+                  << connection_key()
+                  << " have been subscribed for VehicleDataType: " << key_name);
         vi_already_subscribed_by_another_apps_.insert(key_name);
         out_response_params[key_name][strings::data_type] = vd_type;
         out_response_params[key_name][strings::result_code] =
@@ -343,10 +336,9 @@ void SubscribeVehicleDataRequest::CheckVISubscriptions(
     out_request_params[vi_name] = (*message_)[strings::msg_params][vi_name];
 
     vi_waiting_for_subscribe_.insert(vi_name);
-    SDL_DEBUG(logger_,
-              "App with connection key "
-                  << connection_key()
-                  << " will be subscribed for VehicleDataType: " << vi_name);
+    SDL_DEBUG("App with connection key "
+              << connection_key()
+              << " will be subscribed for VehicleDataType: " << vi_name);
     ++subscribed_items;
     return true;
   };

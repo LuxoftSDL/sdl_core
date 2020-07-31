@@ -75,8 +75,7 @@ void StateControllerImpl::SetRegularState(ApplicationSharedPtr app,
   DCHECK_OR_RETURN_VOID(state);
   DCHECK_OR_RETURN_VOID(HmiState::STATE_ID_REGULAR == state->state_id());
 
-  SDL_DEBUG(logger_,
-            "Set window #" << window_id << " regular state " << *state);
+  SDL_DEBUG("Set window #" << window_id << " regular state " << *state);
 
   if (state->hmi_level() == mobile_apis::HMILevel::INVALID_ENUM ||
       state->audio_streaming_state() ==
@@ -84,7 +83,7 @@ void StateControllerImpl::SetRegularState(ApplicationSharedPtr app,
       state->video_streaming_state() ==
           mobile_apis::VideoStreamingState::INVALID_ENUM ||
       state->system_context() == mobile_apis::SystemContext::INVALID_ENUM) {
-    SDL_ERROR(logger_, "Got invalid state");
+    SDL_ERROR("Got invalid state");
     return;
   }
 
@@ -99,7 +98,7 @@ void StateControllerImpl::SetRegularState(ApplicationSharedPtr app,
     return;
   }
 
-  SDL_DEBUG(logger_, "Resolved state: " << *resolved_state);
+  SDL_DEBUG("Resolved state: " << *resolved_state);
   const hmi_apis::Common_HMILevel::eType hmi_level =
       static_cast<hmi_apis::Common_HMILevel::eType>(
           resolved_state->hmi_level());
@@ -117,7 +116,7 @@ void StateControllerImpl::SetRegularState(ApplicationSharedPtr app,
       app_mngr_.set_application_id(corr_id, app->hmi_app_id());
       return;
     }
-    SDL_ERROR(logger_, "Unable to send BC.ActivateApp");
+    SDL_ERROR("Unable to send BC.ActivateApp");
     return;
   }
   ApplyRegularState(app, window_id, resolved_state);
@@ -344,16 +343,14 @@ void StateControllerImpl::HmiLevelConflictResolver::operator()(
   // - all audio/video applications with same app type becomes BACKGROUND
 
   if (!IsStreamableHMILevel(state_->hmi_level())) {
-    SDL_DEBUG(logger_,
-              "Applied for app " << applied_->app_id() << " HMI level "
+    SDL_DEBUG("Applied for app " << applied_->app_id() << " HMI level "
                                  << state_->hmi_level()
                                  << " is NOT streamable. Exit.");
     return;
   }
 
   if (!IsStreamableHMILevel(state_to_resolve->hmi_level())) {
-    SDL_DEBUG(logger_,
-              "To resolve app " << app_to_resolve->app_id() << " HMI level "
+    SDL_DEBUG("To resolve app " << app_to_resolve->app_id() << " HMI level "
                                 << state_to_resolve->hmi_level()
                                 << " is NOT streamable. Exit.");
     return;
@@ -412,8 +409,7 @@ void StateControllerImpl::HmiLevelConflictResolver::operator()(
                       state_to_resolve->video_streaming_state()) !=
       std::make_tuple(
           result_hmi_level, result_audio_state, result_video_state)) {
-    SDL_DEBUG(logger_,
-              "Application " << app_to_resolve->app_id() << " window "
+    SDL_DEBUG("Application " << app_to_resolve->app_id() << " window "
                              << window_id_ << " will change state to: "
                              << "HMI level " << to_resolve_hmi_level << " --> "
                              << result_hmi_level << ", audio "
@@ -427,8 +423,7 @@ void StateControllerImpl::HmiLevelConflictResolver::operator()(
                                       result_audio_state,
                                       result_video_state);
   } else {
-    SDL_DEBUG(logger_,
-              "Application " << app_to_resolve->app_id() << " window "
+    SDL_DEBUG("Application " << app_to_resolve->app_id() << " window "
                              << window_id_ << " will NOT change HMI level");
   }
 }
@@ -437,7 +432,7 @@ HmiStatePtr StateControllerImpl::ResolveHmiState(ApplicationSharedPtr app,
                                                  HmiStatePtr state) const {
   using namespace mobile_apis;
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "State to resolve: " << *state);
+  SDL_DEBUG("State to resolve: " << *state);
 
   HmiStatePtr available_state =
       CreateHmiState(app, HmiState::StateID::STATE_ID_REGULAR);
@@ -466,23 +461,21 @@ bool StateControllerImpl::IsResumptionAllowed(ApplicationSharedPtr app,
   SDL_AUTO_TRACE();
   using namespace mobile_apis;
   if (!app->is_resuming() || !IsStreamableHMILevel(state->hmi_level())) {
-    SDL_DEBUG(logger_, "Application is not in resuming mode.");
+    SDL_DEBUG("Application is not in resuming mode.");
     return true;
   }
 
   if (IsTempStateActive(HmiState::StateID::STATE_ID_AUDIO_SOURCE) &&
       app->is_media_application()) {
-    SDL_DEBUG(logger_,
-              "Resumption for media app is not allowed. "
-                  << "AUDIO_SOURCE event is active");
+    SDL_DEBUG("Resumption for media app is not allowed. "
+              << "AUDIO_SOURCE event is active");
     return false;
   }
 
   if (IsTempStateActive(HmiState::StateID::STATE_ID_EMBEDDED_NAVI) &&
       (app->is_navi() || app->mobile_projection_enabled())) {
-    SDL_DEBUG(logger_,
-              "Resumption for navi or projection app is not allowed. "
-                  << "EMBEDDED_NAVI event is active");
+    SDL_DEBUG("Resumption for navi or projection app is not allowed. "
+              << "EMBEDDED_NAVI event is active");
     return false;
   }
 
@@ -494,7 +487,7 @@ mobile_apis::HMILevel::eType StateControllerImpl::GetAvailableHmiLevel(
   SDL_AUTO_TRACE();
 
   mobile_apis::HMILevel::eType result = hmi_level;
-  SDL_DEBUG(logger_, "HMI Level: " << hmi_level);
+  SDL_DEBUG("HMI Level: " << hmi_level);
 
   if (!IsStreamableHMILevel(hmi_level)) {
     return result;
@@ -521,15 +514,15 @@ mobile_apis::HMILevel::eType StateControllerImpl::GetAvailableHmiLevel(
       result = mobile_apis::HMILevel::HMI_LIMITED;
     } else if (app->is_navi() &&
                IsTempStateActive(HmiState::StateID::STATE_ID_AUDIO_SOURCE)) {
-      SDL_DEBUG(logger_,
-                "Navigation app will be resumed to LIMITED, "
-                "because of AUDIO_SOURCE ia active.");
+      SDL_DEBUG(
+          "Navigation app will be resumed to LIMITED, "
+          "because of AUDIO_SOURCE ia active.");
       result = mobile_apis::HMILevel::HMI_LIMITED;
     } else if (app->is_media_application() &&
                IsTempStateActive(HmiState::StateID::STATE_ID_EMBEDDED_NAVI)) {
-      SDL_DEBUG(logger_,
-                "Media app will be resumed to LIMITED, "
-                "because of EMBEDDED_NAVI is active.");
+      SDL_DEBUG(
+          "Media app will be resumed to LIMITED, "
+          "because of EMBEDDED_NAVI is active.");
       result = mobile_apis::HMILevel::HMI_LIMITED;
     }
   } else if (is_active_app_exist) {
@@ -543,7 +536,7 @@ bool StateControllerImpl::IsStateAvailable(ApplicationSharedPtr app,
                                            HmiStatePtr state) const {
   using namespace mobile_apis;
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "Checking state: " << *state);
+  SDL_DEBUG("Checking state: " << *state);
 
   if (app->is_resuming()) {
     return IsStateAvailableForResumption(app, state);
@@ -552,14 +545,13 @@ bool StateControllerImpl::IsStateAvailable(ApplicationSharedPtr app,
   if (IsTempStateActive(HmiState::StateID::STATE_ID_AUDIO_SOURCE) ||
       IsTempStateActive(HmiState::StateID::STATE_ID_EMBEDDED_NAVI)) {
     if (HMILevel::HMI_FULL == state->hmi_level()) {
-      SDL_DEBUG(logger_,
-                "AUDIO_SOURCE or EMBEDDED_NAVI is active."
-                    << " Requested state is not available");
+      SDL_DEBUG("AUDIO_SOURCE or EMBEDDED_NAVI is active."
+                << " Requested state is not available");
       return false;
     }
   }
 
-  SDL_DEBUG(logger_, "Requested state is available");
+  SDL_DEBUG("Requested state is available");
   return true;
 }
 
@@ -569,34 +561,30 @@ bool StateControllerImpl::IsStateAvailableForResumption(
   using namespace mobile_apis;
 
   if (!app->is_resuming() || !IsStreamableHMILevel(state->hmi_level())) {
-    SDL_DEBUG(logger_,
-              "Application is not in resuming mode."
-                  << " Requested state is available");
+    SDL_DEBUG("Application is not in resuming mode."
+              << " Requested state is available");
     return true;
   }
 
   if (IsTempStateActive(HmiState::StateID::STATE_ID_VR_SESSION) ||
       IsTempStateActive(HmiState::StateID::STATE_ID_SAFETY_MODE)) {
-    SDL_DEBUG(logger_,
-              "Requested state is not available. "
-                  << "VR session or emergency event is active");
+    SDL_DEBUG("Requested state is not available. "
+              << "VR session or emergency event is active");
     return false;
   }
   if (IsTempStateActive(HmiState::StateID::STATE_ID_PHONE_CALL) &&
       app->is_media_application()) {
-    SDL_DEBUG(logger_,
-              "Requested state for media application "
-                  << "is not available. Phone call is active");
+    SDL_DEBUG("Requested state for media application "
+              << "is not available. Phone call is active");
     return false;
   }
   if (IsTempStateActive(HmiState::StateID::STATE_ID_DEACTIVATE_HMI)) {
-    SDL_DEBUG(logger_,
-              "Requested state is not available. "
-                  << "Deactivate HMI event is active");
+    SDL_DEBUG("Requested state is not available. "
+              << "Deactivate HMI event is active");
     return false;
   }
 
-  SDL_DEBUG(logger_, "Requested state is available");
+  SDL_DEBUG("Requested state is available");
   return true;
 }
 
@@ -606,8 +594,7 @@ void StateControllerImpl::SetupRegularHmiState(ApplicationSharedPtr app,
   using namespace mobile_apis;
   SDL_AUTO_TRACE();
   DCHECK_OR_RETURN_VOID(state);
-  SDL_DEBUG(logger_,
-            "Setup window #" << window_id << " regular state: " << *state);
+  SDL_DEBUG("Setup window #" << window_id << " regular state: " << *state);
   HmiStatePtr curr_state = app->CurrentHmiState(window_id);
   HmiStatePtr old_state =
       CreateHmiState(app, HmiState::StateID::STATE_ID_REGULAR);
@@ -621,9 +608,8 @@ void StateControllerImpl::SetupRegularHmiState(ApplicationSharedPtr app,
 
   if (mobile_apis::PredefinedWindows::DEFAULT_WINDOW == window_id &&
       HMILevel::HMI_LIMITED == state->hmi_level() && app->is_resuming()) {
-    SDL_DEBUG(logger_,
-              "Resuming to LIMITED level. "
-                  << "Send OnResumeAudioSource notification");
+    SDL_DEBUG("Resuming to LIMITED level. "
+              << "Send OnResumeAudioSource notification");
     MessageHelper::SendOnResumeAudioSourceToHMI(app->app_id(), app_mngr_);
   }
 
@@ -659,17 +645,16 @@ void StateControllerImpl::ApplyRegularState(ApplicationSharedPtr app,
   DCHECK_OR_RETURN_VOID(app);
   DCHECK_OR_RETURN_VOID(state);
   DCHECK_OR_RETURN_VOID(state->state_id() == HmiState::STATE_ID_REGULAR);
-  SDL_DEBUG(logger_,
-            "Applying to app " << app->app_id() << " window #" << window_id
+  SDL_DEBUG("Applying to app " << app->app_id() << " window #" << window_id
                                << " state " << *state);
   SetupRegularHmiState(app, window_id, state);
 
   if (mobile_apis::PredefinedWindows::DEFAULT_WINDOW != window_id) {
-    SDL_DEBUG(logger_, "No need to resolve conflicts for a widget");
+    SDL_DEBUG("No need to resolve conflicts for a widget");
     return;
   }
 
-  SDL_DEBUG(logger_, "Resolving HMI level conflicts for app " << app->app_id());
+  SDL_DEBUG("Resolving HMI level conflicts for app " << app->app_id());
   ForEachApplication(HmiLevelConflictResolver(app, window_id, state, this));
 }
 
@@ -679,13 +664,12 @@ void StateControllerImpl::UpdateAppWindowsStreamingState(
   const auto window_ids = app->GetWindowIds();
   for (auto window_id : window_ids) {
     HmiStatePtr window_hmi_state = app->RegularHmiState(window_id);
-    SDL_DEBUG(logger_,
-              "State: " << *state << " window state: " << *window_hmi_state);
+    SDL_DEBUG("State: " << *state << " window state: " << *window_hmi_state);
     if (window_hmi_state->audio_streaming_state() !=
             state->audio_streaming_state() ||
         window_hmi_state->video_streaming_state() !=
             state->video_streaming_state()) {
-      SDL_DEBUG(logger_, "Updating streaming state for window #" << window_id);
+      SDL_DEBUG("Updating streaming state for window #" << window_id);
 
       HmiStatePtr new_window_state =
           CreateHmiState(app, HmiState::StateID::STATE_ID_REGULAR);
@@ -797,8 +781,7 @@ void StateControllerImpl::on_event(const event_engine::Event& event) {
         }
       }
 
-      SDL_WARN(logger_,
-               "Couldn't recognize state id (val='" << state_id << "')");
+      SDL_WARN("Couldn't recognize state id (val='" << state_id << "')");
       break;
     }
     default:
@@ -856,20 +839,20 @@ void StateControllerImpl::OnStateChanged(ApplicationSharedPtr app,
   DCHECK_OR_RETURN_VOID(app);
   DCHECK_OR_RETURN_VOID(old_state);
   DCHECK_OR_RETURN_VOID(new_state);
-  SDL_DEBUG(logger_, "Window #" << window_id << " old state: " << *old_state);
-  SDL_DEBUG(logger_, "Window #" << window_id << " new state: " << *new_state);
+  SDL_DEBUG("Window #" << window_id << " old state: " << *old_state);
+  SDL_DEBUG("Window #" << window_id << " new state: " << *new_state);
 
   if (!IsStateChanged(*old_state, *new_state)) {
-    SDL_DEBUG(logger_, "State has NOT been changed.");
+    SDL_DEBUG("State has NOT been changed.");
     return;
   }
 
   MessageHelper::SendHMIStatusNotification(app, window_id, app_mngr_);
 
   if (mobile_apis::PredefinedWindows::DEFAULT_WINDOW != window_id) {
-    SDL_DEBUG(logger_,
-              "State was changed not for a main application window. No "
-              "additional actions required");
+    SDL_DEBUG(
+        "State was changed not for a main application window. No "
+        "additional actions required");
     return;
   }
 
@@ -958,11 +941,11 @@ int64_t StateControllerImpl::RequestHMIStateChange(
         app_mngr_);
   }
   if (!request) {
-    SDL_ERROR(logger_, "Unable to create request");
+    SDL_ERROR("Unable to create request");
     return -1;
   }
   if (!app_mngr_.GetRPCService().ManageHMICommand(request)) {
-    SDL_ERROR(logger_, "Unable to send request");
+    SDL_ERROR("Unable to send request");
     return -1;
   }
   const uint32_t corr_id =
@@ -996,7 +979,7 @@ void StateControllerImpl::TempStateStarted(HmiState::StateID id) {
     }
   }
 
-  SDL_ERROR(logger_, "StateID '" << id << "' is already active");
+  SDL_ERROR("StateID '" << id << "' is already active");
 }
 
 void StateControllerImpl::TempStateStopped(HmiState::StateID ID) {
@@ -1019,8 +1002,7 @@ void StateControllerImpl::DeactivateApp(ApplicationSharedPtr app,
   DCHECK_OR_RETURN_VOID(regular);
   HmiStatePtr new_regular = std::make_shared<HmiState>(*regular);
 
-  SDL_DEBUG(logger_,
-            "Window #" << window_id << " current HMI level: '"
+  SDL_DEBUG("Window #" << window_id << " current HMI level: '"
                        << app->hmi_level(window_id) << "'");
   const bool is_audio_app = app->IsAudioApplication();
   const bool is_video_app = app->IsVideoApplication();
@@ -1077,7 +1059,7 @@ void StateControllerImpl::OnAppActivated(
   uint32_t app_id = message[strings::msg_params][strings::app_id].asUInt();
   ApplicationSharedPtr app = app_mngr_.application(app_id);
   if (!app) {
-    SDL_ERROR(logger_, "Application with id " << app_id << " not found");
+    SDL_ERROR("Application with id " << app_id << " not found");
     return;
   }
 
@@ -1088,9 +1070,8 @@ void StateControllerImpl::OnAppActivated(
 
   const auto window_ids = app->GetWindowIds();
   if (!helpers::in_range(window_ids, window_id)) {
-    SDL_ERROR(
-        logger_,
-        "Application " << app_id << " does not contain window #" << window_id);
+    SDL_ERROR("Application " << app_id << " does not contain window #"
+                             << window_id);
     return;
   }
 
@@ -1118,7 +1099,7 @@ void StateControllerImpl::OnAppDeactivated(
   uint32_t app_id = message[strings::msg_params][strings::app_id].asUInt();
   ApplicationSharedPtr app = app_mngr_.application(app_id);
   if (!app) {
-    SDL_ERROR(logger_, "Application with id " << app_id << " not found");
+    SDL_ERROR("Application with id " << app_id << " not found");
     return;
   }
 
@@ -1129,9 +1110,8 @@ void StateControllerImpl::OnAppDeactivated(
 
   const auto window_ids = app->GetWindowIds();
   if (!helpers::in_range(window_ids, window_id)) {
-    SDL_ERROR(
-        logger_,
-        "Application " << app_id << " does not contain window #" << window_id);
+    SDL_ERROR("Application " << app_id << " does not contain window #"
+                             << window_id);
     return;
   }
 
@@ -1238,7 +1218,7 @@ HmiStatePtr StateControllerImpl::CreateHmiState(
       break;
     }
     default:
-      SDL_FATAL(logger_, "Invalid state_id " << state_id);
+      SDL_FATAL("Invalid state_id " << state_id);
       NOTREACHED();
       break;
   }
@@ -1253,8 +1233,7 @@ mobile_apis::AudioStreamingState::eType StateControllerImpl::CalcAudioState(
     state = mobile_apis::AudioStreamingState::AUDIBLE;
   }
 
-  SDL_DEBUG(logger_,
-            "Calculated audio state of app " << app->app_id() << " for "
+  SDL_DEBUG("Calculated audio state of app " << app->app_id() << " for "
                                              << hmi_level << " HMI level is "
                                              << state);
   return state;
@@ -1268,8 +1247,7 @@ mobile_apis::VideoStreamingState::eType StateControllerImpl::CalcVideoState(
     state = mobile_apis::VideoStreamingState::STREAMABLE;
   }
 
-  SDL_DEBUG(logger_,
-            "Calculated video state of app " << app->app_id() << " for "
+  SDL_DEBUG("Calculated video state of app " << app->app_id() << " for "
                                              << hmi_level << " HMI level is "
                                              << state);
   return state;

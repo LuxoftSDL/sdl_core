@@ -117,10 +117,10 @@ void MediaManagerImpl::set_mock_streamer_listener(
 
 void MediaManagerImpl::Init() {
   using namespace protocol_handler;
-  SDL_INFO(logger_, "MediaManagerImpl::Init()");
+  SDL_INFO("MediaManagerImpl::Init()");
 
 #if defined(EXTENDED_MEDIA_MODE)
-  SDL_INFO(logger_, "Called Init with default configuration.");
+  SDL_INFO("Called Init with default configuration.");
   from_mic_recorder_ = new FromMicRecorderAdapter();
 #endif
 
@@ -224,8 +224,7 @@ void MediaManagerImpl::StartMicrophoneRecording(
     mobile_apis::SamplingRate::eType sampling_rate,
     mobile_apis::BitsPerSample::eType bits_per_sample,
     mobile_apis::AudioType::eType audio_type) {
-  SDL_INFO(logger_,
-           "MediaManagerImpl::StartMicrophoneRecording to " << output_file);
+  SDL_INFO("MediaManagerImpl::StartMicrophoneRecording to " << output_file);
   application_manager::ApplicationSharedPtr app =
       application_manager_.application(application_key);
   std::string file_path = settings().app_storage_folder();
@@ -244,11 +243,11 @@ void MediaManagerImpl::StartMicrophoneRecording(
   }
 #else
   if (file_system::FileExists(file_path)) {
-    SDL_INFO(logger_, "File " << output_file << " exists, removing");
+    SDL_INFO("File " << output_file << " exists, removing");
     if (file_system::DeleteFile(file_path)) {
-      SDL_INFO(logger_, "File " << output_file << " removed");
+      SDL_INFO("File " << output_file << " removed");
     } else {
-      SDL_WARN(logger_, "Could not remove file " << output_file);
+      SDL_WARN("Could not remove file " << output_file);
     }
   }
   const std::string record_file_source = settings().app_resource_folder() +
@@ -257,13 +256,12 @@ void MediaManagerImpl::StartMicrophoneRecording(
   std::vector<uint8_t> buf;
   if (file_system::ReadBinaryFile(record_file_source, buf)) {
     if (file_system::Write(file_path, buf)) {
-      SDL_INFO(logger_,
-               "File " << record_file_source << " copied to " << output_file);
+      SDL_INFO("File " << record_file_source << " copied to " << output_file);
     } else {
-      SDL_WARN(logger_, "Could not write to file " << output_file);
+      SDL_WARN("Could not write to file " << output_file);
     }
   } else {
-    SDL_WARN(logger_, "Could not read file " << record_file_source);
+    SDL_WARN("Could not read file " << record_file_source);
   }
 #endif
   from_mic_listener_->OnActivityStarted(application_key);
@@ -323,16 +321,16 @@ void MediaManagerImpl::OnMessageReceived(
 
   if (Compare<ServiceType, NEQ, ALL>(
           service_type, ServiceType::kMobileNav, ServiceType::kAudio)) {
-    SDL_DEBUG(logger_, "Unsupported service type in MediaManager");
+    SDL_DEBUG("Unsupported service type in MediaManager");
     return;
   }
 
   if (!application_manager_.CanAppStream(streaming_app_id, service_type)) {
     application_manager_.ForbidStreaming(streaming_app_id, service_type);
-    SDL_ERROR(logger_,
-              "The application is trying to stream when it should not."
-              " service type: "
-                  << service_type);
+    SDL_ERROR(
+        "The application is trying to stream when it should not."
+        " service type: "
+        << service_type);
     return;
   }
 
@@ -382,7 +380,7 @@ void MediaManagerImpl::FramesProcessed(int32_t application_key,
     if (audio_stream.use_count() != 0 &&
         "pipe" == settings().audio_server_type()) {
       size_t audio_queue_size = audio_stream->GetMsgQueueSize();
-      SDL_DEBUG(logger_, "# Messages in audio queue = " << audio_queue_size);
+      SDL_DEBUG("# Messages in audio queue = " << audio_queue_size);
       if (audio_queue_size > 0) {
         app->WakeUpStreaming(protocol_handler::ServiceType::kAudio);
       }
@@ -391,7 +389,7 @@ void MediaManagerImpl::FramesProcessed(int32_t application_key,
     if (video_stream.use_count() != 0 &&
         "pipe" == settings().video_server_type()) {
       size_t video_queue_size = video_stream->GetMsgQueueSize();
-      SDL_DEBUG(logger_, "# Messages in video queue = " << video_queue_size);
+      SDL_DEBUG("# Messages in video queue = " << video_queue_size);
       if (video_queue_size > 0) {
         app->WakeUpStreaming(protocol_handler::ServiceType::kMobileNav);
       }

@@ -58,9 +58,8 @@ class Launcher {
           device_launcher_.settings().wait_time_between_apps(),
           timer::kSingleShot);
     } else {
-      SDL_DEBUG(
-          logger_,
-          "All Apps on " << apps_on_device_->first << " postponed launched");
+      SDL_DEBUG("All Apps on " << apps_on_device_->first
+                               << " postponed launched");
       device_launcher_.StopLaunchingAppsOnDevice(apps_on_device_->first);
     }
   }
@@ -136,8 +135,7 @@ bool DeviceAppsLauncherImpl::LaunchAppsOnDevice(
     const std::string& device_mac,
     const std::vector<ApplicationDataPtr>& applications_to_launch) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_,
-            "On Device " << device_mac << " will be launched "
+  SDL_DEBUG("On Device " << device_mac << " will be launched "
                          << applications_to_launch.size() << " apps");
   AppsOnDevicePtr apps_on_device =
       std::make_shared<AppsOnDevice>(device_mac, applications_to_launch);

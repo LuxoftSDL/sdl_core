@@ -47,7 +47,7 @@ void UnregisterAppInterfaceRequest::Run() {
 
   if (!application_manager_.application(connection_key())) {
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     return;
   }
 

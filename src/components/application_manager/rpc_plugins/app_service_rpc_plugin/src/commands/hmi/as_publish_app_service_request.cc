@@ -57,7 +57,7 @@ ASPublishAppServiceRequest::~ASPublishAppServiceRequest() {}
 
 void ASPublishAppServiceRequest::Run() {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "Received a PublishAppService request from HMI");
+  SDL_DEBUG("Received a PublishAppService request from HMI");
   smart_objects::SmartObject response_params =
       smart_objects::SmartObject(smart_objects::SmartType_Map);
   smart_objects::SmartObject manifest =

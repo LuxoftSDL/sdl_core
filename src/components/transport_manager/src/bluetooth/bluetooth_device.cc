@@ -55,13 +55,12 @@ SDL_CREATE_LOGGERPTR("TransportManager")
 
 bool BluetoothDevice::GetRfcommChannel(const ApplicationHandle app_handle,
                                        uint8_t* channel_out) {
-  SDL_TRACE(logger_,
-            "enter. app_handle: " << app_handle << ", channel_out: " << std::hex
+  SDL_TRACE("enter. app_handle: " << app_handle << ", channel_out: " << std::hex
                                   << reinterpret_cast<void*>(channel_out));
   if (app_handle < 0 || app_handle > std::numeric_limits<uint8_t>::max()) {
-    SDL_TRACE(logger_,
-              "exit with FALSE. Condition: app_handle < 0 || app_handle > "
-              "numeric_limits::max()");
+    SDL_TRACE(
+        "exit with FALSE. Condition: app_handle < 0 || app_handle > "
+        "numeric_limits::max()");
     return false;
   }
   const uint8_t channel = static_cast<uint8_t>(app_handle);
@@ -69,20 +68,20 @@ bool BluetoothDevice::GetRfcommChannel(const ApplicationHandle app_handle,
       std::find(rfcomm_channels_.begin(), rfcomm_channels_.end(), channel);
   if (it == rfcomm_channels_.end()) {
     SDL_TRACE(
-        logger_,
+
         "exit with FALSE. Condition: channel not found in RfcommChannelVector");
     return false;
   }
   *channel_out = channel;
-  SDL_TRACE(logger_, "exit with TRUE");
+  SDL_TRACE("exit with TRUE");
   return true;
 }
 
 std::string BluetoothDevice::GetUniqueDeviceId(const bdaddr_t& device_address) {
-  SDL_TRACE(logger_, "enter. device_adress: " << &device_address);
+  SDL_TRACE("enter. device_adress: " << &device_address);
   char device_address_string[32];
   ba2str(&device_address, device_address_string);
-  SDL_TRACE(logger_, "exit with BT-" << device_address_string);
+  SDL_TRACE("exit with BT-" << device_address_string);
   return std::string("BT-") + device_address_string;
 }
 
@@ -94,7 +93,7 @@ BluetoothDevice::BluetoothDevice(const bdaddr_t& device_address,
     , rfcomm_channels_(rfcomm_channels) {}
 
 bool BluetoothDevice::IsSameAs(const Device* other) const {
-  SDL_TRACE(logger_, "enter. device: " << other);
+  SDL_TRACE("enter. device: " << other);
   bool result = false;
 
   const BluetoothDevice* other_bluetooth_device =
@@ -108,9 +107,9 @@ bool BluetoothDevice::IsSameAs(const Device* other) const {
     }
   }
   if (result) {
-    SDL_TRACE(logger_, "exit with TRUE");
+    SDL_TRACE("exit with TRUE");
   } else {
-    SDL_TRACE(logger_, "exit with FALSE");
+    SDL_TRACE("exit with FALSE");
   }
   return result;
 }

@@ -46,7 +46,7 @@ WebSocketDevice::WebSocketDevice(const std::string& name,
     , protocol_(boost::asio::ip::tcp::v4()) {}
 
 bool WebSocketDevice::IsSameAs(const Device* other) const {
-  SDL_TRACE(logger_, "enter. device: " << other);
+  SDL_TRACE("enter. device: " << other);
 
   const WebSocketDevice* other_websocket_device =
       dynamic_cast<const WebSocketDevice*>(other);

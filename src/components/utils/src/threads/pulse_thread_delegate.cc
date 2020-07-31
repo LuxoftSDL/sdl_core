@@ -40,28 +40,28 @@ namespace threads {
 SDL_CREATE_LOGGERPTR("Utils")
 
 PulseThreadDelegate::PulseThreadDelegate() : run_(false) {
-  SDL_TRACE(logger_, "Creating QNX channel");
+  SDL_TRACE("Creating QNX channel");
   chid_ = ChannelCreate(0);
   if (chid_ == -1) {
-    SDL_ERROR(logger_, "Failed to create QNX channel");
+    SDL_ERROR("Failed to create QNX channel");
     return;
   }
-  SDL_DEBUG(logger_, "Created QNX channel " << chid_);
+  SDL_DEBUG("Created QNX channel " << chid_);
 
-  SDL_TRACE(logger_, "Connecting to QNX channel " << chid_);
+  SDL_TRACE("Connecting to QNX channel " << chid_);
   coid_ = ConnectAttach(ND_LOCAL_NODE, 0, chid_, _NTO_SIDE_CHANNEL, 0);
   if (coid_ == -1) {
-    SDL_ERROR(logger_, "Failed to connect to QNX channel " << chid_);
+    SDL_ERROR("Failed to connect to QNX channel " << chid_);
     return;
   }
-  SDL_DEBUG(logger_, "Connected to QNX channel " << chid_);
+  SDL_DEBUG("Connected to QNX channel " << chid_);
 
   run_ = true;
 }
 
 void PulseThreadDelegate::threadMain() {
   if (!Init()) {
-    SDL_ERROR(logger_, "Failed to initialize thread for QNX channel " << chid_);
+    SDL_ERROR("Failed to initialize thread for QNX channel " << chid_);
     return;
   }
   while (run_) {
@@ -69,9 +69,9 @@ void PulseThreadDelegate::threadMain() {
     SIGEV_PULSE_INIT(&event, coid_, SIGEV_PULSE_PRIO_INHERIT, PULSE_CODE, 0);
     if (ArmEvent(&event)) {
       struct _pulse pulse;
-      SDL_INFO(logger_, "Waiting for pulse on QNX channel " << chid_);
+      SDL_INFO("Waiting for pulse on QNX channel " << chid_);
       if (MsgReceivePulse(chid_, &pulse, sizeof(pulse), 0) != -1) {
-        SDL_INFO(logger_, "Received pulse on QNX channel " << chid_);
+        SDL_INFO("Received pulse on QNX channel " << chid_);
         switch (pulse.code) {
           case PULSE_CODE:
             OnPulse();
@@ -79,12 +79,10 @@ void PulseThreadDelegate::threadMain() {
         }
       } else {
         if (run_) {
-          SDL_WARN(logger_,
-                   "Error occurred while waiting for pulse on QNX channel "
-                       << chid_);
+          SDL_WARN("Error occurred while waiting for pulse on QNX channel "
+                   << chid_);
         } else {
-          SDL_INFO(logger_,
-                   "QNX channel " << chid_ << " is apparently destroyed");
+          SDL_INFO("QNX channel " << chid_ << " is apparently destroyed");
         }
       }
     }
@@ -95,18 +93,18 @@ void PulseThreadDelegate::threadMain() {
 void PulseThreadDelegate::exitThreadMain() {
   run_ = false;
 
-  SDL_TRACE(logger_, "Disconnecting from QNX channel " << chid_);
+  SDL_TRACE("Disconnecting from QNX channel " << chid_);
   if (ConnectDetach(coid_) != -1) {
-    SDL_DEBUG(logger_, "Disconnected from QNX channel " << chid_);
+    SDL_DEBUG("Disconnected from QNX channel " << chid_);
   } else {
-    SDL_WARN(logger_, "Failed to disconnect from QNX channel " << chid_);
+    SDL_WARN("Failed to disconnect from QNX channel " << chid_);
   }
 
-  SDL_TRACE(logger_, "Destroying QNX channel " << chid_);
+  SDL_TRACE("Destroying QNX channel " << chid_);
   if (ChannelDestroy(chid_) != -1) {  // unblocks MsgReceivePulse()
-    SDL_DEBUG(logger_, "QNX channel " << chid_ << " destroyed");
+    SDL_DEBUG("QNX channel " << chid_ << " destroyed");
   } else {
-    SDL_WARN(logger_, "Failed to destroy QNX channel " << chid_);
+    SDL_WARN("Failed to destroy QNX channel " << chid_);
   }
 }
 

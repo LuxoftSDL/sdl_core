@@ -58,7 +58,7 @@ PlatformUsbDevice::PlatformUsbDevice(
 std::string PlatformUsbDevice::GetDescString(uint8_t index) const {
   char* str = usbd_string(usbd_device_, index, 0);
   if (NULL == str) {
-    SDL_INFO(logger_, "Failed to get USB string descriptor");
+    SDL_INFO("Failed to get USB string descriptor");
     return "";
   }
   return std::string(str);

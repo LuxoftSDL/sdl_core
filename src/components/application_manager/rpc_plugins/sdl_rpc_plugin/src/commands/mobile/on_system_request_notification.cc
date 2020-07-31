@@ -73,8 +73,7 @@ void OnSystemRequestNotification::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (app.use_count() == 0) {
-    SDL_ERROR(logger_,
-              "Application with connection key " << connection_key()
+    SDL_ERROR("Application with connection key " << connection_key()
                                                  << " is not registered.");
     return;
   }
@@ -90,8 +89,7 @@ void OnSystemRequestNotification::Run() {
 
   if (!policy_handler.IsRequestTypeAllowed(
           app->device(), app->policy_app_id(), request_type)) {
-    SDL_WARN(logger_,
-             "Request type " << stringified_request_type
+    SDL_WARN("Request type " << stringified_request_type
                              << " is not allowed by policies");
     return;
   }
@@ -103,14 +101,13 @@ void OnSystemRequestNotification::Run() {
         (*message_)[strings::msg_params][strings::request_subtype].asString();
     if (!policy_handler.IsRequestSubTypeAllowed(app->policy_app_id(),
                                                 request_subtype)) {
-      SDL_ERROR(logger_,
-                "Request subtype: " << request_subtype
+      SDL_ERROR("Request subtype: " << request_subtype
                                     << " is DISALLOWED by policies");
       return;
     }
   }
 
-  SDL_DEBUG(logger_, "Processing Request type : " << stringified_request_type);
+  SDL_DEBUG("Processing Request type : " << stringified_request_type);
 
   const bool binary_data_is_required =
       Compare<mobile_apis::RequestType::eType, EQ, ONE>(
@@ -155,7 +152,7 @@ void OnSystemRequestNotification::Run() {
   } else if (mobile_apis::RequestType::LOCK_SCREEN_ICON_URL == request_type) {
     if (!(*message_)[strings::msg_params].keyExists(strings::url) ||
         (*message_)[strings::msg_params][strings::url].empty()) {
-      SDL_ERROR(logger_, "discarding LOCK_SCREEN_ICON_URL request without URL");
+      SDL_ERROR("discarding LOCK_SCREEN_ICON_URL request without URL");
       return;
     }
   }
@@ -223,8 +220,7 @@ void OnSystemRequestNotification::AddHeader(BinaryMessage& message) const {
   message.clear();
   message.assign(header.begin(), header.end());
 
-  SDL_DEBUG(logger_,
-            "Header added: " << std::string(message.begin(), message.end()));
+  SDL_DEBUG("Header added: " << std::string(message.begin(), message.end()));
 }
 
 size_t OnSystemRequestNotification::ParsePTString(

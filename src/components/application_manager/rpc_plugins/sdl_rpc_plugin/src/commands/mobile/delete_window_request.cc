@@ -60,12 +60,12 @@ bool DeleteWindowRequest::CheckWindowId(
   const WindowID window_id =
       (*message_)[strings::msg_params][strings::window_id].asInt();
   if (mobile_apis::PredefinedWindows::DEFAULT_WINDOW == window_id) {
-    SDL_ERROR(logger_, "Main application window can't be deleted");
+    SDL_ERROR("Main application window can't be deleted");
     return false;
   }
 
   if (!app->WindowIdExists(window_id)) {
-    SDL_ERROR(logger_, "Window with id #" << window_id << " does not exist");
+    SDL_ERROR("Window with id #" << window_id << " does not exist");
     return false;
   }
 
@@ -92,7 +92,7 @@ void DeleteWindowRequest::Run() {
       application_manager_.application(connection_key());
 
   if (!application) {
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -113,7 +113,7 @@ void DeleteWindowRequest::on_event(const event_engine::Event& event) {
   SDL_AUTO_TRACE();
 
   if (hmi_apis::FunctionID::UI_DeleteWindow != event.id()) {
-    SDL_ERROR(logger_, "Received unknown event" << event.id());
+    SDL_ERROR("Received unknown event" << event.id());
     return;
   }
 
@@ -121,12 +121,12 @@ void DeleteWindowRequest::on_event(const event_engine::Event& event) {
       application_manager_.application(connection_key());
 
   if (!application) {
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
 
-  SDL_INFO(logger_, "Received DeleteWindow event");
+  SDL_INFO("Received DeleteWindow event");
   EndAwaitForInterface(HmiInterfaces::HMI_INTERFACE_UI);
 
   const smart_objects::SmartObject& response_message = event.smart_object();
@@ -139,7 +139,7 @@ void DeleteWindowRequest::on_event(const event_engine::Event& event) {
   GetInfo(response_message, response_info);
 
   if (!is_success) {
-    SDL_ERROR(logger_, "DeleteWindow request has failed on HMI side");
+    SDL_ERROR("DeleteWindow request has failed on HMI side");
     SendResponse(is_success,
                  result_code,
                  response_info.empty() ? nullptr : response_info.c_str());

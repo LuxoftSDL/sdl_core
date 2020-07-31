@@ -57,7 +57,7 @@ GetFileResponse::~GetFileResponse() {}
 
 void GetFileResponse::Run() {
   SDL_AUTO_TRACE();
-  SDL_INFO(logger_, "Sending GetFile response");
+  SDL_INFO("Sending GetFile response");
   rpc_service_.SendMessageToMobile(message_);
 }
 

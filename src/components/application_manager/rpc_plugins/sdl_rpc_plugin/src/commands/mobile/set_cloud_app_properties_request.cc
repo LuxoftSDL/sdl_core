@@ -28,7 +28,7 @@ void SetCloudAppPropertiesRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "Application is not registered");
+    SDL_ERROR("Application is not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -60,7 +60,7 @@ void SetCloudAppPropertiesRequest::Run() {
 
 void SetCloudAppPropertiesRequest::on_event(
     const app_mngr::event_engine::Event& event) {
-  SDL_INFO(logger_, "SetCloudAppPropertiesRequest on_event");
+  SDL_INFO("SetCloudAppPropertiesRequest on_event");
 }
 
 }  // namespace commands

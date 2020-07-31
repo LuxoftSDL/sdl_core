@@ -106,14 +106,13 @@ void ButtonPressRequest::Execute() {
                    &(*message_)[app_mngr::strings::msg_params],
                    true);
   } else if (!button_name_matches_module_type) {
-    SDL_WARN(logger_, "Request module type and button name mismatch!");
+    SDL_WARN("Request module type and button name mismatch!");
     SetResourceState(module_type, ResourceState::FREE);
     SendResponse(false,
                  mobile_apis::Result::INVALID_DATA,
                  "Request module type and button name mismatch!");
   } else {
-    SDL_WARN(logger_,
-             "Requested button or module does not exist in capabilities!");
+    SDL_WARN("Requested button or module does not exist in capabilities!");
     SetResourceState(module_type, ResourceState::FREE);
     SendResponse(false,
                  mobile_apis::Result::UNSUPPORTED_RESOURCE,
@@ -180,7 +179,7 @@ void ButtonPressRequest::on_event(const app_mngr::event_engine::Event& event) {
   auto app = application_manager_.application(connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "NULL pointer.");
+    SDL_ERROR("NULL pointer.");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED, "");
     return;
   }

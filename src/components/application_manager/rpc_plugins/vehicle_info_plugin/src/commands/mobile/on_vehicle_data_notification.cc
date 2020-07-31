@@ -72,7 +72,7 @@ void OnVehicleDataNotification::Run() {
 
   const auto& param_names = (*message_)[strings::msg_params].enumerate();
   for (const auto& name : param_names) {
-    SDL_DEBUG(logger_, "vehicle_data name: " << name);
+    SDL_DEBUG("vehicle_data name: " << name);
     auto vehicle_data_value = (*message_)[strings::msg_params][name].asInt();
     application_manager_.IviInfoUpdated(name, vehicle_data_value);
 
@@ -86,7 +86,7 @@ void OnVehicleDataNotification::Run() {
         application_manager_.applications(), subscribed_to_ivi_predicate);
     for (const auto& app : applications) {
       if (!app) {
-        SDL_ERROR(logger_, "NULL pointer");
+        SDL_ERROR("NULL pointer");
         continue;
       }
       notified_app_it = find(notify_apps.begin(), notify_apps.end(), app);
@@ -103,14 +103,12 @@ void OnVehicleDataNotification::Run() {
     }
   }
 
-  SDL_DEBUG(logger_,
-            "Number of Notifications to be send: " << notify_apps.size());
+  SDL_DEBUG("Number of Notifications to be send: " << notify_apps.size());
 
   for (size_t idx = 0; idx < notify_apps.size(); idx++) {
-    SDL_INFO(logger_,
-             "Send OnVehicleData PRNDL notification to "
-                 << notify_apps[idx]->name().c_str() << " application id "
-                 << notify_apps[idx]->app_id());
+    SDL_INFO("Send OnVehicleData PRNDL notification to "
+             << notify_apps[idx]->name().c_str() << " application id "
+             << notify_apps[idx]->app_id());
     (*message_)[strings::params][strings::connection_key] =
         notify_apps[idx]->app_id();
     (*message_)[strings::msg_params] = appSO[idx];

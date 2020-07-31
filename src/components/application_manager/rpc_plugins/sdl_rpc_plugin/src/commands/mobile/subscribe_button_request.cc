@@ -63,7 +63,7 @@ void SubscribeButtonRequest::Run() {
   ApplicationSharedPtr app = application_manager_.application(connection_key());
 
   if (!app) {
-    SDL_ERROR(logger_, "APPLICATION_NOT_REGISTERED");
+    SDL_ERROR("APPLICATION_NOT_REGISTERED");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
@@ -73,7 +73,7 @@ void SubscribeButtonRequest::Run() {
           (*message_)[str::msg_params][str::button_name].asInt());
 
   if (!IsSubscriptionAllowed(app, btn_id)) {
-    SDL_ERROR(logger_, "Subscribe on button " << btn_id << " isn't allowed");
+    SDL_ERROR("Subscribe on button " << btn_id << " isn't allowed");
     SendResponse(false, mobile_apis::Result::REJECTED);
     return;
   }
@@ -84,23 +84,22 @@ void SubscribeButtonRequest::Run() {
     bool play_pause_supported =
         CheckHMICapabilities(mobile_apis::ButtonName::PLAY_PAUSE);
     if (play_pause_supported) {
-      SDL_DEBUG(logger_, "Converting Legacy OK button to PLAY_PAUSE");
+      SDL_DEBUG("Converting Legacy OK button to PLAY_PAUSE");
       btn_id = mobile_apis::ButtonName::PLAY_PAUSE;
       (*message_)[str::msg_params][str::button_name] = btn_id;
     } else if (!ok_supported) {
-      SDL_ERROR(logger_, "OK button isn't allowed by HMI capabilities");
+      SDL_ERROR("OK button isn't allowed by HMI capabilities");
       SendResponse(false, mobile_apis::Result::UNSUPPORTED_RESOURCE);
     }
   } else if (!CheckHMICapabilities(btn_id)) {
-    SDL_ERROR(logger_,
-              "Subscribe on button " << btn_id
+    SDL_ERROR("Subscribe on button " << btn_id
                                      << " isn't allowed by HMI capabilities");
     SendResponse(false, mobile_apis::Result::UNSUPPORTED_RESOURCE);
     return;
   }
 
   if (app->IsSubscribedToButton(btn_id)) {
-    SDL_ERROR(logger_, "Already subscribed to button " << btn_id);
+    SDL_ERROR("Already subscribed to button " << btn_id);
     SendResponse(false, mobile_apis::Result::IGNORED);
     return;
   }

@@ -93,21 +93,21 @@ LowVoltageSignalsHandler::~LowVoltageSignalsHandler() {
 
 void LowVoltageSignalsHandler::HandleSignal(const int signo) {
   if (SIGLOWVOLTAGE_ == signo) {
-    SDL_DEBUG(logger_, "Received LOW_VOLTAGE signal");
+    SDL_DEBUG("Received LOW_VOLTAGE signal");
 
     life_cycle_.LowVoltage();
     cpid_ = utils::Signals::Fork();
 
     if (0 > cpid_) {
-      SDL_FATAL(logger_, "Error due fork() call. Error: " << strerror(errno));
+      SDL_FATAL("Error due fork() call. Error: " << strerror(errno));
       utils::Signals::ExitProcess(EXIT_FAILURE);
     }
 
     if (0 != cpid_) {
       // In Parent process
-      SDL_DEBUG(logger_, "Child PID: " << cpid_);
+      SDL_DEBUG("Child PID: " << cpid_);
       utils::Signals::WaitPid(cpid_, nullptr, 0);
-      SDL_DEBUG(logger_, "Child process: " << cpid_ << " is stopped");
+      SDL_DEBUG("Child process: " << cpid_ << " is stopped");
       life_cycle_.WakeUp();
     } else {
       // In Child process

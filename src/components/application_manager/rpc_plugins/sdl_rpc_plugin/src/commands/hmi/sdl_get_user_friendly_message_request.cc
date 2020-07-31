@@ -59,7 +59,7 @@ void SDLGetUserFriendlyMessageRequest::Run() {
   SDL_AUTO_TRACE();
   const std::string messageCodes = "messageCodes";
   if (!(*message_)[strings::msg_params].keyExists(messageCodes)) {
-    SDL_WARN(logger_, "Mandatory parameter '" + messageCodes + "'' is missing");
+    SDL_WARN("Mandatory parameter '" + messageCodes + "'' is missing");
     return;
   }
   smart_objects::SmartArray* msg =
@@ -72,7 +72,7 @@ void SDLGetUserFriendlyMessageRequest::Run() {
   for (; it != it_end; ++it) {
     std::string str = (*it).asString();
     if (!CheckSyntax(str)) {
-      SDL_WARN(logger_, "Invalid data");
+      SDL_WARN("Invalid data");
       SendErrorResponse(correlation_id(),
                         static_cast<hmi_apis::FunctionID::eType>(function_id()),
                         hmi_apis::Common_Result::INVALID_DATA,

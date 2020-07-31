@@ -86,13 +86,12 @@ smart_objects::SmartObject AppServiceManager::PublishAppService(
         auto found_service_id =
             found_service->record[strings::service_id].asString();
         if (service_by_name_id != found_service_id) {
-          SDL_WARN(logger_,
-                   "A service already exists with this name, rejecting");
+          SDL_WARN("A service already exists with this name, rejecting");
           return smart_objects::SmartObject();
         }
       }
     }
-    SDL_WARN(logger_, "Service already exists for this provider, updating");
+    SDL_WARN("Service already exists for this provider, updating");
     published_services_lock_.Acquire();
     found_service->record[strings::service_manifest] = manifest;
     found_service->record[strings::service_published] = true;
@@ -114,7 +113,7 @@ smart_objects::SmartObject AppServiceManager::PublishAppService(
 
   if (manifest.keyExists(strings::service_name) &&
       FindServiceByName(manifest[strings::service_name].asString())) {
-    SDL_WARN(logger_, "A service already exists with this name, rejecting");
+    SDL_WARN("A service already exists with this name, rejecting");
     return smart_objects::SmartObject();
   }
 
@@ -187,10 +186,10 @@ bool AppServiceManager::UnpublishAppService(const std::string service_id) {
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
-    SDL_ERROR(logger_, "Service id does not exist in published services");
+    SDL_ERROR("Service id does not exist in published services");
     return false;
   }
-  SDL_DEBUG(logger_, "Unpublishing app service: " << service_id);
+  SDL_DEBUG("Unpublishing app service: " << service_id);
 
   SetServicePublished(service_id, false);
   smart_objects::SmartObject msg_params;
@@ -223,7 +222,7 @@ bool AppServiceManager::UnpublishAppService(const std::string service_id) {
 
 void AppServiceManager::UnpublishServices(const uint32_t connection_key) {
   SDL_AUTO_TRACE();
-  SDL_DEBUG(logger_, "Unpublishing all app services: " << connection_key);
+  SDL_DEBUG("Unpublishing all app services: " << connection_key);
 
   std::list<std::string> app_published_services;
   {
@@ -272,13 +271,12 @@ void AppServiceManager::GetProviderByType(const std::string& service_type,
   SDL_AUTO_TRACE();
   auto active_service = ActiveServiceForType(service_type);
   if (!active_service) {
-    SDL_ERROR(logger_,
-              "There is no active service for the given service type: "
-                  << service_type);
+    SDL_ERROR("There is no active service for the given service type: "
+              << service_type);
     return;
   }
 
-  SDL_DEBUG(logger_, "Found provider for service type: " << service_type);
+  SDL_DEBUG("Found provider for service type: " << service_type);
   GetProviderFromService(*active_service, mobile_consumer, app, hmi_service);
 }
 
@@ -290,11 +288,11 @@ void AppServiceManager::GetProviderByID(const std::string& service_id,
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
-    SDL_ERROR(logger_, "Service id does not exist in published services");
+    SDL_ERROR("Service id does not exist in published services");
     return;
   }
 
-  SDL_DEBUG(logger_, "Found provider with service ID: " << service_id);
+  SDL_DEBUG("Found provider with service ID: " << service_id);
   GetProviderFromService(it->second, mobile_consumer, app, hmi_service);
 }
 
@@ -306,7 +304,7 @@ void AppServiceManager::GetProviderFromService(const AppService& service,
   if (mobile_consumer &&
       !service.record[strings::service_manifest][strings::allow_app_consumers]
            .asBool()) {
-    SDL_ERROR(logger_, "Service does not support app consumers");
+    SDL_ERROR("Service does not support app consumers");
     return;
   }
   bool mobile_service = service.mobile_service;
@@ -323,7 +321,7 @@ bool AppServiceManager::SetDefaultService(const std::string service_id) {
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
-    SDL_ERROR(logger_, "Unable to find published service " << service_id);
+    SDL_ERROR("Unable to find published service " << service_id);
     return false;
   }
   AppService& service = it->second;
@@ -354,13 +352,13 @@ bool AppServiceManager::RemoveDefaultService(const std::string service_id) {
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
-    SDL_ERROR(logger_, "Unable to find published service " << service_id);
+    SDL_ERROR("Unable to find published service " << service_id);
     return false;
   }
 
   AppService& service = it->second;
   if (!service.default_service) {
-    SDL_ERROR(logger_, "Service was not default " << service_id);
+    SDL_ERROR("Service was not default " << service_id);
     return false;
   }
   service.default_service = false;
@@ -381,13 +379,13 @@ bool AppServiceManager::ActivateAppService(const std::string service_id) {
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
-    SDL_ERROR(logger_, "Unable to find published service " << service_id);
+    SDL_ERROR("Unable to find published service " << service_id);
     return false;
   }
 
   smart_objects::SmartObject& service = it->second.record;
   if (service[strings::service_active].asBool()) {
-    SDL_DEBUG(logger_, "Service was already active " << service_id);
+    SDL_DEBUG("Service was already active " << service_id);
     return true;
   }
 
@@ -428,7 +426,7 @@ bool AppServiceManager::DeactivateAppService(const std::string service_id) {
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
-    SDL_ERROR(logger_, "Unable to find published service " << service_id);
+    SDL_ERROR("Unable to find published service " << service_id);
     return false;
   }
   smart_objects::SmartObject& service = it->second.record;
@@ -518,7 +516,7 @@ AppService* AppServiceManager::FindServiceByID(const std::string service_id) {
 
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
-    SDL_ERROR(logger_, "Service id does not exist in published services");
+    SDL_ERROR("Service id does not exist in published services");
     return NULL;
   }
   return &(it->second);
@@ -568,7 +566,7 @@ void AppServiceManager::SetServicePublished(const std::string service_id,
   sync_primitives::AutoLock lock(published_services_lock_);
   auto it = published_services_.find(service_id);
   if (it == published_services_.end()) {
-    SDL_ERROR(logger_, "Service id does not exist in published services");
+    SDL_ERROR("Service id does not exist in published services");
     return;
   }
   it->second.record[strings::service_published] = service_published;

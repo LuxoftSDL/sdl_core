@@ -68,23 +68,21 @@ bool UsbAoaAdapter::IsInitialised() const {
 }
 
 TransportAdapter::Error UsbAoaAdapter::Init() {
-  SDL_TRACE(logger_, "enter");
+  SDL_TRACE("enter");
   TransportAdapter::Error error = usb_handler_->Init();
   if (error != TransportAdapter::OK) {
-    SDL_TRACE(logger_,
-              "exit with error "
-                  << error << ". Condition: error != TransportAdapter::OK");
+    SDL_TRACE("exit with error "
+              << error << ". Condition: error != TransportAdapter::OK");
     return error;
   }
   error = TransportAdapterImpl::Init();
   if (error != TransportAdapter::OK) {
-    SDL_TRACE(logger_,
-              "exit with error "
-                  << error << ". Condition: error != TransportAdapter::OK");
+    SDL_TRACE("exit with error "
+              << error << ". Condition: error != TransportAdapter::OK");
     return error;
   }
   is_initialised_ = true;
-  SDL_TRACE(logger_, "exit with TransportAdapter::OK");
+  SDL_TRACE("exit with TransportAdapter::OK");
   return TransportAdapter::OK;
 }
 

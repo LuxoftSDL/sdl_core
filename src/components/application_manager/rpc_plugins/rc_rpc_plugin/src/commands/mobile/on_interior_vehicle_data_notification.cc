@@ -87,8 +87,7 @@ void OnInteriorVehicleDataNotification::Run() {
 
     const auto extension = RCHelpers::GetRCExtension(app);
     DCHECK(extension);
-    SDL_TRACE(logger_,
-              "Check subscription for " << app.app_id() << "and module type "
+    SDL_TRACE("Check subscription for " << app.app_id() << "and module type "
                                         << module_type << " " << module_id);
 
     if (extension->IsSubscribedToInteriorVehicleData(module)) {

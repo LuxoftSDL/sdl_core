@@ -21,7 +21,7 @@ class CryptoManagerSettingsImpl : public CryptoManagerSettings {
   }
 
   Protocol security_manager_protocol_name() const OVERRIDE {
-        const std::string& protocol_str = profile_.security_manager_protocol_name();
+    const std::string& protocol_str = profile_.security_manager_protocol_name();
     if (protocol_str == "TLSv1.0") {
       return security_manager::TLSv1;
     }
@@ -39,7 +39,7 @@ class CryptoManagerSettingsImpl : public CryptoManagerSettings {
     }
 
     SDL_ERROR(
-        logger_,
+
         "Unknown protocol: " << profile_.security_manager_protocol_name());
     return static_cast<security_manager::Protocol>(-1);
   }

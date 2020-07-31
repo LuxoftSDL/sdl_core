@@ -61,8 +61,7 @@ void VRGetCapabilitiesResponse::Run() {
       hmi_apis::FunctionID::VR_GetCapabilities);
 
   if (hmi_apis::Common_Result::SUCCESS != result_code) {
-    SDL_DEBUG(logger_,
-              "Request was not successful. Don't change HMI capabilities");
+    SDL_DEBUG("Request was not successful. Don't change HMI capabilities");
     return;
   }
 
@@ -77,7 +76,7 @@ void VRGetCapabilitiesResponse::Run() {
 
   if (!hmi_capabilities_.SaveCachedCapabilitiesToFile(
           hmi_interface::vr, sections_to_update, message_->getSchema())) {
-    SDL_ERROR(logger_, "Failed to save VR.GetCapabilities response to cache");
+    SDL_ERROR("Failed to save VR.GetCapabilities response to cache");
   }
 }
 

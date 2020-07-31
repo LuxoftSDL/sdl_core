@@ -65,7 +65,7 @@ ResumptionDataDB::ResumptionDataDB(
 #endif  // __QNX__
   } else {
     SDL_AUTO_TRACE();
-    SDL_ERROR(logger_, "Get not existed type of database storage");
+    SDL_ERROR("Get not existed type of database storage");
   }
 }
 
@@ -78,63 +78,58 @@ bool ResumptionDataDB::Init() {
   SDL_AUTO_TRACE();
 
   if (!db_->Open()) {
-    SDL_ERROR(logger_, "Failed opening database.");
-    SDL_INFO(logger_, "Starting opening retries.");
+    SDL_ERROR("Failed opening database.");
+    SDL_INFO("Starting opening retries.");
     const uint16_t attempts =
         application_manager_.get_settings().attempts_to_open_resumption_db();
-    SDL_DEBUG(logger_, "Total attempts number is: " << attempts);
+    SDL_DEBUG("Total attempts number is: " << attempts);
     bool is_opened = false;
     const uint16_t open_attempt_timeout_ms =
         application_manager_.get_settings()
             .open_attempt_timeout_ms_resumption_db();
     const useconds_t sleep_interval_mcsec = open_attempt_timeout_ms * 1000;
-    SDL_DEBUG(logger_,
-              "Open attempt timeout(ms) is: " << open_attempt_timeout_ms);
+    SDL_DEBUG("Open attempt timeout(ms) is: " << open_attempt_timeout_ms);
     for (int i = 0; i < attempts; ++i) {
       usleep(sleep_interval_mcsec);
-      SDL_INFO(logger_, "Attempt: " << i + 1);
+      SDL_INFO("Attempt: " << i + 1);
       if (db_->Open()) {
-        SDL_INFO(logger_, "Database opened.");
+        SDL_INFO("Database opened.");
         is_opened = true;
         break;
       }
     }
     if (!is_opened) {
-      SDL_ERROR(logger_,
-                "Open retry sequence failed. Tried "
-                    << attempts << " attempts with " << open_attempt_timeout_ms
-                    << " open timeout(ms) for each.");
+      SDL_ERROR("Open retry sequence failed. Tried "
+                << attempts << " attempts with " << open_attempt_timeout_ms
+                << " open timeout(ms) for each.");
       return false;
     }
   }
 #ifndef __QNX__
   if (!db_->IsReadWrite()) {
-    SDL_ERROR(logger_, "There are no read/write permissions for database");
+    SDL_ERROR("There are no read/write permissions for database");
     return false;
   }
 #endif  // __QNX__
   utils::dbms::SQLQuery query(db());
   if (!query.Exec(kCreateSchema)) {
     SDL_ERROR(
-        logger_,
         "Failed creating schema of database: " << query.LastError().text());
     return false;
   }
   utils::dbms::SQLQuery query_checks_resumption(db());
   if (!query_checks_resumption.Prepare(kChecksResumptionData) ||
       !query_checks_resumption.Exec()) {
-    SDL_ERROR(logger_,
-              "Failed verification or execution query kChecksResumptionData"
-                  << query_checks_resumption.LastError().text());
+    SDL_ERROR("Failed verification or execution query kChecksResumptionData"
+              << query_checks_resumption.LastError().text());
     return false;
   }
   if (0 == query_checks_resumption.GetInteger(0)) {
     utils::dbms::SQLQuery query_insert_resumption(db());
     if (!query_insert_resumption.Prepare(kInsertInitData) ||
         !query_insert_resumption.Exec()) {
-      SDL_ERROR(logger_,
-                "Failed insert init data to database: "
-                    << query_insert_resumption.LastError().text());
+      SDL_ERROR("Failed insert init data to database: "
+                << query_insert_resumption.LastError().text());
       return false;
     }
   }
@@ -151,37 +146,36 @@ void ResumptionDataDB::SaveApplication(
   bool application_exist = false;
   const std::string& policy_app_id = application->policy_app_id();
   const std::string& device_mac = application->mac_address();
-  SDL_INFO(logger_,
-           "app_id : " << application->app_id() << " policy_app_id : "
+  SDL_INFO("app_id : " << application->app_id() << " policy_app_id : "
                        << policy_app_id << " device_id : " << device_mac);
 
   if (!CheckExistenceApplication(
           policy_app_id, device_mac, application_exist)) {
-    SDL_ERROR(logger_, "Problem with access to DB");
+    SDL_ERROR("Problem with access to DB");
     return;
   }
 
   if (application->is_application_data_changed()) {
     if (application_exist &&
         !DeleteSavedApplication(policy_app_id, device_mac)) {
-      SDL_ERROR(logger_, "Deleting of application data is not finished");
+      SDL_ERROR("Deleting of application data is not finished");
       return;
     }
 
     if (!SaveApplicationToDB(application, policy_app_id, device_mac)) {
-      SDL_ERROR(logger_, "Saving of application data is not finished");
+      SDL_ERROR("Saving of application data is not finished");
       return;
     }
-    SDL_INFO(logger_, "All data from application were saved successfully");
+    SDL_INFO("All data from application were saved successfully");
     application->set_is_application_data_changed(false);
   } else if (application_exist) {
     if (!UpdateApplicationData(application, policy_app_id, device_mac)) {
-      SDL_ERROR(logger_, "Updating application data is failed");
+      SDL_ERROR("Updating application data is failed");
       return;
     }
-    SDL_INFO(logger_, "Application data were updated successfully");
+    SDL_INFO("Application data were updated successfully");
   } else if (!InsertApplicationData(application, policy_app_id, device_mac)) {
-    SDL_ERROR(logger_, "Saving data of application is failed");
+    SDL_ERROR("Saving data of application is failed");
     return;
   }
   WriteDb();
@@ -214,23 +208,22 @@ void ResumptionDataDB::IncrementIgnOffCount() {
   const int application_lifes = 3;
 
   if (DeleteAppWithIgnCount(application_lifes)) {
-    SDL_INFO(logger_,
-             "Saved application with ign_off_count = " << application_lifes
+    SDL_INFO("Saved application with ign_off_count = " << application_lifes
                                                        << " was deleted");
   } else {
-    SDL_WARN(logger_, "Problem with removing applications");
+    SDL_WARN("Problem with removing applications");
   }
 
   if (query_update_suspend_data.Prepare(kUpdateSuspendData)) {
     if (query_update_suspend_data.Exec()) {
-      SDL_INFO(logger_, "Data ign_off_count and suspend_count were updated");
+      SDL_INFO("Data ign_off_count and suspend_count were updated");
     }
   }
 
   if (query_update_last_ign_off_time.Prepare(kUpdateLastIgnOffTime)) {
     query_update_last_ign_off_time.Bind(0, static_cast<int64_t>(time(NULL)));
     if (query_update_last_ign_off_time.Exec()) {
-      SDL_INFO(logger_, "Data last_ign_off_time was updated");
+      SDL_INFO("Data last_ign_off_time was updated");
     }
   }
 }
@@ -242,16 +235,16 @@ bool ResumptionDataDB::DeleteAppWithIgnCount(const int application_lifes) {
 
   if (!select_apps_for_removing.Prepare(kSelectApplicationsIgnOffCount) ||
       !count_app.Prepare(kCountApplicationsIgnOff)) {
-    SDL_WARN(logger_,
-             "Problem with verification query select_apps_for_removing or"
-             " query count_app");
+    SDL_WARN(
+        "Problem with verification query select_apps_for_removing or"
+        " query count_app");
     return false;
   }
   /* Positions of binding data for "query count_app" :
     field "ign_off_count" from table "application" = 0*/
   count_app.Bind(0, application_lifes);
   if (!count_app.Exec() || !count_app.GetInteger(0)) {
-    SDL_WARN(logger_, "Problem with execution or count app=0");
+    SDL_WARN("Problem with execution or count app=0");
     return false;
   }
   std::string policy_app_id;
@@ -263,11 +256,11 @@ bool ResumptionDataDB::DeleteAppWithIgnCount(const int application_lifes) {
     device_id = select_apps_for_removing.GetString(0);
     policy_app_id = select_apps_for_removing.GetString(1);
     if (!DeleteSavedApplication(policy_app_id, device_id)) {
-      SDL_WARN(logger_, "Problem with removing application data");
+      SDL_WARN("Problem with removing application data");
       return false;
     }
   }
-  SDL_WARN(logger_, "Applications data were removed successfully");
+  SDL_WARN("Applications data were removed successfully");
   WriteDb();
   return true;
 }
@@ -295,47 +288,45 @@ bool ResumptionDataDB::GetSavedApplication(
 
   if (!CheckExistenceApplication(policy_app_id, device_id, application_exist) ||
       !application_exist) {
-    SDL_ERROR(logger_,
-              "Problem with access to DB or application does not exists");
+    SDL_ERROR("Problem with access to DB or application does not exists");
     return false;
   }
 
   if (!SelectDataFromAppTable(policy_app_id, device_id, saved_app)) {
-    SDL_ERROR(logger_, "Problem with restoring of data from application table");
+    SDL_ERROR("Problem with restoring of data from application table");
     return false;
   }
 
   if (!SelectFilesData(policy_app_id, device_id, saved_app)) {
-    SDL_ERROR(logger_, "Problem with restoring of files data");
+    SDL_ERROR("Problem with restoring of files data");
     return false;
   }
 
   if (!SelectSubmenuData(policy_app_id, device_id, saved_app)) {
-    SDL_ERROR(logger_, "Problem with restoring of submenu data");
+    SDL_ERROR("Problem with restoring of submenu data");
     return false;
   }
 
   if (!SelectCommandData(policy_app_id, device_id, saved_app)) {
-    SDL_ERROR(logger_, "Problem with restoring of command data");
+    SDL_ERROR("Problem with restoring of command data");
     return false;
   }
 
   if (!SelectSubscriptionsData(policy_app_id, device_id, saved_app)) {
-    SDL_ERROR(logger_, "Problem with restoring of subscriptions data");
+    SDL_ERROR("Problem with restoring of subscriptions data");
     return false;
   }
 
   if (!SelectChoiceSetData(policy_app_id, device_id, saved_app)) {
-    SDL_ERROR(logger_, "Problem with restoring of choice set data");
+    SDL_ERROR("Problem with restoring of choice set data");
     return false;
   }
 
   if (!SelectGlobalPropertiesData(policy_app_id, device_id, saved_app)) {
-    SDL_ERROR(logger_, "Problem with restoring of global properties data");
+    SDL_ERROR("Problem with restoring of global properties data");
     return false;
   }
-  SDL_INFO(logger_,
-           "Application data were successfully fetched from data base");
+  SDL_INFO("Application data were successfully fetched from data base");
   return true;
 }
 
@@ -345,9 +336,9 @@ bool ResumptionDataDB::RemoveApplicationFromSaved(
   bool application_exist = false;
   if (!CheckExistenceApplication(policy_app_id, device_id, application_exist) ||
       !application_exist) {
-    SDL_ERROR(logger_,
-              "Problem with access to DB or application does not"
-              " exist");
+    SDL_ERROR(
+        "Problem with access to DB or application does not"
+        " exist");
     return false;
   }
   bool result = false;
@@ -369,19 +360,17 @@ uint32_t ResumptionDataDB::GetGlobalIgnOnCounter() const {
 
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(kSelectGlobalIgnOnCounter)) {
-    SDL_ERROR(logger_,
-              "Problem with prepare query : " << kSelectGlobalIgnOnCounter);
+    SDL_ERROR("Problem with prepare query : " << kSelectGlobalIgnOnCounter);
     return 1;
   }
 
   if (!query.Exec()) {
-    SDL_ERROR(logger_,
-              "Problem with exec query : " << kSelectGlobalIgnOnCounter);
+    SDL_ERROR("Problem with exec query : " << kSelectGlobalIgnOnCounter);
     return 1;
   }
 
   const auto global_ign_on_counter = query.GetUInteger(0);
-  SDL_DEBUG(logger_, "Global Ign On Counter = " << global_ign_on_counter);
+  SDL_DEBUG("Global Ign On Counter = " << global_ign_on_counter);
   return global_ign_on_counter;
 }
 
@@ -393,7 +382,7 @@ void ResumptionDataDB::IncrementGlobalIgnOnCounter() {
   utils::dbms::SQLQuery query_update_global_ign_on_count(db());
   if (query_update_global_ign_on_count.Prepare(kUpdateGlobalIgnOnCount)) {
     if (query_update_global_ign_on_count.Exec()) {
-      SDL_DEBUG(logger_, "Data query_update_global_ign_on_count was updated");
+      SDL_DEBUG("Data query_update_global_ign_on_count was updated");
     }
   }
   db_->CommitTransaction();
@@ -404,12 +393,12 @@ void ResumptionDataDB::ResetGlobalIgnOnCount() {
   SDL_AUTO_TRACE();
   sync_primitives::AutoLock autolock(resumption_lock_);
 
-  SDL_DEBUG(logger_, "Global IGN ON counter resetting");
+  SDL_DEBUG("Global IGN ON counter resetting");
 
   utils::dbms::SQLQuery query_update_global_ign_on_count(db());
   if (query_update_global_ign_on_count.Prepare(kResetGlobalIgnOnCount)) {
     if (query_update_global_ign_on_count.Exec()) {
-      SDL_DEBUG(logger_, "Data was updated");
+      SDL_DEBUG("Data was updated");
     }
   }
 }
@@ -420,7 +409,7 @@ ssize_t ResumptionDataDB::IsApplicationSaved(
   bool application_exist = false;
   if (CheckExistenceApplication(policy_app_id, device_id, application_exist) &&
       application_exist) {
-    SDL_INFO(logger_, "Application exists in stored data");
+    SDL_INFO("Application exists in stored data");
     return 0;
   }
   return -1;
@@ -465,12 +454,11 @@ bool ResumptionDataDB::CheckExistenceHMIId(uint32_t hmi_app_id) const {
   if (query.Prepare(kCheckHMIId)) {
     query.Bind(0, static_cast<int64_t>(hmi_app_id));
     if (query.Exec() && (query.GetInteger(0))) {
-      SDL_INFO(logger_, "Saved data has HMI appID = " << hmi_app_id);
+      SDL_INFO("Saved data has HMI appID = " << hmi_app_id);
       return true;
     }
   }
-  SDL_FATAL(logger_,
-            "HMI appID = " << hmi_app_id << " doesn't exist in saved data");
+  SDL_FATAL("HMI appID = " << hmi_app_id << " doesn't exist in saved data");
   return false;
 }
 
@@ -495,14 +483,14 @@ void ResumptionDataDB::SelectHMIId(const std::string& policy_app_id,
     if (query_check.Exec() && query_check.GetInteger(0) &&
         query_select.Exec()) {
       hmi_id = query_select.GetUInteger(0);
-      SDL_INFO(logger_, "HMI appID = " << hmi_id);
+      SDL_INFO("HMI appID = " << hmi_id);
       return;
     }
   }
-  SDL_FATAL(logger_,
-            "Saved data doesn't have application with "
-            "device id = "
-                << device_id << " and policy appID = " << policy_app_id);
+  SDL_FATAL(
+      "Saved data doesn't have application with "
+      "device id = "
+      << device_id << " and policy appID = " << policy_app_id);
 }
 
 bool ResumptionDataDB::SelectHashId(const std::string& policy_app_id,
@@ -512,9 +500,9 @@ bool ResumptionDataDB::SelectHashId(const std::string& policy_app_id,
   utils::dbms::SQLQuery count(db());
   utils::dbms::SQLQuery select_hash(db());
   if (!select_hash.Prepare(kSelectHashId) || !count.Prepare(kCountHashId)) {
-    SDL_WARN(logger_,
-             "Problem with verification count query or"
-             " select_hash query");
+    SDL_WARN(
+        "Problem with verification count query or"
+        " select_hash query");
     return false;
   }
   /* Positions of binding data for "count" and "select_hash" :
@@ -528,14 +516,13 @@ bool ResumptionDataDB::SelectHashId(const std::string& policy_app_id,
      field "hashID" from table "application" = 0 */
   if (count.Exec() && count.GetInteger(0) && select_hash.Exec()) {
     hash_id = select_hash.GetString(0);
-    SDL_INFO(logger_, "Saved hash ID = " << hash_id);
+    SDL_INFO("Saved hash ID = " << hash_id);
     return true;
   }
-  SDL_WARN(logger_,
-           "Saved data doesn't have application with "
-           "device id = "
-               << device_id << " and policy appID = " << policy_app_id
-               << "or hashID");
+  SDL_WARN(
+      "Saved data doesn't have application with "
+      "device id = "
+      << device_id << " and policy appID = " << policy_app_id << "or hashID");
   return false;
 }
 
@@ -547,11 +534,11 @@ uint32_t ResumptionDataDB::SelectIgnOffTime() const {
   if (query.Prepare(kSelectIgnOffTime)) {
     if (query.Exec()) {
       ignOffTime = query.GetUInteger(0);
-      SDL_INFO(logger_, "Last ign off time = " << ignOffTime);
+      SDL_INFO("Last ign off time = " << ignOffTime);
       return ignOffTime;
     }
   }
-  SDL_ERROR(logger_, "Problem with prepare query");
+  SDL_ERROR("Problem with prepare query");
   return ignOffTime;
 }
 
@@ -573,15 +560,14 @@ bool ResumptionDataDB::CheckExistenceApplication(
   /* Position of data in "query" :
      amount of application = 0 */
   if (result && query.GetInteger(0)) {
-    SDL_INFO(logger_,
-             "Saved data has application with policy appID = "
-                 << policy_app_id << " and deviceID = " << device_id);
+    SDL_INFO("Saved data has application with policy appID = "
+             << policy_app_id << " and deviceID = " << device_id);
     application_exist = true;
   } else if (result) {
-    SDL_INFO(logger_, "Saved data does not contain application");
+    SDL_INFO("Saved data does not contain application");
     application_exist = false;
   } else {
-    SDL_ERROR(logger_, "Problem with access DB");
+    SDL_ERROR("Problem with access DB");
   }
   return result;
 }
@@ -595,16 +581,16 @@ void ResumptionDataDB::SelectDataForLoadResumeData(
   utils::dbms::SQLQuery count_application(db());
   if (!select_data.Prepare(kSelectDataForLoadResumeData) ||
       !count_application.Prepare(kCountApplications)) {
-    SDL_WARN(logger_,
-             "Problem with verification select_data query"
-             " or count application");
+    SDL_WARN(
+        "Problem with verification select_data query"
+        " or count application");
     return;
   }
 
   if (!count_application.Exec() || !count_application.GetInteger(0)) {
-    SDL_WARN(logger_,
-             "Problem with execution count_application query"
-             " or appliction table does not contain data");
+    SDL_WARN(
+        "Problem with execution count_application query"
+        " or appliction table does not contain data");
     return;
   }
   SmartObject so_array_data(SmartType_Array);
@@ -642,10 +628,9 @@ void ResumptionDataDB::UpdateHmiLevel(const std::string& policy_app_id,
     query.Bind(1, device_id);
     query.Bind(2, policy_app_id);
     if (query.Exec()) {
-      SDL_INFO(logger_,
-               "Saved data has application with policy appID = "
-                   << policy_app_id << " and deviceID = " << device_id
-                   << " has new HMI level = " << hmi_level);
+      SDL_INFO("Saved data has application with policy appID = "
+               << policy_app_id << " and deviceID = " << device_id
+               << " has new HMI level = " << hmi_level);
       WriteDb();
     }
   }
@@ -658,18 +643,16 @@ void ResumptionDataDB::Persist() {
 bool ResumptionDataDB::RefreshDB() const {
   utils::dbms::SQLQuery query(db());
   if (!query.Exec(resumption::kDropSchema)) {
-    SDL_WARN(logger_, "Failed dropping database: " << query.LastError().text());
+    SDL_WARN("Failed dropping database: " << query.LastError().text());
     return false;
   }
   if (!query.Exec(resumption::kCreateSchema)) {
     SDL_ERROR(
-        logger_,
         "Failed creating schema of database: " << query.LastError().text());
     return false;
   }
   if (!query.Exec(resumption::kInsertInitData)) {
     SDL_ERROR(
-        logger_,
         "Failed insert init data to database: " << query.LastError().text());
     return false;
   }
@@ -680,7 +663,7 @@ bool ResumptionDataDB::GetAllData(smart_objects::SmartObject& data) const {
   SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(resumption::kSelectAllApps)) {
-    SDL_ERROR(logger_, "Can't get applications data from DB.");
+    SDL_ERROR("Can't get applications data from DB.");
     return false;
   }
 
@@ -702,7 +685,7 @@ bool ResumptionDataDB::GetAllData(smart_objects::SmartObject& data) const {
 bool ResumptionDataDB::SaveAllData(const smart_objects::SmartObject& data) {
   SDL_AUTO_TRACE();
   if (smart_objects::SmartType_Array != data.getType()) {
-    SDL_ERROR(logger_, "Unexpected type for resumption data.");
+    SDL_ERROR("Unexpected type for resumption data.");
     return false;
   }
   const smart_objects::SmartArray* apps = data.asArray();
@@ -721,15 +704,13 @@ bool ResumptionDataDB::IsDBVersionActual() const {
   SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(resumption::kSelectDBVersion) || !query.Exec()) {
-    SDL_ERROR(logger_,
-              "Failed to get DB version: " << query.LastError().text());
+    SDL_ERROR("Failed to get DB version: " << query.LastError().text());
     return false;
   }
 
   const int32_t saved_db_version = query.GetInteger(0);
   const int32_t current_db_version = GetDBVersion();
-  SDL_DEBUG(logger_,
-            "Saved DB version is: " << saved_db_version
+  SDL_DEBUG("Saved DB version is: " << saved_db_version
                                     << ". Current DB vesion is: "
                                     << current_db_version);
 
@@ -741,7 +722,6 @@ bool ResumptionDataDB::UpdateDBVersion() const {
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(resumption::kUpdateDBVersion)) {
     SDL_ERROR(
-        logger_,
         "Incorrect DB version update query: " << query.LastError().text());
     return false;
   }
@@ -749,8 +729,7 @@ bool ResumptionDataDB::UpdateDBVersion() const {
   query.Bind(0, GetDBVersion());
 
   if (!query.Exec()) {
-    SDL_ERROR(logger_,
-              "DB version update failed: " << query.LastError().text());
+    SDL_ERROR("DB version update failed: " << query.LastError().text());
     return false;
   }
 
@@ -812,13 +791,13 @@ bool ResumptionDataDB::SelectFilesData(
   saved_app[strings::application_files] = SmartObject(SmartType_Array);
 
   if (0 == count_item) {
-    SDL_INFO(logger_, "Application does not contain files data");
+    SDL_INFO("Application does not contain files data");
     return true;
   }
   utils::dbms::SQLQuery select_files(db());
   if (!PrepareSelectQuery(
           select_files, policy_app_id, device_id, kSelectFiles)) {
-    SDL_WARN(logger_, "Problem with verification select_files");
+    SDL_WARN("Problem with verification select_files");
     return false;
   }
   saved_app[strings::application_files] = SmartObject(SmartType_Array);
@@ -836,7 +815,7 @@ bool ResumptionDataDB::SelectFilesData(
     array_item[strings::sync_file_name] = select_files.GetString(3);
     saved_app[strings::application_files][i++] = array_item;
   }
-  SDL_INFO(logger_, "File data was restored successfully");
+  SDL_INFO("File data was restored successfully");
   return true;
 }
 
@@ -856,13 +835,13 @@ bool ResumptionDataDB::SelectSubmenuData(
   saved_app[strings::application_submenus] = SmartObject(SmartType_Array);
 
   if (0 == count_item) {
-    SDL_INFO(logger_, "Application does not contain submenu data");
+    SDL_INFO("Application does not contain submenu data");
     return true;
   }
   utils::dbms::SQLQuery select_sub_menu(db());
   if (!PrepareSelectQuery(
           select_sub_menu, policy_app_id, device_id, kSelectSubMenu)) {
-    SDL_WARN(logger_, "Problem with verification select_sub_menu");
+    SDL_WARN("Problem with verification select_sub_menu");
     return false;
   }
   saved_app[strings::application_submenus] = SmartObject(SmartType_Array);
@@ -880,7 +859,7 @@ bool ResumptionDataDB::SelectSubmenuData(
     }
     saved_app[strings::application_submenus][i++] = array_item;
   }
-  SDL_INFO(logger_, "Sub menu data was restored successfully");
+  SDL_INFO("Sub menu data was restored successfully");
   return true;
 }
 
@@ -900,7 +879,7 @@ bool ResumptionDataDB::SelectCommandData(
   saved_app[strings::application_commands] = SmartObject(SmartType_Array);
 
   if (0 == count_item) {
-    SDL_INFO(logger_, "Application does not contain commands data");
+    SDL_INFO("Application does not contain commands data");
     return true;
   }
 
@@ -968,7 +947,7 @@ bool ResumptionDataDB::SelectCommandData(
                    select_commands.GetString(7);
     }
   }
-  SDL_INFO(logger_, "Commands were restored from DB successfully");
+  SDL_INFO("Commands were restored from DB successfully");
   return true;
 }
 
@@ -988,7 +967,7 @@ bool ResumptionDataDB::SelectSubscriptionsData(
   saved_app[strings::application_subscriptions] = SmartObject(SmartType_Map);
 
   if (0 == count_item) {
-    SDL_INFO(logger_, "Application does not contain subscriptions data");
+    SDL_INFO("Application does not contain subscriptions data");
     return true;
   }
   utils::dbms::SQLQuery select_subscriptions(db());
@@ -996,7 +975,7 @@ bool ResumptionDataDB::SelectSubscriptionsData(
                           policy_app_id,
                           device_id,
                           kSelectSubscriptions)) {
-    SDL_WARN(logger_, "Problem with verification select_subscriptions");
+    SDL_WARN("Problem with verification select_subscriptions");
     return false;
   }
   SmartObject application_buttons(SmartType_Array);
@@ -1023,7 +1002,7 @@ bool ResumptionDataDB::SelectSubscriptionsData(
     saved_app[strings::application_subscriptions]
              [strings::application_vehicle_info] = application_vehicle_info;
   }
-  SDL_INFO(logger_, "Subscriptions were restored from DB successfully");
+  SDL_INFO("Subscriptions were restored from DB successfully");
   return true;
 }
 
@@ -1043,13 +1022,13 @@ bool ResumptionDataDB::SelectChoiceSetData(
   saved_app[strings::application_choice_sets] = SmartObject(SmartType_Array);
 
   if (0 == count_item) {
-    SDL_INFO(logger_, "Application does not contain choice set data");
+    SDL_INFO("Application does not contain choice set data");
     return true;
   }
   utils::dbms::SQLQuery select_choice_set(db());
   if (!PrepareSelectQuery(
           select_choice_set, policy_app_id, device_id, kSelectChoiceSets)) {
-    SDL_WARN(logger_, "Problem with verification select_choice_set");
+    SDL_WARN("Problem with verification select_choice_set");
     return false;
   }
 
@@ -1125,7 +1104,7 @@ bool ResumptionDataDB::SelectChoiceSetData(
              [vr_cmd_idx++] = select_choice_set.GetString(10);
   }
 
-  SDL_INFO(logger_, "Choice sets were restored from DB successfully");
+  SDL_INFO("Choice sets were restored from DB successfully");
   return true;
 }
 
@@ -1146,7 +1125,7 @@ bool ResumptionDataDB::SelectGlobalPropertiesData(
       SmartObject(SmartType_Map);
 
   if (0 == count_item) {
-    SDL_INFO(logger_, "Application does not contain global properties data");
+    SDL_INFO("Application does not contain global properties data");
     return true;
   }
   utils::dbms::SQLQuery select_globalproperties(db());
@@ -1154,7 +1133,7 @@ bool ResumptionDataDB::SelectGlobalPropertiesData(
                           policy_app_id,
                           device_id,
                           kSelectGlobalProperties)) {
-    SDL_WARN(logger_, "Problem with verification select_globalproperties");
+    SDL_WARN("Problem with verification select_globalproperties");
     return false;
   }
   saved_app[strings::application_global_properties] =
@@ -1258,21 +1237,21 @@ bool ResumptionDataDB::SelectVrHelpItemsData(
   using namespace smart_objects;
   utils::dbms::SQLQuery checks_vrhelp_item(db());
   if (!checks_vrhelp_item.Prepare(kChecksVrHelpItem)) {
-    SDL_WARN(logger_, "Problem with verification checks_vrhelp_item query");
+    SDL_WARN("Problem with verification checks_vrhelp_item query");
     return false;
   }
   checks_vrhelp_item.Bind(0, global_properties_key);
   if (!checks_vrhelp_item.Exec()) {
-    SDL_WARN(logger_, "Problem with execution checks_vrhelp_item query");
+    SDL_WARN("Problem with execution checks_vrhelp_item query");
     return false;
   }
   if (0 == checks_vrhelp_item.GetInteger(0)) {
-    SDL_INFO(logger_, "Global properties doesn't contain vr help item");
+    SDL_INFO("Global properties doesn't contain vr help item");
     return true;
   }
   utils::dbms::SQLQuery select_vrhelp_item(db());
   if (!select_vrhelp_item.Prepare(kSelectVrHelpItem)) {
-    SDL_WARN(logger_, "Problem with verification select_vrhelp_item query");
+    SDL_WARN("Problem with verification select_vrhelp_item query");
     return false;
   }
   global_properties[strings::vr_help] = SmartObject(SmartType_Array);
@@ -1296,7 +1275,7 @@ bool ResumptionDataDB::SelectVrHelpItemsData(
     }
     vr_help_items[vr_help_item_idx++] = item;
   }
-  SDL_INFO(logger_, "VR Help items were restored successfully");
+  SDL_INFO("VR Help items were restored successfully");
   return true;
 }
 
@@ -1308,23 +1287,22 @@ bool ResumptionDataDB::SelectCharactersData(
   using namespace smart_objects;
   utils::dbms::SQLQuery checks_characters(db());
   if (!checks_characters.Prepare(kChecksCharacter)) {
-    SDL_WARN(logger_, "Problem with verification checks_characters query");
+    SDL_WARN("Problem with verification checks_characters query");
     return false;
   }
   checks_characters.Bind(0, global_properties_key);
   if (!checks_characters.Exec()) {
-    SDL_WARN(logger_, "Problem with execution checks_characters query");
+    SDL_WARN("Problem with execution checks_characters query");
     return false;
   }
   if (0 == checks_characters.GetInteger(0)) {
     SDL_INFO(
-        logger_,
         "Keyboard properties doesn't contain table limited character list");
     return true;
   }
   utils::dbms::SQLQuery select_characters(db());
   if (!select_characters.Prepare(kSelectCharacter)) {
-    SDL_WARN(logger_, "Problem with verification select_characters query");
+    SDL_WARN("Problem with verification select_characters query");
     return false;
   }
 
@@ -1349,12 +1327,12 @@ bool ResumptionDataDB::SelectImageData(
   utils::dbms::SQLQuery select_image(db());
 
   if (!select_image.Prepare(kSelectImage)) {
-    SDL_WARN(logger_, "Problem with verification select_image query");
+    SDL_WARN("Problem with verification select_image query");
     return false;
   }
   select_image.Bind(0, image_key);
   if (!select_image.Exec()) {
-    SDL_WARN(logger_, "Problem with execution select_image query");
+    SDL_WARN("Problem with execution select_image query");
     return false;
   }
   /* Position of data in "select_image" :
@@ -1372,12 +1350,12 @@ bool ResumptionDataDB::SelectTTSChunkData(
   utils::dbms::SQLQuery select_tts_chunk(db());
 
   if (!select_tts_chunk.Prepare(kSelectTTSChunk)) {
-    SDL_WARN(logger_, "Problem with verification select_tts_chunk query");
+    SDL_WARN("Problem with verification select_tts_chunk query");
     return false;
   }
   select_tts_chunk.Bind(0, tts_chunk_key);
   if (!select_tts_chunk.Exec()) {
-    SDL_WARN(logger_, "Problem with execution select_tts_chunk query");
+    SDL_WARN("Problem with execution select_tts_chunk query");
     return false;
   }
   /* Position of data in "select_tts_chunk" :
@@ -1396,13 +1374,13 @@ bool ResumptionDataDB::SelectDataFromAppTable(
   using namespace app_mngr;
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(kSelectAppTable)) {
-    SDL_WARN(logger_, "Problem with verification kSelectAppTable query");
+    SDL_WARN("Problem with verification kSelectAppTable query");
     return false;
   }
   query.Bind(0, policy_app_id);
   query.Bind(1, device_id);
   if (!query.Exec()) {
-    SDL_WARN(logger_, "Problem with execution kSelectAppTable query");
+    SDL_WARN("Problem with execution kSelectAppTable query");
     return false;
   }
 
@@ -1435,7 +1413,7 @@ bool ResumptionDataDB::SelectDataFromAppTable(
   saved_app[strings::is_media_application] = query.GetBoolean(9);
   saved_app[strings::subscribed_for_way_points] = query.GetBoolean(10);
 
-  SDL_INFO(logger_, "Data from application table was restored successfully");
+  SDL_INFO("Data from application table was restored successfully");
   return true;
 }
 
@@ -1447,17 +1425,17 @@ bool ResumptionDataDB::SelectCountFromArray(
   SDL_AUTO_TRACE();
   utils::dbms::SQLQuery query(db());
   if (!query.Prepare(text_query)) {
-    SDL_WARN(logger_, "Problem with verification query");
+    SDL_WARN("Problem with verification query");
     return false;
   }
   query.Bind(0, policy_app_id);
   query.Bind(1, device_id);
   if (!query.Exec()) {
-    SDL_WARN(logger_, "Problem with execution query");
+    SDL_WARN("Problem with execution query");
     return false;
   }
   count_item = query.GetInteger(0);
-  SDL_INFO(logger_, "count_item=" << count_item);
+  SDL_INFO("count_item=" << count_item);
   return true;
 }
 
@@ -1500,13 +1478,13 @@ bool ResumptionDataDB::DeleteSavedFiles(const std::string& policy_app_id,
                                         const std::string& device_id) {
   SDL_AUTO_TRACE();
   if (!ExecQueryToDeleteData(policy_app_id, device_id, kDeleteFile)) {
-    SDL_WARN(logger_, "Incorrect delete from file.");
+    SDL_WARN("Incorrect delete from file.");
     return false;
   }
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteApplicationFilesArray)) {
-    SDL_WARN(logger_, "Incorrect delete from applicationFilesArray.");
+    SDL_WARN("Incorrect delete from applicationFilesArray.");
     return false;
   }
   return true;
@@ -1517,13 +1495,13 @@ bool ResumptionDataDB::DeleteSavedSubMenu(const std::string& policy_app_id,
   SDL_AUTO_TRACE();
 
   if (!ExecQueryToDeleteData(policy_app_id, device_id, kDeleteSubMenu)) {
-    SDL_WARN(logger_, "Incorrect delete from subMenu.");
+    SDL_WARN("Incorrect delete from subMenu.");
     return false;
   }
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteApplicationSubMenuArray)) {
-    SDL_WARN(logger_, "Incorrect delete from applicationSubMenuArray.");
+    SDL_WARN("Incorrect delete from applicationSubMenuArray.");
     return false;
   }
   return true;
@@ -1535,7 +1513,7 @@ bool ResumptionDataDB::DeleteSavedSubscriptions(
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteApplicationSubscriptionsArray)) {
-    SDL_WARN(logger_, "Incorrect delete from applicationSubscriptionsArray.");
+    SDL_WARN("Incorrect delete from applicationSubscriptionsArray.");
     return false;
   }
   return true;
@@ -1547,23 +1525,23 @@ bool ResumptionDataDB::DeleteSavedCommands(const std::string& policy_app_id,
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteImageFromCommands)) {
-    SDL_WARN(logger_, "Incorrect delete image from commands.");
+    SDL_WARN("Incorrect delete image from commands.");
     return false;
   }
 
   if (!ExecQueryToDeleteData(policy_app_id, device_id, kDeleteVrCommands)) {
-    SDL_WARN(logger_, "Incorrect delete vrcommands from commands.");
+    SDL_WARN("Incorrect delete vrcommands from commands.");
     return false;
   }
 
   if (!ExecQueryToDeleteData(policy_app_id, device_id, kDeleteCommands)) {
-    SDL_WARN(logger_, "Incorrect delete commands.");
+    SDL_WARN("Incorrect delete commands.");
     return false;
   }
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteApplicationCommandsArray)) {
-    SDL_WARN(logger_, "Incorrect delete applicationCommandsArray.");
+    SDL_WARN("Incorrect delete applicationCommandsArray.");
     return false;
   }
 
@@ -1576,35 +1554,35 @@ bool ResumptionDataDB::DeleteSavedChoiceSet(const std::string& policy_app_id,
 
   if (!ExecUnionQueryToDeleteData(
           policy_app_id, device_id, kDeleteImageFromChoiceSet)) {
-    SDL_WARN(logger_, "Incorrect delete image from choice set");
+    SDL_WARN("Incorrect delete image from choice set");
     return false;
   }
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteVrCommandsFromChoiceSet)) {
-    SDL_WARN(logger_, "Incorrect delete vrCommands from choice set");
+    SDL_WARN("Incorrect delete vrCommands from choice set");
     return false;
   }
 
   if (!ExecQueryToDeleteData(policy_app_id, device_id, kDeleteChoice)) {
-    SDL_WARN(logger_, "Incorrect delete choiceSet");
+    SDL_WARN("Incorrect delete choiceSet");
     return false;
   }
 
   if (!ExecQueryToDeleteData(policy_app_id, device_id, kDeleteChoiceArray)) {
-    SDL_WARN(logger_, "Incorrect delete from choiceArray");
+    SDL_WARN("Incorrect delete from choiceArray");
     return false;
   }
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteApplicationChoiceSet)) {
-    SDL_WARN(logger_, "Incorrect delete applicationChoiceSet");
+    SDL_WARN("Incorrect delete applicationChoiceSet");
     return false;
   }
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteApplicationChoiceSetArray)) {
-    SDL_WARN(logger_, "Incorrect delete from ApplicationChoiceSetArray");
+    SDL_WARN("Incorrect delete from ApplicationChoiceSetArray");
     return false;
   }
 
@@ -1617,46 +1595,46 @@ bool ResumptionDataDB::DeleteSavedGlobalProperties(
 
   if (!ExecUnionQueryToDeleteData(
           policy_app_id, device_id, kDeleteImageFromGlobalProperties)) {
-    SDL_WARN(logger_, "Incorrect delete image from globalProperties");
+    SDL_WARN("Incorrect delete image from globalProperties");
     return false;
   }
 
   if (!ExecQueryToDeleteData(policy_app_id, device_id, kDeletevrHelpItem)) {
-    SDL_WARN(logger_, "Incorrect delete vrHelpItem");
+    SDL_WARN("Incorrect delete vrHelpItem");
     return false;
   }
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeletevrHelpItemArray)) {
-    SDL_WARN(logger_, "Incorrect delete vrHelpItemArray");
+    SDL_WARN("Incorrect delete vrHelpItemArray");
     return false;
   }
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteTableLimitedCharacterList)) {
-    SDL_WARN(logger_, "Incorrect delete from tableLimitedCharacterList");
+    SDL_WARN("Incorrect delete from tableLimitedCharacterList");
     return false;
   }
 
   if (!ExecQueryToDeleteData(policy_app_id, device_id, kDeleteCharacterArray)) {
-    SDL_WARN(logger_, "Incorrect delete from characterArray");
+    SDL_WARN("Incorrect delete from characterArray");
     return false;
   }
 
   if (!ExecUnionQueryToDeleteData(policy_app_id, device_id, kDeleteTTSChunk)) {
-    SDL_WARN(logger_, "Incorrect delete from TTSChunk");
+    SDL_WARN("Incorrect delete from TTSChunk");
     return false;
   }
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteHelpTimeoutPromptArray)) {
-    SDL_WARN(logger_, "Incorrect delete from HelpTimeoutPromptArray");
+    SDL_WARN("Incorrect delete from HelpTimeoutPromptArray");
     return false;
   }
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteGlobalProperties)) {
-    SDL_WARN(logger_, "Incorrect delete from GlobalProperties");
+    SDL_WARN("Incorrect delete from GlobalProperties");
     return false;
   }
 
@@ -1669,7 +1647,7 @@ bool ResumptionDataDB::DeleteDataFromApplicationTable(
 
   if (!ExecQueryToDeleteData(
           policy_app_id, device_id, kDeleteFromApplicationTable)) {
-    SDL_WARN(logger_, "Incorrect delete data from application table");
+    SDL_WARN("Incorrect delete data from application table");
     return false;
   }
 
@@ -1723,7 +1701,7 @@ bool ResumptionDataDB::ExecInsertImage(
     }
   }
   if (!result) {
-    SDL_WARN(logger_, "Problem with preparing or execution count_image_query.");
+    SDL_WARN("Problem with preparing or execution count_image_query.");
     return false;
   }
   if (count_image) {
@@ -1736,9 +1714,9 @@ bool ResumptionDataDB::ExecInsertImage(
       }
     }
     if (!result) {
-      SDL_WARN(logger_,
-               "Problem with preparing or execution "
-               "query for select primary key of image");
+      SDL_WARN(
+          "Problem with preparing or execution "
+          "query for select primary key of image");
     }
   } else {
     result = query.Prepare(kInsertImage);
@@ -1751,9 +1729,9 @@ bool ResumptionDataDB::ExecInsertImage(
       }
     }
     if (!result) {
-      SDL_WARN(logger_,
-               "Problem with preparing or execution "
-               "query for insert image to image table");
+      SDL_WARN(
+          "Problem with preparing or execution "
+          "query for insert image to image table");
     }
   }
   return result;
@@ -1767,7 +1745,7 @@ bool ResumptionDataDB::ExecInsertChoice(
   utils::dbms::SQLQuery insert_choice(db());
 
   if (!insert_choice.Prepare(kInsertChoice)) {
-    SDL_WARN(logger_, "Incorrect preparation insert_choice query");
+    SDL_WARN("Incorrect preparation insert_choice query");
     return false;
   }
   /* Positions of binding data for "insert_choice":
@@ -1790,7 +1768,7 @@ bool ResumptionDataDB::ExecInsertChoice(
     if (choice_array[i].keyExists(strings::image)) {
       if (!ExecInsertImage(image_primary_key,
                            choice_array[i][strings::image])) {
-        SDL_WARN(logger_, "Problem with insert image to choice");
+        SDL_WARN("Problem with insert image to choice");
         return false;
       }
       insert_choice.Bind(4, image_primary_key);
@@ -1800,7 +1778,7 @@ bool ResumptionDataDB::ExecInsertChoice(
     if (choice_array[i].keyExists(strings::secondary_image)) {
       if (!ExecInsertImage(image_primary_key,
                            choice_array[i][strings::secondary_image])) {
-        SDL_WARN(logger_, "Problem with insert secondary_image to choice");
+        SDL_WARN("Problem with insert secondary_image to choice");
         return false;
       }
       insert_choice.Bind(5, image_primary_key);
@@ -1808,7 +1786,7 @@ bool ResumptionDataDB::ExecInsertChoice(
       insert_choice.Bind(5);
     }
     if (!insert_choice.Exec()) {
-      SDL_WARN(logger_, "Problem with execution insert_choice query");
+      SDL_WARN("Problem with execution insert_choice query");
       return false;
     }
     choice_primary_key = insert_choice.LastInsertId();
@@ -1817,17 +1795,17 @@ bool ResumptionDataDB::ExecInsertChoice(
                                choice_array[i][strings::vr_commands],
                                kVRCommandFromChoice)) ||
         !insert_choice.Reset()) {
-      SDL_WARN(logger_, "problemm with add vr commands to choice");
+      SDL_WARN("problemm with add vr commands to choice");
       return false;
     }
 
     if (!ExecInsertDataToArray(
             choice_set_key, choice_primary_key, kInsertChoiceArray)) {
-      SDL_INFO(logger_, "Problem with insertion data to choiceArray table");
+      SDL_INFO("Problem with insertion data to choiceArray table");
       return false;
     }
   }
-  SDL_INFO(logger_, "Choice data were saved to DB successfully");
+  SDL_INFO("Choice data were saved to DB successfully");
   return true;
 }
 
@@ -1839,7 +1817,7 @@ bool ResumptionDataDB::ExecInsertVrCommands(
   utils::dbms::SQLQuery insert_vr_command(db());
 
   if (!insert_vr_command.Prepare(kInsertVrCommand)) {
-    SDL_WARN(logger_, "Incorrect preparation insert_vr_command query");
+    SDL_WARN("Incorrect preparation insert_vr_command query");
     return false;
   }
   size_t length_vr_commands = vr_commands_array.length();
@@ -1858,11 +1836,11 @@ bool ResumptionDataDB::ExecInsertVrCommands(
       insert_vr_command.Bind(2, primary_key);
     }
     if (!insert_vr_command.Exec() || !insert_vr_command.Reset()) {
-      SDL_WARN(logger_, "Problem with insert vr_command to DB");
+      SDL_WARN("Problem with insert vr_command to DB");
       return false;
     }
   }
-  SDL_INFO(logger_, "Insertion of Vr command were executed successfully");
+  SDL_INFO("Insertion of Vr command were executed successfully");
   return true;
 }
 
@@ -1892,7 +1870,7 @@ bool ResumptionDataDB::SaveApplicationToDB(
   db_->BeginTransaction();
   if (!InsertGlobalPropertiesData(GetApplicationGlobalProperties(application),
                                   global_properties_key)) {
-    SDL_WARN(logger_, "Incorrect insert globalProperties data to DB.");
+    SDL_WARN("Incorrect insert globalProperties data to DB.");
     db_->RollbackTransaction();
     return false;
   }
@@ -1902,38 +1880,38 @@ bool ResumptionDataDB::SaveApplicationToDB(
                              device_id,
                              &application_primary_key,
                              global_properties_key)) {
-    SDL_WARN(logger_, "Incorrect insert application data to DB.");
+    SDL_WARN("Incorrect insert application data to DB.");
     db_->RollbackTransaction();
     return false;
   }
   if (!InsertFilesData(GetApplicationFiles(application),
                        application_primary_key)) {
-    SDL_WARN(logger_, "Incorrect insert file data to DB.");
+    SDL_WARN("Incorrect insert file data to DB.");
     db_->RollbackTransaction();
     return false;
   }
 
   if (!InsertSubMenuData(GetApplicationSubMenus(application),
                          application_primary_key)) {
-    SDL_WARN(logger_, "Incorrect insert submenu data to DB.");
+    SDL_WARN("Incorrect insert submenu data to DB.");
     db_->RollbackTransaction();
     return false;
   }
   if (!InsertCommandsData(GetApplicationCommands(application),
                           application_primary_key)) {
-    SDL_WARN(logger_, "Incorrect insert commands data to DB.");
+    SDL_WARN("Incorrect insert commands data to DB.");
     db_->RollbackTransaction();
     return false;
   }
   if (!InsertSubscriptionsData(GetApplicationSubscriptions(application),
                                application_primary_key)) {
-    SDL_WARN(logger_, "Incorrect insert subscriptions data to DB.");
+    SDL_WARN("Incorrect insert subscriptions data to DB.");
     db_->RollbackTransaction();
     return false;
   }
   if (!InsertChoiceSetData(GetApplicationInteractionChoiseSets(application),
                            application_primary_key)) {
-    SDL_WARN(logger_, "Incorrect insert choiceset data to DB.");
+    SDL_WARN("Incorrect insert choiceset data to DB.");
     db_->RollbackTransaction();
     return false;
   }
@@ -1952,7 +1930,7 @@ bool ResumptionDataDB::SaveApplicationToDB(
   db_->BeginTransaction();
   if (!InsertGlobalPropertiesData(application["globalProperties"],
                                   global_properties_key)) {
-    SDL_WARN(logger_, "Incorrect insert globalProperties data to DB.");
+    SDL_WARN("Incorrect insert globalProperties data to DB.");
     db_->RollbackTransaction();
     return false;
   }
@@ -1961,38 +1939,38 @@ bool ResumptionDataDB::SaveApplicationToDB(
                              device_id,
                              &application_primary_key,
                              global_properties_key)) {
-    SDL_WARN(logger_, "Incorrect insert application data to DB.");
+    SDL_WARN("Incorrect insert application data to DB.");
     db_->RollbackTransaction();
     return false;
   }
   if (!InsertFilesData(application["applicationFiles"],
                        application_primary_key)) {
-    SDL_WARN(logger_, "Incorrect insert file data to DB.");
+    SDL_WARN("Incorrect insert file data to DB.");
     db_->RollbackTransaction();
     return false;
   }
 
   if (!InsertSubMenuData(application["applicationSubMenus"],
                          application_primary_key)) {
-    SDL_WARN(logger_, "Incorrect insert submenu data to DB.");
+    SDL_WARN("Incorrect insert submenu data to DB.");
     db_->RollbackTransaction();
     return false;
   }
   if (!InsertCommandsData(application["applicationCommands"],
                           application_primary_key)) {
-    SDL_WARN(logger_, "Incorrect insert commands data to DB.");
+    SDL_WARN("Incorrect insert commands data to DB.");
     db_->RollbackTransaction();
     return false;
   }
   if (!InsertSubscriptionsData(application["subscriptions"],
                                application_primary_key)) {
-    SDL_WARN(logger_, "Incorrect insert subscriptions data to DB.");
+    SDL_WARN("Incorrect insert subscriptions data to DB.");
     db_->RollbackTransaction();
     return false;
   }
   if (!InsertChoiceSetData(application["applicationChoiceSets"],
                            application_primary_key)) {
-    SDL_WARN(logger_, "Incorrect insert choiceset data to DB.");
+    SDL_WARN("Incorrect insert choiceset data to DB.");
     db_->RollbackTransaction();
     return false;
   }
@@ -2007,14 +1985,14 @@ bool ResumptionDataDB::InsertFilesData(const smart_objects::SmartObject& files,
   using namespace smart_objects;
   const size_t length_files_array = files.length();
   if (0 == length_files_array) {
-    SDL_INFO(logger_, "Application doesn't contain files");
+    SDL_INFO("Application doesn't contain files");
     return true;
   }
 
   utils::dbms::SQLQuery query_insert_file(db());
 
   if (!query_insert_file.Prepare(kInsertToFile)) {
-    SDL_WARN(logger_, "Problem with verification queries for insertion files");
+    SDL_WARN("Problem with verification queries for insertion files");
     return false;
   }
   /* Positions of binding data for "query_insert_file":
@@ -2030,7 +2008,7 @@ bool ResumptionDataDB::InsertFilesData(const smart_objects::SmartObject& files,
     query_insert_file.Bind(3, (files[i][strings::sync_file_name]).asString());
 
     if (!query_insert_file.Exec()) {
-      SDL_WARN(logger_, "Incorrect insertion of files data");
+      SDL_WARN("Incorrect insertion of files data");
       return false;
     }
 
@@ -2038,12 +2016,12 @@ bool ResumptionDataDB::InsertFilesData(const smart_objects::SmartObject& files,
                                 query_insert_file.LastInsertId(),
                                 kInsertToApplicationFilesArray)) ||
         !query_insert_file.Reset()) {
-      SDL_WARN(logger_, "Incorrect insertion to application files array");
+      SDL_WARN("Incorrect insertion to application files array");
       return false;
     }
   }
 
-  SDL_INFO(logger_, "Files data were inserted successfully to DB");
+  SDL_INFO("Files data were inserted successfully to DB");
   return true;
 }
 
@@ -2055,14 +2033,13 @@ bool ResumptionDataDB::InsertSubMenuData(
   using namespace smart_objects;
   const size_t length_submenu_array = submenus.length();
   if (0 == length_submenu_array) {
-    SDL_INFO(logger_, "Application doesn't contain submenu");
+    SDL_INFO("Application doesn't contain submenu");
     return true;
   }
   utils::dbms::SQLQuery query_insert_submenu(db());
 
   if (!query_insert_submenu.Prepare(kInsertToSubMenu)) {
-    SDL_WARN(logger_,
-             "Problem with verification queries for insertion submenu");
+    SDL_WARN("Problem with verification queries for insertion submenu");
     return false;
   }
   /* Positions of binding data for "query_insert_submenu":
@@ -2075,7 +2052,7 @@ bool ResumptionDataDB::InsertSubMenuData(
     CustomBind(strings::position, submenus[i], query_insert_submenu, 2);
 
     if (!query_insert_submenu.Exec()) {
-      SDL_WARN(logger_, "Incorrect insertion of submenu data");
+      SDL_WARN("Incorrect insertion of submenu data");
       return false;
     }
 
@@ -2083,12 +2060,12 @@ bool ResumptionDataDB::InsertSubMenuData(
                                 query_insert_submenu.LastInsertId(),
                                 kInsertToApplicationSubMenuArray)) ||
         !query_insert_submenu.Reset()) {
-      SDL_WARN(logger_, "Incorrect insertion to application submenu array");
+      SDL_WARN("Incorrect insertion to application submenu array");
       return false;
     }
   }
 
-  SDL_INFO(logger_, "Data about submenu were inserted successfully to DB");
+  SDL_INFO("Data about submenu were inserted successfully to DB");
   return true;
 }
 
@@ -2100,7 +2077,7 @@ bool ResumptionDataDB::InsertCommandsData(
   using namespace smart_objects;
   const size_t length_command_array = commands.length();
   if (0 == length_command_array) {
-    SDL_INFO(logger_, "Application doesn't contain command");
+    SDL_INFO("Application doesn't contain command");
     return true;
   }
   utils::dbms::SQLQuery query_insert_command(db());
@@ -2108,8 +2085,7 @@ bool ResumptionDataDB::InsertCommandsData(
   int64_t command_primary_key = 0;
 
   if (!query_insert_command.Prepare(kInsertToCommand)) {
-    SDL_WARN(logger_,
-             "Problem with verification queries for insertion commands");
+    SDL_WARN("Problem with verification queries for insertion commands");
     return false;
   }
   /* Positions of binding data for "query_insert_command":
@@ -2122,7 +2098,7 @@ bool ResumptionDataDB::InsertCommandsData(
     query_insert_command.Bind(0, commands[i][strings::cmd_id].asInt());
     if (commands[i].keyExists(strings::cmd_icon)) {
       if (!ExecInsertImage(image_primary_key, commands[i][strings::cmd_icon])) {
-        SDL_WARN(logger_, "Problem with insert command image to DB");
+        SDL_WARN("Problem with insert command image to DB");
         return false;
       }
       query_insert_command.Bind(1, image_primary_key);
@@ -2142,7 +2118,7 @@ bool ResumptionDataDB::InsertCommandsData(
       query_insert_command.Bind(4);
     }
     if (!query_insert_command.Exec()) {
-      SDL_WARN(logger_, "Incorrect insertion of command data to DB");
+      SDL_WARN("Incorrect insertion of command data to DB");
       return false;
     }
     command_primary_key = query_insert_command.LastInsertId();
@@ -2157,7 +2133,7 @@ bool ResumptionDataDB::InsertCommandsData(
                                 command_primary_key,
                                 kInsertApplicationCommandArray)) ||
         !query_insert_command.Reset()) {
-      SDL_WARN(logger_, "Incorrect insertion to application commands array");
+      SDL_WARN("Incorrect insertion to application commands array");
       return false;
     }
   }
@@ -2172,7 +2148,7 @@ bool ResumptionDataDB::InsertSubscriptionsData(
   using namespace smart_objects;
 
   if (subscriptions.empty()) {
-    SDL_INFO(logger_, "Application doesn't contain subscriptions");
+    SDL_INFO("Application doesn't contain subscriptions");
     return true;
   }
   const SmartObject& btn_sub = subscriptions[strings::application_buttons];
@@ -2184,8 +2160,7 @@ bool ResumptionDataDB::InsertSubscriptionsData(
 
   utils::dbms::SQLQuery insert_subscriptions(db());
   if (!insert_subscriptions.Prepare(kInsertSubscriptions)) {
-    SDL_WARN(logger_,
-             "Problem with verification queries for insertion subscriptions");
+    SDL_WARN("Problem with verification queries for insertion subscriptions");
     return false;
   }
   /* Positions of binding data for "insert_subscriptions":
@@ -2205,11 +2180,11 @@ bool ResumptionDataDB::InsertSubscriptionsData(
       insert_subscriptions.Bind(2);
     }
     if (!insert_subscriptions.Exec() || !insert_subscriptions.Reset()) {
-      SDL_WARN(logger_, "Incorrect insertion of buttons to subscriptions");
+      SDL_WARN("Incorrect insertion of buttons to subscriptions");
       return false;
     }
   }
-  SDL_INFO(logger_, "Subscriptions data were saved successfully");
+  SDL_INFO("Subscriptions data were saved successfully");
   return true;
 }
 
@@ -2221,7 +2196,7 @@ bool ResumptionDataDB::InsertChoiceSetData(
   using namespace smart_objects;
 
   if (choicesets.empty()) {
-    SDL_INFO(logger_, "Application doesn't contain choiceSet");
+    SDL_INFO("Application doesn't contain choiceSet");
     return true;
   }
   int64_t choice_set_key = 0;
@@ -2238,13 +2213,13 @@ bool ResumptionDataDB::InsertChoiceSetData(
     if (!ExecInsertDataToArray(choice_set_key,
                                application_primary_key,
                                kInsertApplicationChoiceSetArray)) {
-      SDL_WARN(logger_,
-               "Problem with insertion data to"
-               " applicationChoiceSetArray table");
+      SDL_WARN(
+          "Problem with insertion data to"
+          " applicationChoiceSetArray table");
       return false;
     }
   }
-  SDL_INFO(logger_, "Choice set data were saved to DB successfully");
+  SDL_INFO("Choice set data were saved to DB successfully");
   return true;
 }
 
@@ -2256,9 +2231,9 @@ bool ResumptionDataDB::ExecInsertApplicationChoiceSet(
 
   utils::dbms::SQLQuery insert_application_choice_set(db());
   if (!insert_application_choice_set.Prepare(kInsertApplicationChoiceSet)) {
-    SDL_WARN(logger_,
-             "Problem with preparation insert "
-             "application choice set query");
+    SDL_WARN(
+        "Problem with preparation insert "
+        "application choice set query");
     return false;
   }
   /* Positions of binding data for "insert_application_choice_set":
@@ -2270,12 +2245,11 @@ bool ResumptionDataDB::ExecInsertApplicationChoiceSet(
       1, choiceset[strings::interaction_choice_set_id].asInt());
 
   if (!insert_application_choice_set.Exec()) {
-    SDL_WARN(logger_,
-             "Problem with execution insert application choice set query");
+    SDL_WARN("Problem with execution insert application choice set query");
     return false;
   }
   choice_set_primary_key = insert_application_choice_set.LastInsertId();
-  SDL_INFO(logger_, "Application choice data were saved successfully");
+  SDL_INFO("Application choice data were saved successfully");
   return true;
 }
 
@@ -2290,22 +2264,22 @@ bool ResumptionDataDB::InsertGlobalPropertiesData(
   bool data_exists = false;
   while (it_begin != it_end) {
     if (SmartType::SmartType_Null != ((it_begin->second).getType())) {
-      SDL_INFO(logger_, "Global properties contains - " << it_begin->first);
+      SDL_INFO("Global properties contains - " << it_begin->first);
       data_exists = true;
       break;
     }
     ++it_begin;
   }
   if (!data_exists) {
-    SDL_INFO(logger_, "Application doesn't contain global properties");
+    SDL_INFO("Application doesn't contain global properties");
     return true;
   }
 
   utils::dbms::SQLQuery insert_global_properties(db());
   if (!insert_global_properties.Prepare(kInsertGlobalProperties)) {
-    SDL_WARN(logger_,
-             "Problem with preparation query "
-             "insert_global_properties");
+    SDL_WARN(
+        "Problem with preparation query "
+        "insert_global_properties");
     return false;
   }
   /* Positions of binding data for "insert_global_properties":
@@ -2330,7 +2304,7 @@ bool ResumptionDataDB::InsertGlobalPropertiesData(
     if (ExecInsertImage(image_key, global_properties[strings::menu_icon])) {
       insert_global_properties.Bind(2, image_key);
     } else {
-      SDL_WARN(logger_, "Problem with insert image to global properties");
+      SDL_WARN("Problem with insert image to global properties");
       return false;
     }
   }
@@ -2353,7 +2327,7 @@ bool ResumptionDataDB::InsertGlobalPropertiesData(
         strings::auto_complete_text, kb_prop, insert_global_properties, 6);
   }
   if (!insert_global_properties.Exec()) {
-    SDL_WARN(logger_, "Problem with insert data to global properties table");
+    SDL_WARN("Problem with insert data to global properties table");
     return false;
   }
 
@@ -2366,7 +2340,7 @@ bool ResumptionDataDB::InsertGlobalPropertiesData(
             global_properties_key,
             global_properties[strings::keyboard_properties]
                              [strings::limited_character_list])) {
-      SDL_WARN(logger_, "Problem with insert data to limited_character table");
+      SDL_WARN("Problem with insert data to limited_character table");
       return false;
     }
   }
@@ -2375,18 +2349,17 @@ bool ResumptionDataDB::InsertGlobalPropertiesData(
       global_properties[strings::vr_help].getType()) {
     if (!ExecInsertVRHelpItem(global_properties_key,
                               global_properties[strings::vr_help])) {
-      SDL_WARN(logger_, "Problem with insert data to vrHelpItem table");
+      SDL_WARN("Problem with insert data to vrHelpItem table");
       return false;
     }
   }
 
   if (!ExecInsertHelpTimeoutArray(global_properties, global_properties_key)) {
-    SDL_WARN(logger_,
-             "Problem with insert data to HelpTimeoutPromptArray table");
+    SDL_WARN("Problem with insert data to HelpTimeoutPromptArray table");
     return false;
   }
 
-  SDL_INFO(logger_, "Global properties data were saved successfully");
+  SDL_INFO("Global properties data were saved successfully");
   return true;
 }
 
@@ -2409,15 +2382,14 @@ bool ResumptionDataDB::ExecInsertHelpTimeoutArray(
     timeout_prompt_length = global_properties[strings::timeout_prompt].length();
   }
   if (0 == timeout_prompt_length && 0 == help_prompt_length) {
-    SDL_INFO(logger_, "Application doesn't HelpPrompt and timoutPrompt data");
+    SDL_INFO("Application doesn't HelpPrompt and timoutPrompt data");
     return true;
   }
 
   utils::dbms::SQLQuery insert_help_prompt_array(db());
 
   if (!insert_help_prompt_array.Prepare(kInsertHelpTimeoutPromptArray)) {
-    SDL_WARN(logger_,
-             "Problem with verification query insert_help_prompt_array");
+    SDL_WARN("Problem with verification query insert_help_prompt_array");
     return false;
   }
   int64_t tts_chunk_key = 0;
@@ -2434,7 +2406,7 @@ bool ResumptionDataDB::ExecInsertHelpTimeoutArray(
     if (i < timeout_prompt_length) {
       if (!ExecInsertTTSChunks(global_properties[strings::timeout_prompt][i],
                                tts_chunk_key)) {
-        SDL_WARN(logger_, "Problem with insertion timeoutPrompt's ttsChunk");
+        SDL_WARN("Problem with insertion timeoutPrompt's ttsChunk");
         return false;
       }
       insert_help_prompt_array.Bind(1, tts_chunk_key);
@@ -2445,7 +2417,7 @@ bool ResumptionDataDB::ExecInsertHelpTimeoutArray(
     if (i < help_prompt_length) {
       if (!ExecInsertTTSChunks(global_properties[strings::help_prompt][i],
                                tts_chunk_key)) {
-        SDL_WARN(logger_, "Problem with insertion helpPrompt's ttsChunk");
+        SDL_WARN("Problem with insertion helpPrompt's ttsChunk");
         return false;
       }
       insert_help_prompt_array.Bind(2, tts_chunk_key);
@@ -2454,12 +2426,11 @@ bool ResumptionDataDB::ExecInsertHelpTimeoutArray(
     }
     if (!insert_help_prompt_array.Exec() || !insert_help_prompt_array.Reset()) {
       SDL_WARN(
-          logger_,
           "Problem with execution or resetting insert_help_prompt_array query");
       return false;
     }
   }
-  SDL_INFO(logger_, "Data were saved to helpTimeoutPromptArray table");
+  SDL_INFO("Data were saved to helpTimeoutPromptArray table");
   return true;
 }
 
@@ -2469,7 +2440,7 @@ bool ResumptionDataDB::ExecInsertTTSChunks(
   using namespace app_mngr;
   utils::dbms::SQLQuery insert_tts_chunk(db());
   if (!insert_tts_chunk.Prepare(kInsertTTSChunk)) {
-    SDL_WARN(logger_, "Problem with verification insert_tts_chunk query");
+    SDL_WARN("Problem with verification insert_tts_chunk query");
     return false;
   }
   /* Positions of binding data for "insert_tts_chunk":
@@ -2478,11 +2449,11 @@ bool ResumptionDataDB::ExecInsertTTSChunks(
   insert_tts_chunk.Bind(0, tts_chunk[strings::type].asInt());
   insert_tts_chunk.Bind(1, tts_chunk[strings::text].asString());
   if (!insert_tts_chunk.Exec()) {
-    SDL_WARN(logger_, "Problem with execution insert_tts_chunk query");
+    SDL_WARN("Problem with execution insert_tts_chunk query");
     return false;
   }
   tts_chunk_key = insert_tts_chunk.LastInsertId();
-  SDL_WARN(logger_, "TTSChunk was saved successfully");
+  SDL_WARN("TTSChunk was saved successfully");
   return true;
 }
 
@@ -2493,9 +2464,9 @@ bool ResumptionDataDB::ExecInsertLimitedCharacters(
   using namespace app_mngr;
   utils::dbms::SQLQuery insert_characters(db());
   if (!insert_characters.Prepare(kInsertTableLimitedCharacter)) {
-    SDL_WARN(logger_,
-             "Problem with preparation query "
-             "insert_characters");
+    SDL_WARN(
+        "Problem with preparation query "
+        "insert_characters");
     return false;
   }
   size_t length_characters_array = characters_array.length();
@@ -2505,18 +2476,18 @@ bool ResumptionDataDB::ExecInsertLimitedCharacters(
     insert_characters.Bind(0, characters_array[i].asString());
 
     if (!insert_characters.Exec()) {
-      SDL_WARN(logger_, "Problem with insert data to limited_character table");
+      SDL_WARN("Problem with insert data to limited_character table");
       return false;
     }
     if ((!ExecInsertDataToArray(global_properties_key,
                                 insert_characters.LastInsertId(),
                                 kInsertCharacterArray)) ||
         (!insert_characters.Reset())) {
-      SDL_WARN(logger_, "Problem with insert data to characterArray table");
+      SDL_WARN("Problem with insert data to characterArray table");
       return false;
     }
   }
-  SDL_INFO(logger_, "Data were saved successfully to limited_character table");
+  SDL_INFO("Data were saved successfully to limited_character table");
   return true;
 }
 
@@ -2527,7 +2498,7 @@ bool ResumptionDataDB::ExecInsertVRHelpItem(
   using namespace app_mngr;
   utils::dbms::SQLQuery insert_vrhelp_item(db());
   if (!insert_vrhelp_item.Prepare(kInsertVRHelpItem)) {
-    SDL_WARN(logger_, "Problem with preparation query insert_vrhelp_item");
+    SDL_WARN("Problem with preparation query insert_vrhelp_item");
     return false;
   }
   int64_t image_primary_key = 0;
@@ -2542,7 +2513,7 @@ bool ResumptionDataDB::ExecInsertVRHelpItem(
     if (vrhelp_array[i].keyExists(strings::image)) {
       if (!ExecInsertImage(image_primary_key,
                            vrhelp_array[i][strings::image])) {
-        SDL_INFO(logger_, "Problem with insert image to vrHelpItem table");
+        SDL_INFO("Problem with insert image to vrHelpItem table");
         return false;
       }
       insert_vrhelp_item.Bind(2, image_primary_key);
@@ -2551,7 +2522,7 @@ bool ResumptionDataDB::ExecInsertVRHelpItem(
     }
 
     if (!insert_vrhelp_item.Exec()) {
-      SDL_INFO(logger_, "Problem with insert data vrHelpItem table");
+      SDL_INFO("Problem with insert data vrHelpItem table");
       return false;
     }
 
@@ -2559,11 +2530,11 @@ bool ResumptionDataDB::ExecInsertVRHelpItem(
                                 insert_vrhelp_item.LastInsertId(),
                                 kInsertVRHelpItemArray)) ||
         (!insert_vrhelp_item.Reset())) {
-      SDL_WARN(logger_, "Problem with insert data to vrHelpItemArray table");
+      SDL_WARN("Problem with insert data to vrHelpItemArray table");
       return false;
     }
   }
-  SDL_INFO(logger_, "Data were saved successfully to vrHelpItem array table");
+  SDL_INFO("Data were saved successfully to vrHelpItem array table");
   return true;
 }
 
@@ -2587,7 +2558,7 @@ bool ResumptionDataDB::InsertApplicationData(
   utils::dbms::SQLQuery query(db());
 
   if (!application.m_is_valid) {
-    SDL_ERROR(logger_, "Invalid application params passed.");
+    SDL_ERROR("Invalid application params passed.");
     return false;
   }
 
@@ -2602,9 +2573,9 @@ bool ResumptionDataDB::InsertApplicationData(
       application_manager_.IsAppSubscribedForWayPoints(application.app_ptr);
 
   if (!query.Prepare(kInsertApplication)) {
-    SDL_WARN(logger_,
-             "Problem with verification query "
-             "for insert to table application");
+    SDL_WARN(
+        "Problem with verification query "
+        "for insert to table application");
     return false;
   }
 
@@ -2639,13 +2610,13 @@ bool ResumptionDataDB::InsertApplicationData(
   query.Bind(11, is_subscribed_for_way_points);
 
   if (!query.Exec()) {
-    SDL_WARN(logger_, "Problem with execution query");
+    SDL_WARN("Problem with execution query");
     return false;
   }
   if (NULL != application_primary_key) {
     *application_primary_key = query.LastInsertId();
   }
-  SDL_INFO(logger_, "Data were saved successfully to application table");
+  SDL_INFO("Data were saved successfully to application table");
   return true;
 }
 
@@ -2666,7 +2637,7 @@ void ResumptionDataDB::CustomBind(const std::string& key,
         break;
       }
       default: {
-        SDL_WARN(logger_, "Incorrect type");
+        SDL_WARN("Incorrect type");
         break;
       }
     }
@@ -2681,7 +2652,7 @@ bool ResumptionDataDB::PrepareSelectQuery(utils::dbms::SQLQuery& query,
                                           const std::string& text_query) const {
   SDL_AUTO_TRACE();
   if (!query.Prepare(text_query)) {
-    SDL_WARN(logger_, "Problem with verification query");
+    SDL_WARN("Problem with verification query");
     return false;
   }
   query.Bind(0, policy_app_id);
@@ -2695,8 +2666,7 @@ void ResumptionDataDB::UpdateDataOnAwake() {
   utils::dbms::SQLQuery query(db());
   if (query.Prepare(kUpdateIgnOffCount)) {
     if (query.Exec()) {
-      SDL_INFO(logger_,
-               "Values of ignition off counts were updated successfully");
+      SDL_INFO("Values of ignition off counts were updated successfully");
       WriteDb();
     }
   }
@@ -2715,9 +2685,9 @@ bool ResumptionDataDB::UpdateApplicationData(
       application->hmi_level(mobile_apis::PredefinedWindows::DEFAULT_WINDOW);
 
   if (!query.Prepare(kUpdateApplicationData)) {
-    SDL_WARN(logger_,
-             "Problem with verification query "
-             "for updating some application data");
+    SDL_WARN(
+        "Problem with verification query "
+        "for updating some application data");
     return false;
   }
 
@@ -2732,10 +2702,10 @@ bool ResumptionDataDB::UpdateApplicationData(
   query.Bind(3, device_id);
 
   if (!query.Exec()) {
-    SDL_WARN(logger_, "Problem with execution query");
+    SDL_WARN("Problem with execution query");
     return false;
   }
-  SDL_INFO(logger_, "Data were updated successfully in application table");
+  SDL_INFO("Data were updated successfully in application table");
   return true;
 }
 
@@ -2752,8 +2722,7 @@ bool ResumptionDataDB::UpdateGrammarID(const std::string& policy_app_id,
   utils::dbms::SQLQuery query(db());
 
   if (!query.Prepare(kUpdateGrammarID)) {
-    SDL_WARN(logger_,
-             "Problem with verification query for updating grammar id.");
+    SDL_WARN("Problem with verification query for updating grammar id.");
     return false;
   }
 
@@ -2766,10 +2735,10 @@ bool ResumptionDataDB::UpdateGrammarID(const std::string& policy_app_id,
   query.Bind(2, device_id);
 
   if (!query.Exec()) {
-    SDL_WARN(logger_, "Problem with execution query");
+    SDL_WARN("Problem with execution query");
     return false;
   }
-  SDL_INFO(logger_, "Data were updated successfully in application table");
+  SDL_INFO("Data were updated successfully in application table");
   return true;
 }
 

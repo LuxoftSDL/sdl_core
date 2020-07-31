@@ -53,7 +53,7 @@ CloudDevice::CloudDevice(CloudAppEndpoint& endpoint, std::string& name)
     : Device(name, std::string(name)), endpoint_(endpoint) {}
 
 bool CloudDevice::IsSameAs(const Device* other) const {
-  SDL_TRACE(logger_, "enter. device: " << other);
+  SDL_TRACE("enter. device: " << other);
 
   const CloudDevice* other_cloud_device =
       dynamic_cast<const CloudDevice*>(other);

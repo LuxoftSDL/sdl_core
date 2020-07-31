@@ -69,7 +69,7 @@ DeviceType BluetoothTransportAdapter::GetDeviceType() const {
 }
 
 void BluetoothTransportAdapter::Store() const {
-  SDL_TRACE(logger_, "enter");
+  SDL_TRACE("enter");
   Json::Value bluetooth_adapter_dictionary;
   Json::Value devices_dictionary;
   DeviceList device_ids = GetDeviceList();
@@ -116,11 +116,11 @@ void BluetoothTransportAdapter::Store() const {
   dictionary["TransportManager"]["BluetoothAdapter"] =
       bluetooth_adapter_dictionary;
   accessor.GetMutableData().set_dictionary(dictionary);
-  SDL_TRACE(logger_, "exit");
+  SDL_TRACE("exit");
 }
 
 bool BluetoothTransportAdapter::Restore() {
-  SDL_TRACE(logger_, "enter");
+  SDL_TRACE("enter");
   bool errors_occured = false;
   resumption::LastStateAccessor accessor = last_state_wrapper_->get_accessor();
   Json::Value dictionary = accessor.GetData().dictionary();
@@ -159,9 +159,9 @@ bool BluetoothTransportAdapter::Restore() {
   }
   bool result = !errors_occured;
   if (result) {
-    SDL_TRACE(logger_, "exit with TRUE");
+    SDL_TRACE("exit with TRUE");
   } else {
-    SDL_TRACE(logger_, "exit with FALSE");
+    SDL_TRACE("exit with FALSE");
   }
   return result;
 }

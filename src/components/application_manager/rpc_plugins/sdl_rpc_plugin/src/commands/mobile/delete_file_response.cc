@@ -62,7 +62,7 @@ void DeleteFileResponse::Run() {
       (*message_)[strings::params][strings::connection_key].asUInt();
   ApplicationSharedPtr app = application_manager_.application(app_id);
   if (!app) {
-    SDL_ERROR(logger_, "Application not registered");
+    SDL_ERROR("Application not registered");
     SendResponse(false, mobile_apis::Result::APPLICATION_NOT_REGISTERED);
     return;
   }
