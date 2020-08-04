@@ -125,8 +125,8 @@ void RCRPCPlugin::OnApplicationEvent(
   }
   switch (event) {
     case plugins::kApplicationRegistered: {
-      auto extension =
-          std::shared_ptr<RCAppExtension>(new RCAppExtension(kRCPluginID));
+      auto extension = std::shared_ptr<RCAppExtension>(
+          new RCAppExtension(kRCPluginID, *application));
       application->AddExtension(extension);
       const auto driver_location =
           rc_capabilities_manager_

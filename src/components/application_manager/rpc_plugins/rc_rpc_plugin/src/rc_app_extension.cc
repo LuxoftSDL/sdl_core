@@ -39,29 +39,41 @@
 CREATE_LOGGERPTR_GLOBAL(logger_, "RCAppExtension")
 
 namespace rc_rpc_plugin {
-RCAppExtension::RCAppExtension(application_manager::AppExtensionUID uid)
-    : AppExtension(uid) {}
+RCAppExtension::RCAppExtension(application_manager::AppExtensionUID uid,
+                               application_manager::Application& application)
+    : AppExtension(uid), application_(application) {}
 
 void RCAppExtension::SubscribeToInteriorVehicleData(const ModuleUid& module) {
   subscribed_interior_vehicle_data_.insert(module);
+  UpdateHash();
 }
 
 void RCAppExtension::UnsubscribeFromInteriorVehicleData(
     const ModuleUid& module) {
   subscribed_interior_vehicle_data_.erase(module);
+  UpdateHash();
 }
 
 void RCAppExtension::UnsubscribeFromInteriorVehicleDataOfType(
     const std::string& module_type) {
+  bool unsubscribed = false;
   for (auto& item : subscribed_interior_vehicle_data_) {
     if (module_type == item.first) {
       subscribed_interior_vehicle_data_.erase(item);
+      unsubscribed = true;
     }
+  }
+
+  if (unsubscribed) {
+    // If didin't unsubscribe from some module type, we don't need to update
+    // application hash
+    UpdateHash();
   }
 }
 
 void RCAppExtension::UnsubscribeFromInteriorVehicleData() {
   subscribed_interior_vehicle_data_.clear();
+  UpdateHash();
 }
 
 bool RCAppExtension::IsSubscribedToInteriorVehicleDataOfType(
@@ -138,6 +150,10 @@ void RCAppExtension::SetUserLocation(
 
 void RCAppExtension::SetUserLocation(const Grid& grid) {
   user_location_ = grid;
+}
+
+void RCAppExtension::UpdateHash() {
+  application_.UpdateHash();
 }
 
 RCAppExtension::~RCAppExtension() {}
