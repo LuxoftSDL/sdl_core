@@ -34,6 +34,9 @@
 #include <algorithm>
 #include "rc_rpc_plugin/rc_module_constants.h"
 #include "smart_objects/smart_object.h"
+#include "utils/logger.h"
+
+CREATE_LOGGERPTR_GLOBAL(logger_, "RCAppExtension")
 
 namespace rc_rpc_plugin {
 RCAppExtension::RCAppExtension(application_manager::AppExtensionUID uid)
@@ -81,7 +84,30 @@ bool RCAppExtension::IsSubscribedToInteriorVehicleData(
 }
 
 void RCAppExtension::SaveResumptionData(
-    smart_objects::SmartObject& resumption_data) {}
+    smart_objects::SmartObject& resumption_data) {
+  LOG4CXX_AUTO_TRACE(logger_);
+
+  if (subscribed_interior_vehicle_data_.empty()) {
+    LOG4CXX_DEBUG(logger_, "Subscribed modules data is absent");
+    return;
+  }
+
+  resumption_data[message_params::kModuleData] =
+      smart_objects::SmartObject(smart_objects::SmartType_Array);
+  auto& module_data = resumption_data[message_params::kModuleData];
+
+  uint32_t index = 0;
+  for (const auto& module_uid : subscribed_interior_vehicle_data_) {
+    LOG4CXX_DEBUG(logger_,
+                  "Save module: [" << module_uid.first << ":"
+                                   << module_uid.second << "]");
+    auto module_info_so =
+        smart_objects::SmartObject(smart_objects::SmartType_Map);
+    module_info_so[message_params::kModuleType] = module_uid.first;
+    module_info_so[message_params::kModuleId] = module_uid.second;
+    module_data[index++] = module_info_so;
+  }
+}
 
 void RCAppExtension::ProcessResumption(
     const smart_objects::SmartObject& saved_app,
