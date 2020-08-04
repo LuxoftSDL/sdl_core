@@ -135,7 +135,9 @@ void GetInteriorVehicleDataRequest::ProcessResponseToMobileFromCache(
   if (AppShouldBeUnsubscribed()) {
     auto extension = RCHelpers::GetRCExtension(*app);
     DCHECK(extension);
-    extension->UnsubscribeFromInteriorVehicleData(module);
+    if (extension->IsSubscribedToInteriorVehicleData(module)) {
+      extension->UnsubscribeFromInteriorVehicleData(module);
+    }
   }
 }
 
@@ -260,6 +262,10 @@ void GetInteriorVehicleDataRequest::on_event(
     const ModuleUid module(module_type, module_id);
 
     if (TheLastAppShouldBeUnsubscribed(app)) {
+      LOG4CXX_DEBUG(logger_,
+                    "Removing module: [" << module.first << ":" << module.second
+                                         << "] "
+                                         << "from cache");
       interior_data_cache_.Remove(module);
     }
     ProccessSubscription(hmi_response);
@@ -378,11 +384,13 @@ void GetInteriorVehicleDataRequest::ProccessSubscription(
                                                       << module_id);
       extension->SubscribeToInteriorVehicleData(module);
     } else {
-      LOG4CXX_DEBUG(logger_,
-                    "UnsubscribeFromInteriorVehicleData "
-                        << app->app_id() << " " << module_type << " "
-                        << module_id);
-      extension->UnsubscribeFromInteriorVehicleData(module);
+      if (extension->IsSubscribedToInteriorVehicleData(module)) {
+        LOG4CXX_DEBUG(logger_,
+                      "UnsubscribeFromInteriorVehicleData "
+                          << app->app_id() << " [" << module_type << ":"
+                          << module_id << "]");
+        extension->UnsubscribeFromInteriorVehicleData(module);
+      }
     }
   }
 }
