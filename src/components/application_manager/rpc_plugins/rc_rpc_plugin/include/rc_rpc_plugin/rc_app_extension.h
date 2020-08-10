@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Ford Motor Company
+ * Copyright (c) 2020, Ford Motor Company
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -139,9 +139,12 @@ struct Grid {
   }
 };
 
+class RCRPCPlugin;
+
 class RCAppExtension : public application_manager::AppExtension {
  public:
   explicit RCAppExtension(application_manager::AppExtensionUID uid,
+                          RCRPCPlugin& plugin,
                           application_manager::Application& application);
   ~RCAppExtension();
 
@@ -209,6 +212,8 @@ class RCAppExtension : public application_manager::AppExtension {
   std::set<ModuleUid> subscribed_interior_vehicle_data_;
 
   Grid user_location_;
+
+  RCRPCPlugin& plugin_;
 
   /**
    * ApplicationSharedPtr needed for updating application's hash
