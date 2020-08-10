@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2018, Ford Motor Company
+ Copyright (c) 2020, Ford Motor Company
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,7 @@
 #include "rc_rpc_plugin/rc_command_factory.h"
 #include "rc_rpc_plugin/rc_consent_manager_impl.h"
 #include "rc_rpc_plugin/rc_helpers.h"
+#include "rc_rpc_plugin/rc_pending_resumption_handler.h"
 #include "rc_rpc_plugin/resource_allocation_manager_impl.h"
 #include "utils/helpers.h"
 
@@ -76,6 +77,8 @@ bool RCRPCPlugin::Init(
   command_factory_.reset(new rc_rpc_plugin::RCCommandFactory(params));
   rpc_service_ = &rpc_service;
   app_mngr_ = &app_manager;
+  pending_resumption_handler_ =
+      std::make_shared<RCPendingResumptionHandler>(app_manager);
 
   // Check all saved consents and remove expired
   rc_consent_manager_->RemoveExpiredConsents();
@@ -126,7 +129,7 @@ void RCRPCPlugin::OnApplicationEvent(
   switch (event) {
     case plugins::kApplicationRegistered: {
       auto extension = std::shared_ptr<RCAppExtension>(
-          new RCAppExtension(kRCPluginID, *application));
+          new RCAppExtension(kRCPluginID, *this, *application));
       application->AddExtension(extension);
       const auto driver_location =
           rc_capabilities_manager_
@@ -158,6 +161,16 @@ void RCRPCPlugin::OnApplicationEvent(
     default:
       break;
   }
+}
+
+void RCRPCPlugin::ProcessResumptionSubscription(
+    application_manager::Application& app,
+    RCAppExtension& ext,
+    resumption::Subscriber subscriber) {
+  LOG4CXX_AUTO_TRACE(logger_);
+
+  pending_resumption_handler_->HandleResumptionSubscriptionRequest(
+      ext, subscriber, app);
 }
 
 RCRPCPlugin::Apps RCRPCPlugin::GetRCApplications(

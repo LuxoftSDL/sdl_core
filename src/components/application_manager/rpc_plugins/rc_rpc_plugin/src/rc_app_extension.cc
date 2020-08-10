@@ -33,6 +33,7 @@
 #include "rc_rpc_plugin/rc_app_extension.h"
 #include <algorithm>
 #include "rc_rpc_plugin/rc_module_constants.h"
+#include "rc_rpc_plugin/rc_rpc_plugin.h"
 #include "smart_objects/smart_object.h"
 #include "utils/logger.h"
 
@@ -40,8 +41,9 @@ CREATE_LOGGERPTR_GLOBAL(logger_, "RCAppExtension")
 
 namespace rc_rpc_plugin {
 RCAppExtension::RCAppExtension(application_manager::AppExtensionUID uid,
+                               RCRPCPlugin& plugin,
                                application_manager::Application& application)
-    : AppExtension(uid), application_(application) {}
+    : AppExtension(uid), plugin_(plugin), application_(application) {}
 
 void RCAppExtension::SubscribeToInteriorVehicleData(const ModuleUid& module) {
   subscribed_interior_vehicle_data_.insert(module);
@@ -123,7 +125,40 @@ void RCAppExtension::SaveResumptionData(
 
 void RCAppExtension::ProcessResumption(
     const smart_objects::SmartObject& saved_app,
-    resumption::Subscriber subscriber) {}
+    resumption::Subscriber subscriber) {
+  LOG4CXX_AUTO_TRACE(logger_);
+
+  if (!saved_app.keyExists(
+          application_manager::strings::application_subscriptions)) {
+    LOG4CXX_DEBUG(logger_, "application_subscriptions section does not exist");
+    return;
+  }
+
+  const auto& resumption_data =
+      saved_app[application_manager::strings::application_subscriptions];
+
+  if (!resumption_data.keyExists(message_params::kModuleData)) {
+    LOG4CXX_DEBUG(logger_, "kModuleData section does not exist");
+    return;
+  }
+
+  auto& module_data = resumption_data[message_params::kModuleData];
+
+  if (!module_data.length()) {
+    LOG4CXX_DEBUG(logger_, "Subscribed modules data is absent");
+    return;
+  }
+
+  for (const auto& module_so : *module_data.asArray()) {
+    const auto module_type = module_so[message_params::kModuleType].asString();
+    const auto module_id = module_so[message_params::kModuleId].asString();
+
+    ModuleUid module{module_type, module_id};
+    SubscribeToInteriorVehicleData(module);
+  }
+
+  plugin_.ProcessResumptionSubscription(application_, *this, subscriber);
+}
 
 void RCAppExtension::RevertResumption(
     const smart_objects::SmartObject& subscriptions) {}
