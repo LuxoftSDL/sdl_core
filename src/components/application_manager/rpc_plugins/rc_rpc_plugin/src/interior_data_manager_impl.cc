@@ -126,8 +126,10 @@ void InteriorDataManagerImpl::UpdateHMISubscriptionsOnAppUnregistered(
 void InteriorDataManagerImpl::UnsubscribeFromInteriorVehicleData(
     const ModuleUid& module) {
   cache_.Remove(module);
-  auto unsubscribe_request = RCHelpers::CreateUnsubscribeRequestToHMI(
-      module, app_mngr_.GetNextHMICorrelationID());
+  auto unsubscribe_request = RCHelpers::CreateGetInteriorVDRequestToHMI(
+      module,
+      app_mngr_.GetNextHMICorrelationID(),
+      RCHelpers::GetInteriorData::UNSUBSCRIBE);
   LOG4CXX_DEBUG(logger_,
                 "Send Unsubscribe from module type: " << module.first << " id: "
                                                       << module.second);
@@ -140,8 +142,10 @@ void InteriorDataManagerImpl::UnsubscribeFromInteriorVehicleDataOfType(
 
   for (const auto& module : modules) {
     cache_.Remove(module);
-    auto unsubscribe_request = RCHelpers::CreateUnsubscribeRequestToHMI(
-        module, app_mngr_.GetNextHMICorrelationID());
+    auto unsubscribe_request = RCHelpers::CreateGetInteriorVDRequestToHMI(
+        module,
+        app_mngr_.GetNextHMICorrelationID(),
+        RCHelpers::GetInteriorData::UNSUBSCRIBE);
     LOG4CXX_DEBUG(logger_,
                   "Send Unsubscribe from module type: "
                       << module.first << " id: " << module.second);
