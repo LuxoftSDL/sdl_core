@@ -19,26 +19,25 @@ void RCPendingResumptionHandler::on_event(
                 "Received event with function id: "
                     << event.id() << " and correlation id: " << cid);
   sync_primitives::AutoLock lock(pending_resumption_lock_);
-  auto data_request = pending_requests_.front();
-  if (cid != data_request.first) {
+  const auto& data_request = pending_requests_.find(cid);
+  if (data_request == pending_requests_.end()) {
     LOG4CXX_ERROR(logger_,
                   "Not waiting for message with correlation id: " << cid);
     return;
   }
 
-  auto current_request = data_request.second;
-  pending_requests_.pop();
+  auto current_request = data_request->second;
+  pending_requests_.erase(data_request);
   auto module_uid = GetModuleUid(current_request);
 
   auto& response = event.smart_object();
-  const bool succesful_response = RCHelpers::IsResponseSuccessful(response);
 
-  if (succesful_response) {
+  if (RCHelpers::IsResponseSuccessful(response)) {
     LOG4CXX_DEBUG(logger_,
                   "Resumption of subscriptions is successful"
                       << " module type: " << module_uid.first
                       << " module id: " << module_uid.second);
-    ProcessSuccessfulResponse(event, module_uid);
+    HandleSuccessfulResponse(event, module_uid);
   } else {
     LOG4CXX_DEBUG(logger_,
                   "Resumption of subscriptions is NOT successful"
@@ -55,8 +54,7 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
   UNUSED(extension);
   LOG4CXX_AUTO_TRACE(logger_);
   sync_primitives::AutoLock lock(pending_resumption_lock_);
-  const uint32_t app_id = app.app_id();
-  LOG4CXX_TRACE(logger_, "app id " << app_id);
+  LOG4CXX_TRACE(logger_, "app id " << app.app_id());
 
   auto rc_extension = RCHelpers::GetRCExtension(app);
   auto subscriptions = rc_extension->InteriorVehicleDataSubscriptions();
@@ -64,7 +62,7 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
   std::vector<ModuleUid> already_pending;
   std::vector<ModuleUid> need_to_subscribe;
   for (auto subscription : subscriptions) {
-    if (IsPending(subscription)) {
+    if (IsPendingForResponse(subscription)) {
       already_pending.push_back(subscription);
     } else {
       need_to_subscribe.push_back(subscription);
@@ -75,7 +73,7 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
     const auto cid = application_manager_.GetNextHMICorrelationID();
     const auto subscription_request =
         CreateSubscriptionRequest(subscription, cid);
-    const auto fid = GetFunctionId(subscription_request);
+    const auto fid = GetFunctionId(*subscription_request);
     const auto resumption_request =
         MakeResumptionRequest(cid, fid, *subscription_request);
     freezed_resumptions_[subscription].push(resumption_request);
@@ -90,7 +88,7 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
     const auto cid = application_manager_.GetNextHMICorrelationID();
     const auto subscription_request =
         CreateSubscriptionRequest(subscription, cid);
-    const auto fid = GetFunctionId(subscription_request);
+    const auto fid = GetFunctionId(*subscription_request);
     const auto resumption_request =
         MakeResumptionRequest(cid, fid, *subscription_request);
     pending_requests_.emplace(cid, *subscription_request);
@@ -107,28 +105,9 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
 
 void RCPendingResumptionHandler::ClearPendingResumptionRequests() {
   LOG4CXX_AUTO_TRACE(logger_);
-  sync_primitives::AutoLock lock(pending_resumption_lock_);
-
-  while (!pending_requests_.empty()) {
-    auto data_request = pending_requests_.front();
-    const auto interior_vd_pending_request_fid =
-        static_cast<hmi_apis::FunctionID::eType>(
-            data_request
-                .second[app_mngr::strings::params]
-                       [app_mngr::strings::function_id]
-                .asInt());
-    unsubscribe_from_event(interior_vd_pending_request_fid);
-    pending_requests_.pop();
-  }
-
-  while (!subscriptions_.empty()) {
-    auto module_uid = subscriptions_.front();
-    subscriptions_.pop_front();
-    ProcessNextFreezedResumption(module_uid);
-  }
 }
 
-void RCPendingResumptionHandler::ProcessSuccessfulResponse(
+void RCPendingResumptionHandler::HandleSuccessfulResponse(
     const application_manager::event_engine::Event& event,
     const ModuleUid& module_uid) {
   LOG4CXX_AUTO_TRACE(logger_);
@@ -181,9 +160,11 @@ void RCPendingResumptionHandler::ProcessNextFreezedResumption(
 
   auto freezed_resumption = pop_front_freezed_resumptions(module_uid);
   if (!freezed_resumption) {
-    subscriptions_.remove_if([&module_uid](const ModuleUid& module_to_remove) {
-      return module_to_remove == module_uid;
-    });
+    std::remove_if(subscriptions_.begin(),
+                   subscriptions_.end(),
+                   [&module_uid](const ModuleUid& module_to_remove) {
+                     return module_to_remove == module_uid;
+                   });
     LOG4CXX_DEBUG(logger_, "Not freezed resumptions found");
     return;
   }
@@ -191,7 +172,7 @@ void RCPendingResumptionHandler::ProcessNextFreezedResumption(
   auto& resumption_request = *freezed_resumption;
   auto subscription_request =
       std::make_shared<smart_objects::SmartObject>(resumption_request.message);
-  const auto fid = GetFunctionId(subscription_request);
+  const auto fid = GetFunctionId(*subscription_request);
   const auto cid =
       resumption_request
           .message[app_mngr::strings::params][app_mngr::strings::correlation_id]
@@ -203,14 +184,6 @@ void RCPendingResumptionHandler::ProcessNextFreezedResumption(
                     << cid << " module type: " << module_uid.first
                     << " module id: " << module_uid.second);
   application_manager_.GetRPCService().ManageHMICommand(subscription_request);
-}
-
-smart_objects::SmartObjectSPtr
-RCPendingResumptionHandler::CreateSubscriptionRequest(
-    const ModuleUid& module, const uint32_t correlation_id) const {
-  auto request =
-      RCHelpers::CreateGetInteriorVDRequestToHMI(module, correlation_id, true);
-  return request;
 }
 
 void RCPendingResumptionHandler::RaiseEventForResponse(
@@ -226,28 +199,36 @@ void RCPendingResumptionHandler::RaiseEventForResponse(
   event.raise(application_manager_.event_dispatcher());
 }
 
-const hmi_apis::FunctionID::eType RCPendingResumptionHandler::GetFunctionId(
-    smart_objects::SmartObjectSPtr subscription_request) const {
-  auto& request_ref = *subscription_request;
-  const auto function_id = static_cast<hmi_apis::FunctionID::eType>(
-      request_ref[app_mngr::strings::params][app_mngr::strings::function_id]
-          .asInt());
+bool RCPendingResumptionHandler::IsPendingForResponse(
+    const ModuleUid subscription) const {
+  auto it =
+      std::find(subscriptions_.begin(), subscriptions_.end(), subscription);
+  return it != subscriptions_.end();
+}
 
+smart_objects::SmartObjectSPtr
+RCPendingResumptionHandler::CreateSubscriptionRequest(
+    const ModuleUid& module, const uint32_t correlation_id) {
+  auto request = RCHelpers::CreateGetInteriorVDRequestToHMI(
+      module, correlation_id, RCHelpers::GetInteriorData::SUBSCRIBE);
+  return request;
+}
+
+hmi_apis::FunctionID::eType RCPendingResumptionHandler::GetFunctionId(
+    const smart_objects::SmartObject& subscription_request) {
+  const auto function_id = static_cast<hmi_apis::FunctionID::eType>(
+      subscription_request[app_mngr::strings::params]
+                          [app_mngr::strings::function_id]
+                              .asInt());
   return function_id;
 }
 
 ModuleUid RCPendingResumptionHandler::GetModuleUid(
-    smart_objects::SmartObject subscription_request) const {
-  smart_objects::SmartObject& msg_params =
+    const smart_objects::SmartObject& subscription_request) {
+  const smart_objects::SmartObject& msg_params =
       subscription_request[app_mngr::strings::msg_params];
   return ModuleUid(msg_params[message_params::kModuleType].asString(),
                    msg_params[message_params::kModuleId].asString());
-}
-
-bool RCPendingResumptionHandler::IsPending(const ModuleUid subscription) const {
-  auto it =
-      std::find(subscriptions_.begin(), subscriptions_.end(), subscription);
-  return it != subscriptions_.end();
 }
 
 }  // namespace rc_rpc_plugin

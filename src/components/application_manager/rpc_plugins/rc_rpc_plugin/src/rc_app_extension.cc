@@ -130,11 +130,11 @@ void RCAppExtension::ProcessResumption(
 
   if (!saved_app.keyExists(
           application_manager::strings::application_subscriptions)) {
-    LOG4CXX_DEBUG(logger_, "application_subscriptions section is not exists");
+    LOG4CXX_DEBUG(logger_, "application_subscriptions section does not exist");
     return;
   }
 
-  const smart_objects::SmartObject& resumption_data =
+  const auto& resumption_data =
       saved_app[application_manager::strings::application_subscriptions];
 
   if (!resumption_data.keyExists(message_params::kModuleData)) {
@@ -144,15 +144,12 @@ void RCAppExtension::ProcessResumption(
 
   auto& module_data = resumption_data[message_params::kModuleData];
 
-  const auto lenght = module_data.length();
-
-  if (!lenght) {
+  if (!module_data.length()) {
     LOG4CXX_DEBUG(logger_, "Subscribed modules data is absent");
     return;
   }
 
-  for (uint32_t index = 0; index < lenght; ++index) {
-    auto module_so = module_data[index];
+  for (const auto& module_so : *module_data.asArray()) {
     const auto module_type = module_so[message_params::kModuleType].asString();
     const auto module_id = module_so[message_params::kModuleId].asString();
 
