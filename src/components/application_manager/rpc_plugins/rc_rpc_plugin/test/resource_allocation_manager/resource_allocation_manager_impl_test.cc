@@ -114,7 +114,7 @@ class RAManagerTest : public ::testing::Test {
         .WillByDefault(ReturnRef(mock_policy_handler_));
     auto plugin_id = rc_rpc_plugin::RCRPCPlugin::kRCPluginID;
     app_ext_ptr_ = std::make_shared<rc_rpc_plugin::RCAppExtension>(
-        plugin_id, *mock_app_1_);
+        plugin_id, rc_plugin_, *mock_app_1_);
     ON_CALL(*mock_app_1_, app_id()).WillByDefault(Return(kAppId1));
 
     PrepareResources();
@@ -146,6 +146,7 @@ class RAManagerTest : public ::testing::Test {
     rc_app_extension_ = std::make_shared<rc_rpc_plugin::RCAppExtension>(
         static_cast<application_manager::AppExtensionUID>(
             rc_rpc_plugin::RCRPCPlugin::kRCPluginID),
+        rc_plugin_,
         *mock_app_1_);
     ON_CALL(mock_rc_capabilities_manager_,
             GetDriverLocationFromSeatLocationCapability())
@@ -180,6 +181,7 @@ class RAManagerTest : public ::testing::Test {
       mock_rc_capabilities_manager_;
   std::vector<ModuleUid> resources_;
   Grid module_service_area_;
+  RCRPCPlugin rc_plugin_;
   RCAppExtensionPtr rc_app_extension_;
   MockRCHelpers* mock_rc_helpers_;
 };
@@ -408,6 +410,7 @@ TEST_F(RAManagerTest, AppUnregistered_ReleaseResource) {
   RCAppExtensionPtr rc_extention_ptr = std::make_shared<RCAppExtension>(
       application_manager::AppExtensionUID(
           rc_rpc_plugin::RCRPCPlugin::kRCPluginID),
+      rc_plugin_,
       *mock_app_1_);
 
   EXPECT_EQ(rc_rpc_plugin::AcquireResult::ALLOWED,
@@ -483,6 +486,7 @@ TEST_F(RAManagerTest, AppsDisallowed_ReleaseAllResources) {
   RCAppExtensionPtr rc_extention_ptr = std::make_shared<RCAppExtension>(
       application_manager::AppExtensionUID(
           rc_rpc_plugin::RCRPCPlugin::kRCPluginID),
+      rc_plugin_,
       *mock_app_1_);
 
   EXPECT_CALL(*mock_app_1_, QueryInterface(RCRPCPlugin::kRCPluginID))
@@ -516,6 +520,7 @@ TEST_F(RAManagerTest, AppGotRevokedModulesWithPTU_ReleaseRevokedResource) {
       std::make_shared<rc_rpc_plugin::RCAppExtension>(
           application_manager::AppExtensionUID(
               rc_rpc_plugin::RCRPCPlugin::kRCPluginID),
+          rc_plugin_,
           *mock_app_1_);
 
   EXPECT_CALL(*mock_app_1_, QueryInterface(RCRPCPlugin::kRCPluginID))
