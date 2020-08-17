@@ -173,6 +173,45 @@ void RCRPCPlugin::ProcessResumptionSubscription(
       ext, subscriber, app);
 }
 
+void RCRPCPlugin::RevertResumption(const std::set<ModuleUid>& subscriptions) {
+  LOG4CXX_AUTO_TRACE(logger_);
+
+  pending_resumption_handler_->OnResumptionRevert();
+
+  auto accessor = app_mngr_->applications();
+
+  for (const auto& module : subscriptions) {
+    if (!IsAnotherAppsSubscribedOnTheSameModule(module, accessor.GetData())) {
+      auto unsubscribe_request = RCHelpers::CreateGetInteriorVDRequestToHMI(
+          module,
+          app_mngr_->GetNextHMICorrelationID(),
+          RCHelpers::GetInteriorData::UNSUBSCRIBE);
+
+      LOG4CXX_DEBUG(logger_,
+                    "Send Unsubscribe from module type: "
+                        << module.first << " id: " << module.second);
+      rpc_service_->ManageHMICommand(unsubscribe_request);
+    }
+  }
+}
+
+bool RCRPCPlugin::IsAnotherAppsSubscribedOnTheSameModule(
+    const rc_rpc_types::ModuleUid& module,
+    const application_manager::ApplicationSet& applications) {
+  for (const auto& app : applications) {
+    auto rc_app_extension = RCHelpers::GetRCExtension(*app);
+
+    if (rc_app_extension) {
+      auto subscriptions = rc_app_extension->InteriorVehicleDataSubscriptions();
+      auto it = subscriptions.find(module);
+
+      return !(it == subscriptions.end());
+    }
+  }
+
+  return false;
+}
+
 RCRPCPlugin::Apps RCRPCPlugin::GetRCApplications(
     application_manager::ApplicationManager& app_mngr) {
   using application_manager::ApplicationSet;

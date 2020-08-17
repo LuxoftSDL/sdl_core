@@ -228,7 +228,7 @@ class RCAppExtension : public application_manager::AppExtension {
                          resumption::Subscriber subscriber) OVERRIDE;
 
   void RevertResumption(
-      const smart_objects::SmartObject& subscriptions) OVERRIDE;
+      const smart_objects::SmartObject& subscriptions_so) OVERRIDE;
 };
 
 typedef std::shared_ptr<RCAppExtension> RCAppExtensionPtr;
