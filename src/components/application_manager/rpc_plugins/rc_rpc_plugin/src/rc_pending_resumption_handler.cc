@@ -94,7 +94,7 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
     pending_requests_.emplace(cid, *subscription_request);
     subscriptions_.emplace_back(subscription);
     subscribe_on_event(fid, cid);
-    subscriber(cid, resumption_request);
+    subscriber(app.app_id(), resumption_request);
     LOG4CXX_DEBUG(logger_,
                   "Sending request with correlation id: "
                       << cid << " module type: " << subscription.first
