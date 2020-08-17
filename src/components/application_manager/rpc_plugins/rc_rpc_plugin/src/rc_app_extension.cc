@@ -30,14 +30,38 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "rc_rpc_plugin/rc_app_extension.h"
 #include <algorithm>
+
+#include "rc_rpc_plugin/rc_app_extension.h"
+
 #include "rc_rpc_plugin/rc_module_constants.h"
 #include "rc_rpc_plugin/rc_rpc_plugin.h"
 #include "smart_objects/smart_object.h"
 #include "utils/logger.h"
 
 CREATE_LOGGERPTR_GLOBAL(logger_, "RCAppExtension")
+
+namespace {
+std::set<rc_rpc_plugin::ModuleUid> ConvertSmartObjectToModuleCollection(
+    const smart_objects::SmartObject& subscriptions) {
+  using namespace rc_rpc_plugin;
+
+  const auto& module_data = subscriptions[message_params::kModuleData];
+
+  std::set<rc_rpc_plugin::ModuleUid> module_collection;
+
+  if (!module_data.empty()) {
+    for (const auto& module : *(module_data.asArray())) {
+      const auto module_type = module[message_params::kModuleType].asString();
+      const auto module_id = module[message_params::kModuleId].asString();
+
+      module_collection.insert({module_type, module_id});
+    }
+  }
+
+  return module_collection;
+}
+}  // namespace
 
 namespace rc_rpc_plugin {
 RCAppExtension::RCAppExtension(application_manager::AppExtensionUID uid,
@@ -161,7 +185,17 @@ void RCAppExtension::ProcessResumption(
 }
 
 void RCAppExtension::RevertResumption(
-    const smart_objects::SmartObject& subscriptions) {}
+    const smart_objects::SmartObject& subscriptions_so) {
+  LOG4CXX_AUTO_TRACE(logger_);
+
+  subscribed_interior_vehicle_data_.clear();
+
+  const auto module_subscriptions =
+      ConvertSmartObjectToModuleCollection(subscriptions_so);
+
+  plugin_.RevertResumption(module_subscriptions);
+  UpdateHash();
+}
 
 std::set<ModuleUid> RCAppExtension::InteriorVehicleDataSubscriptions() const {
   return subscribed_interior_vehicle_data_;
