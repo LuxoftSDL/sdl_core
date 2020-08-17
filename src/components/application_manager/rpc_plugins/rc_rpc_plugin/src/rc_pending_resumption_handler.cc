@@ -77,7 +77,7 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
     const auto resumption_request =
         MakeResumptionRequest(cid, fid, *subscription_request);
     freezed_resumptions_[subscription].push(resumption_request);
-    subscriber(cid, resumption_request);
+    subscriber(app.app_id(), resumption_request);
     LOG4CXX_DEBUG(logger_,
                   "Freezed request with correlation_id: "
                       << cid << " module type: " << subscription.first
