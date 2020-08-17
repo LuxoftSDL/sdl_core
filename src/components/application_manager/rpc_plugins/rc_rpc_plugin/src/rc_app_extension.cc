@@ -30,14 +30,38 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "rc_rpc_plugin/rc_app_extension.h"
 #include <algorithm>
+
+#include "rc_rpc_plugin/rc_app_extension.h"
+
 #include "rc_rpc_plugin/rc_module_constants.h"
 #include "rc_rpc_plugin/rc_rpc_plugin.h"
 #include "smart_objects/smart_object.h"
 #include "utils/logger.h"
 
 CREATE_LOGGERPTR_GLOBAL(logger_, "RCAppExtension")
+
+namespace {
+std::set<rc_rpc_plugin::ModuleUid> ConvertSmartObjectToModuleCollection(
+    const smart_objects::SmartObject& subscriptions) {
+  using namespace rc_rpc_plugin;
+
+  const auto& module_data = subscriptions[message_params::kModuleData];
+
+  std::set<rc_rpc_plugin::ModuleUid> module_collection;
+
+  if (!module_data.empty()) {
+    for (const auto& module : *(module_data.asArray())) {
+      const auto module_type = module[message_params::kModuleType].asString();
+      const auto module_id = module[message_params::kModuleId].asString();
+
+      module_collection.insert({module_type, module_id});
+    }
+  }
+
+  return module_collection;
+}
+}  // namespace
 
 namespace rc_rpc_plugin {
 RCAppExtension::RCAppExtension(application_manager::AppExtensionUID uid,
@@ -161,7 +185,42 @@ void RCAppExtension::ProcessResumption(
 }
 
 void RCAppExtension::RevertResumption(
-    const smart_objects::SmartObject& subscriptions) {}
+    const smart_objects::SmartObject& subscriptions_so) {
+  LOG4CXX_AUTO_TRACE(logger_);
+
+  subscribed_interior_vehicle_data_.clear();
+
+  const auto module_subscriptions =
+      ConvertSmartObjectToModuleCollection(subscriptions_so);
+
+  for (auto& module : module_subscriptions) {
+    LOG4CXX_TRACE(logger_,
+                  "Requested to unsubscribe module_type  "
+                      << module.first << "module_id: " << module.second);
+  }
+  std::set<rc_rpc_plugin::ModuleUid> not_subscribed_by_other_apps;
+
+  const auto app_id = application_.app_id();
+  auto no_apps_subscribed = [app_id,
+                             this](const rc_rpc_plugin::ModuleUid& module) {
+    if (plugin_.IsAnotherAppsSubscribedOnTheSameModule(module, app_id)) {
+      LOG4CXX_DEBUG(logger_,
+                    "Some other app except " << app_id
+                                             << " is already subscribed to "
+                                             << " module_type  " << module.first
+                                             << "module_id: " << module.second);
+      return false;
+    }
+    return true;
+  };
+  std::copy_if(module_subscriptions.begin(),
+               module_subscriptions.end(),
+               std::inserter(not_subscribed_by_other_apps,
+                             not_subscribed_by_other_apps.end()),
+               no_apps_subscribed);
+
+  plugin_.RevertResumption(not_subscribed_by_other_apps);
+}
 
 std::set<ModuleUid> RCAppExtension::InteriorVehicleDataSubscriptions() const {
   return subscribed_interior_vehicle_data_;
