@@ -55,7 +55,6 @@ class RCPendingResumptionHandler
 
   bool IsPendingForResponse(const ModuleUid& module) const;
 
-  void RemoveWaitingForResponse(const ModuleUid& module);
   void AddWaitingForResponse(const ModuleUid& module);
 
   using QueueFreezedResumptions = std::queue<resumption::ResumptionRequest>;
