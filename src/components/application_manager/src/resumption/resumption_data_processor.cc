@@ -1051,7 +1051,8 @@ void ResumptionDataProcessor::DeletePluginsSubscriptions(
   }
   resumption_status_lock_.Release();
 
-  for (auto& extension : application->Extensions()) {
+  auto extenstions = application->Extensions();
+  for (auto& extension : extenstions) {
     extension->RevertResumption(extension_vd_subscriptions);
   }
 }
