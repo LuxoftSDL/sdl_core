@@ -121,9 +121,16 @@ class RCRPCPlugin : public plugins::RPCPlugin {
    */
   void RevertResumption(const std::set<ModuleUid>& subscriptions);
 
+  /**
+   * @brief IsAnotherAppsSubscribedOnTheSameModule check if any app exept passed
+   * is subscribed to the module
+   * @param module module to check
+   * @param app_id app to ignore subscription
+   * @return  true is any app expect passed subscribed to module, otherwise
+   * false
+   */
   bool IsAnotherAppsSubscribedOnTheSameModule(
-      const rc_rpc_types::ModuleUid& module,
-      const application_manager::ApplicationSet& applications);
+      const rc_rpc_types::ModuleUid& module, const uint32_t app_id);
 
   static const uint32_t kRCPluginID = 153;
 

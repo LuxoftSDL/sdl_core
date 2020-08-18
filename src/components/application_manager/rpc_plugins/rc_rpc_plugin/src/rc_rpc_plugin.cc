@@ -176,40 +176,47 @@ void RCRPCPlugin::ProcessResumptionSubscription(
 void RCRPCPlugin::RevertResumption(const std::set<ModuleUid>& subscriptions) {
   LOG4CXX_AUTO_TRACE(logger_);
 
-  pending_resumption_handler_->OnResumptionRevert();
+  for (auto& module : subscriptions) {
+    auto unsubscribe_request = RCHelpers::CreateGetInteriorVDRequestToHMI(
+        module,
+        app_mngr_->GetNextHMICorrelationID(),
+        RCHelpers::GetInteriorData::UNSUBSCRIBE);
 
-  auto accessor = app_mngr_->applications();
-
-  for (const auto& module : subscriptions) {
-    if (!IsAnotherAppsSubscribedOnTheSameModule(module, accessor.GetData())) {
-      auto unsubscribe_request = RCHelpers::CreateGetInteriorVDRequestToHMI(
-          module,
-          app_mngr_->GetNextHMICorrelationID(),
-          RCHelpers::GetInteriorData::UNSUBSCRIBE);
-
-      LOG4CXX_DEBUG(logger_,
-                    "Send Unsubscribe from module type: "
-                        << module.first << " id: " << module.second);
-      rpc_service_->ManageHMICommand(unsubscribe_request);
-    }
+    LOG4CXX_DEBUG(logger_,
+                  "Send Unsubscribe from module type: "
+                      << module.first << " id: " << module.second);
+    rpc_service_->ManageHMICommand(unsubscribe_request);
   }
+  pending_resumption_handler_->OnResumptionRevert();
 }
 
 bool RCRPCPlugin::IsAnotherAppsSubscribedOnTheSameModule(
-    const rc_rpc_types::ModuleUid& module,
-    const application_manager::ApplicationSet& applications) {
-  for (const auto& app : applications) {
+    const rc_rpc_types::ModuleUid& module, const uint32_t app_id) {
+  auto get_subscriptions = [](application_manager::ApplicationSharedPtr app) {
+    std::set<ModuleUid> result;
     auto rc_app_extension = RCHelpers::GetRCExtension(*app);
-
     if (rc_app_extension) {
-      auto subscriptions = rc_app_extension->InteriorVehicleDataSubscriptions();
-      auto it = subscriptions.find(module);
-
-      return !(it == subscriptions.end());
+      result = rc_app_extension->InteriorVehicleDataSubscriptions();
     }
-  }
+    return result;
+  };
 
-  return false;
+  auto another_app_subscribed =
+      [app_id, module, &get_subscriptions](
+          application_manager::ApplicationSharedPtr app) {
+        if (app_id == app->app_id()) {
+          return false;
+        }
+        auto subscriptions = get_subscriptions(app);
+        auto it = subscriptions.find(module);
+        return subscriptions.end() != it;
+      };
+
+  auto accessor = app_mngr_->applications();
+  auto it = std::find_if(accessor.GetData().begin(),
+                         accessor.GetData().end(),
+                         another_app_subscribed);
+  return accessor.GetData().end() != it;
 }
 
 RCRPCPlugin::Apps RCRPCPlugin::GetRCApplications(
