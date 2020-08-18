@@ -51,11 +51,14 @@ class RCPendingResumptionHandler
       const smart_objects::SmartObject& subscription_response,
       const uint32_t correlation_id) const;
 
-  bool IsPendingForResponse(const ModuleUid subscription) const;
+  bool IsPendingForResponse(const ModuleUid& module) const;
+
+  void RemoveWaitingForResponse(const ModuleUid& module);
+  void AddWaitingForResponse(const ModuleUid& module);
 
   using QueueFreezedResumptions = std::queue<resumption::ResumptionRequest>;
   std::map<ModuleUid, QueueFreezedResumptions> freezed_resumptions_;
-  std::vector<ModuleUid> subscriptions_;
+  std::vector<ModuleUid> waiting_for_response_modules_;
   sync_primitives::Lock pending_resumption_lock_;
   std::map<int32_t, smart_objects::SmartObject> pending_requests_;
   application_manager::rpc_service::RPCService& rpc_service_;

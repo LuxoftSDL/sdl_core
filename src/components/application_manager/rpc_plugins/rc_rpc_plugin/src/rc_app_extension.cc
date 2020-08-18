@@ -192,8 +192,28 @@ void RCAppExtension::RevertResumption(
 
   const auto module_subscriptions =
       ConvertSmartObjectToModuleCollection(subscriptions_so);
+  std::set<rc_rpc_plugin::ModuleUid> not_subscribed_by_other_apps;
 
-  plugin_.RevertResumption(module_subscriptions);
+  const auto app_id = application_.app_id();
+  auto no_apps_subscribed = [app_id,
+                             this](const rc_rpc_plugin::ModuleUid& module) {
+    if (plugin_.IsAnotherAppsSubscribedOnTheSameModule(module, app_id)) {
+      LOG4CXX_DEBUG(logger_,
+                    "Some other app except " << app_id
+                                             << " is already subscribed to "
+                                             << " module_type  " << module.first
+                                             << "module_id: " << module.second);
+      return false;
+    }
+    return true;
+  };
+  std::copy_if(module_subscriptions.begin(),
+               module_subscriptions.end(),
+               std::inserter(not_subscribed_by_other_apps,
+                             not_subscribed_by_other_apps.end()),
+               no_apps_subscribed);
+
+  plugin_.RevertResumption(not_subscribed_by_other_apps);
   UpdateHash();
 }
 
