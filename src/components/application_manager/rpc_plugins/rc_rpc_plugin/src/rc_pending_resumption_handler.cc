@@ -117,6 +117,7 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
 
 void RCPendingResumptionHandler::OnResumptionRevert() {
   LOG4CXX_AUTO_TRACE(logger_);
+  waiting_for_response_modules_.clear();
 }
 
 void RCPendingResumptionHandler::HandleSuccessfulResponse(
