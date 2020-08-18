@@ -33,7 +33,7 @@ void RCPendingResumptionHandler::on_event(
   auto module_uid = GetModuleUid(current_request);
 
   auto& response = event.smart_object();
-  RemoveWaitingForResponse(module_uid);
+
   if (RCHelpers::IsResponseSuccessful(response)) {
     LOG4CXX_DEBUG(logger_,
                   "Resumption of subscriptions is successful"
@@ -76,6 +76,10 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
     } else {
       need_to_subscribe.push_back(subscription);
     }
+  }
+
+  if (pending_requests_.empty()) {
+    already_pending.clear();
   }
 
   for (auto subscription : already_pending) {
@@ -209,15 +213,6 @@ bool RCPendingResumptionHandler::IsPendingForResponse(
                       waiting_for_response_modules_.end(),
                       module);
   return it != waiting_for_response_modules_.end();
-}
-
-void RCPendingResumptionHandler::RemoveWaitingForResponse(
-    const ModuleUid& module) {
-  std::remove_if(waiting_for_response_modules_.begin(),
-                 waiting_for_response_modules_.end(),
-                 [&module](const ModuleUid& module_to_remove) {
-                   return module_to_remove == module;
-                 });
 }
 
 void RCPendingResumptionHandler::AddWaitingForResponse(
