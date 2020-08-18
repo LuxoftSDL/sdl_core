@@ -223,6 +223,15 @@ void GetInteriorVehicleDataRequest::Execute() {
     return;
   }
   ProcessResponseToMobileFromCache(app);
+  if (AppShouldBeUnsubscribed()) {
+    (*message_)[app_mngr::strings::msg_params][message_params::kModuleType] =
+        ModuleType();
+    (*message_)[app_mngr::strings::msg_params][message_params::kModuleId] =
+        ModuleId();
+    SendHMIRequest(hmi_apis::FunctionID::RC_GetInteriorVehicleData,
+                   &(*message_)[app_mngr::strings::msg_params],
+                   true);
+  }
 }
 
 void GetInteriorVehicleDataRequest::on_event(
