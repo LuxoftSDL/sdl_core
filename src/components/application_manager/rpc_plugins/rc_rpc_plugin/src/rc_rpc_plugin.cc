@@ -176,17 +176,7 @@ void RCRPCPlugin::ProcessResumptionSubscription(
 void RCRPCPlugin::RevertResumption(const std::set<ModuleUid>& subscriptions) {
   LOG4CXX_AUTO_TRACE(logger_);
 
-  for (auto& module : subscriptions) {
-    auto unsubscribe_request = RCHelpers::CreateGetInteriorVDRequestToHMI(
-        module,
-        app_mngr_->GetNextHMICorrelationID(),
-        RCHelpers::GetInteriorData::UNSUBSCRIBE);
-
-    LOG4CXX_DEBUG(logger_,
-                  "Send Unsubscribe from module type: "
-                      << module.first << " id: " << module.second);
-    rpc_service_->ManageHMICommand(unsubscribe_request);
-  }
+  interior_data_manager_->OnResumptionRevert(subscriptions);
   pending_resumption_handler_->OnResumptionRevert();
 }
 

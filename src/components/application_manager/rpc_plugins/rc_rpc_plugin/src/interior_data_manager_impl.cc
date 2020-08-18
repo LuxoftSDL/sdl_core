@@ -50,6 +50,13 @@ void InteriorDataManagerImpl::OnDisablingRC() {
   }
 }
 
+void InteriorDataManagerImpl::OnResumptionRevert(
+    const std::set<ModuleUid>& subscriptions) {
+  for (const auto& module : subscriptions) {
+    UnsubscribeFromInteriorVehicleData(module);
+  }
+}
+
 void InteriorDataManagerImpl::StoreRequestToHMITime(const ModuleUid& module) {
   LOG4CXX_AUTO_TRACE(logger_);
   sync_primitives::AutoLock autolock(requests_to_hmi_history_lock_);
