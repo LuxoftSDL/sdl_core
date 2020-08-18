@@ -31,7 +31,7 @@ void RCPendingResumptionHandler::on_event(
   auto module_uid = GetModuleUid(current_request);
 
   auto& response = event.smart_object();
-
+  RemoveWaitingForResponse(module_uid);
   if (RCHelpers::IsResponseSuccessful(response)) {
     LOG4CXX_DEBUG(logger_,
                   "Resumption of subscriptions is successful"
@@ -84,21 +84,20 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
                       << " module id: " << subscription.second);
   }
 
-  for (auto subscription : need_to_subscribe) {
+  for (auto module : need_to_subscribe) {
     const auto cid = application_manager_.GetNextHMICorrelationID();
-    const auto subscription_request =
-        CreateSubscriptionRequest(subscription, cid);
+    const auto subscription_request = CreateSubscriptionRequest(module, cid);
     const auto fid = GetFunctionId(*subscription_request);
     const auto resumption_request =
         MakeResumptionRequest(cid, fid, *subscription_request);
     pending_requests_.emplace(cid, *subscription_request);
-    subscriptions_.emplace_back(subscription);
+    AddWaitingForResponse(module);
     subscribe_on_event(fid, cid);
     subscriber(app.app_id(), resumption_request);
     LOG4CXX_DEBUG(logger_,
                   "Sending request with correlation id: "
-                      << cid << " module type: " << subscription.first
-                      << " module id: " << subscription.second);
+                      << cid << " module type: " << module.first
+                      << " module id: " << module.second);
     application_manager_.GetRPCService().ManageHMICommand(subscription_request);
   }
 }
@@ -160,12 +159,7 @@ void RCPendingResumptionHandler::ProcessNextFreezedResumption(
 
   auto freezed_resumption = pop_front_freezed_resumptions(module_uid);
   if (!freezed_resumption) {
-    std::remove_if(subscriptions_.begin(),
-                   subscriptions_.end(),
-                   [&module_uid](const ModuleUid& module_to_remove) {
-                     return module_to_remove == module_uid;
-                   });
-    LOG4CXX_DEBUG(logger_, "Not freezed resumptions found");
+    LOG4CXX_DEBUG(logger_, "No freezed resumptions found");
     return;
   }
 
@@ -177,6 +171,7 @@ void RCPendingResumptionHandler::ProcessNextFreezedResumption(
       resumption_request
           .message[app_mngr::strings::params][app_mngr::strings::correlation_id]
           .asInt();
+  AddWaitingForResponse(module_uid);
   subscribe_on_event(fid, cid);
   pending_requests_.emplace(cid, *subscription_request);
   LOG4CXX_DEBUG(logger_,
@@ -200,10 +195,25 @@ void RCPendingResumptionHandler::RaiseEventForResponse(
 }
 
 bool RCPendingResumptionHandler::IsPendingForResponse(
-    const ModuleUid subscription) const {
-  auto it =
-      std::find(subscriptions_.begin(), subscriptions_.end(), subscription);
-  return it != subscriptions_.end();
+    const ModuleUid& module) const {
+  auto it = std::find(waiting_for_response_modules_.begin(),
+                      waiting_for_response_modules_.end(),
+                      module);
+  return it != waiting_for_response_modules_.end();
+}
+
+void RCPendingResumptionHandler::RemoveWaitingForResponse(
+    const ModuleUid& module) {
+  std::remove_if(waiting_for_response_modules_.begin(),
+                 waiting_for_response_modules_.end(),
+                 [&module](const ModuleUid& module_to_remove) {
+                   return module_to_remove == module;
+                 });
+}
+
+void RCPendingResumptionHandler::AddWaitingForResponse(
+    const ModuleUid& module) {
+  waiting_for_response_modules_.emplace_back(module);
 }
 
 smart_objects::SmartObjectSPtr
