@@ -7,13 +7,16 @@ namespace rc_rpc_plugin {
 CREATE_LOGGERPTR_GLOBAL(logger_, "RCPendingResumptionHandler")
 
 RCPendingResumptionHandler::RCPendingResumptionHandler(
-    application_manager::ApplicationManager& application_manager)
+    application_manager::ApplicationManager& application_manager,
+    InteriorDataCache& interior_data_cache)
     : ExtensionPendingResumptionHandler(application_manager)
-    , rpc_service_(application_manager.GetRPCService()) {}
+    , rpc_service_(application_manager.GetRPCService())
+    , interior_data_cache_(interior_data_cache) {}
 
 void RCPendingResumptionHandler::on_event(
     const application_manager::event_engine::Event& event) {
   LOG4CXX_AUTO_TRACE(logger_);
+  namespace am_strings = application_manager::strings;
   const auto cid = event.smart_object_correlation_id();
   LOG4CXX_TRACE(logger_,
                 "Received event with function id: "
@@ -37,6 +40,18 @@ void RCPendingResumptionHandler::on_event(
                   "Resumption of subscriptions is successful"
                       << " module type: " << module_uid.first
                       << " module id: " << module_uid.second);
+
+    if (response[am_strings::msg_params].keyExists(
+            message_params::kModuleData)) {
+      const auto module_data =
+          response[am_strings::msg_params][message_params::kModuleData];
+      const auto& data_mapping = RCHelpers::GetModuleTypeToDataMapping();
+      if (module_data.keyExists(data_mapping(module_uid.first))) {
+        const auto control_data = module_data[data_mapping(module_uid.first)];
+        interior_data_cache_.Add(module_uid, control_data);
+      }
+    }
+
     HandleSuccessfulResponse(event, module_uid);
   } else {
     LOG4CXX_DEBUG(logger_,

@@ -7,6 +7,7 @@
 #include "application_manager/resumption/extension_pending_resumption_handler.h"
 #include "application_manager/resumption/resumption_data_processor.h"
 #include "application_manager/rpc_service.h"
+#include "rc_rpc_plugin/interior_data_cache.h"
 #include "rc_rpc_plugin/rc_app_extension.h"
 
 namespace rc_rpc_plugin {
@@ -20,7 +21,8 @@ class RCPendingResumptionHandler
     : public resumption::ExtensionPendingResumptionHandler {
  public:
   RCPendingResumptionHandler(
-      application_manager::ApplicationManager& application_manager);
+      application_manager::ApplicationManager& application_manager,
+      rc_rpc_plugin::InteriorDataCache& interior_data_cache);
 
   void on_event(const application_manager::event_engine::Event& event) override;
 
@@ -62,6 +64,7 @@ class RCPendingResumptionHandler
   sync_primitives::Lock pending_resumption_lock_;
   std::map<int32_t, smart_objects::SmartObject> pending_requests_;
   application_manager::rpc_service::RPCService& rpc_service_;
+  rc_rpc_plugin::InteriorDataCache& interior_data_cache_;
 };
 
 }  // namespace rc_rpc_plugin
