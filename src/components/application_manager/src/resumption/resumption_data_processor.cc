@@ -276,6 +276,11 @@ void ResumptionDataProcessor::ProcessResumptionStatus(
       found_request.request_ids.function_id) {
     CheckCreateWindowResponse(found_request.message, response);
   }
+
+  if (hmi_apis::FunctionID::RC_GetInteriorVehicleData ==
+      found_request.request_ids.function_id) {
+    CheckModuleDataSubscription(found_request.message, response, status);
+  }
 }
 
 bool ResumptionDataProcessor::IsResumptionFinished(
