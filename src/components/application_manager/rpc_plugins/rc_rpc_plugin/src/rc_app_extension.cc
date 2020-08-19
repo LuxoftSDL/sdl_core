@@ -220,7 +220,6 @@ void RCAppExtension::RevertResumption(
                no_apps_subscribed);
 
   plugin_.RevertResumption(not_subscribed_by_other_apps);
-  UpdateHash();
 }
 
 std::set<ModuleUid> RCAppExtension::InteriorVehicleDataSubscriptions() const {
