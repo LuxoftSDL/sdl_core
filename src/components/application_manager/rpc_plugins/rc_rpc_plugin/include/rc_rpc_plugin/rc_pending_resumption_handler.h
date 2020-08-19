@@ -19,8 +19,6 @@ namespace rc_rpc_plugin {
 class RCPendingResumptionHandler
     : public resumption::ExtensionPendingResumptionHandler {
  public:
-  typedef std::map<int32_t, smart_objects::SmartObject> PendingRequestList;
-
   RCPendingResumptionHandler(
       application_manager::ApplicationManager& application_manager,
       rc_rpc_plugin::InteriorDataCache& interior_data_cache);
@@ -62,6 +60,7 @@ class RCPendingResumptionHandler
   using QueueFreezedResumptions = std::queue<resumption::ResumptionRequest>;
   std::map<ModuleUid, QueueFreezedResumptions> freezed_resumptions_;
   sync_primitives::Lock pending_resumption_lock_;
+  using PendingRequestList = std::map<int32_t, smart_objects::SmartObject>;
   PendingRequestList pending_requests_;
   application_manager::rpc_service::RPCService& rpc_service_;
   rc_rpc_plugin::InteriorDataCache& interior_data_cache_;
