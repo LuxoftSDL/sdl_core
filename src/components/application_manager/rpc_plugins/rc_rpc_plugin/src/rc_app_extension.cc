@@ -192,6 +192,12 @@ void RCAppExtension::RevertResumption(
 
   const auto module_subscriptions =
       ConvertSmartObjectToModuleCollection(subscriptions_so);
+
+  for (auto& module : module_subscriptions) {
+    LOG4CXX_TRACE(logger_,
+                  "Requested to unsubscribe module_type  "
+                      << module.first << "module_id: " << module.second);
+  }
   std::set<rc_rpc_plugin::ModuleUid> not_subscribed_by_other_apps;
 
   const auto app_id = application_.app_id();
