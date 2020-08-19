@@ -52,6 +52,7 @@ file(GLOB SOURCES
   ${COMMANDS_TEST_DIR}/mobile/*
   ${CMAKE_CURRENT_SOURCE_DIR}/custom_vehicle_data_manager_test.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/vehicle_data_item_schema_test.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/vehicle_info_plugin_test.cc
   ${COMPONENTS_DIR}/application_manager/src/message.cc
   ${COMPONENTS_DIR}/application_manager/src/event_engine/*
   ${COMPONENTS_DIR}/resumption/src/last_state_wrapper_impl.cc
