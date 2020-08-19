@@ -31,6 +31,8 @@
  */
 
 #include "rc_rpc_plugin/commands/hmi/rc_get_interior_vehicle_data_request.h"
+#include "application_manager/resumption/resume_ctrl.h"
+
 #include "utils/macro.h"
 
 namespace rc_rpc_plugin {
@@ -50,6 +52,14 @@ RCGetInteriorVehicleDataRequest::~RCGetInteriorVehicleDataRequest() {}
 void RCGetInteriorVehicleDataRequest::Run() {
   LOG4CXX_AUTO_TRACE(logger_);
   SendRequest();
+}
+
+void RCGetInteriorVehicleDataRequest::onTimeOut() {
+  auto& resume_ctrl = application_manager_.resume_controller();
+
+  resume_ctrl.HandleOnTimeOut(
+      correlation_id(),
+      static_cast<hmi_apis::FunctionID::eType>(function_id()));
 }
 
 }  // namespace commands
