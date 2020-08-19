@@ -46,8 +46,10 @@ void RCPendingResumptionHandler::on_event(
       const auto module_data =
           response[am_strings::msg_params][message_params::kModuleData];
       const auto& data_mapping = RCHelpers::GetModuleTypeToDataMapping();
-      const auto control_data = module_data[data_mapping(module_uid.first)];
-      interior_data_cache_.Add(module_uid, control_data);
+      if (module_data.keyExists(data_mapping(module_uid.first))) {
+        const auto control_data = module_data[data_mapping(module_uid.first)];
+        interior_data_cache_.Add(module_uid, control_data);
+      }
     }
 
     HandleSuccessfulResponse(event, module_uid);
