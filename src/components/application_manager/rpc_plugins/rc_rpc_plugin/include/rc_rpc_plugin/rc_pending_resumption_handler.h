@@ -2,7 +2,6 @@
 
 #include <map>
 #include <queue>
-#include <vector>
 #include "application_manager/event_engine/event_observer.h"
 #include "application_manager/resumption/extension_pending_resumption_handler.h"
 #include "application_manager/resumption/resumption_data_processor.h"
@@ -20,6 +19,8 @@ namespace rc_rpc_plugin {
 class RCPendingResumptionHandler
     : public resumption::ExtensionPendingResumptionHandler {
  public:
+  typedef std::map<int32_t, smart_objects::SmartObject> PendingRequestList;
+
   RCPendingResumptionHandler(
       application_manager::ApplicationManager& application_manager,
       rc_rpc_plugin::InteriorDataCache& interior_data_cache);
@@ -55,13 +56,13 @@ class RCPendingResumptionHandler
 
   bool IsPendingForResponse(const ModuleUid& module) const;
 
-  void AddWaitingForResponse(const ModuleUid& module);
+  bool IsAnotherAppsSubscribedOnTheSameModule(const uint32_t app_id,
+                                              const ModuleUid& module) const;
 
   using QueueFreezedResumptions = std::queue<resumption::ResumptionRequest>;
   std::map<ModuleUid, QueueFreezedResumptions> freezed_resumptions_;
-  std::vector<ModuleUid> waiting_for_response_modules_;
   sync_primitives::Lock pending_resumption_lock_;
-  std::map<int32_t, smart_objects::SmartObject> pending_requests_;
+  PendingRequestList pending_requests_;
   application_manager::rpc_service::RPCService& rpc_service_;
   rc_rpc_plugin::InteriorDataCache& interior_data_cache_;
 };
