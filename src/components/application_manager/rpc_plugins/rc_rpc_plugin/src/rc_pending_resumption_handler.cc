@@ -16,7 +16,7 @@ RCPendingResumptionHandler::RCPendingResumptionHandler(
 void RCPendingResumptionHandler::on_event(
     const application_manager::event_engine::Event& event) {
   LOG4CXX_AUTO_TRACE(logger_);
-  namespace am_strings = application_manager::hmi_notification;
+  namespace am_strings = application_manager::strings;
   sync_primitives::AutoLock lock(pending_resumption_lock_);
   const auto cid = event.smart_object_correlation_id();
   LOG4CXX_TRACE(logger_,
@@ -41,9 +41,10 @@ void RCPendingResumptionHandler::on_event(
                       << " module type: " << module_uid.first
                       << " module id: " << module_uid.second);
 
-    if (response[am_strings::result].keyExists(message_params::kModuleData)) {
+    if (response[am_strings::msg_params].keyExists(
+            message_params::kModuleData)) {
       const auto module_data =
-          response[am_strings::result][message_params::kModuleData];
+          response[am_strings::msg_params][message_params::kModuleData];
       const auto& data_mapping = RCHelpers::GetModuleTypeToDataMapping();
       const auto control_data = module_data[data_mapping(module_uid.first)];
       interior_data_cache_.Add(module_uid, control_data);
