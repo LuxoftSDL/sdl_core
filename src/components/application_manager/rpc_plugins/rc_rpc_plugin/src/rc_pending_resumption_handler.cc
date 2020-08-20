@@ -1,10 +1,11 @@
 #include "rc_rpc_plugin/rc_pending_resumption_handler.h"
+#include <sstream>
 #include "rc_rpc_plugin/rc_helpers.h"
 #include "rc_rpc_plugin/rc_module_constants.h"
 
 namespace rc_rpc_plugin {
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RCPendingResumptionHandler")
+CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule")
 
 RCPendingResumptionHandler::RCPendingResumptionHandler(
     application_manager::ApplicationManager& application_manager,
@@ -22,15 +23,18 @@ void RCPendingResumptionHandler::on_event(
   LOG4CXX_TRACE(logger_,
                 "Received event with function id: "
                     << event.id() << " and correlation id: " << cid);
-  const auto& data_request = pending_requests_.find(cid);
-  if (data_request == pending_requests_.end()) {
+
+  const auto request_optional = GetPendingRequest(cid);
+  const auto app_id_optional = GetPendingApp(cid);
+  if (!request_optional) {
     LOG4CXX_ERROR(logger_,
                   "Not waiting for message with correlation id: " << cid);
     return;
   }
 
-  auto current_request = data_request->second;
-  pending_requests_.erase(data_request);
+  auto current_request = *request_optional;
+  const auto app_id = *app_id_optional;
+  RemovePendingRequest(cid);
   auto module_uid = GetModuleUid(current_request);
 
   auto& response = event.smart_object();
@@ -57,8 +61,23 @@ void RCPendingResumptionHandler::on_event(
                   "Resumption of subscriptions is NOT successful"
                       << " module type: " << module_uid.first
                       << " module id: " << module_uid.second);
+
+    auto app = application_manager_.application(app_id);
+    if (app) {
+      auto rc_app_extension = RCHelpers::GetRCExtension(*app);
+      rc_app_extension->UnsubscribeFromInteriorVehicleData(module_uid);
+    }
     ProcessNextFreezedResumption(module_uid);
   }
+}
+
+template <typename RCModulesCollection>
+std::string Stringify(RCModulesCollection& collection) {
+  std::stringstream ss;
+  for (const auto& module : collection) {
+    ss << "{type : " << module.first << " id " << module.second << "} ";
+  }
+  return ss.str();
 }
 
 void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
@@ -68,34 +87,40 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
   UNUSED(extension);
   LOG4CXX_AUTO_TRACE(logger_);
   sync_primitives::AutoLock lock(pending_resumption_lock_);
-  LOG4CXX_TRACE(logger_, "app id " << app.app_id());
 
   auto rc_extension = RCHelpers::GetRCExtension(app);
   auto subscriptions = rc_extension->InteriorVehicleDataSubscriptions();
+  LOG4CXX_TRACE(logger_,
+                "app id " << app.app_id() << " " << Stringify(subscriptions));
 
+  std::vector<ModuleUid> ignored;
   std::vector<ModuleUid> already_pending;
   std::vector<ModuleUid> need_to_subscribe;
-  for (auto subscription : subscriptions) {
+  for (const auto& subscription : subscriptions) {
     bool is_another_app_subscribed =
         IsAnotherAppsSubscribedOnTheSameModule(app.app_id(), subscription);
     bool is_pending_response = IsPendingForResponse(subscription);
     if (is_another_app_subscribed && !is_pending_response) {
-      continue;
+      ignored.push_back(subscription);
     } else if (is_pending_response) {
       already_pending.push_back(subscription);
     } else {
       need_to_subscribe.push_back(subscription);
     }
   }
+  LOG4CXX_TRACE(logger_, "ignored: " << Stringify(ignored));
+  LOG4CXX_TRACE(logger_, "already_pending: " << Stringify(already_pending));
+  LOG4CXX_TRACE(logger_, "need_to_subscribe: " << Stringify(need_to_subscribe));
 
   for (auto subscription : already_pending) {
     const auto cid = application_manager_.GetNextHMICorrelationID();
     const auto subscription_request =
         CreateSubscriptionRequest(subscription, cid);
     const auto fid = GetFunctionId(*subscription_request);
+    freezed_resumptions_[subscription].push(
+        {app.app_id(), *subscription_request});
     const auto resumption_request =
         MakeResumptionRequest(cid, fid, *subscription_request);
-    freezed_resumptions_[subscription].push(resumption_request);
     subscriber(app.app_id(), resumption_request);
     LOG4CXX_DEBUG(logger_,
                   "Freezed request with correlation_id: "
@@ -109,7 +134,7 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
     const auto fid = GetFunctionId(*subscription_request);
     const auto resumption_request =
         MakeResumptionRequest(cid, fid, *subscription_request);
-    pending_requests_.emplace(cid, *subscription_request);
+    AddPendingRequest(app.app_id(), *subscription_request);
     subscribe_on_event(fid, cid);
     subscriber(app.app_id(), resumption_request);
     LOG4CXX_DEBUG(logger_,
@@ -188,7 +213,7 @@ void RCPendingResumptionHandler::ProcessNextFreezedResumption(
           .message[app_mngr::strings::params][app_mngr::strings::correlation_id]
           .asInt();
   subscribe_on_event(fid, cid);
-  pending_requests_.emplace(cid, *subscription_request);
+  AddPendingRequest(resumption_request.app_id, *subscription_request);
   LOG4CXX_DEBUG(logger_,
                 "Sending request with correlation id: "
                     << cid << " module type: " << module_uid.first
@@ -211,10 +236,9 @@ void RCPendingResumptionHandler::RaiseEventForResponse(
 
 bool RCPendingResumptionHandler::IsPendingForResponse(
     const ModuleUid& module_uid) const {
-  auto is_module_exists =
-      [&module_uid](const PendingRequestList::value_type& value_type) {
-        return module_uid == GetModuleUid(value_type.second);
-      };
+  auto is_module_exists = [&module_uid](const PendingRequest& pending) {
+    return module_uid == GetModuleUid(pending.message);
+  };
   auto it = std::find_if(
       pending_requests_.begin(), pending_requests_.end(), is_module_exists);
   return it != pending_requests_.end();
@@ -231,22 +255,72 @@ bool RCPendingResumptionHandler::IsAnotherAppsSubscribedOnTheSameModule(
     return result;
   };
 
-  auto another_app_subscribed =
-      [app_id, module_uid, &get_subscriptions](
-          application_manager::ApplicationSharedPtr app) {
-        if (app_id == app->app_id()) {
-          return false;
-        }
-        auto subscriptions = get_subscriptions(app);
-        auto it = subscriptions.find(module_uid);
-        return subscriptions.end() != it;
-      };
+  auto app_subscribed = [module_uid, &get_subscriptions](
+                            application_manager::ApplicationSharedPtr app) {
+    auto subscriptions = get_subscriptions(app);
+    auto it = subscriptions.find(module_uid);
+    return subscriptions.end() != it;
+  };
 
-  auto accessor = application_manager_.applications();
-  auto it = std::find_if(accessor.GetData().begin(),
-                         accessor.GetData().end(),
-                         another_app_subscribed);
-  return accessor.GetData().end() != it;
+  std::set<uint32_t> subscribed_apps;
+  for (auto& app : application_manager_.applications().GetData()) {
+    if (app_subscribed(app)) {
+      LOG4CXX_DEBUG(logger_,
+                    "APP " << app->app_id() << " subscribed "
+                           << module_uid.first << " " << module_uid.second);
+      subscribed_apps.insert(app->app_id());
+    }
+  }
+
+  subscribed_apps.erase(app_id);
+  return !subscribed_apps.empty();
+}
+
+utils::Optional<smart_objects::SmartObject>
+RCPendingResumptionHandler::GetPendingRequest(const uint32_t corr_id) {
+  auto corr_id_match = [corr_id](const PendingRequest& item) {
+    return corr_id == item.correlation_id();
+  };
+  auto it = std::find_if(
+      pending_requests_.begin(), pending_requests_.end(), corr_id_match);
+  if (it == pending_requests_.end()) {
+    return utils::Optional<smart_objects::SmartObject>::EMPTY;
+  }
+  return it->message;
+}
+
+utils::Optional<uint32_t> RCPendingResumptionHandler::GetPendingApp(
+    const uint32_t corr_id) {
+  auto corr_id_match = [corr_id](const PendingRequest& item) {
+    return corr_id == item.correlation_id();
+  };
+  auto it = std::find_if(
+      pending_requests_.begin(), pending_requests_.end(), corr_id_match);
+  if (it == pending_requests_.end()) {
+    return utils::Optional<uint32_t>::EMPTY;
+  }
+  return it->app_id;
+}
+
+void RCPendingResumptionHandler::RemovePendingRequest(const uint32_t corr_id) {
+  auto corr_id_match = [corr_id](const PendingRequest& item) {
+    return corr_id == item.correlation_id();
+  };
+  auto it = std::find_if(
+      pending_requests_.begin(), pending_requests_.end(), corr_id_match);
+  if (it != pending_requests_.end()) {
+    pending_requests_.erase(it);
+  }
+  LOG4CXX_WARN(logger_,
+               "Pending request with corr_id " << corr_id << " not found");
+}
+
+void RCPendingResumptionHandler::AddPendingRequest(
+    const uint32_t app_id, const smart_objects::SmartObject request_so) {
+  namespace am_strings = app_mngr::strings;
+  auto cid = request_so[am_strings::params][am_strings::correlation_id].asInt();
+
+  pending_requests_.push_back({app_id, request_so});
 }
 
 smart_objects::SmartObjectSPtr

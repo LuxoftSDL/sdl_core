@@ -42,6 +42,17 @@ class RCPendingResumptionHandler
       const smart_objects::SmartObject& subscription_request);
 
  private:
+  struct PendingRequest {
+    uint32_t app_id;
+    smart_objects::SmartObject message;
+    uint32_t correlation_id() const {
+      namespace am_strings = app_mngr::strings;
+      const auto cid =
+          message[am_strings::params][am_strings::correlation_id].asInt();
+      return cid;
+    }
+  };
+
   void HandleSuccessfulResponse(
       const application_manager::event_engine::Event& event,
       const ModuleUid& module_uid);
@@ -57,11 +68,21 @@ class RCPendingResumptionHandler
   bool IsAnotherAppsSubscribedOnTheSameModule(const uint32_t app_id,
                                               const ModuleUid& module) const;
 
-  using QueueFreezedResumptions = std::queue<resumption::ResumptionRequest>;
+  utils::Optional<smart_objects::SmartObject> GetPendingRequest(
+      const uint32_t corr_id);
+
+  utils::Optional<uint32_t> GetPendingApp(const uint32_t corr_id);
+
+  void RemovePendingRequest(const uint32_t corr_id);
+
+  void AddPendingRequest(const uint32_t app_id,
+                         const smart_objects::SmartObject request_so);
+  using QueueFreezedResumptions = std::queue<PendingRequest>;
   std::map<ModuleUid, QueueFreezedResumptions> freezed_resumptions_;
   sync_primitives::Lock pending_resumption_lock_;
-  using PendingRequestList = std::map<int32_t, smart_objects::SmartObject>;
-  PendingRequestList pending_requests_;
+
+  std::vector<PendingRequest> pending_requests_;
+
   application_manager::rpc_service::RPCService& rpc_service_;
   rc_rpc_plugin::InteriorDataCache& interior_data_cache_;
 };
