@@ -39,7 +39,7 @@
 #include "smart_objects/smart_object.h"
 #include "utils/logger.h"
 
-CREATE_LOGGERPTR_GLOBAL(logger_, "RCAppExtension")
+CREATE_LOGGERPTR_GLOBAL(logger_, "RemoteControlModule")
 
 namespace {
 std::set<rc_rpc_plugin::ModuleUid> ConvertSmartObjectToModuleCollection(
@@ -151,6 +151,7 @@ void RCAppExtension::ProcessResumption(
     const smart_objects::SmartObject& saved_app,
     resumption::Subscriber subscriber) {
   LOG4CXX_AUTO_TRACE(logger_);
+  LOG4CXX_TRACE(logger_, "app id : " << application_.app_id());
 
   if (!saved_app.keyExists(
           application_manager::strings::application_subscriptions)) {
@@ -168,8 +169,8 @@ void RCAppExtension::ProcessResumption(
 
   auto& module_data = resumption_data[message_params::kModuleData];
 
-  if (!module_data.length()) {
-    LOG4CXX_DEBUG(logger_, "Subscribed modules data is absent");
+  if (0 == module_data.length()) {
+    LOG4CXX_WARN(logger_, "Subscribed modules data is absent");
     return;
   }
 
@@ -178,6 +179,9 @@ void RCAppExtension::ProcessResumption(
     const auto module_id = module_so[message_params::kModuleId].asString();
 
     ModuleUid module{module_type, module_id};
+    LOG4CXX_TRACE(logger_,
+                  "app id " << application_.app_id() << " type : "
+                            << module_type << " id <" << module_id);
     SubscribeToInteriorVehicleData(module);
   }
 
