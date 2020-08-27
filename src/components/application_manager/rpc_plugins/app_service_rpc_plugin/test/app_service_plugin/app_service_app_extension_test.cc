@@ -34,6 +34,9 @@
 #include <memory>
 #include "app_service_rpc_plugin/app_service_rpc_plugin.h"
 #include "application_manager/mock_application.h"
+#include "application_manager/mock_application_manager.h"
+#include "application_manager/mock_message_helper.h"
+#include "application_manager/mock_rpc_service.h"
 #include "gtest/gtest.h"
 
 namespace {
@@ -48,7 +51,10 @@ namespace test {
 namespace components {
 namespace app_service_plugin_test {
 
+using ::application_manager::MockMessageHelper;
 using test::components::application_manager_test::MockApplication;
+using test::components::application_manager_test::MockApplicationManager;
+using test::components::application_manager_test::MockRPCService;
 using ::testing::_;
 using ::testing::Mock;
 using ::testing::NiceMock;
@@ -56,6 +62,7 @@ using ::testing::Return;
 using ::testing::ReturnNull;
 using ::testing::ReturnRef;
 using ::testing::SaveArg;
+using ::testing::Types;
 
 using namespace app_service_rpc_plugin;
 namespace strings = application_manager::strings;
@@ -63,20 +70,28 @@ namespace plugins = application_manager::plugin_manager;
 
 class AppServiceAppExtensionTest : public ::testing::Test {
  public:
-  AppServiceAppExtensionTest() : mock_app_(new NiceMock<MockApplication>()) {}
+  AppServiceAppExtensionTest()
+      : mock_app_(new NiceMock<MockApplication>())
+      , mock_app_mgr_(new NiceMock<MockApplicationManager>())
+      , message_helper_mock_(
+            *application_manager::MockMessageHelper::message_helper_mock()) {}
 
  protected:
   void SetUp() OVERRIDE {
-    app_service_app_extension_.reset(
-        new AppServiceAppExtension(app_service_plugin_, *mock_app_));
+    app_service_app_extension_.reset(new AppServiceAppExtension(
+        app_service_plugin_, *mock_app_, mock_app_mgr_));
   }
 
   void TearDown() OVERRIDE {
     app_service_app_extension_.reset();
+    delete mock_app_mgr_;
   }
 
   app_service_rpc_plugin::AppServiceRpcPlugin app_service_plugin_;
   std::unique_ptr<MockApplication> mock_app_;
+  MockApplicationManager* mock_app_mgr_;
+  NiceMock<MockRPCService> mock_rpc_service_;
+  application_manager::MockMessageHelper& message_helper_mock_;
   std::unique_ptr<AppServiceAppExtension> app_service_app_extension_;
 };
 
@@ -198,6 +213,13 @@ TEST_F(AppServiceAppExtensionTest, ProcessResumption_SUCCESS) {
   smart_objects::SmartObject resumption_data;
   resumption_data[application_manager::strings::application_subscriptions]
                  [kAppServiceInfoKey] = app_service_data;
+
+  auto notification = std::make_shared<smart_objects::SmartObject>();
+  ON_CALL(message_helper_mock_,
+          CreateMessageForHMI(testing::An<hmi_apis::messageType::eType>(), _))
+      .WillByDefault(Return(notification));
+  ON_CALL(*mock_app_mgr_, GetRPCService())
+      .WillByDefault(ReturnRef(mock_rpc_service_));
 
   resumption::Subscriber subscriber;
   app_service_app_extension_->ProcessResumption(resumption_data, subscriber);

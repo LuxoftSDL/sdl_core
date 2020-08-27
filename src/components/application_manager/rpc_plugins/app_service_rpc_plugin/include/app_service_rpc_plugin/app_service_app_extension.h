@@ -59,7 +59,8 @@ class AppServiceAppExtension : public app_mngr::AppExtension {
    * @param app application that contains this plugin
    */
   AppServiceAppExtension(AppServiceRpcPlugin& plugin,
-                         app_mngr::Application& app);
+                         app_mngr::Application& app,
+                         app_mngr::ApplicationManager* app_mngr);
   virtual ~AppServiceAppExtension();
 
   /**
@@ -119,6 +120,7 @@ class AppServiceAppExtension : public app_mngr::AppExtension {
   AppServiceSubscriptions subscribed_data_;
   AppServiceRpcPlugin& plugin_;
   app_mngr::Application& app_;
+  app_mngr::ApplicationManager* app_manager_;
 };
 }  // namespace app_service_rpc_plugin
 

@@ -76,9 +76,10 @@ class OnAppServiceDataNotificationTest
  public:
   OnAppServiceDataNotificationTest()
       : mock_app_(std::make_shared<NiceMock<MockApplication> >())
+      , mock_app_mgr_(std::make_shared<NiceMock<MockApplicationManager> >())
       , app_service_app_extension_(
             std::make_shared<app_service_rpc_plugin::AppServiceAppExtension>(
-                app_service_plugin_, *mock_app_))
+                app_service_plugin_, *mock_app_, mock_app_mgr_.get()))
       , apps_lock_(std::make_shared<sync_primitives::Lock>())
       , apps_da_(apps_, apps_lock_)
       , last_state_(std::make_shared<resumption::LastStateWrapperImpl>(
@@ -107,6 +108,7 @@ class OnAppServiceDataNotificationTest
 
  protected:
   std::shared_ptr<MockApplication> mock_app_;
+  std::shared_ptr<MockApplicationManager> mock_app_mgr_;
   std::shared_ptr<AppServiceAppExtension> app_service_app_extension_;
   app_service_rpc_plugin::AppServiceRpcPlugin app_service_plugin_;
   application_manager::ApplicationSet apps_;

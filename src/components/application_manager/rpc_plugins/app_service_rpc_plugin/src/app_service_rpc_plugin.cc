@@ -89,8 +89,8 @@ void AppServiceRpcPlugin::OnApplicationEvent(
     plugins::ApplicationEvent event,
     app_mngr::ApplicationSharedPtr application) {
   if (plugins::ApplicationEvent::kApplicationRegistered == event) {
-    application->AddExtension(
-        std::make_shared<AppServiceAppExtension>(*this, *application));
+    application->AddExtension(std::make_shared<AppServiceAppExtension>(
+        *this, *application, application_manager_));
   } else if (plugins::ApplicationEvent::kDeleteApplicationData == event) {
     DeleteSubscriptions(application);
   }

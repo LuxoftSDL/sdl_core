@@ -33,6 +33,7 @@
 #include "app_service_rpc_plugin/app_service_app_extension.h"
 #include "app_service_rpc_plugin/app_service_rpc_plugin.h"
 #include "application_manager/include/application_manager/smart_object_keys.h"
+#include "application_manager/message_helper.h"
 
 CREATE_LOGGERPTR_GLOBAL(logger_, "AppServiceRpcPlugin")
 
@@ -41,10 +42,13 @@ namespace app_service_rpc_plugin {
 const AppExtensionUID AppServiceAppExtensionUID = 455;
 
 AppServiceAppExtension::AppServiceAppExtension(
-    AppServiceRpcPlugin& plugin, application_manager::Application& app)
+    AppServiceRpcPlugin& plugin,
+    application_manager::Application& app,
+    app_mngr::ApplicationManager* app_mgr)
     : app_mngr::AppExtension(AppServiceAppExtensionUID)
     , plugin_(plugin)
-    , app_(app) {
+    , app_(app)
+    , app_manager_(app_mgr) {
   LOG4CXX_AUTO_TRACE(logger_);
 }
 
@@ -112,6 +116,18 @@ void AppServiceAppExtension::ProcessResumption(
     for (size_t i = 0; i < subscriptions_app_services.length(); ++i) {
       std::string service_type = subscriptions_app_services[i].asString();
       SubscribeToAppService(service_type);
+
+      auto gasd_subscribe = app_mngr::MessageHelper::CreateMessageForHMI(
+          hmi_apis::messageType::request,
+          app_manager_->GetNextHMICorrelationID());
+      (*gasd_subscribe)[app_mngr::strings::params]
+                       [app_mngr::strings::function_id] =
+                           hmi_apis::FunctionID::AppService_GetAppServiceData;
+      (*gasd_subscribe)[app_mngr::strings::msg_params]
+                       [app_mngr::strings::subscribe] = true;
+      (*gasd_subscribe)[app_mngr::strings::msg_params]
+                       [app_mngr::strings::service_type] = service_type;
+      app_manager_->GetRPCService().ManageHMICommand(gasd_subscribe);
     }
   }
 }
