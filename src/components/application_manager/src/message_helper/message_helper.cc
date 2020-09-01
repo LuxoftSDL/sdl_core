@@ -779,10 +779,10 @@ void MessageHelper::SendGetAppServiceData(ApplicationManager& app_mngr,
     (*message)[strings::params][strings::function_id] =
         hmi_apis::FunctionID::AppService_GetAppServiceData;
     (*message)[strings::msg_params][strings::service_type] = service_type;
-    (*message)[strings::msg_params][strings::subscribe] = true;
+    (*message)[strings::msg_params][strings::subscribe] = subscribe_value;
 
     if (!app_mngr.GetRPCService().ManageHMICommand(message)) {
-      LOG4CXX_ERROR(logger_, "Unable to send request to mobile");
+      LOG4CXX_ERROR(logger_, "Unable to send request to HMI");
     }
   } else {
     auto message = std::make_shared<smart_objects::SmartObject>();
