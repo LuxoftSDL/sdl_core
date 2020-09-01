@@ -44,6 +44,12 @@ void RCPendingResumptionHandler::on_event(
                       << " module type: " << module_uid.first
                       << " module id: " << module_uid.second);
 
+    auto app = application_manager_.application(app_id);
+    if (app) {
+      auto rc_app_extension = RCHelpers::GetRCExtension(*app);
+      rc_app_extension->SubscribeToInteriorVehicleData(module_uid);
+    }
+
     if (response[am_strings::msg_params].keyExists(
             message_params::kModuleData)) {
       const auto module_data =
@@ -62,11 +68,6 @@ void RCPendingResumptionHandler::on_event(
                       << " module type: " << module_uid.first
                       << " module id: " << module_uid.second);
 
-    auto app = application_manager_.application(app_id);
-    if (app) {
-      auto rc_app_extension = RCHelpers::GetRCExtension(*app);
-      rc_app_extension->UnsubscribeFromInteriorVehicleData(module_uid);
-    }
     ProcessNextFreezedResumption(module_uid);
   }
 }
@@ -89,7 +90,8 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
   sync_primitives::AutoLock lock(pending_resumption_lock_);
 
   auto rc_extension = RCHelpers::GetRCExtension(app);
-  auto subscriptions = rc_extension->InteriorVehicleDataSubscriptions();
+  auto subscriptions = rc_extension->PendingSubscriptions();
+  rc_extension->RemovePendingSubscriptions();
   LOG4CXX_TRACE(logger_,
                 "app id " << app.app_id() << " " << Stringify(subscriptions));
 
@@ -101,6 +103,7 @@ void RCPendingResumptionHandler::HandleResumptionSubscriptionRequest(
         IsAnotherAppsSubscribedOnTheSameModule(app.app_id(), subscription);
     bool is_pending_response = IsPendingForResponse(subscription);
     if (is_another_app_subscribed && !is_pending_response) {
+      rc_extension->SubscribeToInteriorVehicleData(subscription);
       ignored.push_back(subscription);
     } else if (is_pending_response) {
       already_pending.push_back(subscription);
