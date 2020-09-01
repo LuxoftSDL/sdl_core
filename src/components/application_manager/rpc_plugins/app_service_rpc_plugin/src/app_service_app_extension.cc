@@ -114,20 +114,27 @@ void AppServiceAppExtension::ProcessResumption(
     const smart_objects::SmartObject& subscriptions_app_services =
         subscriptions[app_mngr::hmi_interface::app_service];
     for (size_t i = 0; i < subscriptions_app_services.length(); ++i) {
+      bool any_app_subscribed = false;
       std::string service_type = subscriptions_app_services[i].asString();
-      SubscribeToAppService(service_type);
 
-      auto gasd_subscribe = app_mngr::MessageHelper::CreateMessageForHMI(
-          hmi_apis::messageType::request,
-          app_manager_->GetNextHMICorrelationID());
-      (*gasd_subscribe)[app_mngr::strings::params]
-                       [app_mngr::strings::function_id] =
-                           hmi_apis::FunctionID::AppService_GetAppServiceData;
-      (*gasd_subscribe)[app_mngr::strings::msg_params]
-                       [app_mngr::strings::subscribe] = true;
-      (*gasd_subscribe)[app_mngr::strings::msg_params]
-                       [app_mngr::strings::service_type] = service_type;
-      app_manager_->GetRPCService().ManageHMICommand(gasd_subscribe);
+      {
+        auto apps_accessor = app_manager_->applications();
+
+        for (auto& app : apps_accessor.GetData()) {
+          auto& ext = AppServiceAppExtension::ExtractASExtension(*app);
+          if (ext.IsSubscribedToAppService(service_type)) {
+            any_app_subscribed = true;
+            break;
+          }
+        }
+      }
+
+      if (!any_app_subscribed) {
+        application_manager::MessageHelper::SendGetAppServiceData(
+            *app_manager_, service_type, true);
+      }
+
+      SubscribeToAppService(service_type);
     }
   }
 }

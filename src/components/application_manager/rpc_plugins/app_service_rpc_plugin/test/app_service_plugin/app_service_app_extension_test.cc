@@ -221,12 +221,21 @@ TEST_F(AppServiceAppExtensionTest, ProcessResumption_SUCCESS) {
   ON_CALL(*mock_app_mgr_, GetRPCService())
       .WillByDefault(ReturnRef(mock_rpc_service_));
 
+  const auto app_lock = std::make_shared<sync_primitives::Lock>();
+  application_manager::ApplicationSet applications;
+  DataAccessor<application_manager::ApplicationSet> empty_app_accessor(
+      applications, app_lock);
+  ON_CALL(*mock_app_mgr_, applications())
+      .WillByDefault(Return(empty_app_accessor));
+
   resumption::Subscriber subscriber;
   app_service_app_extension_->ProcessResumption(resumption_data, subscriber);
 
   for (const auto& app_service_type : {kAppServiceType1, kAppServiceType2}) {
     EXPECT_TRUE(
         app_service_app_extension_->IsSubscribedToAppService(app_service_type));
+    EXPECT_CALL(message_helper_mock_,
+                SendGetAppServiceData(_, app_service_type, true));
   }
   EXPECT_EQ(2u, app_service_app_extension_->Subscriptions().size());
 }

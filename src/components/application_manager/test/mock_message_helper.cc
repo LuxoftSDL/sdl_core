@@ -617,6 +617,13 @@ void MessageHelper::SendDeleteChoiceSetRequest(smart_objects::SmartObject* cmd,
       cmd, application, app_mngr);
 }
 
+void MessageHelper::SendGetAppServiceData(ApplicationManager& app_mngr,
+                                          const std::string& service_type,
+                                          const bool subscribe_value) {
+  return MockMessageHelper::message_helper_mock()->SendGetAppServiceData(
+      app_mngr, service_type, subscribe_value);
+}
+
 void MessageHelper::SendResetPropertiesRequest(ApplicationSharedPtr application,
                                                ApplicationManager& app_mngr) {
   return MockMessageHelper::message_helper_mock()->SendResetPropertiesRequest(

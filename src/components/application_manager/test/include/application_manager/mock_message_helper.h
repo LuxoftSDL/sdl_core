@@ -361,6 +361,10 @@ class MockMessageHelper {
                void(smart_objects::SmartObject* cmd,
                     ApplicationSharedPtr application,
                     ApplicationManager& app_mngr));
+  MOCK_METHOD3(SendGetAppServiceData,
+               void(ApplicationManager& app_mngr,
+                    const std::string& service_type,
+                    const bool subscribe_value));
   MOCK_METHOD2(SendResetPropertiesRequest,
                void(ApplicationSharedPtr application,
                     ApplicationManager& app_mngr));

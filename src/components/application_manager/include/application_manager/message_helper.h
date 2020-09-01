@@ -1028,6 +1028,18 @@ class MessageHelper {
                                          ApplicationManager& app_mngr);
 
   /**
+   * @brief SendGetAppServiceData sends a GetAppServiceData request to an app
+   * service provider
+   * @param app_mngr Application manager
+   * @param service_type Name of the app service data type
+   * @param subscribe_value whether to subscribe or unsubscribe from
+   * notifications
+   */
+  static void SendGetAppServiceData(ApplicationManager& app_mngr,
+                                    const std::string& service_type,
+                                    const bool subscribe_value = false);
+
+  /**
    * @brief SendResetPropertiesRequest sends requests to HMI to remove/reset
    * global properties for application
    * @param application Application to remove/reset global properties for

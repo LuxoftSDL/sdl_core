@@ -47,6 +47,7 @@
 #include <string>
 #include <utility>
 
+#include "application_manager/app_service_manager.h"
 #include "application_manager/application.h"
 #include "application_manager/application_manager.h"
 #include "application_manager/commands/command_impl.h"
@@ -758,6 +759,54 @@ void MessageHelper::SendDeleteChoiceSetRequest(smart_objects::SmartObject* cmd,
     object[strings::msg_params] = msg_params;
 
     app_mngr.GetRPCService().ManageHMICommand(message);
+  }
+}
+
+void MessageHelper::SendGetAppServiceData(ApplicationManager& app_mngr,
+                                          const std::string& service_type,
+                                          const bool subscribe_value) {
+  LOG4CXX_AUTO_TRACE(logger_);
+
+  bool hmi_destination = false;
+  ApplicationSharedPtr app_service_provider_app;
+  app_mngr.GetAppServiceManager().GetProviderByType(
+      service_type, true, app_service_provider_app, hmi_destination);
+
+  if (hmi_destination) {
+    auto message = CreateMessageForHMI(hmi_apis::messageType::request,
+                                       app_mngr.GetNextHMICorrelationID());
+
+    (*message)[strings::params][strings::function_id] =
+        hmi_apis::FunctionID::AppService_GetAppServiceData;
+    (*message)[strings::msg_params][strings::service_type] = service_type;
+    (*message)[strings::msg_params][strings::subscribe] = true;
+
+    if (!app_mngr.GetRPCService().ManageHMICommand(message)) {
+      LOG4CXX_ERROR(logger_, "Unable to send request to mobile");
+    }
+  } else {
+    auto message = std::make_shared<smart_objects::SmartObject>();
+
+    (*message)[strings::params][strings::message_type] =
+        application_manager::MessageType::kRequest;
+    (*message)[strings::params][strings::function_id] =
+        mobile_apis::FunctionID::GetAppServiceDataID;
+    (*message)[strings::params][strings::correlation_id] =
+        app_mngr.GetNextMobileCorrelationID();
+    (*message)[strings::params][strings::protocol_version] =
+        app_service_provider_app->protocol_version();
+    (*message)[strings::params][strings::protocol_type] =
+        commands::CommandImpl::mobile_protocol_type_;
+    (*message)[strings::params][strings::connection_key] =
+        app_service_provider_app->app_id();
+
+    (*message)[strings::msg_params][strings::service_type] = service_type;
+    (*message)[strings::msg_params][strings::subscribe] = subscribe_value;
+
+    if (!app_mngr.GetRPCService().ManageMobileCommand(
+            message, commands::Command::SOURCE_SDL)) {
+      LOG4CXX_ERROR(logger_, "Unable to send request to mobile");
+    }
   }
 }
 
