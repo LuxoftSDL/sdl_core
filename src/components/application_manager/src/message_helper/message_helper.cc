@@ -784,6 +784,8 @@ void MessageHelper::SendGetAppServiceData(ApplicationManager& app_mngr,
     if (!app_mngr.GetRPCService().ManageHMICommand(message)) {
       LOG4CXX_ERROR(logger_, "Unable to send request to HMI");
     }
+  } else if (!app_service_provider_app) {
+    LOG4CXX_DEBUG(logger_, "No app service found of type " << service_type);
   } else {
     auto message = std::make_shared<smart_objects::SmartObject>();
 
