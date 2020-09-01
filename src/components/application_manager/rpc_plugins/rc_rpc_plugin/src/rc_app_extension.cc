@@ -231,7 +231,7 @@ bool RCAppExtension::AddPendingSubscription(const ModuleUid& module) {
 }
 
 void RCAppExtension::RemovePendingSubscription(const ModuleUid& module) {
-  subscribed_interior_vehicle_data_.erase(module);
+  pending_subscriptions_.erase(module);
 }
 
 void RCAppExtension::RemovePendingSubscriptions() {
