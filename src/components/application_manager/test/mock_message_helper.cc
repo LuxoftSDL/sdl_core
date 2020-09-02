@@ -33,6 +33,7 @@
 #include "application_manager/mock_message_helper.h"
 #include "application_manager/message_helper.h"
 #include "application_manager/policies/policy_handler_interface.h"
+#include "application_manager/resumption/resumption_data_processor.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "transport_manager/common.h"
@@ -617,11 +618,13 @@ void MessageHelper::SendDeleteChoiceSetRequest(smart_objects::SmartObject* cmd,
       cmd, application, app_mngr);
 }
 
-void MessageHelper::SendGetAppServiceData(ApplicationManager& app_mngr,
-                                          const std::string& service_type,
-                                          const bool subscribe_value) {
+void MessageHelper::SendGetAppServiceData(
+    ApplicationManager& app_mngr,
+    const std::string& service_type,
+    const bool subscribe_value,
+    resumption::ResumptionRequest& subscribe_app_data) {
   return MockMessageHelper::message_helper_mock()->SendGetAppServiceData(
-      app_mngr, service_type, subscribe_value);
+      app_mngr, service_type, subscribe_value, subscribe_app_data);
 }
 
 void MessageHelper::SendResetPropertiesRequest(ApplicationSharedPtr application,

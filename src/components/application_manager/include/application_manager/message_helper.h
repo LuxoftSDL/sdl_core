@@ -1034,10 +1034,13 @@ class MessageHelper {
    * @param service_type Name of the app service data type
    * @param subscribe_value whether to subscribe or unsubscribe from
    * notifications
+   * @param out_request Resumption request sent out so that the response can be
+   * tracked
    */
   static void SendGetAppServiceData(ApplicationManager& app_mngr,
                                     const std::string& service_type,
-                                    const bool subscribe_value = false);
+                                    const bool subscribe_value,
+                                    resumption::ResumptionRequest& out_request);
 
   /**
    * @brief SendResetPropertiesRequest sends requests to HMI to remove/reset

@@ -91,7 +91,8 @@ void AppServiceRpcPlugin::OnApplicationEvent(
   if (plugins::ApplicationEvent::kApplicationRegistered == event) {
     application->AddExtension(std::make_shared<AppServiceAppExtension>(
         *this, *application, application_manager_));
-  } else if (plugins::ApplicationEvent::kDeleteApplicationData == event) {
+  } else if (plugins::ApplicationEvent::kDeleteApplicationData == event ||
+             plugins::ApplicationEvent::kApplicationUnregistered == event) {
     DeleteSubscriptions(application);
   }
 }
@@ -99,10 +100,7 @@ void AppServiceRpcPlugin::OnApplicationEvent(
 void AppServiceRpcPlugin::DeleteSubscriptions(
     application_manager::ApplicationSharedPtr app) {
   auto& ext = AppServiceAppExtension::ExtractASExtension(*app);
-  auto subscriptions = ext.Subscriptions();
-  for (auto& service_type : subscriptions) {
-    ext.UnsubscribeFromAppService(service_type);
-  }
+  ext.UnsubscribeFromAppService();
 }
 
 }  // namespace app_service_rpc_plugin

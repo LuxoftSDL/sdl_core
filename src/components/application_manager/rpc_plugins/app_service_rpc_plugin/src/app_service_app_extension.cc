@@ -34,6 +34,7 @@
 #include "app_service_rpc_plugin/app_service_rpc_plugin.h"
 #include "application_manager/include/application_manager/smart_object_keys.h"
 #include "application_manager/message_helper.h"
+#include "application_manager/resumption/resumption_data_processor.h"
 
 CREATE_LOGGERPTR_GLOBAL(logger_, "AppServiceRpcPlugin")
 
@@ -65,16 +66,33 @@ bool AppServiceAppExtension::SubscribeToAppService(
 bool AppServiceAppExtension::UnsubscribeFromAppService(
     const std::string app_service_type) {
   LOG4CXX_DEBUG(logger_, app_service_type);
-  auto it = subscribed_data_.find(app_service_type);
-  if (it != subscribed_data_.end()) {
-    subscribed_data_.erase(it);
-    return true;
-  }
-  return false;
+  return subscribed_data_.erase(app_service_type);
 }
 
 void AppServiceAppExtension::UnsubscribeFromAppService() {
   LOG4CXX_AUTO_TRACE(logger_);
+
+  for (auto service_type : subscribed_data_) {
+    bool any_app_subscribed = false;
+    {
+      auto apps_accessor = app_manager_->applications();
+
+      for (auto& app : apps_accessor.GetData()) {
+        auto& ext = AppServiceAppExtension::ExtractASExtension(*app);
+        if (ext.IsSubscribedToAppService(service_type)) {
+          any_app_subscribed = true;
+          break;
+        }
+      }
+    }
+
+    if (!any_app_subscribed) {
+      resumption::ResumptionRequest resumption_request;
+      application_manager::MessageHelper::SendGetAppServiceData(
+          *app_manager_, service_type, false, resumption_request);
+    }
+  }
+
   subscribed_data_.clear();
 }
 
@@ -130,8 +148,13 @@ void AppServiceAppExtension::ProcessResumption(
       }
 
       if (!any_app_subscribed) {
+        resumption::ResumptionRequest subscribe_app_data;
         application_manager::MessageHelper::SendGetAppServiceData(
-            *app_manager_, service_type, true);
+            *app_manager_, service_type, true, subscribe_app_data);
+
+        // for now don't track response, could be request to mobile
+        // also no guarantee providers resume before consumers yet
+        // subscriber(app_.app_id(), subscribe_app_data);
       }
 
       SubscribeToAppService(service_type);

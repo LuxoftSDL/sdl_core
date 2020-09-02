@@ -37,6 +37,7 @@
 #include "application_manager/mock_application_manager.h"
 #include "application_manager/mock_message_helper.h"
 #include "application_manager/mock_rpc_service.h"
+#include "application_manager/resumption/resumption_data_processor.h"
 #include "gtest/gtest.h"
 
 namespace {
@@ -134,6 +135,13 @@ TEST_F(
   ASSERT_TRUE(
       app_service_app_extension_->IsSubscribedToAppService(kAppServiceType2));
 
+  const auto app_lock = std::make_shared<sync_primitives::Lock>();
+  application_manager::ApplicationSet applications;
+  DataAccessor<application_manager::ApplicationSet> empty_app_accessor(
+      applications, app_lock);
+  ON_CALL(*mock_app_mgr_, applications())
+      .WillByDefault(Return(empty_app_accessor));
+
   // Unsubscribe
   EXPECT_TRUE(
       app_service_app_extension_->UnsubscribeFromAppService(kAppServiceType1));
@@ -169,8 +177,18 @@ TEST_F(AppServiceAppExtensionTest,
         app_service_app_extension_->SubscribeToAppService(app_service_type));
     ASSERT_TRUE(
         app_service_app_extension_->IsSubscribedToAppService(app_service_type));
+
+    EXPECT_CALL(message_helper_mock_,
+                SendGetAppServiceData(_, app_service_type, false, _));
   }
   ASSERT_EQ(2u, app_service_app_extension_->Subscriptions().size());
+
+  const auto app_lock = std::make_shared<sync_primitives::Lock>();
+  application_manager::ApplicationSet applications;
+  DataAccessor<application_manager::ApplicationSet> empty_app_accessor(
+      applications, app_lock);
+  ON_CALL(*mock_app_mgr_, applications())
+      .WillByDefault(Return(empty_app_accessor));
 
   app_service_app_extension_->UnsubscribeFromAppService();
 
@@ -228,16 +246,26 @@ TEST_F(AppServiceAppExtensionTest, ProcessResumption_SUCCESS) {
   ON_CALL(*mock_app_mgr_, applications())
       .WillByDefault(Return(empty_app_accessor));
 
-  resumption::Subscriber subscriber;
-  app_service_app_extension_->ProcessResumption(resumption_data, subscriber);
+  for (const auto& app_service_type : {kAppServiceType1, kAppServiceType2}) {
+    EXPECT_CALL(message_helper_mock_,
+                SendGetAppServiceData(_, app_service_type, true, _));
+  }
+  uint32_t* subscribed_calls = new uint32_t{0u};
+  app_service_app_extension_->ProcessResumption(
+      resumption_data,
+      [subscribed_calls](const int32_t app_id,
+                         const resumption::ResumptionRequest request) {
+        ++*subscribed_calls;
+      });
 
   for (const auto& app_service_type : {kAppServiceType1, kAppServiceType2}) {
     EXPECT_TRUE(
         app_service_app_extension_->IsSubscribedToAppService(app_service_type));
-    EXPECT_CALL(message_helper_mock_,
-                SendGetAppServiceData(_, app_service_type, true));
   }
   EXPECT_EQ(2u, app_service_app_extension_->Subscriptions().size());
+  // for now subscriber is not called, no logic to track request to mobile
+  // EXPECT_EQ(*subscribed_calls,
+  // app_service_app_extension_->Subscriptions().size());
 }
 
 }  // namespace app_service_plugin_test

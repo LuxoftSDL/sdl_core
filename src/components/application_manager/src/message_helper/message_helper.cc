@@ -54,6 +54,7 @@
 #include "application_manager/message_helper.h"
 #include "application_manager/policies/policy_handler_interface.h"
 #include "application_manager/resumption/resume_ctrl.h"
+#include "application_manager/resumption/resumption_data_processor.h"
 #include "application_manager/rpc_service.h"
 #include "connection_handler/connection_handler_impl.h"
 #include "interfaces/MOBILE_API.h"
@@ -762,9 +763,11 @@ void MessageHelper::SendDeleteChoiceSetRequest(smart_objects::SmartObject* cmd,
   }
 }
 
-void MessageHelper::SendGetAppServiceData(ApplicationManager& app_mngr,
-                                          const std::string& service_type,
-                                          const bool subscribe_value) {
+void MessageHelper::SendGetAppServiceData(
+    ApplicationManager& app_mngr,
+    const std::string& service_type,
+    const bool subscribe_value,
+    resumption::ResumptionRequest& out_request) {
   LOG4CXX_AUTO_TRACE(logger_);
 
   bool hmi_destination = false;
@@ -780,6 +783,8 @@ void MessageHelper::SendGetAppServiceData(ApplicationManager& app_mngr,
         hmi_apis::FunctionID::AppService_GetAppServiceData;
     (*message)[strings::msg_params][strings::service_type] = service_type;
     (*message)[strings::msg_params][strings::subscribe] = subscribe_value;
+
+    out_request.message = *message;
 
     if (!app_mngr.GetRPCService().ManageHMICommand(message)) {
       LOG4CXX_ERROR(logger_, "Unable to send request to HMI");
@@ -805,11 +810,19 @@ void MessageHelper::SendGetAppServiceData(ApplicationManager& app_mngr,
     (*message)[strings::msg_params][strings::service_type] = service_type;
     (*message)[strings::msg_params][strings::subscribe] = subscribe_value;
 
+    out_request.message = *message;
+
     if (!app_mngr.GetRPCService().ManageMobileCommand(
             message, commands::Command::SOURCE_SDL)) {
       LOG4CXX_ERROR(logger_, "Unable to send request to mobile");
     }
   }
+
+  // should we be able to track mobile requests as well??
+  out_request.request_id.function_id =
+      hmi_apis::FunctionID::AppService_GetAppServiceData;
+  out_request.request_id.correlation_id =
+      out_request.message[strings::params][strings::correlation_id].asInt();
 }
 
 void MessageHelper::SendResetPropertiesRequest(ApplicationSharedPtr application,
