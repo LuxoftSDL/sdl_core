@@ -267,27 +267,43 @@ void VehicleInfoPendingResumptionHandler::HandleResumptionSubscriptionRequest(
     application_manager::AppExtension& extension,
     application_manager::Application& app) {
   SDL_LOG_AUTO_TRACE();
+  using namespace application_manager;
+
   sync_primitives::AutoLock lock(pending_resumption_lock_);
   SDL_LOG_TRACE("app id " << app.app_id());
   auto& ext = dynamic_cast<VehicleInfoAppExtension&>(extension);
 
   auto subscriptions = ext.PendingSubscriptions().GetData();
+  SDL_LOG_TRACE("resume subscriptions to : " << Stringify(subscriptions));
+  auto pending_request = SubscribeToFakeRequest(app.app_id(), subscriptions);
+  VehicleDataList already_subscribed_ivi;
+
   for (auto ivi = subscriptions.begin(); ivi != subscriptions.end();) {
     if (IsSubscribedAppExist(*ivi, application_manager_)) {
       ext.RemovePendingSubscription(*ivi);
       ext.subscribeToVehicleInfo(*ivi);
+      already_subscribed_ivi.insert(*ivi);
       subscriptions.erase(ivi++);
     } else {
       ++ivi;
     }
   }
 
+  if (!already_subscribed_ivi.empty()) {
+    pending_request.FillRestoredData(already_subscribed_ivi);
+    pending_request.FillSubscriptionResults();
+    auto fake_response = CreateFakeResponseFromHMI(
+        pending_request.subscription_results_, pending_request.fake_corr_id_);
+    event_engine::Event event(VehicleInfo_SubscribeVehicleData);
+    event.set_smart_object(fake_response);
+    SDL_LOG_DEBUG("Raise fake response for resumption data processor");
+    event.raise(application_manager_.event_dispatcher());
+  }
+
   if (subscriptions.empty()) {
     SDL_LOG_DEBUG("Subscriptions is empty");
     return;
   }
-  SDL_LOG_TRACE("resume subscriptions to : " << Stringify(subscriptions));
-  auto pending_request = SubscribeToFakeRequest(app.app_id(), subscriptions);
 
   pending_requests_.push_back(pending_request);
   SDL_LOG_DEBUG(
