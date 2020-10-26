@@ -415,6 +415,9 @@ class ApplicationManagerImpl
    * @brief Closes all registered applications
    */
   void UnregisterAllApplications();
+
+  void ActivatePostponedApp(uint32_t app_id, uint32_t corr_id) OVERRIDE;
+
   bool ActivateApplication(ApplicationSharedPtr app) OVERRIDE;
 
   /**

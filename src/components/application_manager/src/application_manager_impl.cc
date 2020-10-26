@@ -286,6 +286,12 @@ ApplicationManagerImpl::reregister_applications() const {
   return accessor;
 }
 
+void ApplicationManagerImpl::ActivatePostponedApp(uint32_t app_id,
+                                                  uint32_t corr_id) {
+  SDL_LOG_AUTO_TRACE();
+  policy_handler_->OnActivateApp(app_id, corr_id);
+}
+
 ApplicationSharedPtr ApplicationManagerImpl::application(
     uint32_t app_id) const {
   AppIdPredicate finder(app_id);
