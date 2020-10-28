@@ -46,18 +46,15 @@ void PostponedActivationController::AddAppToActivate(uint32_t app_id,
   app_to_activate_.insert(std::pair<uint32_t, uint32_t>(app_id, corr_id));
 }
 
-bool PostponedActivationController::IsAppWaitingForActivation(
-    uint32_t app_id) const {
-  SDL_LOG_AUTO_TRACE();
-  sync_primitives::AutoLock lock(activate_app_list_lock_ptr_);
-  return app_to_activate_.find(app_id) != app_to_activate_.end();
-}
-
 uint32_t PostponedActivationController::GetPendingActivationCorrId(
     uint32_t app_id) const {
   SDL_LOG_AUTO_TRACE();
   sync_primitives::AutoLock lock(activate_app_list_lock_ptr_);
-  return app_to_activate_.find(app_id)->second;
+  auto it = app_to_activate_.find(app_id);
+  if (app_to_activate_.end() == it) {
+    return 0;
+  }
+  return it->second;
 }
 
 void PostponedActivationController::RemoveAppToActivate(uint32_t app_id) {

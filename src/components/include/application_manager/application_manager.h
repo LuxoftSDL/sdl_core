@@ -822,13 +822,6 @@ class ApplicationManager {
    */
   virtual void OnAppUnauthorized(const uint32_t& app_id) = 0;
 
-  /**
-   * @brief ActivatePostponedApp starts postponed activation
-   * @param app application to activate
-   * @param corr_id correlation_id of the SDLActivateApp request
-   */
-  virtual void ActivatePostponedApp(uint32_t app_id, uint32_t corr_id) = 0;
-
   virtual bool ActivateApplication(ApplicationSharedPtr app) = 0;
 
   /**

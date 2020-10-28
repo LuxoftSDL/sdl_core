@@ -957,14 +957,14 @@ void StateControllerImpl::OnStateChanged(ApplicationSharedPtr app,
 
   if (new_state->hmi_level() == mobile_apis::HMILevel::HMI_NONE) {
     app->ResetDataInNone();
-    if (mobile_apis::HMILevel::INVALID_ENUM == old_state->hmi_level() &&
-        postponed_activation_controller_.IsAppWaitingForActivation(
-            app->app_id())) {
+    if (mobile_apis::HMILevel::INVALID_ENUM == old_state->hmi_level()) {
       const uint32_t app_id = app->app_id();
       const uint32_t corr_id =
           postponed_activation_controller_.GetPendingActivationCorrId(app_id);
-      app_mngr_.ActivatePostponedApp(app_id, corr_id);
-      postponed_activation_controller_.RemoveAppToActivate(app_id);
+      if (corr_id > 0) {
+        app_mngr_.GetPolicyHandler().OnActivateApp(app_id, corr_id);
+        postponed_activation_controller_.RemoveAppToActivate(app_id);
+      }
     }
   }
 

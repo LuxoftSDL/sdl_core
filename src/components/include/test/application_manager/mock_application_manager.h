@@ -310,7 +310,6 @@ class MockApplicationManager : public application_manager::ApplicationManager {
   MOCK_CONST_METHOD1(GetUserConsentForDevice,
                      policy::DeviceConsent(const std::string& device_id));
   MOCK_METHOD1(OnAppUnauthorized, void(const uint32_t& app_id));
-  MOCK_METHOD2(ActivatePostponedApp, void(uint32_t app_id, uint32_t corr_id));
   MOCK_METHOD1(ActivateApplication,
                bool(application_manager::ApplicationSharedPtr app));
   MOCK_METHOD3(

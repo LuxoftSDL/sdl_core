@@ -39,7 +39,7 @@ namespace application_manager {
 
 /**
  * @brief AppToActivateSet is a map of application ids expected to be
- * activated after the registration is completed (NONE hmi level is assigned)
+ * activated after the registration is completed (default hmi level is assigned)
  * and correlation_ids of the SDLActivateApp requests
  */
 typedef std::map<uint32_t, uint32_t> AppToActivate;
@@ -54,14 +54,6 @@ class PostponedActivationController {
    * @param corr_id correlation_id of the SDLActivateApp request
    */
   void AddAppToActivate(uint32_t app_id, uint32_t corr_id);
-
-  /**
-   * @brief IsAppWaitingForActivation checks if app_id is present
-   * in the app_to_activate_ map
-   * @param app_id application id
-   * @return true if yes, otherwise - false
-   */
-  bool IsAppWaitingForActivation(uint32_t app_id) const;
 
   /**
    * @brief GetPendingActivationCorrId gets the pending
