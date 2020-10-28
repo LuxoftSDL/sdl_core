@@ -59,7 +59,6 @@ ThreadedSocketConnection::ThreadedSocketConnection(
     , frames_to_send_mutex_()
     , socket_(-1)
     , terminate_flag_(false)
-    , unexpected_disconnect_(false)
     , device_uid_(device_id)
     , app_handle_(app_handle)
     , thread_(nullptr) {
@@ -92,7 +91,6 @@ void ThreadedSocketConnection::StopAndJoinThread() {
 
 void ThreadedSocketConnection::Abort() {
   SDL_LOG_AUTO_TRACE();
-  unexpected_disconnect_ = true;
   terminate_flag_ = true;
 }
 
@@ -125,15 +123,9 @@ TransportAdapter::Error ThreadedSocketConnection::Start() {
 
 void ThreadedSocketConnection::Finalize() {
   SDL_LOG_AUTO_TRACE();
-  if (unexpected_disconnect_) {
-    SDL_LOG_DEBUG("unexpected_disconnect");
-    controller_->ConnectionAborted(
-        device_handle(), application_handle(), CommunicationError());
-  } else {
-    SDL_LOG_DEBUG("not unexpected_disconnect");
-    controller_->ConnectionFinished(device_handle(), application_handle());
-  }
 
+  controller_->ConnectionAborted(
+      device_handle(), application_handle(), CommunicationError());
   ShutdownAndCloseSocket();
 }
 

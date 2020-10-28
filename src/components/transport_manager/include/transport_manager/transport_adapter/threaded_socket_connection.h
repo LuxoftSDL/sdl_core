@@ -205,7 +205,6 @@ class ThreadedSocketConnection : public Connection {
 
   std::atomic_int socket_;
   bool terminate_flag_;
-  bool unexpected_disconnect_;
   const DeviceUID device_uid_;
   const ApplicationHandle app_handle_;
   threads::Thread* thread_;
