@@ -85,6 +85,8 @@ class RegisterAppInterfaceRequest
 
   uint32_t default_timeout() const FINAL;
 
+  void on_event(const app_mngr::event_engine::Event& event);
+
  private:
   /**
    * @brief The AppicationType enum defines whether application is newly
@@ -96,6 +98,7 @@ class RegisterAppInterfaceRequest
     kSwitchedApplicationWrongHashId
   };
 
+  void ContinueRegistration();
   /**
    * @brief Prepares and sends RegisterAppInterface response to mobile
    * considering application type

@@ -4133,6 +4133,16 @@ bool ApplicationManagerImpl::IsHMICooperating() const {
 
 void ApplicationManagerImpl::SetHMICooperating(const bool hmi_cooperating) {
   hmi_cooperating_ = hmi_cooperating;
+  if (hmi_cooperating) {
+    SDL_LOG_DEBUG("Fake OnReady notification is risen");
+    event_engine::Event event(hmi_apis::FunctionID::BasicCommunication_OnReady);
+    auto fake_response = MessageHelper::CreateResponseMessageFromHmi(
+        hmi_apis::FunctionID::BasicCommunication_OnReady,
+        0,
+        hmi_apis::Common_Result::SUCCESS);
+    event.set_smart_object(*fake_response);
+    event.raise(event_dispatcher_);
+  }
 }
 
 void ApplicationManagerImpl::OnApplicationListUpdateTimer() {

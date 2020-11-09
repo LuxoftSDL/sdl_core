@@ -60,18 +60,11 @@ UpdateDeviceListRequest::~UpdateDeviceListRequest() {}
 
 void UpdateDeviceListRequest::Run() {
   SDL_LOG_AUTO_TRACE();
-  sync_primitives::AutoLock auto_lock(wait_hmi_lock);
-  // Fix problem with SDL and HMI HTML. This problem is not actual for HMI PASA.
-  // Flag conditional compilation for specific customer is used in order to
-  // exclude
-  // hit code to RTC
-  if (true == application_manager_.get_settings().launch_hmi()) {
-    if (!application_manager_.IsHMICooperating()) {
-      SDL_LOG_INFO("Wait for HMI Cooperation");
-      subscribe_on_event(hmi_apis::FunctionID::BasicCommunication_OnReady);
-      termination_condition_.Wait(auto_lock);
-      SDL_LOG_DEBUG("HMI Cooperation OK");
-    }
+
+  if (!application_manager_.IsHMICooperating()) {
+    SDL_LOG_INFO("Wait for HMI Cooperation");
+    subscribe_on_event(hmi_apis::FunctionID::BasicCommunication_OnReady);
+    return;
   }
 
   SendRequest();
@@ -79,12 +72,12 @@ void UpdateDeviceListRequest::Run() {
 
 void UpdateDeviceListRequest::on_event(const event_engine::Event& event) {
   SDL_LOG_AUTO_TRACE();
-  sync_primitives::AutoLock auto_lock(wait_hmi_lock);
+
   switch (event.id()) {
     case hmi_apis::FunctionID::BasicCommunication_OnReady: {
       SDL_LOG_INFO("received OnReady");
       unsubscribe_from_event(hmi_apis::FunctionID::BasicCommunication_OnReady);
-      termination_condition_.Broadcast();
+      SendRequest();
       break;
     };
     default: {
@@ -92,12 +85,6 @@ void UpdateDeviceListRequest::on_event(const event_engine::Event& event) {
       break;
     };
   }
-}
-
-bool UpdateDeviceListRequest::CleanUp() {
-  sync_primitives::AutoLock auto_lock(wait_hmi_lock);
-  termination_condition_.Broadcast();
-  return true;
 }
 
 }  // namespace commands

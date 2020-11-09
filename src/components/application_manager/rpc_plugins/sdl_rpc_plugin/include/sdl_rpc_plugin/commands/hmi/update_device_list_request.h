@@ -35,8 +35,6 @@
 
 #include "application_manager/commands/request_to_hmi.h"
 #include "application_manager/event_engine/event_observer.h"
-#include "utils/conditional_variable.h"
-#include "utils/lock.h"
 
 namespace sdl_rpc_plugin {
 namespace app_mngr = application_manager;
@@ -77,15 +75,6 @@ class UpdateDeviceListRequest : public app_mngr::commands::RequestToHMI,
    * @param event The received event
    */
   virtual void on_event(const app_mngr::event_engine::Event& event);
-
-  /**
-   * @brief Need to stop execution StopMethod if HMI did not started
-   */
-  virtual bool CleanUp();
-
- private:
-  sync_primitives::Lock wait_hmi_lock;
-  sync_primitives::ConditionalVariable termination_condition_;
 
   DISALLOW_COPY_AND_ASSIGN(UpdateDeviceListRequest);
 };

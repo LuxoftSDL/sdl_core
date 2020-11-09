@@ -484,11 +484,40 @@ void FinishSendingResponseToMobile(const smart_objects::SmartObject& msg_params,
 }
 
 void RegisterAppInterfaceRequest::Run() {
-  using namespace helpers;
   SDL_LOG_AUTO_TRACE();
-  SDL_LOG_DEBUG("Connection key is " << connection_key());
 
-  WaitForHMIIsReady();
+  if (!application_manager_.IsStopping() &&
+      !application_manager_.IsHMICooperating()) {
+    SDL_LOG_DEBUG("Waiting for the HMI... conn_key="
+                  << connection_key() << ", correlation_id=" << correlation_id()
+                  << ", default_timeout=" << default_timeout()
+                  << ", thread=" << pthread_self());
+    subscribe_on_event(hmi_apis::FunctionID::BasicCommunication_OnReady);
+    return;
+  }
+  ContinueRegistration();
+}
+
+void RegisterAppInterfaceRequest::on_event(const event_engine::Event& event) {
+  SDL_LOG_AUTO_TRACE();
+
+  switch (event.id()) {
+    case hmi_apis::FunctionID::BasicCommunication_OnReady: {
+      SDL_LOG_INFO("received OnReady");
+      unsubscribe_from_event(hmi_apis::FunctionID::BasicCommunication_OnReady);
+      ContinueRegistration();
+      break;
+    };
+    default: {
+      SDL_LOG_ERROR("Unknown event " << event.id());
+      break;
+    };
+  }
+}
+
+void RegisterAppInterfaceRequest::ContinueRegistration() {
+  SDL_LOG_AUTO_TRACE();
+  using namespace helpers;
 
   if (application_manager_.IsStopping()) {
     SDL_LOG_WARN("The ApplicationManager is stopping!");
