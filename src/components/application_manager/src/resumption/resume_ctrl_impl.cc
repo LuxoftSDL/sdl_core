@@ -30,27 +30,25 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "application_manager/resumption/resume_ctrl_impl.h"
-#include "application_manager/display_capabilities_builder.h"
 
 #include <algorithm>
 #include <fstream>
 
 #include "application_manager/application_manager.h"
-#include "application_manager/rpc_service.h"
-
 #include "application_manager/commands/command_impl.h"
+#include "application_manager/display_capabilities_builder.h"
 #include "application_manager/message_helper.h"
 #include "application_manager/policies/policy_handler.h"
 #include "application_manager/resumption/resumption_data_db.h"
 #include "application_manager/resumption/resumption_data_json.h"
 #include "application_manager/resumption/resumption_data_processor_impl.h"
+#include "application_manager/rpc_service.h"
 #include "application_manager/state_controller.h"
 #include "connection_handler/connection.h"
 #include "connection_handler/connection_handler_impl.h"
 #include "policy/policy_manager_impl.h"
 #include "utils/file_system.h"
 #include "utils/helpers.h"
-
 #include "utils/timer_task_impl.h"
 
 namespace resumption {

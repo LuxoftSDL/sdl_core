@@ -131,7 +131,7 @@ class CommandImpl : public Command {
    * has exceed it's limit
    *
    */
-  void onTimeOut() OVERRIDE;
+  void HandleTimeOut() OVERRIDE;
 
   /**
    * @brief AllowedToTerminate tells request Controller if it can terminate this
@@ -148,6 +148,8 @@ class CommandImpl : public Command {
    * If true, request controller will terminate request on response
    */
   void SetAllowedToTerminate(const bool allowed) OVERRIDE;
+
+  void OnUpdateTimeOut() OVERRIDE;
 
   /**
    * @brief Calculates command`s internal consecutive number
@@ -192,14 +194,14 @@ class CommandImpl : public Command {
    * @param message Message to replace its ids
    * @return True if replacement succeeded, otherwise - false
    */
-  bool ReplaceMobileWithHMIAppId(smart_objects::SmartObject& message);
+  virtual bool ReplaceMobileWithHMIAppId(smart_objects::SmartObject& message);
 
   /**
    * @brief Parses message from HMI and replaces HMI app id with mobile app id
    * @param message Message to replace its ids
    * @return True if replacement succeeded, otherwise - false
    */
-  bool ReplaceHMIWithMobileAppId(smart_objects::SmartObject& message);
+  virtual bool ReplaceHMIWithMobileAppId(smart_objects::SmartObject& message);
 
   MessageSharedPtr message_;
   uint32_t default_timeout_;
