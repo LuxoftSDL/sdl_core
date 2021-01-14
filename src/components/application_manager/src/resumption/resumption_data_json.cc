@@ -107,6 +107,9 @@ void ResumptionDataJson::SaveApplication(
   json_app[strings::windows_info] = tmp;
   json_app[strings::time_stamp] = time_stamp;
   json_app[strings::subscribed_for_way_points] = is_subscribed_for_way_points;
+  formatters::CFormatterJsonBase::objToJsonValue(
+    application->get_user_location(), tmp);
+  json_app[strings::user_location] = tmp;
 
   accessor.GetMutableData().set_dictionary(dictionary);
   SDL_LOG_DEBUG("SaveApplication : " << json_app.toStyledString());

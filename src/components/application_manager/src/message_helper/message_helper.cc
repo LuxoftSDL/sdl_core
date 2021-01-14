@@ -1310,6 +1310,29 @@ MessageHelper::CreateGlobalPropertiesRequestsToHMI(
 
     requests.push_back(tts_global_properties);
   }
+
+  // RC global properties
+  {
+    smart_objects::SmartObjectSPtr rc_global_properties =
+    CreateMessageForHMI(hmi_apis::messageType::request, app_mngr.GetNextHMICorrelationID());
+    if (!rc_global_properties) {
+      return requests;
+    }
+
+    (*rc_global_properties)[strings::params][strings::function_id] =
+        static_cast<int>(hmi_apis::FunctionID::RC_SetGlobalProperties);
+
+    smart_objects::SmartObject rc_msg_params =
+        smart_objects::SmartObject(smart_objects::SmartType_Map);
+      
+    rc_msg_params[strings::user_location] = (app->get_user_location());
+    rc_msg_params[strings::app_id] = app->app_id();
+
+    (*rc_global_properties)[strings::msg_params] = rc_msg_params;
+
+    requests.push_back(rc_global_properties);
+  }
+
   return requests;
 }
 
