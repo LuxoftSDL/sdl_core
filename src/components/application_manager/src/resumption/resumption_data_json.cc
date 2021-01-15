@@ -560,6 +560,7 @@ bool ResumptionDataJson::DropAppDataResumption(const std::string& device_id,
   application[strings::application_global_properties].clear();
   application[strings::application_subscriptions].clear();
   application[strings::application_files].clear();
+  application[strings::user_location].clear();
   application.removeMember(strings::grammar_id);
   accessor.GetMutableData().set_dictionary(dictionary);
   SDL_LOG_DEBUG("Resumption data for application "
