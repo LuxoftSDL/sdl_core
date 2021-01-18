@@ -37,11 +37,11 @@
 #include "application_manager/message_helper.h"
 #include "application_manager/resumption/resumption_data_db.h"
 #include "application_manager/resumption/resumption_sql_queries.h"
+#include "application_manager/rpc_plugins/rc_rpc_plugin/include/rc_rpc_plugin/rc_module_constants.h"
 #include "application_manager/smart_object_keys.h"
 #include "utils/gen_hash.h"
 #include "utils/helpers.h"
 #include "utils/scope_guard.h"
-#include "application_manager/rpc_plugins/rc_rpc_plugin/include/rc_rpc_plugin/rc_module_constants.h"
 
 namespace {
 const std::string kDatabaseName = "resumption";
@@ -1017,9 +1017,9 @@ bool ResumptionDataDB::SelectSubscriptionsData(
 }
 
 bool ResumptionDataDB::SelectUserLocationData(
-  const std::string& policy_app_id,
-  const std::string& device_id,
-  smart_objects::SmartObject& saved_app) const {
+    const std::string& policy_app_id,
+    const std::string& device_id,
+    smart_objects::SmartObject& saved_app) const {
   SDL_LOG_AUTO_TRACE();
   using namespace app_mngr;
   using namespace smart_objects;
@@ -1055,19 +1055,18 @@ bool ResumptionDataDB::SelectUserLocationData(
      field "row"        from table "applicationUserLocation" = 4
      field "rowspan"    from table "applicationUserLocation" = 5*/
   smart_objects::SmartObject grid =
-    smart_objects::SmartObject(smart_objects::SmartType_Map);
+      smart_objects::SmartObject(smart_objects::SmartType_Map);
   grid[rc_rpc_plugin::strings::kCol] = select_user_location.GetInteger(0);
   grid[rc_rpc_plugin::strings::kColspan] = select_user_location.GetInteger(1);
   grid[rc_rpc_plugin::strings::kLevel] = select_user_location.GetInteger(2);
-  grid[rc_rpc_plugin::strings::kLevelspan] = 
-    select_user_location.GetInteger(3);
+  grid[rc_rpc_plugin::strings::kLevelspan] = select_user_location.GetInteger(3);
   grid[rc_rpc_plugin::strings::kRow] = select_user_location.GetInteger(4);
   grid[rc_rpc_plugin::strings::kRowspan] = select_user_location.GetInteger(5);
 
   saved_app[strings::user_location][rc_rpc_plugin::strings::kGrid] = grid;
 
   SDL_LOG_INFO("UserLocation were restored from DB successfully");
-  return true;                
+  return true;
 }
 
 bool ResumptionDataDB::SelectChoiceSetData(
@@ -1584,7 +1583,7 @@ bool ResumptionDataDB::DeleteSavedSubscriptions(
 }
 
 bool ResumptionDataDB::DeleteUserLocation(const std::string& policy_app_id,
-    const std::string& device_id) {
+                                          const std::string& device_id) {
   SDL_LOG_AUTO_TRACE();
 
   if (!ExecQueryToDeleteData(
@@ -1991,7 +1990,7 @@ bool ResumptionDataDB::SaveApplicationToDB(
     return false;
   }
   if (!InsertUserLocationData(application->get_user_location(),
-                           application_primary_key)) {
+                              application_primary_key)) {
     SDL_LOG_WARN("Incorrect insert user location to DB.");
     db_->RollbackTransaction();
     return false;
@@ -2056,7 +2055,7 @@ bool ResumptionDataDB::SaveApplicationToDB(
     return false;
   }
   if (!InsertUserLocationData(application["userLocation"],
-                           application_primary_key)) {
+                              application_primary_key)) {
     SDL_LOG_WARN("Incorrect insert userLocation to DB.");
     db_->RollbackTransaction();
     return false;
@@ -2332,10 +2331,10 @@ bool ResumptionDataDB::InsertUserLocationData(
 
   utils::dbms::SQLQuery insert_application_user_location(db());
   if (!insert_application_user_location.Prepare(kInsertUserLocation)) {
-  SDL_LOG_WARN(
-      "Problem with preparation insert "
-      "application user location query");
-  return false;
+    SDL_LOG_WARN(
+        "Problem with preparation insert "
+        "application user location query");
+    return false;
   }
 
   /* Positions of binding data for "insert_application_user_location":
@@ -2360,7 +2359,7 @@ bool ResumptionDataDB::InsertUserLocationData(
   }
 
   SDL_LOG_INFO("User Location data were saved successfully");
-  return true;   
+  return true;
 }
 
 bool ResumptionDataDB::ExecInsertApplicationChoiceSet(

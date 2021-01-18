@@ -644,8 +644,7 @@ bool ResumeCtrlImpl::RestoreApplicationData(ApplicationSharedPtr application,
   bool result = resumption_storage_->GetSavedApplication(
       application->policy_app_id(), device_mac, saved_app);
   if (result) {
-
-    if(saved_app.keyExists(strings::user_location)){
+    if (saved_app.keyExists(strings::user_location)) {
       application->set_user_location(saved_app[strings::user_location]);
     }
 

@@ -314,7 +314,7 @@ const std::string kCreateSchema =
     "CREATE TABLE IF NOT EXISTS `_internal_data`( "
     "   `db_version_hash` INTEGER "
     "  ); "
-    "CREATE TABLE IF NOT EXISTS `applicationUserLocation`( " 
+    "CREATE TABLE IF NOT EXISTS `applicationUserLocation`( "
     "  `idLocation` INTEGER PRIMARY KEY NOT NULL, "
     "  `idApplication` INTEGER, "
     "  `col` INTEGER, "
@@ -759,7 +759,8 @@ const std::string kInsertSubscriptions =
 
 const std::string kInsertUserLocation =
     "INSERT INTO `applicationUserLocation` "
-    "(`idApplication`, `col`, `colspan`, `level`, `levelspan`, `row`, `rowspan`) "
+    "(`idApplication`, `col`, `colspan`, `level`, `levelspan`, `row`, "
+    "`rowspan`) "
     "VALUES "
     "(?, ?, ?, ?, ?, ?, ?);";
 
@@ -920,7 +921,7 @@ const std::string kSelectUserLocation =
     "FROM `applicationUserLocation` "
     "WHERE `idApplication` = (SELECT `idApplication` "
     "FROM `application` "
-    "WHERE `appID` = ? AND `deviceID` = ?);";   
+    "WHERE `appID` = ? AND `deviceID` = ?);";
 
 const std::string kSelectCountChoiceSet =
     "SELECT COUNT (`idApplication`) "

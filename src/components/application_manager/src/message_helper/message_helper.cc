@@ -1313,8 +1313,8 @@ MessageHelper::CreateGlobalPropertiesRequestsToHMI(
 
   // RC global properties
   {
-    smart_objects::SmartObjectSPtr rc_global_properties =
-    CreateMessageForHMI(hmi_apis::messageType::request, app_mngr.GetNextHMICorrelationID());
+    smart_objects::SmartObjectSPtr rc_global_properties = CreateMessageForHMI(
+        hmi_apis::messageType::request, app_mngr.GetNextHMICorrelationID());
     if (!rc_global_properties) {
       return requests;
     }
@@ -1324,7 +1324,7 @@ MessageHelper::CreateGlobalPropertiesRequestsToHMI(
 
     smart_objects::SmartObject rc_msg_params =
         smart_objects::SmartObject(smart_objects::SmartType_Map);
-      
+
     rc_msg_params[strings::user_location] = (app->get_user_location());
     rc_msg_params[strings::app_id] = app->app_id();
 

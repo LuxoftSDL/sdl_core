@@ -360,7 +360,7 @@ class ResumptionDataDB : public ResumptionData {
    * false
    */
   bool DeleteUserLocation(const std::string& policy_app_id,
-                                const std::string& device_id);
+                          const std::string& device_id);
 
   /**
    * @brief Deletes commands from saved application
@@ -459,7 +459,7 @@ class ResumptionDataDB : public ResumptionData {
    * false
    */
   bool InsertUserLocationData(const smart_objects::SmartObject& user_location,
-                           int64_t application_primary_key) const;
+                              int64_t application_primary_key) const;
 
   /**
    * @brief Saves globalProperties data to DB
