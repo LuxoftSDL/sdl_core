@@ -1312,7 +1312,7 @@ MessageHelper::CreateGlobalPropertiesRequestsToHMI(
   }
 
   // RC global properties
-  {
+  if (!app->get_user_location().empty()) {
     smart_objects::SmartObjectSPtr rc_global_properties = CreateMessageForHMI(
         hmi_apis::messageType::request, app_mngr.GetNextHMICorrelationID());
     if (!rc_global_properties) {
