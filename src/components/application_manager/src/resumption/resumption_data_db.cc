@@ -1026,10 +1026,9 @@ bool ResumptionDataDB::SelectUserLocationData(
   uint32_t count_item = 0;
   if (!SelectCountFromArray(
           count_item, kSelectCountUserLocation, policy_app_id, device_id)) {
+    SDL_LOG_ERROR("Select query has been failed");
     return false;
   }
-
-  saved_app[strings::user_location] = SmartObject(SmartType_Map);
 
   if (0 == count_item) {
     SDL_LOG_INFO("Application does not contain user_location data");
@@ -2317,7 +2316,7 @@ bool ResumptionDataDB::InsertUserLocationData(
   using namespace smart_objects;
 
   if (user_location.empty()) {
-    SDL_LOG_INFO("Application doesn't contain user location");
+    SDL_LOG_DEBUG("Application doesn't contain user location");
     return true;
   }
 
@@ -2358,7 +2357,6 @@ bool ResumptionDataDB::InsertUserLocationData(
     return false;
   }
 
-  SDL_LOG_INFO("User Location data were saved successfully");
   return true;
 }
 

@@ -713,8 +713,8 @@ class ResumptionDataDB : public ResumptionData {
    * @brief Selects data from applicationUserLocation table
    * @param policy_app_id contains mobile application id of application
    * @param device_id contains id of device on which is running application
-   * @param saved_app will contain userLocation
-   * @return true if query was run successfully otherwise returns
+   * @param saved_app contains userLocation
+   * @return true if query has been executed successfully otherwise returns
    * false
    */
   bool SelectUserLocationData(const std::string& policy_app_id,

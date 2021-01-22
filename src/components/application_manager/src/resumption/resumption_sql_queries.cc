@@ -910,18 +910,16 @@ const std::string kSelectSubscriptions =
     "WHERE `appID` = ? AND `deviceID` = ?);";
 
 const std::string kSelectCountUserLocation =
-    "SELECT COUNT (`idApplication`) "
-    "FROM `applicationUserLocation` "
-    "WHERE `idApplication` = (SELECT `idApplication` "
-    "FROM `application` "
-    "WHERE `appID` = ? AND `deviceID` = ?);";
+    "SELECT COUNT (*) "
+    "FROM `applicationUserLocation` INNER JOIN `application` ON "
+    "`applicationUserLocation`.`idApplication` = `application`.`idApplication` "
+    "WHERE `appID` = ? AND `deviceID` = ?";
 
 const std::string kSelectUserLocation =
     "SELECT `col`, `colspan`, `level`, `levelspan`, `row`, `rowspan` "
-    "FROM `applicationUserLocation` "
-    "WHERE `idApplication` = (SELECT `idApplication` "
-    "FROM `application` "
-    "WHERE `appID` = ? AND `deviceID` = ?);";
+    "FROM `applicationUserLocation` INNER JOIN `application` ON "
+    "`applicationUserLocation`.`idApplication` = `application`.`idApplication` "
+    "WHERE `appID` = ? AND `deviceID` = ?";
 
 const std::string kSelectCountChoiceSet =
     "SELECT COUNT (`idApplication`) "
