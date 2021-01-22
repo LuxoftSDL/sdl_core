@@ -1031,7 +1031,7 @@ bool ResumptionDataDB::SelectUserLocationData(
   }
 
   if (0 == count_item) {
-    SDL_LOG_INFO("Application does not contain user_location data");
+    SDL_LOG_DEBUG("Application does not contain user_location data");
     return true;
   }
   utils::dbms::SQLQuery select_user_location(db());
@@ -1039,11 +1039,12 @@ bool ResumptionDataDB::SelectUserLocationData(
                           policy_app_id,
                           device_id,
                           kSelectUserLocation)) {
-    SDL_LOG_WARN("Problem with verification user_location");
+    SDL_LOG_ERROR("Failed to prepare user location select query");
     return false;
   }
+
   if (!select_user_location.Exec()) {
-    SDL_LOG_WARN("Problem with execution select_user_location query");
+    SDL_LOG_ERROR("Failed to execute user location select query");
     return false;
   }
   /* Position of data in "select_user_location" :
@@ -1064,7 +1065,6 @@ bool ResumptionDataDB::SelectUserLocationData(
 
   saved_app[strings::user_location][rc_rpc_plugin::strings::kGrid] = grid;
 
-  SDL_LOG_INFO("UserLocation were restored from DB successfully");
   return true;
 }
 
