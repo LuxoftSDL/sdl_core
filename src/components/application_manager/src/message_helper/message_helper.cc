@@ -1244,7 +1244,9 @@ MessageHelper::CreateGlobalPropertiesRequestsToHMI(
 
   // UI global properties
 
-  if (can_send_ui && (app->vr_help_title() || app->vr_help())) {
+  if (can_send_ui &&
+      (app->vr_help_title() || app->vr_help() || app->keyboard_props() ||
+       app->menu_title() || app->menu_icon())) {
     smart_objects::SmartObjectSPtr ui_global_properties = CreateMessageForHMI(
         hmi_apis::messageType::request, app_mngr.GetNextHMICorrelationID());
     if (ui_global_properties) {
