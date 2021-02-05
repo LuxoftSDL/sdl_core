@@ -1596,6 +1596,19 @@ TEST_F(PolicyHandlerTest, OnGetListOfPermissions) {
               GetDataOnDeviceID(
                   testing::An<transport_manager::DeviceHandle>(), _, _, _, _));
 
+#ifdef EXTERNAL_PROPRIETARY_MODE
+  policy::ExternalConsentStatus external_consent_status =
+      policy::ExternalConsentStatus();
+  EXPECT_CALL(
+      mock_message_helper_,
+      SendGetListOfPermissionsResponse(_, external_consent_status, corr_id, _));
+  EXPECT_CALL(*mock_policy_manager_, GetExternalConsentStatus())
+      .WillOnce(Return(external_consent_status));
+#else
+  EXPECT_CALL(mock_message_helper_,
+              SendGetListOfPermissionsResponse(_, corr_id, _));
+#endif  // #ifdef EXTERNAL_PROPRIETARY_MODE
+
   policy_handler_.OnGetListOfPermissions(app_id, corr_id);
 }
 
