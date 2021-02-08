@@ -1612,6 +1612,22 @@ TEST_F(PolicyHandlerTest, OnGetListOfPermissions) {
   policy_handler_.OnGetListOfPermissions(app_id, corr_id);
 }
 
+TEST_F(PolicyHandlerTest, OnGetListOfPermissions_CollectResult_false) {
+  // Arrange
+  EnablePolicyAndPolicyManagerMock();
+
+  const uint32_t app_id = 10u;
+  const uint32_t corr_id = 1u;
+  test_app.insert(mock_app_);
+
+  // Expectations
+  EXPECT_CALL(app_manager_, application(app_id))
+      .WillOnce(Return(mock_app_))
+      .WillOnce(Return(nullptr));
+
+  policy_handler_.OnGetListOfPermissions(app_id, corr_id);
+}
+
 TEST_F(PolicyHandlerTest, OnGetListOfPermissions_WithoutConnectionKey) {
   // Arrange
   EnablePolicyAndPolicyManagerMock();
