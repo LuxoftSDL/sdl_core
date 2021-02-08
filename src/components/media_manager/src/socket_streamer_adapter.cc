@@ -97,14 +97,14 @@ bool SocketStreamerAdapter::SocketStreamer::Connect() {
     return false;
   }
 
-  send_socket_fd_ = accept(socket_fd_, NULL, NULL);
-  if (0 >= send_socket_fd_) {
-    SDL_LOG_ERROR("Unable to accept");
-    return false;
-  }
+  //  send_socket_fd_ = accept(socket_fd_, NULL, NULL);
+  //  if (0 >= send_socket_fd_) {
+  //    SDL_LOG_ERROR("Unable to accept");
+  //    return false;
+  //  }
 
-  is_first_frame_ = true;
-  SDL_LOG_INFO("Client connected: " << send_socket_fd_);
+  //  is_first_frame_ = true;
+  //  SDL_LOG_INFO("Client connected: " << send_socket_fd_);
   return true;
 }
 
@@ -114,11 +114,11 @@ void SocketStreamerAdapter::SocketStreamer::Close() {
 
 void SocketStreamerAdapter::SocketStreamer::Disconnect() {
   SDL_LOG_AUTO_TRACE();
-  if (0 < send_socket_fd_) {
-    shutdown(send_socket_fd_, SHUT_RDWR);
-    close(send_socket_fd_);
-    send_socket_fd_ = 0;
-  }
+  //  if (0 < send_socket_fd_) {
+  //    shutdown(send_socket_fd_, SHUT_RDWR);
+  //    close(send_socket_fd_);
+  //    send_socket_fd_ = 0;
+  //  }
   if (0 < socket_fd_) {
     shutdown(socket_fd_, SHUT_RDWR);
     close(socket_fd_);
@@ -129,14 +129,20 @@ void SocketStreamerAdapter::SocketStreamer::Disconnect() {
 bool SocketStreamerAdapter::SocketStreamer::Send(
     protocol_handler::RawMessagePtr msg) {
   SDL_LOG_AUTO_TRACE();
+
+  send_socket_fd_ = accept(socket_fd_, NULL, NULL);
+  if (0 >= send_socket_fd_) {
+    SDL_LOG_ERROR("Unable to accept");
+    return false;
+  }
+
+  SDL_LOG_INFO("Client connected: " << send_socket_fd_);
+
   ssize_t ret;
-  if (is_first_frame_) {
-    ret = send(send_socket_fd_, header_.c_str(), header_.size(), MSG_NOSIGNAL);
-    if (static_cast<uint32_t>(ret) != header_.size()) {
-      SDL_LOG_ERROR("Unable to send data to socket");
-      return false;
-    }
-    is_first_frame_ = false;
+  ret = send(send_socket_fd_, header_.c_str(), header_.size(), MSG_NOSIGNAL);
+  if (static_cast<uint32_t>(ret) != header_.size()) {
+    SDL_LOG_ERROR("Unable to send data to socket");
+    return false;
   }
 
   ret = send(send_socket_fd_, msg->data(), msg->data_size(), MSG_NOSIGNAL);
@@ -150,6 +156,14 @@ bool SocketStreamerAdapter::SocketStreamer::Send(
   }
 
   SDL_LOG_INFO("Streamer::sent " << msg->data_size());
+
+  if (0 < send_socket_fd_) {
+    shutdown(send_socket_fd_, SHUT_RDWR);
+    close(send_socket_fd_);
+    send_socket_fd_ = 0;
+    SDL_LOG_INFO("Client closed");
+  }
+
   return true;
 }
 

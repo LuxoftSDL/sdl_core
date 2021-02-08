@@ -336,7 +336,8 @@ void MediaManagerImpl::FramesProcessed(int32_t application_key,
     auto video_stream = std::dynamic_pointer_cast<StreamerAdapter>(
         streamer_[protocol_handler::ServiceType::kMobileNav]);
 
-    if (audio_stream.use_count() != 0) {
+    if (audio_stream.use_count() != 0 &&
+        "pipe" == settings().audio_server_type()) {
       size_t audio_queue_size = audio_stream->GetMsgQueueSize();
       SDL_LOG_DEBUG("# Messages in audio queue = " << audio_queue_size);
       if (audio_queue_size > 0) {
@@ -344,7 +345,8 @@ void MediaManagerImpl::FramesProcessed(int32_t application_key,
       }
     }
 
-    if (video_stream.use_count() != 0) {
+    if (video_stream.use_count() != 0 &&
+        "pipe" == settings().video_server_type()) {
       size_t video_queue_size = video_stream->GetMsgQueueSize();
       SDL_LOG_DEBUG("# Messages in video queue = " << video_queue_size);
       if (video_queue_size > 0) {

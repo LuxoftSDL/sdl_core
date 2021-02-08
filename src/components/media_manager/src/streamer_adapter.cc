@@ -85,8 +85,7 @@ void StreamerAdapter::StopActivity(int32_t application_key) {
   }
 
   DCHECK(streamer_);
-  streamer_->exitThreadMain();
-  messages_.Reset();
+  thread_->Stop(threads::Thread::kThreadStopDelegate);
 
   for (std::set<MediaListenerPtr>::iterator it = media_listeners_.begin();
        media_listeners_.end() != it;
@@ -129,7 +128,12 @@ void StreamerAdapter::Streamer::threadMain() {
     SDL_LOG_ERROR("Unable to connect");
     return;
   }
+
   stop_flag_ = false;
+  if (adapter_->messages_.IsShuttingDown()) {
+    adapter_->messages_.Reset();
+  }
+
   while (!stop_flag_) {
     adapter_->messages_.wait();
     while (!adapter_->messages_.empty()) {
