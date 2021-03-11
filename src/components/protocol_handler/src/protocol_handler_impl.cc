@@ -1383,29 +1383,65 @@ RESULT_CODE ProtocolHandlerImpl::SendMultiFrameMessage(
     const bool is_final_message) {
   SDL_LOG_AUTO_TRACE();
 
-  SDL_LOG_DEBUG(" data size " << data_size << " max_frame_size "
+  auto getEncryptedDataSize = [this,
+                               &connection_id,
+                               &service_type,
+                               &needs_encryption,
+                               &data,
+                               &data_size,
+                               &session_id]() -> size_t {
+#ifdef ENABLE_SECURITY
+    const uint32_t connection_key =
+        session_observer_.KeyFromPair(connection_id, session_id);
+    security_manager::SSLContext* context = session_observer_.GetSSLContext(
+        connection_key, ServiceTypeFromByte(service_type));
+
+    SDL_LOG_DEBUG("Protection flag is: " << needs_encryption << std::boolalpha);
+    if ((!context || !context->IsInitCompleted()) || !needs_encryption) {
+      SDL_LOG_DEBUG("Ecryption is skipped!");
+      return 0;
+    }
+
+    const uint8_t* out_data;
+    size_t out_data_size;
+    if (!context->Encrypt(data, data_size, &out_data, &out_data_size)) {
+      SDL_LOG_ERROR("Enryption failed");
+      return 0;
+    }
+
+    SDL_LOG_DEBUG("Encrypted " << data_size << " bytes to " << out_data_size
+                               << " bytes");
+    return out_data_size;
+#else
+    return 0;
+#endif
+  };
+
+  const auto encrypted_size = getEncryptedDataSize();
+  const auto new_data_size = encrypted_size > 0 ? encrypted_size : data_size;
+  SDL_LOG_DEBUG(" data size " << new_data_size << " max_frame_size "
                               << max_frame_size);
 
   // remainder of last frame
-  const size_t lastframe_remainder = data_size % max_frame_size;
+  const size_t lastframe_remainder = new_data_size % max_frame_size;
   // size of last frame (full fill or not)
   const size_t lastframe_size =
       lastframe_remainder > 0 ? lastframe_remainder : max_frame_size;
 
-  const size_t frames_count = data_size / max_frame_size +
+  const size_t frames_count = new_data_size / max_frame_size +
                               // add last frame if not empty
                               (lastframe_remainder > 0 ? 1 : 0);
 
-  SDL_LOG_DEBUG("Data " << data_size << " bytes in " << frames_count
+  SDL_LOG_DEBUG("Data " << new_data_size << " bytes in " << frames_count
                         << " frames with last frame size " << lastframe_size);
 
   DCHECK(max_frame_size >= FIRST_FRAME_DATA_SIZE);
   DCHECK(FIRST_FRAME_DATA_SIZE >= 8);
   uint8_t out_data[FIRST_FRAME_DATA_SIZE];
-  out_data[0] = data_size >> 24;
-  out_data[1] = data_size >> 16;
-  out_data[2] = data_size >> 8;
-  out_data[3] = data_size;
+  out_data[0] = new_data_size >> 24;
+  out_data[1] = new_data_size >> 16;
+  out_data[2] = new_data_size >> 8;
+  out_data[3] = new_data_size;
 
   out_data[4] = frames_count >> 24;
   out_data[5] = frames_count >> 16;
@@ -2279,7 +2315,9 @@ RESULT_CODE ProtocolHandlerImpl::EncryptFrame(ProtocolFramePtr packet) {
   if (packet->service_type() == kControl ||
       // For protocol v5 control frames could be protected
       (packet->frame_type() == FRAME_TYPE_CONTROL &&
-       packet->protocol_version() < PROTOCOL_VERSION_5)) {
+       packet->protocol_version() < PROTOCOL_VERSION_5) ||
+      // First frame should be unprotected
+      packet->frame_type() == FRAME_TYPE_FIRST) {
     return RESULT_OK;
   }
   if (!security_manager_) {
