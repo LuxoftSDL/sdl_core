@@ -417,7 +417,8 @@ bool RPCHandlerImpl::ConvertMessageToSO(
       output[strings::params][strings::protocol_version] =
           message.protocol_version();
       if (message.binary_data()) {
-        if (message.payload_size() < message.data_size()) {
+        if (message.payload_size() < message.data_size() &&
+            !message.is_message_encrypted()) {
           SDL_LOG_ERROR("Incomplete binary"
                         << " binary size should be  " << message.data_size()
                         << " payload data size is " << message.payload_size());
