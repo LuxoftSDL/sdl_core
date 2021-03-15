@@ -1389,6 +1389,7 @@ RESULT_CODE ProtocolHandlerImpl::SendMultiFrameMessage(
                                &needs_encryption,
                                &data,
                                &data_size,
+                               max_frame_size,
                                &session_id]() -> size_t {
 #ifdef ENABLE_SECURITY
     const uint32_t connection_key =
@@ -1402,11 +1403,35 @@ RESULT_CODE ProtocolHandlerImpl::SendMultiFrameMessage(
       return 0;
     }
 
-    const uint8_t* out_data;
-    size_t out_data_size;
-    if (!context->Encrypt(data, data_size, &out_data, &out_data_size)) {
-      SDL_LOG_ERROR("Enryption failed");
-      return 0;
+    // remainder of last frame
+    const size_t lastframe_remainder = data_size % max_frame_size;
+    // size of last frame (full fill or not)
+    const size_t lastframe_size =
+        lastframe_remainder > 0 ? lastframe_remainder : max_frame_size;
+
+    const size_t frames_count = data_size / max_frame_size +
+                                // add last frame if not empty
+                                (lastframe_remainder > 0 ? 1 : 0);
+
+    size_t out_data_size = 0;
+    int data_shift = 0;
+
+    // calc encrypted data size by chunks
+    for (uint32_t i = 0; i < frames_count; ++i) {
+      const bool is_last_frame = (i == (frames_count - 1));
+      const size_t frame_size = is_last_frame ? lastframe_size : max_frame_size;
+
+      const uint8_t* out_data;
+      size_t tmp_out_data_size;
+
+      if (!context->Encrypt(
+              &data[data_shift], frame_size, &out_data, &tmp_out_data_size)) {
+        SDL_LOG_ERROR("Enryption failed");
+        return 0;
+      }
+
+      data_shift += frame_size;
+      out_data_size += tmp_out_data_size;
     }
 
     SDL_LOG_DEBUG("Encrypted " << data_size << " bytes to " << out_data_size
