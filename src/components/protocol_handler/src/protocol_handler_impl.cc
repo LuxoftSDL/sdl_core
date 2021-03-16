@@ -1514,7 +1514,8 @@ RESULT_CODE ProtocolHandlerImpl::SendMultiFrameMessage(
 
     raw_ford_messages_to_mobile_.PostMessage(
         impl::RawFordMessageToMobile(ptr, is_final_packet));
-    SDL_LOG_DEBUG('#' << i << " frame is sent.");
+    SDL_LOG_DEBUG('#' << i << " frame is sent."
+                      << " needs_encryption:" << needs_encryption);
   }
   return RESULT_OK;
 }
