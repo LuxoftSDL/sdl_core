@@ -385,6 +385,10 @@ CryptoManagerImpl::SSLContextImpl::PerformHandshake() {
     BIO_set_ssl(bioFilter_, connection_, BIO_NOCLOSE);
 
     const SSL_CIPHER* cipher = SSL_get_current_cipher(connection_);
+
+    const char* cipher_name = SSL_CIPHER_get_name(cipher);
+    SDL_LOG_DEBUG("cipher_name...is " << cipher_name);
+
     max_block_size_ = max_block_sizes[SSL_CIPHER_get_name(cipher)];
     is_handshake_pending_ = false;
 
