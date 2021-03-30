@@ -261,6 +261,8 @@ bool CryptoManagerImpl::Init() {
 #endif
   }
 
+  SSL_CTX_set_security_level(context_, 1);
+
   if (get_settings().ca_cert_path().empty()) {
     SDL_LOG_WARN("Setting up empty CA certificate location");
   }
