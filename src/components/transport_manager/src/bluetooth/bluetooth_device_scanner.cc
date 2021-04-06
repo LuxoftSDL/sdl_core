@@ -95,10 +95,10 @@ int FindPairedDevs(std::vector<bdaddr_t>* result) {
     delete[] buffer;
     buffer = new char[1028];
   }
-  pclose(pipe);
+  int status = pclose(pipe);
   LOG4CXX_TRACE(logger_, "exit with 0");
   delete[] buffer;
-  return 0;
+  return status;
 }
 }  //  namespace
 
@@ -112,6 +112,7 @@ BluetoothDeviceScanner::BluetoothDeviceScanner(
     , ready_(true)
     , device_scan_requested_(false)
     , device_scan_requested_lock_()
+    , terminate_lock_()
     , device_scan_requested_cv_()
     , auto_repeat_search_(auto_repeat_search)
     , auto_repeat_pause_sec_(auto_repeat_pause_sec) {
@@ -148,6 +149,7 @@ BluetoothDeviceScanner::BluetoothDeviceScanner(
     , ready_(true)
     , device_scan_requested_(false)
     , device_scan_requested_lock_()
+    , terminate_lock_()
     , device_scan_requested_cv_()
     , auto_repeat_search_(auto_repeat_search)
     , auto_repeat_pause_sec_(auto_repeat_pause_sec) {
@@ -173,9 +175,6 @@ void BluetoothDeviceScanner::UpdateTotalDeviceList() {
   devices.insert(devices.end(),
                  paired_devices_with_sdl_.begin(),
                  paired_devices_with_sdl_.end());
-  devices.insert(devices.end(),
-                 found_devices_with_sdl_.begin(),
-                 found_devices_with_sdl_.end());
   controller_->SearchDeviceDone(devices);
 }
 
@@ -213,39 +212,9 @@ void BluetoothDeviceScanner::DoInquiry() {
       paired_devices_, device_handle, &paired_devices_with_sdl_);
   UpdateTotalDeviceList();
 
-  LOG4CXX_INFO(logger_, "Starting hci_inquiry on device " << device_id);
-  const uint8_t inquiry_time = 8u;  // Time unit is 1.28 seconds
-  const size_t max_devices = 256u;
-  inquiry_info* inquiry_info_list = new inquiry_info[max_devices];
-
-  const int number_of_devices = hci_inquiry(device_id,
-                                            inquiry_time,
-                                            max_devices,
-                                            0,
-                                            &inquiry_info_list,
-                                            IREQ_CACHE_FLUSH);
-
-  if (number_of_devices >= 0) {
-    LOG4CXX_INFO(logger_,
-                 "hci_inquiry: found " << number_of_devices << " devices");
-    std::vector<bdaddr_t> found_devices(number_of_devices);
-    for (int i = 0; i < number_of_devices; ++i) {
-      found_devices[i] = inquiry_info_list[i].bdaddr;
-    }
-    found_devices_with_sdl_.clear();
-    CheckSDLServiceOnDevices(
-        found_devices, device_handle, &found_devices_with_sdl_);
-  }
-  UpdateTotalDeviceList();
   controller_->FindNewApplicationsRequest();
 
   close(device_handle);
-  delete[] inquiry_info_list;
-
-  if (number_of_devices < 0) {
-    LOG4CXX_DEBUG(logger_, "number_of_devices < 0");
-    controller_->SearchDeviceFailed(SearchDeviceError());
-  }
 }
 
 void BluetoothDeviceScanner::CheckSDLServiceOnDevices(
@@ -460,12 +429,22 @@ void BluetoothDeviceScanner::TimedWaitForDeviceScanRequest() {
     return;
   }
 
+  if (shutdown_requested_) {
+    LOG4CXX_TRACE(logger_, "Bluetooth scanner Condition: shutdown_requested_ == true");
+    return;
+  }
+
   {
     sync_primitives::AutoLock auto_lock(device_scan_requested_lock_);
     while (!(device_scan_requested_ || shutdown_requested_)) {
+      if (!terminate_lock_.Try()) {
+        // Lock is taken by terminate thread, return
+        return;
+      }
       const sync_primitives::ConditionalVariable::WaitStatus wait_status =
           device_scan_requested_cv_.WaitFor(auto_lock,
                                             auto_repeat_pause_sec_ * 1000);
+      terminate_lock_.Release();
       if (wait_status == sync_primitives::ConditionalVariable::kTimeout) {
         LOG4CXX_INFO(logger_, "Bluetooth scanner timeout, performing scan");
         device_scan_requested_ = true;
@@ -486,13 +465,16 @@ TransportAdapter::Error BluetoothDeviceScanner::Init() {
 
 void BluetoothDeviceScanner::Terminate() {
   LOG4CXX_AUTO_TRACE(logger_);
+  if (shutdown_requested_)
+    return;
   shutdown_requested_ = true;
   if (thread_) {
+    device_scan_requested_cv_.NotifyOne();
     {
       sync_primitives::AutoLock auto_lock(device_scan_requested_lock_);
       device_scan_requested_ = false;
-      device_scan_requested_cv_.NotifyOne();
     }
+    sync_primitives::AutoLock auto_lock(terminate_lock_);
     LOG4CXX_INFO(logger_,
                  "Waiting for bluetooth device scanner thread termination");
     thread_->stop();
