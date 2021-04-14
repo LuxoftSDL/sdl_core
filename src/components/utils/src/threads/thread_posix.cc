@@ -375,7 +375,7 @@ bool Thread::StopDelegate(sync_primitives::AutoLock& auto_lock) {
 
   delegate_->exitThreadMain();
 
-  //JoinDelegate(auto_lock);
+  // JoinDelegate(auto_lock);
 
   return true;
 }
