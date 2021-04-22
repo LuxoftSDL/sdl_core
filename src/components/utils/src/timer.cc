@@ -148,7 +148,7 @@ void timer::Timer::StopThread() {
     delegate_->set_finalized_flag(true);
     {
       sync_primitives::AutoUnlock auto_unlock(state_lock_);
-      thread_->Stop(threads::Thread::kThreadStopDelegate);
+      thread_->Stop(threads::Thread::kThreadSoftStop);
     }
     delegate_->set_finalized_flag(false);
   }
