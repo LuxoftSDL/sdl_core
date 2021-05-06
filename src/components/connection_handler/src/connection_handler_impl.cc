@@ -1424,7 +1424,7 @@ void ConnectionHandlerImpl::ConnectToAllDevices() {
       continue;
     }
     if ("CLOUD_WEBSOCKET" == i->second.connection_type()) {
-      SDL_LOG_DEBUG("No need to connect to cloud device");
+      LOG4CXX_DEBUG(logger_, "No need to connect to cloud device");
       continue;
     }
     ConnectToDevice(i->first);
