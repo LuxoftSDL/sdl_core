@@ -572,7 +572,7 @@ class CodeGenerator(object):
                         struct.members.values(), struct.since, struct.until, struct.deprecated, struct.removed)),
                 1))
 
-    
+
     def _enum_has_history_present(self, enum):
         '''
         Check if any elements in an enum has history signature
@@ -593,7 +593,7 @@ class CodeGenerator(object):
             element.since is not None or
             element.until is not None or
             element.removed is not None ):
-            return True        
+            return True
         return False
 
     def _enum_param_type_has_history_present(self, param_type):
@@ -653,12 +653,12 @@ class CodeGenerator(object):
                     history_result += u"\n".join(
                         [self._impl_code_loc_decl_enum_history_set_value_init_template.substitute(
                             enum=member.param_type.name,
-                            value=x.primary_name) 
+                            value=x.primary_name)
                             for x in member.param_type.elements.values() if self._element_has_history_present(x)])
                     history_result += u"\n"
                     history_map_result = []
 
-                    for x in member.param_type.elements.values(): 
+                    for x in member.param_type.elements.values():
                         if self._element_has_history_present(x):
                             history_map_result.append(
                                 self._impl_code_loc_decl_enum_history_set_insert_template.
@@ -670,7 +670,7 @@ class CodeGenerator(object):
                                         removed=x.removed if x.removed is not None else u"false"))
                             if(x.history is not None) :
                                 history_list = x.history
-                                for item in history_list:                            
+                                for item in history_list:
                                     history_map_result.append(
                                         self._impl_code_loc_decl_enum_history_set_insert_template.
                                             substitute(
@@ -965,19 +965,19 @@ class CodeGenerator(object):
             Checks set of rules that history items are valid
             Raises error if rules are violated
         """
-        if (member.since is None and 
-            member.until is None and 
-            member.deprecated is None and 
-            member.removed is None and 
+        if (member.since is None and
+            member.until is None and
+            member.deprecated is None and
+            member.removed is None and
             member.history is None):
             return
         if (member.history is not None and member.since is None):
             raise GenerateError("Error: Missing since version parameter for " + member.name)
-        if (member.until is not None): 
+        if (member.until is not None):
             raise GenerateError("Error: Until should only exist in history tag for " + member.name)
         if (member.history is None):
-            if(member.until is not None or 
-                member.deprecated is not None or 
+            if(member.until is not None or
+                member.deprecated is not None or
                 member.removed is not None):
                 raise GenerateError("Error: No history present for " + member.name)
         if (member.deprecated is not None and member.removed is not None):
@@ -1001,16 +1001,16 @@ class CodeGenerator(object):
         """
         self._check_member_history(member)
 
-        if (since is not None or 
+        if (since is not None or
             member.since is not None):
             if member.history is not None:
                 return self._impl_code_item_fill_template_with_version_and_history_vector.substitute(
                     name=member.name,
                     var_name=self._gen_schema_item_var_name(member),
                     is_mandatory=u"true" if member.is_mandatory is True else u"false",
-                    since=member.since if member.since is not None else since if since is not None else "", 
-                    until=member.until if member.until is not None else until if until is not None else "", 
-                    deprecated=member.deprecated if member.deprecated is not None else deprecated if deprecated is not None else u"false", 
+                    since=member.since if member.since is not None else since if since is not None else "",
+                    until=member.until if member.until is not None else until if until is not None else "",
+                    deprecated=member.deprecated if member.deprecated is not None else deprecated if deprecated is not None else u"false",
                     removed=member.removed if member.removed is not None else removed if removed is not None else u"false",
                     vector_name=member.name)
             else:
@@ -1018,15 +1018,15 @@ class CodeGenerator(object):
                     name=member.name,
                     var_name=self._gen_schema_item_var_name(member),
                     is_mandatory=u"true" if member.is_mandatory is True else u"false",
-                    since=member.since if member.since is not None else since if since is not None else "", 
-                    until=member.until if member.until is not None else until if until is not None else "", 
-                    deprecated=member.deprecated if member.deprecated is not None else deprecated if deprecated is not None else u"false", 
+                    since=member.since if member.since is not None else since if since is not None else "",
+                    until=member.until if member.until is not None else until if until is not None else "",
+                    deprecated=member.deprecated if member.deprecated is not None else deprecated if deprecated is not None else u"false",
                     removed=member.removed if member.removed is not None else removed if removed is not None else u"false")
         else:
             return self._impl_code_item_fill_template.substitute(
                 name=member.name,
                 var_name=self._gen_schema_item_var_name(member),
-                is_mandatory=u"true" if member.is_mandatory is True else u"false")            
+                is_mandatory=u"true" if member.is_mandatory is True else u"false")
 
     def _gen_history_vector_item_fill(self, member, vector_name):
         """Generate schema item fill code.
@@ -1041,17 +1041,17 @@ class CodeGenerator(object):
 
         """
 
-        if (member.since is not None or 
-            member.until is not None or 
+        if (member.since is not None or
+            member.until is not None or
             member.deprecated is not None or
             member.removed is not None):
             return self._impl_code_append_history_vector_template.substitute(
                 vector_name=vector_name,
                 name=member.name,
                 mandatory=u"true" if member.is_mandatory is True else u"false",
-                since=member.since if member.since is not None else "", 
-                until=member.until if member.until is not None else "", 
-                deprecated=member.deprecated if member.deprecated is not None else u"false", 
+                since=member.since if member.since is not None else "",
+                until=member.until if member.until is not None else "",
+                deprecated=member.deprecated if member.deprecated is not None else u"false",
                 removed=member.removed if member.removed is not None else u"false")
         else:
             print("Warning! History item does not have any version history. Omitting " + member.name)
@@ -1319,7 +1319,7 @@ class CodeGenerator(object):
                                 is True else u"// {0}\n").format(x)
                                 for x in self._normalize_multiline_comments(
                                     interface_item_base.description)])
-        if description is not u"":
+        if description != u"":
             description = u"".join([u" *\n" if use_doxygen
                                     is True else u"//\n", description])
 
@@ -1329,7 +1329,7 @@ class CodeGenerator(object):
                                        self._normalize_multiline_comments(
                                            interface_item_base.
                                            design_description)])
-        if design_description is not u"":
+        if design_description != u"":
             design_description = u"".join([u" *\n" if use_doxygen is
                                            True else "//\n",
                                            design_description])
@@ -1338,7 +1338,7 @@ class CodeGenerator(object):
                            True else u"// Note: {0}\n").format(x)
                            for x in self._normalize_multiline_comments(
                                [x.value for x in interface_item_base.issues])])
-        if issues is not u"":
+        if issues != u"":
             issues = u"".join([u" *\n" if use_doxygen is
                               True else u"//\n", issues])
 
@@ -1346,7 +1346,7 @@ class CodeGenerator(object):
                           True else u"// ToDo: {0}\n").format(x)
                           for x in self._normalize_multiline_comments(
                               interface_item_base.todos)])
-        if todos is not u"":
+        if todos != u"":
             todos = u"".join([u" *\n" if use_doxygen is
                               True else u"//\n", todos])
 
@@ -1383,7 +1383,7 @@ class CodeGenerator(object):
         return u"".join(
             [u"{0}{1}\n".format(
                 self._indent_template * indent_level,
-                x) if x is not u"" else u"\n" for x in code_lines])
+                x) if x != u"" else u"\n" for x in code_lines])
 
     @staticmethod
     def _normalize_multiline_comments(initial_strings):

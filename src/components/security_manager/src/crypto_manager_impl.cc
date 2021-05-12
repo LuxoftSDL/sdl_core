@@ -50,6 +50,7 @@
 #include "utils/macro.h"
 #include "utils/scope_guard.h"
 
+#define OPENSSL1_1_VERSION 0x1010100fL
 #define TLS1_1_MINIMAL_VERSION 0x1000103fL
 #define CONST_SSL_METHOD_MINIMAL_VERSION 0x00909000L
 
@@ -177,7 +178,11 @@ bool CryptoManagerImpl::Init() {
 #endif
     case TLSv1:
       LOG4CXX_DEBUG(logger_, "TLSv1 is used");
+#if OPENSSL_VERSION_NUMBER < OPENSSL1_1_VERSION
       method = is_server ? TLSv1_server_method() : TLSv1_client_method();
+#else
+      method = is_server ? TLS_server_method() : TLS_client_method();
+#endif
       break;
     case TLSv1_1:
       LOG4CXX_DEBUG(logger_, "TLSv1_1 is used");
@@ -186,8 +191,10 @@ bool CryptoManagerImpl::Init() {
           logger_,
           "OpenSSL has no TLSv1.1 with version lower 1.0.1, set TLSv1.0");
       method = is_server ? TLSv1_server_method() : TLSv1_client_method();
-#else
+#elseif OPENSSL_VERSION_NUMBER < OPENSSL1_1_VERSION
       method = is_server ? TLSv1_1_server_method() : TLSv1_1_client_method();
+#else
+      method = is_server ? TLS_server_method() : TLS_client_method();
 #endif
       break;
     case TLSv1_2:
@@ -197,13 +204,19 @@ bool CryptoManagerImpl::Init() {
           logger_,
           "OpenSSL has no TLSv1.2 with version lower 1.0.1, set TLSv1.0");
       method = is_server ? TLSv1_server_method() : TLSv1_client_method();
-#else
+#elseif OPENSSL_VERSION_NUMBER < OPENSSL1_1_VERSION
       method = is_server ? TLSv1_2_server_method() : TLSv1_2_client_method();
+#else
+      method = is_server ? TLS_server_method() : TLS_client_method();
 #endif
       break;
     case DTLSv1:
       LOG4CXX_DEBUG(logger_, "DTLSv1 is used");
+#if OPENSSL_VERSION_NUMBER < OPENSSL1_1_VERSION
       method = is_server ? DTLSv1_server_method() : DTLSv1_client_method();
+#else
+      method = is_server ? DTLS_server_method() : DTLS_client_method();
+#endif
       break;
     default:
       LOG4CXX_ERROR(logger_,
