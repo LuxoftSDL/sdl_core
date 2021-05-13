@@ -1680,6 +1680,12 @@ const ServiceStatus ProtocolHandlerImpl::ServiceDisallowedBySettings(
       audio_transports.empty() ||
       std::find(audio_transports.begin(), audio_transports.end(), transport) !=
           audio_transports.end();
+  SDL_LOG_DEBUG("Audio transports empty: " << audio_transports.empty()
+                                           << " and current transport is "
+                                           << transport);
+  for (auto& tr : audio_transports) {
+    SDL_LOG_DEBUG("Audio transport: " << tr);
+  }
 
 #ifdef ENABLE_SECURITY
   const auto& force_protected = get_settings().force_protected_service();
