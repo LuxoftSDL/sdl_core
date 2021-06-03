@@ -264,7 +264,7 @@ void RCCommandRequest::ProcessAccessResponse(
     SetResourceState(ModuleType(), ResourceState::BUSY);
     const auto default_timeout =
         application_manager_.get_settings().default_timeout();
-    application_manager_.updateRequestTimeout(
+    application_manager_.UpdateRequestTimeout(
         connection_key(), correlation_id(), default_timeout);
     Execute();  // run child's logic
     return;
