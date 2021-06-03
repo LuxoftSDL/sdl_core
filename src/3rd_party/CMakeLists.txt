@@ -221,7 +221,7 @@ else()
 endif()
 
 set(BOOST_ROOT ${3RD_PARTY_INSTALL_PREFIX})
-find_package(Boost 1.66.0 COMPONENTS system thread date_time filesystem regex) 
+find_package(Boost 1.66.0 COMPONENTS system thread date_time filesystem regex)
 set(BOOST_LIB_SOURCE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/boost_src)
 set(BOOST_LIBS_DIRECTORY ${3RD_PARTY_INSTALL_PREFIX}/lib)
 set(BOOST_INCLUDE_DIR ${3RD_PARTY_INSTALL_PREFIX}/include PARENT_SCOPE)
@@ -235,7 +235,7 @@ if (NOT ${Boost_FOUND})
   include(ExternalProject)
   ExternalProject_Add(
     Boost
-    URL https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.gz
+    URL https://sourceforge.net/projects/boost/files/boost/1.66.0/boost_1_66_0.tar.gz/download
     DOWNLOAD_DIR ${BOOST_LIB_SOURCE_DIRECTORY}
     SOURCE_DIR ${BOOST_LIB_SOURCE_DIRECTORY}
     CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=system,thread,date_time,filesystem,regex --prefix=${3RD_PARTY_INSTALL_PREFIX}
