@@ -200,7 +200,6 @@ const char* seat_location = "seatLocation";
 const char* app_capability = "appCapability";
 const char* app_capability_type = "appCapabilityType";
 const char* enable_seek = "enableSeek";
-const char* seekTime = "seekTime";
 
 // PutFile
 const char* sync_file_name = "syncFileName";

@@ -72,7 +72,7 @@ void OnSeekMediaClockTimerNotification::Run() {
     return;
   }
 
-  (*message_)[strings::params][strings::connection_key] = app->app_id();
+  (*message_)[strings::params][strings::connection_key] = app_id;
   SendNotification();
 }
 

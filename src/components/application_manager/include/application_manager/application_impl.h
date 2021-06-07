@@ -136,16 +136,7 @@ class ApplicationImpl : public virtual Application,
   bool audio_streaming_allowed() const;
   void set_audio_streaming_allowed(bool state);
 
-  /**
-   * @brief set_seek_enabled Set seek enabled for application
-   * @param seek_enabled
-   */
   void set_seek_enabled(bool seek_enabled) OVERRIDE;
-
-  /**
-   * @brief seek_enabled
-   * @return true if seek enabled
-   */
   bool seek_enabled() const OVERRIDE;
 
   bool SetVideoConfig(protocol_handler::ServiceType service_type,

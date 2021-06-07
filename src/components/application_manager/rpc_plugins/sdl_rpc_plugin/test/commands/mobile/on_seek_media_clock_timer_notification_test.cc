@@ -84,11 +84,11 @@ class OnSeekMediaClockTimerNotificationTest
  private:
   void CreateBasicMessage() {
     commands_msg = CreateMessage(smart_objects::SmartType_Map);
-    (*commands_msg)[am::strings::msg_params][am::strings::seekTime]
+    (*commands_msg)[am::strings::msg_params][am::strings::seek_time]
                    [am::strings::hours] = kHours;
-    (*commands_msg)[am::strings::msg_params][am::strings::seekTime]
+    (*commands_msg)[am::strings::msg_params][am::strings::seek_time]
                    [am::strings::minutes] = kMinutes;
-    (*commands_msg)[am::strings::msg_params][am::strings::seekTime]
+    (*commands_msg)[am::strings::msg_params][am::strings::seek_time]
                    [am::strings::seconds] = kSeconds;
     (*commands_msg)[am::strings::msg_params][am::strings::app_id] = kAppID;
   }
@@ -103,6 +103,32 @@ TEST_F(OnSeekMediaClockTimerNotificationTest,
   ON_CALL(*mock_app, seek_enabled()).WillByDefault(Return(true));
 
   EXPECT_CALL(mock_rpc_service_, SendMessageToMobile(commands_msg, _));
+
+  command->Run();
+}
+
+TEST_F(OnSeekMediaClockTimerNotificationTest,
+       Run_SendNotificationToMobile_SeekDisabled) {
+  NotificationPtr command(
+      CreateCommand<OnSeekMediaClockTimerNotification>(commands_msg));
+
+  ON_CALL(app_mngr_, application(kAppID)).WillByDefault(Return(mock_app));
+  ON_CALL(*mock_app, seek_enabled()).WillByDefault(Return(false));
+
+  EXPECT_CALL(mock_rpc_service_, SendMessageToMobile(commands_msg, _)).Times(0);
+
+  command->Run();
+}
+
+TEST_F(OnSeekMediaClockTimerNotificationTest,
+       Run_SendNotificationToMobile_AppDoesntExist) {
+  NotificationPtr command(
+      CreateCommand<OnSeekMediaClockTimerNotification>(commands_msg));
+
+  ON_CALL(app_mngr_, application(kAppID)).WillByDefault(Return(nullptr));
+  ON_CALL(*mock_app, seek_enabled()).WillByDefault(Return(true));
+
+  EXPECT_CALL(mock_rpc_service_, SendMessageToMobile(commands_msg, _)).Times(0);
 
   command->Run();
 }

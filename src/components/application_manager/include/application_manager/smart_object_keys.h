@@ -232,7 +232,6 @@ extern const char* displays;
 extern const char* seat_location;
 extern const char* app_capability;
 extern const char* app_capability_type;
-extern const char* seekTime;
 extern const char* enable_seek;
 
 // PutFile
