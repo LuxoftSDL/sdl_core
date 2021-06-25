@@ -399,6 +399,9 @@ void RequestControllerImpl::UpdateRequestTimeout(const uint32_t app_id,
       waiting_for_response_.Find(app_id, correlation_id);
   if (request_info) {
     if (0 == request_info->timeout_msec()) {
+      SDL_LOG_INFO(
+          "Request with zero timeout is not updating, "
+          "manual control is assumed");
       return;
     }
 
