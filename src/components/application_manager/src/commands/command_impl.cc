@@ -567,25 +567,14 @@ bool CommandImpl::IsHMIResultSuccess(
     hmi_apis::Common_Result::eType result_code,
     HmiInterfaces::InterfaceID interface) const {
   SDL_LOG_AUTO_TRACE();
-  using namespace helpers;
-  if (Compare<hmi_apis::Common_Result::eType, EQ, ONE>(
-          result_code,
-          hmi_apis::Common_Result::SUCCESS,
-          hmi_apis::Common_Result::WARNINGS,
-          hmi_apis::Common_Result::WRONG_LANGUAGE,
-          hmi_apis::Common_Result::RETRY,
-          hmi_apis::Common_Result::SAVED,
-          hmi_apis::Common_Result::TRUNCATED_DATA)) {
+  if (application_manager::commands::IsHMIResultSuccess(result_code)) {
     return true;
   }
 
   const HmiInterfaces::InterfaceState state =
       application_manager_.hmi_interfaces().GetInterfaceState(interface);
-  if ((hmi_apis::Common_Result::UNSUPPORTED_RESOURCE == result_code) &&
-      (HmiInterfaces::STATE_NOT_AVAILABLE != state)) {
-    return true;
-  }
-  return false;
+  return hmi_apis::Common_Result::UNSUPPORTED_RESOURCE == result_code &&
+         HmiInterfaces::STATE_NOT_AVAILABLE != state;
 }
 
 }  // namespace commands
