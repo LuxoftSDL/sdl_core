@@ -58,6 +58,7 @@
 #include "hmi/on_find_applications.h"
 #include "hmi/on_update_device_list.h"
 #include "hmi/sdl_policy_update_response.h"
+#include "hmi/subscribe_button_response.h"
 #include "hmi/tts_change_registration_response.h"
 #include "hmi/tts_set_global_properties_response.h"
 #include "hmi/tts_speak_response.h"
@@ -199,6 +200,8 @@ typedef Types<
                 hmi_apis::FunctionID::Navigation_UnsubscribeWayPoints>,
     CommandData<sdl_rpc_plugin::commands::NaviUpdateTurnListResponse,
                 hmi_apis::FunctionID::Navigation_UpdateTurnList>,
+    CommandData<sdl_rpc_plugin::commands::hmi::SubscribeButtonResponse,
+                hmi_apis::FunctionID::Buttons_SubscribeButton>,
     CommandData<sdl_rpc_plugin::commands::UISetAppIconResponse,
                 hmi_apis::FunctionID::UI_SetAppIcon>,
     CommandData<sdl_rpc_plugin::commands::UiSetDisplayLayoutResponse,
