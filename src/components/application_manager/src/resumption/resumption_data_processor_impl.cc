@@ -80,12 +80,15 @@ void ResumptionDataProcessorImpl::Restore(
   AddSubscriptions(application, saved_app);
   AddWindows(application, saved_app);
 
-  const auto app_id = application->app_id();
-  if (!IsResumptionFinished(app_id)) {
-    sync_primitives::AutoWriteLock lock(register_callbacks_lock_);
-    register_callbacks_[app_id] = callback;
-  } else {
-    FinalizeResumption(callback, app_id);
+  {
+    sync_primitives::AutoLock resumption_lock(resumption_data_lock_);
+    const auto app_id = application->app_id();
+    if (!IsResumptionFinished(app_id)) {
+      sync_primitives::AutoWriteLock callback_lock(register_callbacks_lock_);
+      register_callbacks_[app_id] = callback;
+    } else {
+      FinalizeResumption(callback, app_id);
+    }
   }
 }
 
@@ -331,6 +334,7 @@ void ResumptionDataProcessorImpl::FinalizeResumption(
 void ResumptionDataProcessorImpl::HandleOnTimeOut(
     const uint32_t corr_id, const hmi_apis::FunctionID::eType function_id) {
   SDL_LOG_AUTO_TRACE();
+  sync_primitives::AutoLock lock(resumption_data_lock_);
   SDL_LOG_DEBUG("Handling timeout with corr id: "
                 << corr_id << " and function_id: " << function_id);
 
@@ -344,6 +348,7 @@ void ResumptionDataProcessorImpl::HandleOnTimeOut(
 
 void ResumptionDataProcessorImpl::on_event(const event_engine::Event& event) {
   SDL_LOG_AUTO_TRACE();
+  sync_primitives::AutoLock lock(resumption_data_lock_);
   SDL_LOG_DEBUG(
       "Handling response message from HMI "
       << event.id() << " "

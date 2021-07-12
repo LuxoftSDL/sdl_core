@@ -386,6 +386,8 @@ class ResumptionDataProcessorImpl
    */
   std::map<ResumptionRequestID, std::uint32_t> request_app_ids_;
   mutable sync_primitives::RWLock request_app_ids_lock_;
+
+  sync_primitives::Lock resumption_data_lock_;
 };
 
 }  // namespace resumption
