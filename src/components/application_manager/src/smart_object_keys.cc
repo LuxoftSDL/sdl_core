@@ -199,6 +199,7 @@ const char* displays = "displays";
 const char* seat_location = "seatLocation";
 const char* app_capability = "appCapability";
 const char* app_capability_type = "appCapabilityType";
+const char* enable_seek = "enableSeek";
 
 // PutFile
 const char* sync_file_name = "syncFileName";
