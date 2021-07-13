@@ -702,8 +702,11 @@ void RegisterAppInterfaceRequest::Run() {
   SendOnAppRegisteredNotificationToHMI(
       application, is_resumption_required && !is_resumption_failed_);
 
-  // By default app subscribed to CUSTOM_BUTTON
-  SendSubscribeCustomButtonNotification();
+  if(CheckHMICapabilities(mobile_apis::ButtonName::CUSTOM_BUTTON)) {
+    SDL_LOG_DEBUG("CUSTOM_BUTTON available");
+    SendSubscribeCustomButtonNotification();
+  }
+
   SendChangeRegistrationOnHMI(application);
 
   if (is_resumption_required) {
