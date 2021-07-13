@@ -159,8 +159,7 @@ ApplicationImpl::ApplicationImpl(
   set_name(app_name);
 
   MarkUnregistered();
-  // subscribe application to custom button by default
-  SubscribeToButton(mobile_apis::ButtonName::CUSTOM_BUTTON);
+
   // load persistent files
   LoadPersistentFiles();
 
@@ -1384,6 +1383,42 @@ void ApplicationImpl::set_user_location(
 
 const smart_objects::SmartObject& ApplicationImpl::get_user_location() const {
   return user_location_;
+}
+
+const std::map<int32_t, hmi_apis::Common_ButtonName::eType>&
+ApplicationImpl::PendingButtonSubscriptions() const {
+  return pending_button_subscriptions_;
+}
+
+const std::map<int32_t, hmi_apis::Common_ButtonName::eType>&
+ApplicationImpl::PendingButtonUnsubscriptions() const {
+  return pending_button_unsubscriptions_;
+}
+
+void ApplicationImpl::AddPendingButtonSubscription(
+    const int32_t correlation_id,
+    const hmi_apis::Common_ButtonName::eType button_name) {
+  sync_primitives::AutoLock auto_lock(pending_button_subscription_lock_);
+  pending_button_subscriptions_[correlation_id] = button_name;
+}
+
+void ApplicationImpl::RemovePendingSubscriptionButton(
+    const int32_t correlation_id) {
+  sync_primitives::AutoLock auto_lock(pending_button_subscription_lock_);
+  pending_button_subscriptions_.erase(correlation_id);
+}
+
+void ApplicationImpl::AddPendingButtonUnsubscription(
+    const int32_t correlation_id,
+    const hmi_apis::Common_ButtonName::eType button_name) {
+  sync_primitives::AutoLock auto_lock(pending_button_subscription_lock_);
+  pending_button_unsubscriptions_[correlation_id] = button_name;
+}
+
+void ApplicationImpl::RemovePendingButtonUnsubscription(
+    const int32_t correlation_id) {
+  sync_primitives::AutoLock auto_lock(pending_button_subscription_lock_);
+  pending_button_unsubscriptions_.erase(correlation_id);
 }
 
 void ApplicationImpl::PushMobileMessage(
